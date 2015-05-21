@@ -64,7 +64,6 @@ void lineReset()
 	{
 		clockGenerator_1cycle();
 	}
-	sendBit(0);
 }
 
 void sendBit(int value)
@@ -73,6 +72,8 @@ void sendBit(int value)
 		SWDIO_High()
 	else
 		SWDIO_Low()
+
+	clockGenerator_1cycle();
 }
 
 void sendBits(long dataToSend,int numberOfBits)
@@ -97,7 +98,9 @@ int readBit()
 {
 	GPIO_PinState bitRead ;
 
+	SWCLK_ON();
 	bitRead  = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_12);
+	SWCLK_OFF();
 
 	if (bitRead  == 1)
 		return 1 ;
