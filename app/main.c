@@ -11,7 +11,7 @@ void configurePort()
 	__GPIOB_CLK_ENABLE();
 
 	GpioInfo.Mode = GPIO_MODE_OUTPUT_PP ;
-	GpioInfo.Pin = GPIO_PIN_10 | GPIO_PIN_12; // Init PG13 and PG14
+	GpioInfo.Pin = GPIO_PIN_10 | GPIO_PIN_12; // Init PB10 clock and PG14
 	GpioInfo.Pull = GPIO_NOPULL ;
 	GpioInfo.Speed = GPIO_SPEED_HIGH ;
 
@@ -74,9 +74,19 @@ void readBits(long *dataRead,int numberOfBits)
 
 void clockGenerator_1cycle()
 {
-	SWCLK_ON();
-	SWCLK_OFF();
+	SWCLK_ON()
+	SWCLK_OFF()
 
+}
+
+int check_Parity(int APnDP, int RnW, int addrBit3, int addrBit2)	{
+	int sum = 0;
+
+	sum = APnDP + RnW + addrBit3 + addrBit2;
+
+	if((sum % 2) != 0) //if odd num 1's return 1
+		return 1;
+	else return 0; // if even numm  1's return 0
 }
 
 int main(void)

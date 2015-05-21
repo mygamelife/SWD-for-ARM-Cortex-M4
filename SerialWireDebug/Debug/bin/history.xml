@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SerialWireDebug.map -O0 --gc-sections -LC:/Users/Boyka/CoIDE/workspace/SerialWireDebug -TC:/Users/Boyka/CoIDE/workspace/SerialWireDebug/stm32f429zi_flash.ld -g">
-      <target file="SerialWireDebug.elf" lastModified="14d7493f457">
-         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14d7493f14a"/>
-         <source file="..\obj\main.o" lastModified="14d7493ec5b"/>
-         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14d7493efa1"/>
-         <source file="..\obj\system_stm32f4xx.o" lastModified="14d7493f057"/>
-         <source file="..\obj\startup_stm32f429xx.o" lastModified="14d7493ecaa"/>
-         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14d7493eea9"/>
-         <source file="..\obj\stm32f4xx_hal.o" lastModified="14d7493eda1"/>
+      <target file="SerialWireDebug.elf" lastModified="14d74f26135">
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14d74c28c7b"/>
+         <source file="..\obj\main.o" lastModified="14d74f2589d"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14d74c28b77"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14d74c28bdb"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="14d74c28950"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14d74c28ad0"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14d74c289fc"/>
       </target>
    </processor>
 </history>
