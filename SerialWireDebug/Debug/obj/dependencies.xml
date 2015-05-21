@@ -1,6 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dependencies>
+<<<<<<< HEAD
+   <includePath signature="/I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers /I..\..\..\..\..\..\..\CoIDE\workspace\SerialWireDebug\app /I..\..\..\..\..\..\..\CoIDE\workspace /I..\..\..\..\..\..\..\CoIDE\workspace\SerialWireDebug /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS">
+=======
    <includePath signature="/I..\..\..\..\..\..\..\CoIDE\workspace\SerialWireDebug /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc /I..\..\..\..\..\..\..\CoIDE\workspace /I..\..\..\..\..\..\..\CoIDE\workspace\SerialWireDebug\app /I..\..\..\..\..\..\..\CoIDE\workspace\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS">
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_i2s_ex.h" lastModified="14c0ebffb57">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
@@ -17,7 +21,11 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_fmc.h" lastModified="14c0ebffd2b">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
+<<<<<<< HEAD
+      <source file="..\..\..\app\startup_stm32f429xx.s" lastModified="14d747f887e">
+=======
       <source file="..\..\..\app\startup_stm32f429xx.s" lastModified="14c0ebfd050">
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
       </source>
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_i2c.h" lastModified="14c0ebff446">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
@@ -87,9 +95,18 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c" lastModified="14c0ebff33c">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
       </source>
+<<<<<<< HEAD
+      <source file="..\..\..\app\system_stm32f4xx.h" lastModified="14d747f8894">
+      </source>
+      <source file="..\..\..\app\system_stm32f4xx.c" lastModified="14d747f8893">
+         <include file="..\..\..\app\stm32f4xx.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_conf.h" lastModified="14d747f8891">
+=======
       <source file="..\..\..\app\system_stm32f4xx.h" lastModified="14c0ebfdff0">
       </source>
       <source file="..\..\..\app\stm32f4xx_hal_conf.h" lastModified="14c21974cd0">
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_rcc.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma.h"/>
@@ -128,9 +145,12 @@
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pcd.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_hcd.h"/>
       </source>
+<<<<<<< HEAD
+=======
       <source file="..\..\..\app\system_stm32f4xx.c" lastModified="14c21974cd0">
          <include file="..\..\..\app\stm32f4xx.h"/>
       </source>
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c" lastModified="14c0ebff252">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
       </source>
@@ -140,7 +160,11 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h" lastModified="14c0ebffcdd">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
+<<<<<<< HEAD
+      <source file="..\..\..\app\stm32f4xx.h" lastModified="14d747fb388">
+=======
       <source file="..\..\..\app\stm32f4xx.h" lastModified="14d40ec0c28">
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
          <include file="..\..\..\app\stm32f429xx.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
       </source>
@@ -150,7 +174,11 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h" lastModified="14c0ebffc51">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
+<<<<<<< HEAD
+      <source file="..\..\..\app\stm32f429xx.h" lastModified="14d747f8c6e">
+=======
       <source file="..\..\..\app\stm32f429xx.h" lastModified="14c0ebfe3d8">
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
          <include file="..\..\..\app\core_cm4.h"/>
          <include file="..\..\..\app\system_stm32f4xx.h"/>
       </source>
@@ -189,7 +217,11 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_wwdg.h" lastModified="14c0ebffb48">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
+<<<<<<< HEAD
+      <source file="..\..\..\app\core_cm4.h" lastModified="14d747f8c64">
+=======
       <source file="..\..\..\app\core_cm4.h" lastModified="14c0ebd8278">
+>>>>>>> 8e9fc7f5ca73a9b9f2025c95ea10c0360350459f
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include\core_cmInstr.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include\core_cmFunc.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include\core_cmSimd.h"/>
