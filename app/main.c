@@ -17,6 +17,7 @@ void sendBits(long dataToSend,int numberOfBits);
 int readBit();
 void readBits(long *dataRead,int numberOfBits);
 void clockGenerator_1cycle();
+int check_Parity(int ApnDp,int RnW,int AddrBit3,int AddrBit2);
 
 void configurePort()
 {
@@ -121,6 +122,26 @@ void readBits(long *dataRead,int numberOfBits)
 	}
 
 
+}
+
+
+int SWD_Protocol(int APnDP,int ReadWrite,int Address)
+{
+	int SWD_Protocol = 0x81;
+	int Address_bit2 , Address_bit3, ParityBit ;
+
+	Address_bit3 = Address & ( 1 << 3) ;
+	Address_bit2 = Address & ( 1 << 2) ;
+
+	ParityBit = check_Parity(APnDP,ReadWrite,Address_bit3,Address_bit2);
+
+	SWD_Protocol = SWD_Protocol | APnDP << 6;
+	SWD_Protocol = SWD_Protocol | ReadWrite << 5;
+	SWD_Protocol = SWD_Protocol | Address_bit2 << 4;
+	SWD_Protocol = SWD_Protocol | Address_bit3 << 3;
+	SWD_Protocol = SWD_Protocol | ParityBit << 2 ;
+
+	return SWD_Protocol ;
 }
 
 void clockGenerator_1cycle()
