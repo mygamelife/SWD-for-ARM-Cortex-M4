@@ -1,32 +1,21 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio.h"
 #define SWDIO
-#define SWCLK
-//HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
-//HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_RESET);
 
-
-
-int main(void)
-{
-
-    while(1)
-    {
-    }
-}
+#define SWCLK_ON() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_SET);
+#define SWCLK_OFF() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 
 void configurePort()
 {
-	GPIO_InitTypeDef GpioInfo ;
+	GPIO_InitTypeDef GpioInfo;
+	__GPIOB_CLK_ENABLE();
 
 	GpioInfo.Mode = GPIO_MODE_OUTPUT_PP ;
-	GpioInfo.Pin = GPIO_PIN_13 | GPIO_PIN_14; // Init PG13 and PG14
+	GpioInfo.Pin = GPIO_PIN_10 | GPIO_PIN_12; // Init PG13 and PG14
 	GpioInfo.Pull = GPIO_NOPULL ;
 	GpioInfo.Speed = GPIO_SPEED_HIGH ;
 
-	//_GPIOA_CLK_ENABLE();
-	//HAL_GPIO_Init(GPIOA,&GpioInfo);
-
+	HAL_GPIO_Init(GPIOB,&GpioInfo);
 }
 
 void lineReset()
@@ -36,7 +25,7 @@ void lineReset()
 	sendBit(1);
 	for (i = 0 ; i < 50 ; i ++)
 	{
-		clockGenerator_1cycle();
+		//clockGenerator_1cycle();
 	}
 }
 
@@ -53,7 +42,7 @@ void sendBits(long dataToSend,int numberOfBits)
 	int i ;
 	for (i=0 ; i < numberOfBits ; i ++)
 	{
-		sendBit();
+		//sendBit();
 	}
 }
 
@@ -85,9 +74,16 @@ void readBits(long *dataRead,int numberOfBits)
 
 void clockGenerator_1cycle()
 {
-	//HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_SET);
-	//HAL_GPIO_WritePin(GPIOG, GPIO_PIN_13, GPIO_PIN_RESET);
+	SWCLK_ON();
+	SWCLK_OFF();
 
 }
-}
 
+int main(void)
+{
+	configurePort();
+    while(1)
+    {
+    	clockGenerator_1cycle();
+    }
+}
