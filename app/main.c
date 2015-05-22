@@ -65,7 +65,7 @@ void lineReset()
 {
 	int i ;
 
-	sendBit(1);
+	SWDIO_High();
 	for (i = 0 ; i < 50 ; i ++)
 	{
 		clockGenerator_1cycle();
@@ -183,7 +183,7 @@ int main(void)
 	readBits(&IDCODE,32);
 */
 
-	sendBits(0xA5,8);
+	lineReset();
 
 	while(1)
 	{
