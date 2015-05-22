@@ -6,6 +6,10 @@
 #define SWCLK_OFF() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_10, GPIO_PIN_RESET);
 #define SWDIO_High() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_SET);
 #define SWDIO_Low() HAL_GPIO_WritePin(GPIOB, GPIO_PIN_12, GPIO_PIN_RESET);
+#define READ 1
+#define WRITE 0
+#define DP 0
+#define AP 1
 
 void clockGenerator_1cycle();
 void configurePort();
@@ -76,6 +80,7 @@ void sendBit(int value)
 		SWDIO_Low()
 
 	clockGenerator_1cycle();
+
 }
 
 void sendBits(long dataToSend,int numberOfBits)
@@ -89,7 +94,7 @@ void sendBits(long dataToSend,int numberOfBits)
 	{
 		bitValue = dataToSend & (1 << i ) ;
 
-		if (bitValue == 1)
+		if (bitValue != 0)
 			sendBit(1);
 		else
 			sendBit(0);
@@ -162,9 +167,26 @@ void clockGenerator_1cycle()
 
 int main(void)
 {
+	long ACK ;
+	long IDCODE ;
+
 	configurePort();
-    while(1)
-    {
-    	clockGenerator_1cycle();
-    }
+	SWDIO_OutputMode();
+/*
+	lineReset();
+	sendBits(0xE79E,16);
+	lineReset();
+	sendBits(SWD_Protocol(DP,READ,0x00),8);
+	clockGenerator_1cycle();
+	readBits(&ACK,3);
+	clockGenerator_1cycle();
+	readBits(&IDCODE,32);
+*/
+
+	sendBits(0xA5,8);
+
+	while(1)
+	{
+	}
+
 }

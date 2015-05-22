@@ -1,14 +1,14 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
-   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SerialWireDebug.map -O0 --gc-sections -LC:/Users/Boyka/CoIDE/workspace/SerialWireDebug -TC:/Users/Boyka/CoIDE/workspace/SerialWireDebug/stm32f429zi_flash.ld -g">
-      <target file="SerialWireDebug.elf" lastModified="14d750197cb">
-         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14d75019559"/>
-         <source file="..\obj\main.o" lastModified="14d75019224"/>
-         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14d75019451"/>
-         <source file="..\obj\system_stm32f4xx.o" lastModified="14d750194b9"/>
-         <source file="..\obj\startup_stm32f429xx.o" lastModified="14d75019245"/>
-         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14d7501939d"/>
-         <source file="..\obj\stm32f4xx_hal.o" lastModified="14d750192e1"/>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SerialWireDebug.map -O0 --gc-sections -LC:/Users/Shengli/CoIDE/workspace/SerialWireDebug -TC:/Users/Shengli/CoIDE/workspace/SerialWireDebug/stm32f429zi_flash.ld -g">
+      <target file="SerialWireDebug.elf" lastModified="14d797e5aa3">
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14d797a33f0"/>
+         <source file="..\obj\main.o" lastModified="14d797e4649"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14d797a2fca"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="14d797a28c0"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14d797a31c4"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14d797a2d89"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14d797a2b25"/>
       </target>
    </processor>
 </history>
