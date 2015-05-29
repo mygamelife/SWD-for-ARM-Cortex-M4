@@ -150,10 +150,6 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h" lastModified="14c0ebffc51">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\main.c" lastModified="14d9ec13483">
-         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
-         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
-      </source>
       <source file="..\..\..\app\stm32f429xx.h" lastModified="14c0ebfe3d8">
          <include file="..\..\..\app\core_cm4.h"/>
          <include file="..\..\..\app\system_stm32f4xx.h"/>

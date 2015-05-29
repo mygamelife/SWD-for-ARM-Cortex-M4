@@ -23,6 +23,7 @@ void readBits(long *dataRead,int numberOfBits);
 void clockGenerator_1cycle();
 int check_Parity(int ApnDp,int RnW,int AddrBit3,int AddrBit2);
 void resetTarget();
+int checkAddressbit(int address,int bitNumber);
 
 
 void simpleDelay()
@@ -181,18 +182,8 @@ int SWD_Protocol(int APnDP,int ReadWrite,int Address)
 	int SWD_Protocol = 0, startBit = 1 , stopBit = 0 , parkBit = 1 ;
 	int Address_bit2 , Address_bit3, ParityBit ;
 
-	Address_bit3 = Address & ( 1 << 3) ;
-	if (Address_bit3 != 0)
-		Address_bit3 = 1 ;
-	else
-		Address_bit3 = 0 ;
-
-	Address_bit2 = Address & ( 1 << 2) ;
-
-	if (Address_bit2 != 0)
-			Address_bit2 = 1 ;
-		else
-			Address_bit2 = 0 ;
+	Address_bit2 = checkAddressbit(Address,2);
+	Address_bit3 = checkAddressbit(Address,3);
 
 	ParityBit = check_Parity(APnDP,ReadWrite,Address_bit3,Address_bit2);
 
@@ -206,6 +197,18 @@ int SWD_Protocol(int APnDP,int ReadWrite,int Address)
 	SWD_Protocol = SWD_Protocol | parkBit << 7 ;
 
 	return SWD_Protocol ;
+}
+
+int checkAddressbit(int address,int bitNumber)
+{
+	int address_bit =0 ;
+
+	address_bit = address & ( 1 << bitNumber);
+
+	if (address_bit !=0)
+		return 1 ;
+	else
+		return 0 ;
 }
 
 void clockGenerator_1cycle()
