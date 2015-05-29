@@ -27,11 +27,14 @@ void resetTarget();
 
 void simpleDelay()
 {
-	int counter = 0 ;
+	int counter1 = 0,counter2 = 0 ;
 
-
-	while (counter != 10000)
-		counter ++ ;
+	while(counter2 != 100000)
+	{
+		while (counter1 != 100000)
+			counter1 ++ ;
+		counter2++;
+	}
 
 
 }
@@ -41,17 +44,19 @@ void resetTarget()
 {
 	GPIO_InitTypeDef GpioInfo;
 
-	GpioInfo.Mode = GPIO_MODE_OUTPUT_PP ;
+	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD ;
 	GpioInfo.Pin = GPIO_PIN_13; // PB13 as target reset pin
 	GpioInfo.Pull = GPIO_NOPULL ;
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
 	HAL_GPIO_Init(GPIOB,&GpioInfo);
 
+	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
+	simpleDelay();
+
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 	simpleDelay();
 
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 }
 
 
@@ -86,7 +91,6 @@ void SWDIO_OutputMode()
 void SWDIO_InputMode()
 {
 	GPIO_InitTypeDef GpioInfo;
-	SWCLK_ON();
 
 	GpioInfo.Mode = GPIO_MODE_INPUT ;
 	GpioInfo.Pin = GPIO_PIN_12; // PB12 as input
@@ -94,7 +98,6 @@ void SWDIO_InputMode()
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
 	HAL_GPIO_Init(GPIOB,&GpioInfo);
-	SWCLK_OFF();
 }
 
 void lineReset()
@@ -102,11 +105,10 @@ void lineReset()
 	int i ;
 
 	SWDIO_High();
-	for (i = 0 ; i < 60 ; i ++)
+	for (i = 0 ; i < 52 ; i ++)
 	{
 		clockGenerator_1cycle();
 	}
-	SWDIO_Low() ;
 }
 
 void sendBit(int value)
@@ -135,7 +137,6 @@ void sendBits(long dataToSend,int numberOfBits)
 			sendBit(0);
 	}
 
-	SWDIO_Low() ;
 }
 
 int readBit()
@@ -177,19 +178,32 @@ int check_Parity(int APnDP, int RnW, int addrBit3, int addrBit2)	{
 
 int SWD_Protocol(int APnDP,int ReadWrite,int Address)
 {
-	int SWD_Protocol = 0x81;
+	int SWD_Protocol = 0, startBit = 1 , stopBit = 0 , parkBit = 1 ;
 	int Address_bit2 , Address_bit3, ParityBit ;
 
 	Address_bit3 = Address & ( 1 << 3) ;
+	if (Address_bit3 != 0)
+		Address_bit3 = 1 ;
+	else
+		Address_bit3 = 0 ;
+
 	Address_bit2 = Address & ( 1 << 2) ;
+
+	if (Address_bit2 != 0)
+			Address_bit2 = 1 ;
+		else
+			Address_bit2 = 0 ;
 
 	ParityBit = check_Parity(APnDP,ReadWrite,Address_bit3,Address_bit2);
 
-	SWD_Protocol = SWD_Protocol | APnDP << 6;
-	SWD_Protocol = SWD_Protocol | ReadWrite << 5;
-	SWD_Protocol = SWD_Protocol | Address_bit2 << 4;
-	SWD_Protocol = SWD_Protocol | Address_bit3 << 3;
-	SWD_Protocol = SWD_Protocol | ParityBit << 2 ;
+	SWD_Protocol = SWD_Protocol | startBit << 0 ;
+	SWD_Protocol = SWD_Protocol | APnDP << 1 ;
+	SWD_Protocol = SWD_Protocol | ReadWrite << 2 ;
+	SWD_Protocol = SWD_Protocol | Address_bit2 << 3;
+	SWD_Protocol = SWD_Protocol | Address_bit3 << 4;
+	SWD_Protocol = SWD_Protocol | ParityBit << 5;
+	SWD_Protocol = SWD_Protocol | stopBit << 6;
+	SWD_Protocol = SWD_Protocol | parkBit << 7 ;
 
 	return SWD_Protocol ;
 }
@@ -204,18 +218,22 @@ void clockGenerator_1cycle()
 
 int main(void)
 {
-	long ACK ;
-	long IDCODE ;
+	long ACK =0;
+	long IDCODE=0 ;
+	long SWD_Request ;
 
 	configurePort();
 	SWDIO_OutputMode();
+	SWD_Request = SWD_Protocol(DP,READ,0x00);
 
 	resetTarget();
 	lineReset();
 	sendBits(0xE79E,16);
 	lineReset();
-	sendBits(SWD_Protocol(DP,READ,0x00),8);
+	sendBits(SWD_Request,8);
+	clockGenerator_1cycle();
 	SWDIO_InputMode();
+	clockGenerator_1cycle();
 	readBits(&ACK,3);
 	readBits(&IDCODE,32);
 	resetTarget();
