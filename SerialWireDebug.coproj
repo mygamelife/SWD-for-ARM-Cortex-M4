@@ -93,8 +93,8 @@
     <File name="Hardware/stm32f4xx_hal_cortex.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c" type="1"/>
-    <File name="Core" path="" type="2"/>
     <File name="STM32F4/system_stm32f4xx.h" path="app/system_stm32f4xx.h" type="1"/>
+    <File name="Core" path="" type="2"/>
     <File name="Code" path="" type="2"/>
     <File name="Code/swdProtocol.c" path="app/swdProtocol.c" type="1"/>
   </Files>

@@ -11,19 +11,9 @@ int main(void)
 	long SWD_RequestData = 0 ;
 
 	configureClock();
-	SWDIO_OutputMode();
-	SWD_RequestData = SWD_Request(DP,READ,0x00);
 
-	resetTarget();
-	lineReset();
-	sendBits(0xE79E,16);
-	lineReset();
-	sendBits(SWD_RequestData,8);
-	clockGenerator_1cycle();
-	SWDIO_InputMode();
-	clockGenerator_1cycle();
-	readBits(&ACK,3);
-	readBits(&IDCODE,32);
+	initialisation();
+
 	resetTarget();
 	while(1)
 	{

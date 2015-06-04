@@ -1,6 +1,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "Bit_ReadSend.h"
+#include "configurePort.h"
 #include "swdProtocol.h"
 
 void simpleDelay()
@@ -94,4 +95,130 @@ int checkAddressbit(int address,int bitNumber)
 		return 1 ;
 	else
 		return 0 ;
+}
+
+int ABORT_CLEAR_ERRFLAG(int DAPabort,ErrorFlag errflag)
+{
+	long data = 0x00000000;
+	int SWD_RequestData = 0 ;
+	int status = 0 ;
+
+	if (DAPabort == 1)
+		data = data | DAPabort ;
+	else
+	{
+		switch(errflag)
+		{
+			case	STICKYORUN :
+								data = data | 1 << 4 ;
+								break ;
+			case	WDATAERR:
+								data = data | 1 << 3 ;
+								break ;
+			case	STICKYERR:
+								data = data | 1 << 2 ;
+								break ;
+			case	STICKYCMP:
+								data = data | 1 << 1 ;
+								break ;
+		}
+	}
+
+	SWD_RequestData = SWD_Request(DP,WRITE,0x00);
+	sendSWDRequest(SWD_RequestData);
+	status = checkACK_RWData(&data,SWD_RequestData,WRITE);
+
+	return status ;
+}
+
+int AP_Select(int APnDP,int BankNo,int APSEL)
+{
+	long data = 0x00000000 ;
+	int SWD_RequestData = 0 ;
+	int status = 0 ;
+
+
+	if (APnDP == DP) //debug port select modification
+		data = data | (BankNo & 0x00000001) ; //modify bit 0
+	else //access port select modification
+	{
+		if (BankNo == 0x0 || BankNo == 0x1 || BankNo == 0xF)
+			data = data | BankNo << 4 ; //modify bit [7:4]
+		else // unknown/non existing BankNo
+			return 0 ;
+	}
+
+	SWD_RequestData = SWD_Request(DP,WRITE,0x08);
+	sendSWDRequest(SWD_RequestData);
+	status = checkACK_RWData(&data,SWD_RequestData,WRITE);
+	return status ;
+}
+
+int checkACK_RWData(long *data, int SWD_RequestData, int ReadWrite)
+{
+	int i = 0 , ACK ;
+	readBit(&ACK,3);
+
+	if (ACK == OK)
+	{
+		if (ReadWrite)
+			readBits(data,32);
+		else
+		{
+			SWDIO_OutputMode();
+			clockGenerator_1cycle();//turn around
+			sendBits(*data,32);
+		}
+		return OK ;
+	}
+	else if (ACK == WAIT)
+	{
+		for ( i = 0 ; i < 3 ; i ++) //retry for maximum 3 times
+		{
+			sendSWDRequest(SWD_RequestData);
+			readBit(&ACK,3);
+			if (ACK == OK)
+			{
+				if (ReadWrite)
+					readBits(data,32);
+				else
+				{
+					SWDIO_OutputMode();
+					clockGenerator_1cycle(); //turn around
+					sendBits(*data,32);
+				}
+
+				return OK ;
+			}
+		}
+		return WAITED_TOOLONG ;
+	}
+	else
+		return FAULT ; //FAULT response or no response
+}
+
+void sendSWDRequest(int SWD_RequestData)
+{
+	SWDIO_OutputMode();
+	sendBits(SWD_RequestData,8);
+	SWDIO_InputMode();
+	clockGenerator_1cycle();
+}
+
+void initialisation()
+{
+	int SWD_RequestData ;
+	long IDCODE ;
+
+	SWDIO_OutputMode();
+
+	SWD_RequestData = SWD_Request(DP,READ,0x00);
+
+	resetTarget();
+	lineReset();
+	sendBits(0xE79E,16);
+	lineReset();
+
+	sendSWDRequest(SWD_RequestData);
+	checkACK_RWData(&IDCODE,SWD_RequestData,READ);
 }
