@@ -140,7 +140,7 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h" lastModified="14c0ebffcdd">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\swdProtocol.h" lastModified="14dbf9c86a4">
+      <source file="..\..\..\app\swdProtocol.h" lastModified="14dc2b4d58f">
       </source>
       <source file="..\..\..\app\stm32f4xx.h" lastModified="14d40ec0c28">
          <include file="..\..\..\app\stm32f429xx.h"/>
@@ -154,7 +154,7 @@
       </source>
       <source file="..\..\..\app\Bit_ReadSend.h" lastModified="14d9ee5c5a2">
       </source>
-      <source file="..\..\..\app\main.c" lastModified="14dbf5931cb">
+      <source file="..\..\..\app\main.c" lastModified="14dc1b2ade8">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
          <include file="..\..\..\app\configurePort.h"/>
@@ -165,7 +165,7 @@
          <include file="..\..\..\app\core_cm4.h"/>
          <include file="..\..\..\app\system_stm32f4xx.h"/>
       </source>
-      <source file="..\..\..\app\Bit_ReadSend.c" lastModified="14dbf9b6e38">
+      <source file="..\..\..\app\Bit_ReadSend.c" lastModified="14dc1c53abc">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
          <include file="..\..\..\app\Bit_ReadSend.h"/>
@@ -238,7 +238,7 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_spi.h" lastModified="14c0ebff446">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\configurePort.c" lastModified="14d9ee7e39c">
+      <source file="..\..\..\app\configurePort.c" lastModified="14dc1a829e0">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
          <include file="..\..\..\app\configurePort.h"/>

@@ -6,14 +6,10 @@
 
 int main(void)
 {
-	long ACK =0;
-	long IDCODE=0 ;
-	long SWD_RequestData = 0 ;
-
 	configureClock();
 
-	initialisation();
 
+	initialisation();
 	resetTarget();
 	while(1)
 	{

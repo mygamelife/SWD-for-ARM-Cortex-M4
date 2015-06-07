@@ -2,11 +2,20 @@
 #include "stm32f4xx_hal_gpio.h"
 #include "Bit_ReadSend.h"
 
+void simpleDelay()
+{
+	int counter1 = 0,counter2 = 0 ;
+		while (counter1 != 63)
+			counter1 ++ ;
+}
+
 
 void clockGenerator_1cycle()
 {
 	SWCLK_ON()
+	simpleDelay();
 	SWCLK_OFF()
+	simpleDelay();
 }
 
 
@@ -43,8 +52,10 @@ int readBit()
 	GPIO_PinState bitRead ;
 
 	SWCLK_ON();
+	simpleDelay();
 	bitRead  = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_12);
 	SWCLK_OFF();
+	simpleDelay();
 
 	if (bitRead  == 1)
 		return 1 ;

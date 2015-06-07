@@ -4,19 +4,6 @@
 #include "configurePort.h"
 #include "swdProtocol.h"
 
-void simpleDelay()
-{
-	int counter1 = 0,counter2 = 0 ;
-
-	while(counter2 != 100000)
-	{
-		while (counter1 != 100000)
-			counter1 ++ ;
-		counter2++;
-	}
-
-
-}
 
 
 void resetTarget()
@@ -25,17 +12,14 @@ void resetTarget()
 
 	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD ;
 	GpioInfo.Pin = GPIO_PIN_13; // PB13 as target reset pin
-	GpioInfo.Pull = GPIO_NOPULL ;
+	GpioInfo.Pull = GPIO_PULLDOWN ;
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
 	HAL_GPIO_Init(GPIOB,&GpioInfo);
 
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
 	simpleDelay();
 
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	simpleDelay();
-
+	HAL_GPIO_DeInit(GPIOB,GPIO_PIN_13);
 }
 
 
@@ -156,8 +140,8 @@ int AP_Select(int APnDP,int BankNo,int APSEL)
 
 int checkACK_RWData(long *data, int SWD_RequestData, int ReadWrite)
 {
-	int i = 0 , ACK ;
-	readBit(&ACK,3);
+	int i = 0 , ACK = 0 ;
+	readBits(&ACK,3);
 
 	if (ACK == OK)
 	{
@@ -176,7 +160,7 @@ int checkACK_RWData(long *data, int SWD_RequestData, int ReadWrite)
 		for ( i = 0 ; i < 3 ; i ++) //retry for maximum 3 times
 		{
 			sendSWDRequest(SWD_RequestData);
-			readBit(&ACK,3);
+			readBits(&ACK,3);
 			if (ACK == OK)
 			{
 				if (ReadWrite)
@@ -202,13 +186,15 @@ void sendSWDRequest(int SWD_RequestData)
 	SWDIO_OutputMode();
 	sendBits(SWD_RequestData,8);
 	SWDIO_InputMode();
-	clockGenerator_1cycle();
+	//simpleDelay();
 }
 
+/*
 void initialisation()
 {
 	int SWD_RequestData ;
 	long IDCODE ;
+	int ACK = 0 ;
 
 	SWDIO_OutputMode();
 
@@ -220,5 +206,9 @@ void initialisation()
 	lineReset();
 
 	sendSWDRequest(SWD_RequestData);
-	checkACK_RWData(&IDCODE,SWD_RequestData,READ);
-}
+	readBits(&ACK,3);
+	//checkACK_RWData(&IDCODE,SWD_RequestData,READ);
+}*/
+
+
+

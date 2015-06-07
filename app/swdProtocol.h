@@ -22,6 +22,7 @@ typedef enum
 	WAITED_TOOLONG = 5
 } ACK_Response;
 
+void simpleDelay();
 
 void lineReset();
 void resetTarget();
