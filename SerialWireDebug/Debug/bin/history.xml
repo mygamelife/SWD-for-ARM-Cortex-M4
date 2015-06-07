@@ -1,17 +1,17 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SerialWireDebug.map -O0 --gc-sections -LC:/Users/Shengli/CoIDE/workspace/SerialWireDebug -TC:/Users/Shengli/CoIDE/workspace/SerialWireDebug/stm32f429zi_flash.ld -g">
-      <target file="SerialWireDebug.elf" lastModified="14dc2c983b2">
-         <source file="..\obj\configurePort.o" lastModified="14dc2b3c777"/>
-         <source file="..\obj\main.o" lastModified="14dc2b4ddb6"/>
-         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14dc2b3c604"/>
-         <source file="..\obj\system_stm32f4xx.o" lastModified="14dc2b3c69f"/>
-         <source file="..\obj\startup_stm32f429xx.o" lastModified="14dc2b3c20c"/>
-         <source file="..\obj\stm32f4xx_hal.o" lastModified="14dc2b3c311"/>
-         <source file="..\obj\Bit_ReadSend.o" lastModified="14dc2b3c3f7"/>
-         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14dc2b3c860"/>
-         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14dc2b3c503"/>
-         <source file="..\obj\swdProtocol.o" lastModified="14dc2c9812b"/>
+      <target file="SerialWireDebug.elf" lastModified="14dced98780">
+         <source file="..\obj\configurePort.o" lastModified="14dced983de"/>
+         <source file="..\obj\main.o" lastModified="14dced97d43"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14dced98243"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14dced982d4"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="14dced97e5c"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14dced97f54"/>
+         <source file="..\obj\Bit_ReadSend.o" lastModified="14dced98040"/>
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14dced984e8"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14dced9814a"/>
+         <source file="..\obj\swdProtocol.o" lastModified="14dced97e37"/>
       </target>
    </processor>
 </history>

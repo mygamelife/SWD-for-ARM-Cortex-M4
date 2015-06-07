@@ -36,6 +36,7 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/SerialWireDebug/Code/main.c"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\Shengli\CoIDE\workspace\SerialWireDebug\app\main.c"/>
+<<<<<<< HEAD
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
@@ -82,6 +83,10 @@
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="workingset_name" value=""/>
 <attrib name="workingset_id" value="org.eclipse.debug.ui.breakpointWorkingSet"/>
+=======
+<attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
+>>>>>>> ee4f3d9263b5e4e31b27d88d850aa0e6068e8552
 </marker>
 </breakpoint>
 </breakpoints>

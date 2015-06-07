@@ -1,14 +1,7 @@
 #include "stm32f4xx_hal.h"
 #include "stm32f4xx_hal_gpio.h"
 #include "Bit_ReadSend.h"
-
-void simpleDelay()
-{
-	int counter1 = 0,counter2 = 0 ;
-		while (counter1 != 63)
-			counter1 ++ ;
-}
-
+#include "swdProtocol.h"
 
 void clockGenerator_1cycle()
 {
