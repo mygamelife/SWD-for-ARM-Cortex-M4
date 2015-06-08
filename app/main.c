@@ -4,13 +4,12 @@
 #include "Bit_ReadSend.h"
 #include "swdProtocol.h"
 
+
 int main(void)
 {
-	configureClock();
-
+	configure_IOPorts();
 
 	initialisation();
-	resetTarget();
 	while(1)
 	{
 	}

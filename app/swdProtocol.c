@@ -3,66 +3,51 @@
 #include "Bit_ReadSend.h"
 #include "configurePort.h"
 #include "swdProtocol.h"
+#include "Reset.h"
 
-void simpleDelay()
+void initialisation()
 {
-	int counter1 = 0 ;
-		while (counter1 != 63)
-			counter1 ++ ;
-}
+	int SWD_RequestData, ACK = 0;
+	int Parity = 0 ;
+	uint32_t IDCODE ;
 
-/* include three IDLE clock cycles with SWDIO low for each packet
- * to ensure the operation is in stable mode
- */
-void extraIdleClock()
-{
-	int i;
+	SWD_RequestData = SWD_Request(DP,READ,0x00);
 
+	resetTarget();
 	SWDIO_Low();
-
-	for(i = 0 ; i < 3 ; i ++)
-		clockGenerator_1cycle();
-}
-
-void resetTarget()
-{
-	GPIO_InitTypeDef GpioInfo;
-
-	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD ;
-	GpioInfo.Pin = GPIO_PIN_13; // PB13 as target reset pin
-	GpioInfo.Pull = GPIO_NOPULL ;
-	GpioInfo.Speed = GPIO_SPEED_FAST ;
-
-	HAL_GPIO_Init(GPIOB,&GpioInfo);
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-	simpleDelay();
-
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	simpleDelay();
-
-}
-
-
-void lineReset()
-{
-	int i ;
-
 	SWDIO_High();
+	switchJTAGtoSWD();
 
-	for (i = 0 ; i < 52 ; i ++)
-		clockGenerator_1cycle();
+	sendSWDRequest(SWD_RequestData);
+	readBits(&ACK,3);
+	readBits(&IDCODE,32);
+	Parity = readBit();
+
+	//Eight extra idle clock
+	extraIdleClock(8);
 }
 
+void sendSWDRequest(int SWD_RequestData)
+{
+	sendBits(SWD_RequestData,8);
+	SWDIO_InputMode();
+	clockGenerator_1cycle();
+}
 
-int check_Parity(int APnDP, int RnW, int addrBit3, int addrBit2)	{
-	int sum = 0;
+/* To switch SWJ-DP from JTAG to SWD operation:
+ * 1. Send more than 50 SWDCLK cycles with SWDIO = 1. This ensures that both SWD and JTAG are in their reset states
+ * 2. Send the 16-bit (0xE79E LSB first) JTAG-to-SWD select sequence on SWDIO
+ * 3. Send more than 50 SWDCLK cycles with SWDIO = 1. This ensures that if SWJ-DP was already in SWD mode.
+ * 4. Send two or more SWDCLK cycles with SWDIO = 0. This ensures that the SWD line is in the idle state
+ *    before starting a new SWD packet transaction.
+ */
+void switchJTAGtoSWD()
+{
+	lineReset();
+	sendBits(0xE79E,16);
+	lineReset();
 
-	sum = APnDP + RnW + addrBit3 + addrBit2;
-
-	if((sum % 2) != 0) //if odd num 1's return 1
-		return 1;
-	else return 0; // if even numm  1's return 0
+	extraIdleClock(2);
 }
 
 
@@ -74,7 +59,7 @@ int SWD_Request(int APnDP,int ReadWrite,int Address)
 	Address_bit2 = checkAddressbit(Address,2);
 	Address_bit3 = checkAddressbit(Address,3);
 
-	ParityBit = check_Parity(APnDP,ReadWrite,Address_bit3,Address_bit2);
+	ParityBit = check_SWDRequest_Parity(APnDP,ReadWrite,Address_bit3,Address_bit2);
 
 	SWD_RequestData = SWD_RequestData | STARTBIT << 0 ;
 	SWD_RequestData = SWD_RequestData | APnDP << 1 ;
@@ -88,6 +73,57 @@ int SWD_Request(int APnDP,int ReadWrite,int Address)
 	return SWD_RequestData ;
 }
 
+int checkACK_RWData(uint32_t *data,int *Parity, int SWD_RequestData, int ReadWrite)
+{
+	int ACK  = 0, status = 0;
+	readBits(&ACK,3);
+
+	if (ACK == OK)
+	{
+		if (ReadWrite)
+			Read_32bits_Data_Parity(data,Parity);
+		else
+			switchOutput_Send_32bits_Data_Parity(data,Parity);
+
+		return OK ;
+	}
+	else if (ACK == WAIT)
+	{
+		status = retryCurrentOperation(data,Parity,SWD_RequestData,ReadWrite);
+		return status ;
+	}
+	else
+		return FAULT ; //FAULT response or no response
+}
+
+int check_SWDRequest_Parity(int APnDP, int RnW, int addrBit3, int addrBit2)
+{
+	int sum = 0;
+
+	sum = APnDP + RnW + addrBit3 + addrBit2;
+
+	if((sum % 2) != 0) //if odd num 1's return 1
+		return 1;
+	else return 0; // if even numm  1's return 0
+}
+
+int check_32bits_Data_Parity(uint32_t Data,int *Parity)
+{
+	int sum = 0 ;
+
+	while (Data > 0)
+	{
+		if ( (Data & 1) == 1)
+			sum ++ ;
+		Data = Data >> 1;
+	}
+
+	if((sum % 2) != 0) //if odd num 1's return 1
+			return 1;
+	else return 0; // if even numm  1's return 0
+}
+
+
 int checkAddressbit(int address,int bitNumber)
 {
 	int address_bit =0 ;
@@ -100,11 +136,12 @@ int checkAddressbit(int address,int bitNumber)
 		return 0 ;
 }
 
+
 int ABORT_CLEAR_ERRFLAG(int DAPabort,ErrorFlag errflag)
 {
-	long data = 0x00000000;
+	unsigned long data = 0x00000000;
 	int SWD_RequestData = 0 ;
-	int status = 0 ;
+	int status = 0 , Parity = 0;
 
 	if (DAPabort == 1)
 		data = data | DAPabort ;
@@ -129,16 +166,16 @@ int ABORT_CLEAR_ERRFLAG(int DAPabort,ErrorFlag errflag)
 
 	SWD_RequestData = SWD_Request(DP,WRITE,0x00);
 	sendSWDRequest(SWD_RequestData);
-	status = checkACK_RWData(&data,SWD_RequestData,WRITE);
+	status = checkACK_RWData(&data,&Parity,SWD_RequestData,WRITE);
 
 	return status ;
 }
 
 int AP_Select(int APnDP,int BankNo,int APSEL)
 {
-	long data = 0x00000000 ;
+	unsigned long data = 0x00000000 ;
 	int SWD_RequestData = 0 ;
-	int status = 0 ;
+	int status = 0 , Parity = 0;
 
 
 	if (APnDP == DP) //debug port select modification
@@ -153,93 +190,44 @@ int AP_Select(int APnDP,int BankNo,int APSEL)
 
 	SWD_RequestData = SWD_Request(DP,WRITE,0x08);
 	sendSWDRequest(SWD_RequestData);
-	status = checkACK_RWData(&data,SWD_RequestData,WRITE);
+	status = checkACK_RWData(&data,&Parity,SWD_RequestData,WRITE);
 	return status ;
 }
 
-int checkACK_RWData(long *data, int SWD_RequestData, int ReadWrite)
+
+int retryCurrentOperation(uint32_t *data,int *Parity, int SWD_RequestData, int ReadWrite)
 {
-	int i = 0 , ACK ;
-	readBit(&ACK,3);
+	int i , ACK = 0  ;
 
-	if (ACK == OK)
+	for ( i = 0 ; i < 3 ; i ++) //retry for maximum 3 times
 	{
-		if (ReadWrite)
-			readBits(data,32);
-		else
+		sendSWDRequest(SWD_RequestData); // resend SWD request
+		readBit(&ACK,3); // check ACK
+		if (ACK == OK)
 		{
-			SWDIO_OutputMode();
-			clockGenerator_1cycle();//turn around
-			sendBits(*data,32);
-		}
-		return OK ;
-	}
-	else if (ACK == WAIT)
-	{
-		for ( i = 0 ; i < 3 ; i ++) //retry for maximum 3 times
-		{
-			sendSWDRequest(SWD_RequestData);
-			readBit(&ACK,3);
-			if (ACK == OK)
-			{
-				if (ReadWrite)
-					readBits(data,32);
-				else
-				{
-					SWDIO_OutputMode();
-					clockGenerator_1cycle(); //turn around
-					sendBits(*data,32);
-				}
+			if (ReadWrite)
+				Read_32bits_Data_Parity(data,Parity);
+			else
+				switchOutput_Send_32bits_Data_Parity(data,Parity);
 
-				return OK ;
-			}
+			return OK ;
 		}
-		return WAITED_TOOLONG ;
 	}
-	else
-		return FAULT ; //FAULT response or no response
+	return WAITED_TOOLONG ;
+
 }
 
-void sendSWDRequest(int SWD_RequestData)
+void switchOutput_Send_32bits_Data_Parity(uint32_t *data,int *Parity)
 {
 	SWDIO_OutputMode();
-	sendBits(SWD_RequestData,8);
-	SWDIO_InputMode();
-	clockGenerator_1cycle();
+	clockGenerator_1cycle(); //turn around
+	sendBits(*data,32);
+	sendBits(*Parity,1);
 }
 
-/* To switch SWJ-DP from JTAG to SWD operation:
- * 1. Send more than 50 SWDCLK cycles with SWDIO = 1. This ensures that both SWD and JTAG are in their reset states
- * 2. Send the 16-bit (0xE79E LSB first) JTAG-to-SWD select sequence on SWDIO
- * 3. Send more than 50 SWDCLK cycles with SWDIO = 1. This ensures that if SWJ-DP was already in SWD mode.
- * 4. Send three or more SWDCLK cycles with SWDIO = 0. This ensures that the SWD line is in the idle state
- *    before starting a new SWD packet transaction.
- */
-void switchJTAGtoSWD()
+void Read_32bits_Data_Parity(uint32_t *data,int *Parity)
 {
-	lineReset();
-	sendBits(0xE79E,16);
-	lineReset();
-
-	extraIdleClock();
+	readBits(data,32);
+	*Parity = readBit();
 }
 
-void initialisation()
-{
-	int SWD_RequestData ;
-	long IDCODE ;
-
-	SWDIO_OutputMode();
-
-	SWD_RequestData = SWD_Request(DP,READ,0x00);
-
-	resetTarget();
-
-	switchJTAGtoSWD();
-
-	sendSWDRequest(SWD_RequestData);
-	checkACK_RWData(&IDCODE,SWD_RequestData,READ);
-
-	//3 idle clock delay after finish each packet
-	extraIdleClock();
-}

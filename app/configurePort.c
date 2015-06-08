@@ -17,11 +17,24 @@ void configureClock()
 
 }
 
+void configureTargetResetPin()
+{
+	GPIO_InitTypeDef GpioInfo;
+
+	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD ;
+	GpioInfo.Pin = GPIO_PIN_13; // PB13 as target reset pin
+	GpioInfo.Pull = GPIO_PULLUP ;
+	GpioInfo.Speed = GPIO_SPEED_FAST ;
+
+	HAL_GPIO_Init(GPIOB,&GpioInfo);
+}
+
+
 void SWDIO_OutputMode()
 {
 	GPIO_InitTypeDef GpioInfo;
 
-	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD;
+	GpioInfo.Mode = GPIO_MODE_OUTPUT_PP;
 	GpioInfo.Pin = GPIO_PIN_12; // PB12 as output
 	GpioInfo.Pull = GPIO_PULLUP ;
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
@@ -39,4 +52,12 @@ void SWDIO_InputMode()
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
 	HAL_GPIO_Init(GPIOB,&GpioInfo);
+}
+
+
+void configure_IOPorts()
+{
+	configureClock();
+	configureTargetResetPin();
+	SWDIO_OutputMode();
 }
