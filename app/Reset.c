@@ -4,9 +4,9 @@
 void resetTarget()
 {
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	delay(10,1);
+	delay(10,1,1);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-	delay(260,1);
+	delay(2600,1,1);
 }
 
 void lineReset()

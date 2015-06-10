@@ -15,8 +15,10 @@ void extraIdleClock(int numberOfClocks)
 {
 	int i;
 
+	SWDIO_Low();
+
 	for(i = 0 ; i < numberOfClocks ; i ++)
-		sendBit(0);
+		clockGenerator_1cycle();
 }
 
 
@@ -54,6 +56,7 @@ int readBit()
 	GPIO_PinState bitRead ;
 
 	SWCLK_ON();
+	//delay(2,1,10);
 	SWCLK_OFF();
 	bitRead  = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_12);
 

@@ -1,19 +1,19 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SerialWireDebug.map -O0 --gc-sections -LC:/Users/Shengli/CoIDE/workspace/SerialWireDebug -TC:/Users/Shengli/CoIDE/workspace/SerialWireDebug/stm32f429zi_flash.ld -g">
-      <target file="SerialWireDebug.elf" lastModified="14dd3b9816d">
-         <source file="..\obj\configurePort.o" lastModified="14dd3b97cf9"/>
-         <source file="..\obj\main.o" lastModified="14dd3b975ee"/>
-         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14dd3b97b86"/>
-         <source file="..\obj\system_stm32f4xx.o" lastModified="14dd3b97c14"/>
-         <source file="..\obj\startup_stm32f429xx.o" lastModified="14dd3b97794"/>
-         <source file="..\obj\stm32f4xx_hal.o" lastModified="14dd3b97885"/>
-         <source file="..\obj\Reset.o" lastModified="14dd3b97edd"/>
-         <source file="..\obj\Delay.o" lastModified="14dd3b97766"/>
-         <source file="..\obj\Bit_ReadSend.o" lastModified="14dd3b9796e"/>
-         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14dd3b97df7"/>
-         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14dd3b97a94"/>
-         <source file="..\obj\swdProtocol.o" lastModified="14dd3b976e8"/>
+      <target file="SerialWireDebug.elf" lastModified="14ddc2522dc">
+         <source file="..\obj\configurePort.o" lastModified="14ddc2398ed"/>
+         <source file="..\obj\main.o" lastModified="14ddc23917c"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14ddc23977e"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="14ddc239365"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14ddc23980b"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14ddc23947f"/>
+         <source file="..\obj\Reset.o" lastModified="14ddc239ab6"/>
+         <source file="..\obj\Delay.o" lastModified="14ddc23933d"/>
+         <source file="..\obj\Bit_ReadSend.o" lastModified="14ddc23957a"/>
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14ddc2399e1"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14ddc23968e"/>
+         <source file="..\obj\swdProtocol.o" lastModified="14ddc25204d"/>
       </target>
    </processor>
 </history>

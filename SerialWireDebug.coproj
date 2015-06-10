@@ -76,10 +76,10 @@
     <File name="Code/Delay.h" path="app/Delay.h" type="1"/>
     <File name="Code/main.c" path="app/main.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c" type="1"/>
-    <File name="STM32F4/system_stm32f4xx.c" path="app/system_stm32f4xx.c" type="1"/>
     <File name="STM32F4/startup_stm32f429xx.s" path="app/startup_stm32f429xx.s" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_rcc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h" type="1"/>
+    <File name="STM32F4/system_stm32f4xx.c" path="app/system_stm32f4xx.c" type="1"/>
     <File name="STM32F4" path="" type="2"/>
+    <File name="Hardware/stm32f4xx_hal_rcc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c" type="1"/>
     <File name="Code/Reset.c" path="app/Reset.c" type="1"/>
     <File name="Code/swdProtocol.h" path="app/swdProtocol.h" type="1"/>
@@ -96,9 +96,9 @@
     <File name="Hardware/stm32f4xx_hal_gpio.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c" type="1"/>
-    <File name="STM32F4/system_stm32f4xx.h" path="app/system_stm32f4xx.h" type="1"/>
-    <File name="Core" path="" type="2"/>
     <File name="Code/Reset.h" path="app/Reset.h" type="1"/>
+    <File name="Core" path="" type="2"/>
+    <File name="STM32F4/system_stm32f4xx.h" path="app/system_stm32f4xx.h" type="1"/>
     <File name="Code" path="" type="2"/>
     <File name="Code/swdProtocol.c" path="app/swdProtocol.c" type="1"/>
   </Files>

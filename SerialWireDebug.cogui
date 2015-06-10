@@ -18,25 +18,23 @@
 <part id="5"/>
 <part id="6"/>
 <part id="7"/>
+<part id="8"/>
+<part id="9"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/main.c" title="main.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/main.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="163" selectionTopPixel="0"/>
-</editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Bit_ReadSend.c" partName="Bit_ReadSend.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Bit_ReadSend.c" title="Bit_ReadSend.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Bit_ReadSend.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/Bit_ReadSend.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="703" selectionTopPixel="150"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="820" selectionTopPixel="690"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Bit_ReadSend.h" partName="Bit_ReadSend.h" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Bit_ReadSend.h" title="Bit_ReadSend.h" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Bit_ReadSend.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/Bit_ReadSend.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="58" selectionOffset="488" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="536" selectionTopPixel="0"/>
 </editor>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.c" partName="swdProtocol.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swdProtocol.c" title="swdProtocol.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swdProtocol.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/swdProtocol.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1059" selectionTopPixel="480"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="530" selectionTopPixel="255"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.h" partName="swdProtocol.h" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swdProtocol.h" title="swdProtocol.h" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swdProtocol.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/swdProtocol.h"/>
@@ -48,11 +46,23 @@
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.c" partName="configurePort.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/configurePort.c" title="configurePort.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/configurePort.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/configurePort.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="476" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="476" selectionTopPixel="479"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" partName="startup_stm32f429xx.s" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/startup_stm32f429xx.s" title="startup_stm32f429xx.s" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/startup_stm32f429xx.s" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/STM32F4/startup_stm32f429xx.s"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Reset.c" partName="Reset.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Reset.c" title="Reset.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Reset.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/Reset.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="209" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Delay.c" partName="Delay.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Delay.c" title="Delay.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Delay.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/Delay.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="50" selectionOffset="22" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Delay.h" partName="Delay.h" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Delay.h" title="Delay.h" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Delay.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/Delay.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="87" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/main.c" title="main.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/main.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SerialWireDebug/Code/main.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="165" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -66,7 +76,7 @@
 <element path="/SerialWireDebug/STM32F4"/>
 </expanded>
 <selection>
-<element path="/SerialWireDebug/Hardware/stm32f4xx_hal_gpio.c"/>
+<element path="/SerialWireDebug/Code/Delay.h"/>
 </selection>
 </viewState>
 </view>
@@ -111,8 +121,8 @@
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showMemoryBrowserAction"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showVariablesAction"/>
 <hide_menu_item_id id="org.coocox.builder.ui.openProjectExplorerAction"/>
-<hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
 <hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
+<hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showRegistersAction"/>
 <hide_toolbar_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
@@ -203,8 +213,8 @@
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
 <hide_toolbar_item_id id="org.coocox.builder.ui.build"/>
 <hide_toolbar_item_id id="org.coocox.welcome.ui.action.welcome"/>
-<hide_toolbar_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
 <hide_toolbar_item_id id="org.coocox.codebugger.configuration.coideProgramDownloadAction"/>
+<hide_toolbar_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
 <view id="org.eclipse.ui.console.ConsoleView"/>
 <view id="org.eclipse.debug.ui.DebugView"/>
 <view id="org.coocox.codebugger.trace.ui.traceview"/>
@@ -229,7 +239,7 @@
 </folder>
 </info>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@10a5ced" ratio="0.6997245" ratioLeft="508" ratioRight="218" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1379f82">
-<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">
+<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
@@ -269,158 +279,181 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/main.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/swdProtocol.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/main.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Bit_ReadSend.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/swdProtocol.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Reset.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Bit_ReadSend.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/configurePort.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/configurePort.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Bit_ReadSend.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SerialWireDebug/STM32F4/startup_stm32f429xx.s"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/swdProtocol.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Bit_ReadSend.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/swdProtocol.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SerialWireDebug/STM32F4/startup_stm32f429xx.s"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Reset.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Delay.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Delay.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/configurePort.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Reset.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/swdProtocol.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/swdProtocol.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Bit_ReadSend.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/Bit_ReadSend.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SerialWireDebug/STM32F4/startup_stm32f429xx.s"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SerialWireDebug/Code/main.c"/>
 </editors>
-<item historyLabel="configurePort.h" index="4">
-<position info="not_deleted" x="156" y="0"/>
-</item>
-<item historyLabel="configurePort.c" index="5">
-<position info="not_deleted" x="727" y="0"/>
-</item>
-<item historyLabel="configurePort.h" index="4">
-<position info="not_deleted" x="156" y="0"/>
-</item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="787" y="0"/>
-</item>
 <item historyLabel="Bit_ReadSend.c" index="2">
-<position info="not_deleted" x="703" y="0"/>
+<position info="not_deleted" x="527" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="787" y="0"/>
+<item historyLabel="Bit_ReadSend.h" index="4">
+<position info="not_deleted" x="536" y="0"/>
 </item>
-<item historyLabel="configurePort.c" index="5">
-<position info="not_deleted" x="727" y="0"/>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="61" y="27"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position/>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="5351" y="21"/>
 </item>
-<item historyLabel="Bit_ReadSend.h" index="6">
-<position info="not_deleted" x="488" y="58"/>
+<item historyLabel="swdProtocol.h" index="8">
+<position info="not_deleted" x="387" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position/>
-</item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="500" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="163" y="0"/>
-</item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="5159" y="0"/>
-</item>
-<item historyLabel="configurePort.h" index="4">
+<item historyLabel="configurePort.h" index="5">
 <position info="not_deleted" x="23" y="0"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
-<position info="not_deleted" x="769" y="0"/>
+<item historyLabel="main.c" index="1">
+<position info="not_deleted" x="165" y="0"/>
 </item>
-<item historyLabel="configurePort.c" index="5">
-<position info="not_deleted" x="727" y="0"/>
-</item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="5159" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="163" y="0"/>
-</item>
-<item historyLabel="configurePort.h" index="4">
-<position info="not_deleted" x="23" y="0"/>
-</item>
-<item historyLabel="swdProtocol.h" index="3">
-<position info="not_deleted" x="769" y="0"/>
-</item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="5159" y="0"/>
-</item>
-<item historyLabel="configurePort.c" index="5">
+<item historyLabel="configurePort.c" index="6">
 <position info="not_deleted" x="476" y="0"/>
 </item>
 <item historyLabel="startup_stm32f429xx.s" index="7">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="163" y="0"/>
+<item historyLabel="Reset.c" index="3">
+<position info="not_deleted" x="131" y="0"/>
 </item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="163" y="0"/>
+<item historyLabel="startup_stm32f429xx.s" index="7">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="163" y="0"/>
+<item historyLabel="main.c" index="1">
+<position info="not_deleted" x="165" y="0"/>
 </item>
-<item historyLabel="configurePort.c" index="5">
+<item historyLabel="Bit_ReadSend.c" index="2">
+<position info="not_deleted" x="527" y="0"/>
+</item>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="948" y="0"/>
+</item>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="414" y="0"/>
+</item>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="434" y="0"/>
+</item>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="458" y="0"/>
+</item>
+<item historyLabel="main.c" index="1">
+<position info="not_deleted" x="225" y="0"/>
+</item>
+<item historyLabel="configurePort.c" index="6">
 <position info="not_deleted" x="476" y="0"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
-<position info="not_deleted" x="769" y="0"/>
+<item historyLabel="swdProtocol.c" index="0">
+<position info="not_deleted" x="458" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="5159" y="0"/>
+<item historyLabel="configurePort.c" index="6">
+<position info="not_deleted" x="476" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position/>
+<item historyLabel="Bit_ReadSend.c" index="9">
+<position info="not_deleted" x="527" y="0"/>
 </item>
-<item historyLabel="Bit_ReadSend.c" index="2">
-<position info="not_deleted" x="703" y="0"/>
+<item historyLabel="main.c" index="10">
+<position info="not_deleted" x="225" y="0"/>
 </item>
-<item historyLabel="Bit_ReadSend.h" index="6">
-<position info="not_deleted" x="488" y="58"/>
+<item historyLabel="Bit_ReadSend.c" index="9">
+<position info="not_deleted" x="527" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position/>
+<item historyLabel="swdProtocol.c" index="11">
+<position info="not_deleted" x="458" y="0"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
-<position info="not_deleted" x="769" y="0"/>
+<item historyLabel="swdProtocol.c" index="11">
+<position info="not_deleted" x="414" y="18"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position/>
+<item historyLabel="startup_stm32f429xx.s" index="12">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="Bit_ReadSend.h" index="6">
-<position info="not_deleted" x="488" y="58"/>
+<item historyLabel="main.c" index="10">
+<position info="not_deleted" x="165" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="961" y="0"/>
+<item historyLabel="swdProtocol.c" index="11">
+<position info="not_deleted" x="414" y="18"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
-<position info="not_deleted" x="769" y="0"/>
+<item historyLabel="swdProtocol.c" index="11">
+<position info="not_deleted" x="509" y="0"/>
 </item>
-<item historyLabel="configurePort.h" index="4">
-<position info="not_deleted" x="23" y="0"/>
+<item historyLabel="swdProtocol.c" index="11">
+<position info="not_deleted" x="509" y="0"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
-<position info="not_deleted" x="769" y="0"/>
+<item historyLabel="Reset.c" index="13">
+<position info="not_deleted" x="131" y="0"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
+<item historyLabel="Delay.c" index="14">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="Delay.h" index="15">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="configurePort.c" index="16">
+<position info="not_deleted" x="476" y="0"/>
+</item>
+<item historyLabel="Reset.c" index="17">
+<position info="not_deleted" x="131" y="0"/>
+</item>
+<item historyLabel="swdProtocol.h" index="18">
 <position info="not_deleted" x="387" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="252" y="1"/>
+<item historyLabel="swdProtocol.c" index="19">
+<position info="not_deleted" x="509" y="0"/>
 </item>
-<item historyLabel="swdProtocol.h" index="3">
+<item historyLabel="Bit_ReadSend.h" index="20">
+<position info="not_deleted" x="536" y="0"/>
+</item>
+<item historyLabel="swdProtocol.c" index="19">
+<position info="not_deleted" x="509" y="0"/>
+</item>
+<item historyLabel="Bit_ReadSend.c" index="21">
+<position info="not_deleted" x="827" y="0"/>
+</item>
+<item historyLabel="main.c" index="22">
+<position info="not_deleted" x="165" y="0"/>
+</item>
+<item historyLabel="swdProtocol.h" index="18">
 <position info="not_deleted" x="387" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="321" y="0"/>
+<item historyLabel="swdProtocol.c" index="19">
+<position info="not_deleted" x="509" y="0"/>
 </item>
-<item historyLabel="Bit_ReadSend.c" index="2">
-<position info="not_deleted" x="703" y="0"/>
+<item historyLabel="swdProtocol.c" index="19">
+<position info="not_deleted" x="530" y="0"/>
 </item>
-<item historyLabel="Bit_ReadSend.h" index="6">
-<position info="not_deleted" x="488" y="58"/>
+<item historyLabel="startup_stm32f429xx.s" index="23">
+<position info="not_deleted" x="3665" y="0"/>
 </item>
-<item historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="321" y="0"/>
+<item historyLabel="main.c" index="24">
+<position info="not_deleted" x="165" y="0"/>
 </item>
-<item active="true" historyLabel="swdProtocol.c" index="1">
-<position info="not_deleted" x="1074" y="0"/>
+<item historyLabel="swdProtocol.c" index="19">
+<position info="not_deleted" x="323" y="0"/>
+</item>
+<item historyLabel="main.c" index="24">
+<position info="not_deleted" x="225" y="0"/>
+</item>
+<item active="true" historyLabel="swdProtocol.c" index="19">
+<position info="not_deleted" x="530" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -429,8 +462,31 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
+<persistable>
+<org.coocox.welcome.ui.WelcomePage/>
+</persistable>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="SerialWireDebug/Code/main.c">
+<persistable path="/SerialWireDebug/Code/main.c"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" tooltip="SerialWireDebug/STM32F4/startup_stm32f429xx.s">
 <persistable path="/SerialWireDebug/STM32F4/startup_stm32f429xx.s"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Delay.h" tooltip="SerialWireDebug/Code/Delay.h">
+<persistable path="/SerialWireDebug/Code/Delay.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Delay.c" tooltip="SerialWireDebug/Code/Delay.c">
+<persistable path="/SerialWireDebug/Code/Delay.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Reset.c" tooltip="SerialWireDebug/Code/Reset.c">
+<persistable path="/SerialWireDebug/Code/Reset.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.h" tooltip="SerialWireDebug/Code/swdProtocol.h">
+<persistable path="/SerialWireDebug/Code/swdProtocol.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Reset.h" tooltip="SerialWireDebug/Code/Reset.h">
+<persistable path="/SerialWireDebug/Code/Reset.h"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.c" tooltip="SerialWireDebug/Code/configurePort.c">
 <persistable path="/SerialWireDebug/Code/configurePort.c"/>
@@ -441,9 +497,6 @@
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" tooltip="SerialWireDebug/Code/configurePort.h">
 <persistable path="/SerialWireDebug/Code/configurePort.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.h" tooltip="SerialWireDebug/Code/swdProtocol.h">
-<persistable path="/SerialWireDebug/Code/swdProtocol.h"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.c" tooltip="SerialWireDebug/Code/swdProtocol.c">
 <persistable path="/SerialWireDebug/Code/swdProtocol.c"/>
 </file>
@@ -452,21 +505,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Bit_ReadSend.c" tooltip="SerialWireDebug/Code/Bit_ReadSend.c">
 <persistable path="/SerialWireDebug/Code/Bit_ReadSend.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_gpio.c" tooltip="Test/Hardware/stm32f4xx_hal_gpio.c">
-<persistable path="/Test/Hardware/stm32f4xx_hal_gpio.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="LED.h" tooltip="Test/Code/LED.h">
-<persistable path="/Test/Code/LED.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configuration.c" tooltip="Test/Code/configuration.c">
-<persistable path="/Test/Code/configuration.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" tooltip="SerialWireDebug/Code/configurePort.h">
-<persistable path="/SerialWireDebug/Code/configurePort.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.c" tooltip="SerialWireDebug/Code/configurePort.c">
-<persistable path="/SerialWireDebug/Code/configurePort.c"/>
 </file>
 </mruList>
 </workbench>

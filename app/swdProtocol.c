@@ -47,7 +47,7 @@ void switchJTAGtoSWD()
 	sendBits(0xE79E,16);
 	lineReset();
 
-	extraIdleClock(2);
+	extraIdleClock(3);
 }
 
 
