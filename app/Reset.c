@@ -1,20 +1,37 @@
 #include "Reset.h"
-#include "Delay.h"
 
-void resetTarget()
+/**
+ * Perform a line reset by clocking at least 50 cycles of SWDIO high to 
+ * ensure that JTAG/SWD interface is at reset state
+ *
+ * Input : numberOfClock is the number of clock with SWDIO high to be generated
+ */
+void lineReset(int numberOfClock)
 {
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
-	delay(10,1,1);
-	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_SET);
-	delay(2600,1,1);
+	int i  = 0 ;
+	
+	if (numberOfClock < 50 )
+		numberOfClock = 50 ;
+	
+	SWDIO_High();
+	
+	for ( i = 0 ; i < numberOfClock ; i ++)
+	{
+		clockGenerator_1cycle();
+	}
 }
 
-void lineReset()
+/**
+ * Perform a hard reset on the target device by setting low and high 
+ * on the nRST pin of the target
+ *
+ * Note : It is recommended to perform a hard reset as the target device might not respond
+ */
+void resetTarget()
 {
-	int i ;
+	ResetPin_Low();
+	delay(500,1,1);
+	ResetPin_High();
+	delay(2500,1,1);
 
-	SWDIO_High();
-
-	for (i = 0 ; i < 53 ; i ++)
-		clockGenerator_1cycle();
 }

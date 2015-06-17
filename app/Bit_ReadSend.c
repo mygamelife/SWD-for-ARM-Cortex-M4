@@ -1,26 +1,4 @@
 #include "Bit_ReadSend.h"
-#include "swdProtocol.h"
-
-
-void clockGenerator_1cycle()
-{
-	SWCLK_OFF()
-	SWCLK_ON()
-}
-
-/* include two IDLE clock cycles with SWDIO low for each packet
- * to ensure the operation is in stable mode
- */
-void extraIdleClock(int numberOfClocks)
-{
-	int i;
-
-	SWDIO_Low();
-
-	for(i = 0 ; i < numberOfClocks ; i ++)
-		clockGenerator_1cycle();
-}
-
 
 void sendBit(int value)
 {
@@ -29,7 +7,7 @@ void sendBit(int value)
 	if (value == 1)
 		SWDIO_High()
 	else
-		SWDIO_Low()
+		SWDIO_Low();
 
 	SWCLK_ON();
 }
@@ -37,7 +15,6 @@ void sendBit(int value)
 void sendBits(uint32_t dataToSend,int numberOfBits)
 {
 	//LSB first
-
 	int i , bitValue = 0;
 	for (i=0 ; i < numberOfBits ; i ++)
 	{
@@ -53,17 +30,14 @@ void sendBits(uint32_t dataToSend,int numberOfBits)
 
 int readBit()
 {
-	GPIO_PinState bitRead ;
+	int bitRead = 0 ;
 
 	SWCLK_ON();
-	//delay(2,1,10);
+	delay(3,1,10);
 	SWCLK_OFF();
-	bitRead  = HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_12);
 
-	if (bitRead  == 1)
-		return 1 ;
-	else
-		return 0 ;
+	bitRead = readSWDIO_Pin();
+	return bitRead ;
 }
 
 void readBits(uint32_t *dataRead,int numberOfBits)
@@ -76,6 +50,5 @@ void readBits(uint32_t *dataRead,int numberOfBits)
 		bitRead = readBit();
 		*dataRead = *dataRead | (bitRead << i ) ;
 	}
-
 
 }

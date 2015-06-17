@@ -1,9 +1,10 @@
 #ifndef Reset_H
 #define Reset_H
 
-#include "Bit_ReadSend.h"
+#include "Delay.h"
+#include "IO_Operations.h"
+#include "Clock.h"
 
-void lineReset();
+void lineReset(int numberOfClock);
 void resetTarget();
-
 #endif // Reset_H

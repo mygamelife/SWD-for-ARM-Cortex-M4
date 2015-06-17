@@ -9,7 +9,7 @@ void delay(int ms,int numberOfLoops, int division)
 
 	for ( i = 0 ; i < numberOfLoops; i ++)
 	{
-		while (counter1 != ((100 / division) * ms ))
+		while (counter1 != ((60 / division) * ms )) // default about 100 microsecond
 			counter1 ++ ;
 	}
 }
