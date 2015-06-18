@@ -16,7 +16,7 @@
  *  0x00          IDCODE        ABORT
  *  0x04          CTRL/STAT     CTRL/STAT
  *  0x08          RESEND        SELECT
- *  0x04          RDBUFF        N/A
+ *  0x0C          RDBUFF        N/A
  */
 
 /**
@@ -48,9 +48,48 @@ void setCtrlStatusReg(uint32_t data) {
   send32bit(data);
 }
 
+/**
+ * --------CAUTION----------- 
+ * It is read-only register
+ * --------------------------
+ * Read IDCODE register by sending SWD-DP request
+ */
 void readIDCODEReg(int RnW) {
   int SWD_Request;
 
   SWD_Request = getSWD_Request(0x00, DP, RnW);
+  send8bit(SWD_Request);
+}
+
+/**
+ * --------CAUTION----------- 
+ * It is write-only register
+ * --------------------------
+ * Write IDCODE register by sending SWD-DP request
+ */
+void writeAbortReg()  {
+  int SWD_Request;
+
+  SWD_Request = getSWD_Request(0x00, DP, WRITE);
+  send8bit(SWD_Request);
+}
+
+/**
+ * set bits in abort register
+ */
+void setAbortReg(uint32_t data)  {
+  send32bit(data);
+}
+
+/**
+ * --------CAUTION----------- 
+ * It is write-only register
+ * --------------------------
+ * Write IDCODE register by sending SWD-DP request
+ */
+void writeSelectReg()  {
+  int SWD_Request;
+
+  SWD_Request = getSWD_Request(0x08, DP, WRITE);
   send8bit(SWD_Request);
 }

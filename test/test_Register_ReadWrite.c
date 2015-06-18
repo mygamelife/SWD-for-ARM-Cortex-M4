@@ -115,3 +115,69 @@ void test_readIDCODEReg_request_10010101_should_be_send(void)
 
 	readIDCODEReg(READ);
 }
+
+ /******************************************************************************************************
+ |  Start bit   | 	APnDP   |   RW     |    Addr2   |   Addr3   |   Parity    |   Stop    |   Park    |
+ ------------------------------------------------------------------------------------------------------
+ |      1       |    0      |    0     |     0      |     0     |     0       |    0      |     1     |
+ ******************************************************************************************************/
+void test_writeAbortReg_request_10000001_should_be_send(void)
+{
+  //DP = 0, Write = 0, Addr = 0x00
+	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
+
+	writeAbortReg();
+}
+
+void test_setAbortReg_should_send_0x8(void)
+{
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+  SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
+
+	setAbortReg(0x8);
+}

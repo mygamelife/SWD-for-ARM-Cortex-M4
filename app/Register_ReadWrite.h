@@ -10,8 +10,15 @@
 //IDCODE Register
 void readIDCODEReg(int RnW);
 
-//Control/Status Register
+//CONTROL/STATUS Register
 void ctrlStatusReg(int RnW);
 void setCtrlStatusReg(uint32_t data);
+
+//ABORT Register
+void writeAbortReg();
+void setAbortReg(uint32_t data);
+
+//SELECT Register
+void writeSelectReg();
 //-------------------------- SWD-DP Register --------------------------------
 #endif // Register_ReadWrite_H
