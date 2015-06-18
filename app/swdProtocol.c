@@ -18,7 +18,7 @@ void SWD_Initialisation()
 	uint32_t IDCODE = 0 ;
 
 	switchJTAGtoSWD();
-	readIDCODEReg(READ);
+	readIDCODEReg();
 
 	SWDIO_InputMode();
 	turnAround();

@@ -42,22 +42,15 @@ void ctrlStatusReg(int RnW) {
 }
 
 /**
- * Set CSYSPWRUPRED(bit30) and CDBGPWRUPREQ(bit 28) bits of CTRL/STATUS Register
- */
-void setCtrlStatusReg(uint32_t data) {
-  send32bit(data);
-}
-
-/**
  * --------CAUTION----------- 
  * It is read-only register
  * --------------------------
  * Read IDCODE register by sending SWD-DP request
  */
-void readIDCODEReg(int RnW) {
+void readIDCODEReg() {
   int SWD_Request;
 
-  SWD_Request = getSWD_Request(0x00, DP, RnW);
+  SWD_Request = getSWD_Request(0x00, DP, READ);
   send8bit(SWD_Request);
 }
 
@@ -75,13 +68,6 @@ void writeAbortReg()  {
 }
 
 /**
- * set bits in abort register
- */
-void setAbortReg(uint32_t data)  {
-  send32bit(data);
-}
-
-/**
  * --------CAUTION----------- 
  * It is write-only register
  * --------------------------
@@ -92,4 +78,31 @@ void writeSelectReg()  {
 
   SWD_Request = getSWD_Request(0x08, DP, WRITE);
   send8bit(SWD_Request);
+}
+
+/** writeDataToSelectReg is a function to write data into the SELECT REGISTER
+ *
+ * input :  data is the 32 bit size data that will be write into SELECT REGISTER 
+ *          to perform certain task
+ *
+ * return : NONE
+ */
+void writeDataToSelectReg(uint32_t data)  {
+  int ack = 0;
+  
+  //write request
+  writeAbortReg();
+
+  SWDIO_InputMode();
+  turnAround();
+
+  read3bit(&ack);
+
+  SWDIO_OutputMode();
+  turnAround();
+
+  send32bit(data);
+  sendBit(1); //Parity bit
+
+  extraIdleClock(8);
 }
