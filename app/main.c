@@ -2,7 +2,7 @@
 int main(void)
 {
 	configure_IOPorts();
-	resetTarget();
+	//resetTarget();
 
 	while(1)
 	{

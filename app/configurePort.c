@@ -83,5 +83,5 @@ void configure_IOPorts()
 	configureTargetResetPin();
 	SWDIO_OutputMode();
 
-	delay(10,1,1);
+	//delay(10,1,1);
 }

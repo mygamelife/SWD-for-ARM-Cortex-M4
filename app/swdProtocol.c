@@ -17,15 +17,18 @@ void SWD_Initialisation()
 	int SWD_Request = 0 , ACK = 0, Parity = 0  ;
 	uint32_t IDCODE = 0 ;
 	
-	SWD_Request = getSWD_Request(0x00,DP,Read);
+	SWD_Request = getSWD_Request(0x00,DP,READ);
 
 	switchJTAGtoSWD();
 	send8bit(SWD_Request);
-	SWDIO_InputMode();
+
 	turnAround();
+	SWDIO_InputMode();
+
 	read3bit(&ACK);
 	read32bit(&IDCODE);
 	Parity = readBit();
+
 	turnAround();
 	SWDIO_OutputMode();
 	extraIdleClock(8);
@@ -39,10 +42,10 @@ void SWD_Initialisation()
  */
 void switchJTAGtoSWD()
 {
-	SWDIO_OutputMode();
-	
+	//SWDIO_OutputMode();
 	lineReset(55);
 	send16bit(0xE79E);
 	lineReset(55);
+
 	extraIdleClock(3);
 }

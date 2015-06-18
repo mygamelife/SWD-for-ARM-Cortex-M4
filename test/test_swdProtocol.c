@@ -20,7 +20,7 @@ void test_switchJTAGtoSWD_should_call_SWDIO_Output_lineReset_send0xE79E_lineRese
 {
 	int i = 0 ;	
 	
-	SWDIO_OutputMode_Expect();
+	//SWDIO_OutputMode_Expect();
 	
 	//lineReset
 	SWDIO_High_Expect();
@@ -74,7 +74,7 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	
 	
 	//switch to OutputMode
-	SWDIO_OutputMode_Expect();
+	//SWDIO_OutputMode_Expect();
 	
 	//lineReset
 	SWDIO_High_Expect();
@@ -131,14 +131,13 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
 	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
 	
-	SWDIO_InputMode_Expect();
-	
 	//turnAround
 	SWCLK_OFF_Expect();
 	SWCLK_ON_Expect();
 	
-	//read ACK
-	
+	SWDIO_InputMode_Expect();
+  
+	//read ACK	
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);

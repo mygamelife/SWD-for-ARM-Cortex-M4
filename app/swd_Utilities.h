@@ -3,11 +3,11 @@
 
 #define DP 0
 #define AP 1
-#define Write 0
-#define Read 1
-#define StartBit 1
-#define StopBit 0
-#define ParkBit 1
+#define WRITE 0
+#define READ 1
+#define STARTBIT 1
+#define STOPBIT 0
+#define PARKBIT 1
 
 #include <stdint.h>
 int calculateParity_SWDRequest(int Address_bit3,int Address_bit2,int APnDP, int ReadWrite);

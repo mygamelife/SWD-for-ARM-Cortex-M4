@@ -102,7 +102,7 @@ void test_getSWD_Request_given_Address_0x00_DP_Read_should_return_0xA5()
 	//Start bit	|	APnDP	|	RW	|	Addr2	|	Addr3	|	Parity	|	Stop	|	Park	|
 	//    1     |	0		|	1	| 	0		|	0		|	1		|	0		|	1		|
 	
-	TEST_ASSERT_EQUAL(0xA5,getSWD_Request(0x00,DP,Read));
+	TEST_ASSERT_EQUAL(0xA5,getSWD_Request(0x00,DP,READ));
 }
 
 
@@ -116,6 +116,6 @@ void test_getSWD_Request_given_Address0x08_AP_Write_should_return_0x93()
 	//    1     |	1		|	0	| 	0		|	1		|	0		|	0		|	1		|
 	
 	
-	TEST_ASSERT_EQUAL(0x93,getSWD_Request(0x08,AP,Write));
+	TEST_ASSERT_EQUAL(0x93,getSWD_Request(0x08,AP,WRITE));
 	
 }
