@@ -2,6 +2,8 @@
 #define Bit_Operations_H
 
 #include "IO_Operations.h"
+#include "stm32f4xx_hal_gpio.h"
+
 #include <stdint.h>
 
 void sendBit(int data);
