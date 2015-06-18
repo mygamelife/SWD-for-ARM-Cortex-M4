@@ -22,13 +22,13 @@
 /**
  *	Action          Value        
  *	-------------------------------------------------------------------
- *	START         Always  1
- *	AP/DP1        DP  = 0,   AP  = 1
- *	RW            W   = 0,   R   = 1
- *	Addr[2:3]     Refer Register Address
- *	Parity        APnDP + RW + Addr2 + Addr3 Even 1's = 0, Odd 1's = 1
- *	STOP          Always  1   
- *	PARK          Always  1
+ * START         Always  1
+ * AP/DP1        DP  = 0,   AP  = 1
+ * RW            W   = 0,   R   = 1
+ * Addr[2:3]     Refer Register Address
+ * Parity        APnDP + RW + Addr2 + Addr3 Even 1's = 0, Odd 1's = 1
+ * STOP          Always  1   
+ * PARK          Always  1
  */
 
 /**
