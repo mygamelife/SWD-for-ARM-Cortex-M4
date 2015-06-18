@@ -14,13 +14,11 @@
  */
 void SWD_Initialisation()
 {
-	int SWD_Request = 0 , ACK = 0, Parity = 0  ;
+	int ACK = 0, Parity = 0  ;
 	uint32_t IDCODE = 0 ;
-	
-	SWD_Request = getSWD_Request(0x00,DP,READ);
 
 	switchJTAGtoSWD();
-	send8bit(SWD_Request);
+	readIDCODEReg(READ);
 
 	turnAround();
 	SWDIO_InputMode();

@@ -7,6 +7,7 @@
 #include "Delay.h"
 #include "Reset.h"
 #include "swdProtocol.h"
+#include "Register_ReadWrite.h"
 
 void setUp(void)
 {

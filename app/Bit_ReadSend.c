@@ -2,10 +2,10 @@
 
 void sendBit(int value)
 {
-	SWCLK_OFF() ;
+	SWCLK_OFF();
 
 	if (value == 1)
-		SWDIO_High()
+		SWDIO_High();
 	else
 		SWDIO_Low();
 

@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "swd_Utilities.h"
 
 /**

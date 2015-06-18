@@ -1,11 +1,12 @@
 #ifndef IO_Operations_H
 #define IO_Operations_H
 
+#include "stm32f4xx_hal_gpio.h"
 #include "configurePort.h"
 
-#ifndef TEST
+#if !defined(TEST)
+
 #include "stm32f4xx_hal.h"
-#include "stm32f4xx_hal_gpio.h"
 
 #define SWCLK_ON()			HAL_GPIO_WritePin(SWD_PORT, SWDCLK_PIN, GPIO_PIN_SET)
 #define SWCLK_OFF()			HAL_GPIO_WritePin(SWD_PORT, SWDCLK_PIN, GPIO_PIN_RESET)
@@ -21,7 +22,7 @@ void SWDIO_High();
 void SWDIO_Low();
 void ResetPin_High();
 void ResetPin_Low();
-#endif
+#endif // !defined(TEST)
 
 int readSWDIO_Pin();
 
