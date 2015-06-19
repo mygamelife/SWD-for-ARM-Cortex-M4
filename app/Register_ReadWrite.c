@@ -66,7 +66,6 @@ void writeAbortReg()  {
   SWD_Request = getSWD_Request(0x00, DP, WRITE);
   send8bit(SWD_Request);
 }
-<<<<<<< HEAD
 
 /**
  * --------CAUTION-----------
@@ -94,13 +93,15 @@ void writeDataToSelectReg(uint32_t data)  {
   //write request
   writeAbortReg();
 
+ 
+  turnAround_ToRead();
   SWDIO_InputMode();
-  turnAround();
 
   read3bit(&ack);
 
+  turnAround_ToWrite();
   SWDIO_OutputMode();
-  turnAround();
+  
 
   send32bit(data);
   sendBit(1); //Parity bit

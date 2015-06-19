@@ -15,15 +15,17 @@ int main(void)
 		writeDataToSelectReg(WDERRCLR);
 		/**********READ CTRL/STAT*****************/
 		ctrlStatusReg(READ);
+		turnAround_ToRead();
 		SWDIO_InputMode();
-		turnAround();
+
 
 		read3bit(&ack);
 		read32bit(&ctrlStatusRegData);
 		parity = readBit();
 
+		turnAround_ToWrite();
 		SWDIO_OutputMode();
-		turnAround();
+
 		extraIdleClock(8);
 		/**********READ CTRL/STAT*****************/
 	}

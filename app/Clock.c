@@ -28,12 +28,27 @@ void extraIdleClock(int numberOfClocks)
 }
 
 /**
- * Generate turn around period by clocking 1 cycle
- * and to be used when the host/target change I/O mode
+ * Generate 0.5 clock cycle of turn around period 
+ *
+ * Host : change from output mode to input mode
+ * Target : change from input mode to output mode
  * 
  */
-void turnAround()
+void turnAround_ToRead()
 {
+	SWCLK_OFF(); // z impedance on both line starts here
+}
+
+/**
+ * Generate 1.5 clock cycle of turn around period 
+ *
+ * Host : change from input mode to output mode
+ * Target : change output mode to input mode
+ * 
+ */
+void turnAround_ToWrite()
+{
+	SWCLK_ON(); // z impedance on both line starts here
 	SWCLK_OFF();
 	SWCLK_ON();
 }

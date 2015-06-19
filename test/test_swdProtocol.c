@@ -132,11 +132,11 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
 	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
 
-  SWDIO_InputMode_Expect();
-  
-	//turnAround
+	//turnAround_ToRead
 	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
+	
+	//SWDIO Input mode
+	SWDIO_InputMode_Expect();
 
 	//read ACK
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
@@ -186,12 +186,14 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	//read Parity
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
 
-  //SWDIO_Output mode
-	SWDIO_OutputMode_Expect();
-
-	//turnAround
+	//turnAround_ToWrite
+	SWCLK_ON_Expect();
 	SWCLK_OFF_Expect();
 	SWCLK_ON_Expect();
+	
+	
+	//SWDIO_Output mode
+	SWDIO_OutputMode_Expect();
 
 	//extraIdleClock
 	SWDIO_Low_Expect();
