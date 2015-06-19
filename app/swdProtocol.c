@@ -18,17 +18,17 @@ void SWD_Initialisation()
 	uint32_t IDCODE = 0 ;
 
 	switchJTAGtoSWD();
-	readIDCODEReg(READ);
+	readIDCODEReg();
 
-	turnAround();
 	SWDIO_InputMode();
+	turnAround();
 
 	read3bit(&ACK);
 	read32bit(&IDCODE);
 	Parity = readBit();
 
-	turnAround();
 	SWDIO_OutputMode();
+	turnAround();
 	extraIdleClock(8);
 }
 
