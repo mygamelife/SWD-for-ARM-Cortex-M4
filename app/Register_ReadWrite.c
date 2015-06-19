@@ -66,7 +66,6 @@ void writeAbortReg()  {
   SWD_Request = getSWD_Request(0x00, DP, WRITE);
   send8bit(SWD_Request);
 }
-<<<<<<< HEAD
 
 /**
  * --------CAUTION-----------
