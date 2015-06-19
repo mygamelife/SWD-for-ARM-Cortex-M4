@@ -19,7 +19,7 @@ void ctrlStatusReg(int RnW);
 
 //ABORT Register
 void writeAbortReg();
-void writeDataToSelectReg(uint32_t data);
+void writeDataToAbortReg(uint32_t data);
 
 //SELECT Register
 void writeSelectReg();

@@ -10,22 +10,39 @@ int main(void)
 
 	SWD_Initialisation();
 
+	writeDataToSelectReg(WDERRCLR);
+	/**********READ CTRL/STAT*****************/
+	ctrlStatusReg(READ);
+	SWDIO_InputMode();
+	turnAround();
+
+	read3bit(&ack);
+	read32bit(&ctrlStatusRegData);
+	parity = readBit();
+
+	SWDIO_OutputMode();
+	turnAround();
+	extraIdleClock(8);
+	/**********READ CTRL/STAT*****************/
+
+	writeDataToAbortReg(WDERRCLR);
+
+	/**********READ CTRL/STAT*****************/
+	ctrlStatusReg(READ);
+	SWDIO_InputMode();
+	turnAround();
+
+	read3bit(&ack);
+	read32bit(&ctrlStatusRegData);
+	parity = readBit();
+
+	SWDIO_OutputMode();
+	turnAround();
+	extraIdleClock(8);
+	/**********READ CTRL/STAT*****************/
+
 	while(1)
 	{
-		writeDataToSelectReg(WDERRCLR);
-		/**********READ CTRL/STAT*****************/
-		ctrlStatusReg(READ);
-		SWDIO_InputMode();
-		turnAround();
-
-		read3bit(&ack);
-		read32bit(&ctrlStatusRegData);
-		parity = readBit();
-
-		SWDIO_OutputMode();
-		turnAround();
-		extraIdleClock(8);
-		/**********READ CTRL/STAT*****************/
 	}
 
 }
