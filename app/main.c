@@ -6,22 +6,23 @@ int main(void)
 	uint32_t ctrlStatusRegData = 0;
 
 	configure_IOPorts();
-	resetTarget();
+	//resetTarget();
 
 	SWD_Initialisation();
 
-	writeDataToSelectReg(WDERRCLR);
 	/**********READ CTRL/STAT*****************/
 	ctrlStatusReg(READ);
+
+	turnAround_ToRead();
 	SWDIO_InputMode();
-	turnAround();
 
 	read3bit(&ack);
 	read32bit(&ctrlStatusRegData);
 	parity = readBit();
 
+	turnAround_ToWrite();
 	SWDIO_OutputMode();
-	turnAround();
+
 	extraIdleClock(8);
 	/**********READ CTRL/STAT*****************/
 
@@ -29,15 +30,17 @@ int main(void)
 
 	/**********READ CTRL/STAT*****************/
 	ctrlStatusReg(READ);
+
+	turnAround_ToRead();
 	SWDIO_InputMode();
-	turnAround();
 
 	read3bit(&ack);
 	read32bit(&ctrlStatusRegData);
 	parity = readBit();
 
+	turnAround_ToWrite();
 	SWDIO_OutputMode();
-	turnAround();
+
 	extraIdleClock(8);
 	/**********READ CTRL/STAT*****************/
 

@@ -107,26 +107,26 @@ void test_writeDataToAbortReg_should_execute_same_sequence_as_wrote_in_the_funct
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
 	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
 
-	//turnAround
+	//turnAround_ToRead
 	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
 
-  //Switch to Input
-  SWDIO_InputMode_Expect();
+	//Switch to Input
+	SWDIO_InputMode_Expect();
 
 	//read ACK
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
 	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
 
-	//turnAround
+	//turnAround_ToWrite
+	SWCLK_ON_Expect();
 	SWCLK_OFF_Expect();
 	SWCLK_ON_Expect();
 
-  //SWDIO_Output mode
+	//SWDIO_Output mode
 	SWDIO_OutputMode_Expect();
 
-  //Data
+	//Data
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // LSB
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 8

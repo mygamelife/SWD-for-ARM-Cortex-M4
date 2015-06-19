@@ -5,7 +5,7 @@
  * 1. Perform a line reset and switch SWJ-DP from JTAG to SWD
  * 2. Perform a line reset again and generate idle clock cycles
  * 3. Send 8 bits of SWD request header (Address of IDCODE register 0x00,Debug Port access,Read)
- * 4. Switch to input mode and generate turn around
+ * 4. Generate a turn around and switch to input mode
  * 5. Read 3 bits of ACK response from the target
  * 6. Read 32 bits of IDCODE data replied by the target
  * 7. Read 1 bit of parity bit replied by the target
@@ -20,15 +20,16 @@ void SWD_Initialisation()
 	switchJTAGtoSWD();
 	readIDCODEReg();
 
+	turnAround_ToRead();
 	SWDIO_InputMode();
-	turnAround();
-
+	
 	read3bit(&ACK);
 	read32bit(&IDCODE);
 	Parity = readBit();
 
+	turnAround_ToWrite();
 	SWDIO_OutputMode();
-	turnAround();
+	
 	extraIdleClock(8);
 }
 

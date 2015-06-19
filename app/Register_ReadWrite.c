@@ -92,13 +92,13 @@ void writeDataToAbortReg(uint32_t data)  {
 
   //write request
   writeAbortReg();
-
-  turnAround();
+ 
+  turnAround_ToRead();
   SWDIO_InputMode();
 
   read3bit(&ack);
 
-  turnAround();
+  turnAround_ToWrite();
   SWDIO_OutputMode();
 
   send32bit(data);
