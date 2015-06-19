@@ -80,19 +80,18 @@ void writeSelectReg()  {
   send8bit(SWD_Request);
 }
 
-/** writeDataToSelectReg is a function to write data into the SELECT REGISTER
+/** writeDataToAbortReg is a function to write data into the ABORT REGISTER
  *
- * input :  data is the 32 bit size data that will be write into SELECT REGISTER
+ * input :  data is the 32 bit size data that will be write into ABORT REGISTER
  *          to perform certain task
  *
  * return : NONE
  */
-void writeDataToSelectReg(uint32_t data)  {
+void writeDataToAbortReg(uint32_t data)  {
   int ack = 0;
 
   //write request
   writeAbortReg();
-
  
   turnAround_ToRead();
   SWDIO_InputMode();
@@ -101,7 +100,6 @@ void writeDataToSelectReg(uint32_t data)  {
 
   turnAround_ToWrite();
   SWDIO_OutputMode();
-  
 
   send32bit(data);
   sendBit(1); //Parity bit
