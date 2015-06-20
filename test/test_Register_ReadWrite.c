@@ -93,8 +93,8 @@ void test_writeAbortReg_request_10000001_should_be_send(void)
 	writeAbortReg();
 }
 
-void test_writeDataToSelectReg_should_execute_same_sequence_as_wrote_in_the_function()  
-{  
+void test_writeDataToAbortReg_should_execute_same_sequence_as_wrote_in_the_function()
+{
   int i = 0;
 	//send 0x81
 	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
@@ -107,11 +107,9 @@ void test_writeDataToSelectReg_should_execute_same_sequence_as_wrote_in_the_func
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
 	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
 
-  
-  
 	//turnAround_ToRead
 	SWCLK_OFF_Expect();
-	
+
 	//Switch to Input
 	SWDIO_InputMode_Expect();
 
@@ -124,23 +122,23 @@ void test_writeDataToSelectReg_should_execute_same_sequence_as_wrote_in_the_func
 	SWCLK_ON_Expect();
 	SWCLK_OFF_Expect();
 	SWCLK_ON_Expect();
-	
+
 	//SWDIO_Output mode
 	SWDIO_OutputMode_Expect();
-  
+
 	//Data
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // LSB
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 8
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
+	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
 
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0  
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
 
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
 	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
 
@@ -175,6 +173,7 @@ void test_writeDataToSelectReg_should_execute_same_sequence_as_wrote_in_the_func
 	//-----------extraIdleClock-------------
 	SWDIO_Low_Expect();
 
+<<<<<<< HEAD
 	for(i = 0; i < 8; i++)  {
 		SWCLK_OFF_Expect();SWCLK_ON_Expect();
 	}
@@ -310,4 +309,12 @@ void test_SWDRegister_RW_given_Address_0x4_AP_READ_data_0xFFFFFFFF_should_send_S
 	TEST_ASSERT_EQUAL(1,ACK);
 	TEST_ASSERT_EQUAL(0xFFFFFFFF,dataRead);
 	TEST_ASSERT_EQUAL(1,parity);
+=======
+  for(i = 0; i < 8; i++)  {
+    SWCLK_OFF_Expect();SWCLK_ON_Expect();
+  }
+  //-----------extraIdleClock-------------
+
+  writeDataToAbortReg(WDERRCLR);
+>>>>>>> 93be5a87effad50d608db3144d0e31fa798f07ac
 }

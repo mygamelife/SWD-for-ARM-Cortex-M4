@@ -18,14 +18,6 @@ int main(void)
 
 	SWD_Initialisation();
 
-	SWDRegister_RW(CTRLSTAT_REG,DP,WRITE,&ctrlStatusRegData);
-	SWDRegister_RW(CSW_REG,AP,WRITE,&CSW_data);
-
-	SWDRegister_RW(TAR_REG,AP,WRITE, &TAR_data);
-
-	SWDRegister_RW(DRW_REG,AP,WRITE,&DRW_data);
-
-
 	resetTarget();
 	while(1)
 	{

@@ -1,23 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SWD-for-ARM-Cortex-M4.map -O0 --gc-sections -LC:/Users/Shengli/CoIDE/workspace/SerialWireDebug -TC:/Users/Shengli/CoIDE/workspace/SerialWireDebug/stm32f429zi_flash.ld -g">
-      <target file="SWD-for-ARM-Cortex-M4.elf" lastModified="14e0af65f7c">
-         <source file="..\obj\configurePort.o" lastModified="14e0af477e9"/>
-         <source file="..\obj\swd_Utilities.o" lastModified="14e0af46d5e"/>
-         <source file="..\obj\IO_Operations.o" lastModified="14e0af4736d"/>
-         <source file="..\obj\Register_ReadWrite.o" lastModified="14e0af47292"/>
-         <source file="..\obj\main.o" lastModified="14e0af65cb8"/>
-         <source file="..\obj\Bit_Operations.o" lastModified="14e0af46ca8"/>
-         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14e0af47649"/>
-         <source file="..\obj\startup_stm32f429xx.o" lastModified="14e0af471a3"/>
-         <source file="..\obj\system_stm32f4xx.o" lastModified="14e0af47712"/>
-         <source file="..\obj\stm32f4xx_hal.o" lastModified="14e0af4745a"/>
-         <source file="..\obj\Reset.o" lastModified="14e0af479d6"/>
-         <source file="..\obj\Delay.o" lastModified="14e0af47179"/>
-         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14e0af478fa"/>
-         <source file="..\obj\Clock.o" lastModified="14e0af46f99"/>
-         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14e0af4755e"/>
-         <source file="..\obj\swdProtocol.o" lastModified="14e0af470bb"/>
+      <target file="SWD-for-ARM-Cortex-M4.elf" lastModified="14e10e855db">
+         <source file="..\obj\configurePort.o" lastModified="14e10e8512b"/>
+         <source file="..\obj\swd_Utilities.o" lastModified="14e10e847db"/>
+         <source file="..\obj\IO_Operations.o" lastModified="14e10e84cdc"/>
+         <source file="..\obj\Register_ReadWrite.o" lastModified="14e10e84c0b"/>
+         <source file="..\obj\main.o" lastModified="14e10e848b5"/>
+         <source file="..\obj\Bit_Operations.o" lastModified="14e10e8473b"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14e10e84fb8"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="14e10e84b2c"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14e10e85048"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14e10e84dd1"/>
+         <source file="..\obj\Reset.o" lastModified="14e10e85305"/>
+         <source file="..\obj\Delay.o" lastModified="14e10e84b05"/>
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14e10e8520d"/>
+         <source file="..\obj\Clock.o" lastModified="14e10e849a9"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14e10e84ec6"/>
+         <source file="..\obj\swdProtocol.o" lastModified="14e10e84a84"/>
       </target>
    </processor>
 </history>
