@@ -119,3 +119,17 @@ void test_getSWD_Request_given_Address0x08_AP_Write_should_return_0x93()
 	TEST_ASSERT_EQUAL(0x93,getSWD_Request(0x08,AP,WRITE));
 	
 }
+
+void test_getSWD_Request_given_Address0x04_DP_READ_should_return_0x8D()
+{
+	//DP = 0 , AP = 1 
+	//WRiTE = 0 ,READ = 1
+	
+	//**Note LSB
+	//Start bit	|	APnDP	|	RW	|	Addr2	|	Addr3	|	Parity	|	Stop	|	Park	|
+	//    1     |	0		|	1	| 	1		|	0		|	0		|	0		|	1		|
+	
+	
+	TEST_ASSERT_EQUAL(0x8D,getSWD_Request(0x04,DP,READ));
+	
+}

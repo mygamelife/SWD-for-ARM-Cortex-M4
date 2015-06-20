@@ -17,7 +17,7 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_fmc.h" lastModified="14c0ebffd2b">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\Register_ReadWrite.h" lastModified="14e09a4ec22">
+      <source file="..\..\..\app\Register_ReadWrite.h" lastModified="14e0adad9a8">
          <include file="..\..\..\app\Clock.h"/>
          <include file="..\..\..\app\Bit_Operations.h"/>
          <include file="..\..\..\app\configurePort.h"/>
@@ -30,7 +30,7 @@
          <include file="..\..\..\app\IO_Operations.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
       </source>
-      <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e09b37988">
+      <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e0ab0a5bb">
          <include file="..\..\..\app\Register_ReadWrite.h"/>
       </source>
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_i2c.h" lastModified="14c0ebff446">
@@ -43,7 +43,7 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_smartcard.h" lastModified="14c0ebff272">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\Bit_Operations.c" lastModified="14dfd5f2e29">
+      <source file="..\..\..\app\Bit_Operations.c" lastModified="14e0a98c7b9">
          <include file="..\..\..\app\Bit_Operations.h"/>
       </source>
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr.h" lastModified="14c0ebff262">
@@ -183,10 +183,11 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h" lastModified="14c0ebffc51">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\main.c" lastModified="14e09b571f5">
+      <source file="..\..\..\app\main.c" lastModified="14e0af6436a">
          <include file="..\..\..\app\swdProtocol.h"/>
+         <include file="..\..\..\app\Register_ReadWrite.h"/>
       </source>
-      <source file="..\..\..\app\swdProtocol.c" lastModified="14e09b2ba6c">
+      <source file="..\..\..\app\swdProtocol.c" lastModified="14e0ac9657f">
          <include file="..\..\..\app\swdProtocol.h"/>
       </source>
       <source file="..\..\..\app\stm32f429xx.h" lastModified="14c0ebfe3d8">
@@ -248,7 +249,7 @@
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_fsmc.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_ll_fmc.h"/>
       </source>
-      <source file="..\..\..\app\configurePort.h" lastModified="14e00b1f629">
+      <source file="..\..\..\app\configurePort.h" lastModified="14e0af3797b">
          <include file="..\..\..\app\Delay.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
@@ -336,11 +337,11 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" lastModified="14c0ebff197">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal.h"/>
       </source>
-      <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma2d.h" lastModified="14c0ebffa5e">
-         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
-      </source>
       <source file="..\..\..\app\Clock.h" lastModified="14e09a5a895">
          <include file="..\..\..\app\IO_Operations.h"/>
+      </source>
+      <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_dma2d.h" lastModified="14c0ebffa5e">
+         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
       <source file="..\..\..\app\Clock.c" lastModified="14e09ab958c">
          <include file="..\..\..\app\Clock.h"/>

@@ -29,7 +29,6 @@ void SWD_Initialisation()
 
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
-	
 	extraIdleClock(8);
 }
 

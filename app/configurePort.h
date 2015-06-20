@@ -8,10 +8,10 @@
 #include "stm32f4xx_hal_gpio.h"
 #endif
 
-#define SWDIO_PIN 			GPIO_PIN_4
-#define SWDCLK_PIN			GPIO_PIN_5
-#define SWDnRST_PIN			GPIO_PIN_6
-#define SWD_PORT			GPIOA
+#define SWDIO_PIN 			GPIO_PIN_12
+#define SWDCLK_PIN			GPIO_PIN_11
+#define SWDnRST_PIN			GPIO_PIN_8
+#define SWD_PORT			GPIOC
 
 #define CLK_EN()	do{								\
 							__GPIOA_CLK_ENABLE();	\

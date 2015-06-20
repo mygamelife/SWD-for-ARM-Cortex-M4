@@ -1,17 +1,40 @@
 #include "swdProtocol.h"
+#include "Register_ReadWrite.h"
 
 int main(void)
 {
 	int ack = 0, parity = 0;
-	uint32_t ctrlStatusRegData = 0;
+
+	uint32_t dummyRead = 0 ;
+
+	uint32_t ctrlStatusRegData = 0x50000000  ,CTRLSTAT_READDATA =0 ;
+	uint32_t CSW_data = 0x22000002 ;
+	uint32_t TAR_data = 0xE000EDF0 ;
+	uint32_t DRW_data = 0xA05F0003 ;
+	uint32_t DP_Select_data = 0x0 ;
 
 	configure_IOPorts();
 	resetTarget();
 
 	SWD_Initialisation();
 
+	SWDRegister_RW(CTRLSTAT_REG,DP,WRITE,&ctrlStatusRegData);
+	SWDRegister_RW(CSW_REG,AP,WRITE,&CSW_data);
+
+	SWDRegister_RW(TAR_REG,AP,WRITE, &TAR_data);
+
+	SWDRegister_RW(DRW_REG,AP,WRITE,&DRW_data);
+
+
+	resetTarget();
 	while(1)
 	{
+
+	}
+
+	while(1)
+	{
+
 		writeDataToSelectReg(WDERRCLR);
 		/**********READ CTRL/STAT*****************/
 		ctrlStatusReg(READ);

@@ -1,8 +1,8 @@
 #include "Bit_Operations.h"
 
 /**
- * Send 1 bit of data through SWDIO pin (PB12) by setting the SWDIO pin first
- * and generate 1 clock cycle through SWCLK pin (PB10)
+ * Send 1 bit of data through SWDIO pin by setting the SWDIO pin first
+ * and generate 1 clock cycle through SWCLK pin
  *
  * Input : data  : 0 will set SWDIO pin low
  *		         : 1 will set SWDIO pin high	 
@@ -42,7 +42,7 @@ void sendBits(uint32_t dataToSend,int numberOfBits)
 }
 
 /**
- * Read 1 bit of data through SWDIO pin (PB12) during the falling edge of SWCLK
+ * Read 1 bit of data through SWDIO pin during the falling edge of SWCLK
  *
  * Output : return the pin state read at SWDIO pin , either 1 for high 0 for low
  * 
@@ -59,7 +59,7 @@ int readBit()
 }
 
 /**
- * Read multiple bits (max 32 bits) of data through SWDIO pin (PB12)
+ * Read multiple bits (max 32 bits) of data through SWDIO pin 
  * by calling multiple times of readBit() function
  *
  * Input : dataRead is the pointer to the place where data is stored (maximum 32 bits of data)
@@ -115,7 +115,7 @@ void send32bit(uint32_t dataToSend)
 }
 
 /**
- * Read 3 bits of data through SWDIO pin (PB12)
+ * Read 3 bits of data through SWDIO pin
  *
  * Input : dataRead is the pointer to the place where data is stored (maximum 16 bits of data)
  * 
@@ -126,7 +126,7 @@ void read3bit(int *dataRead)
 }
 
 /**
- * Read 32 bits of data through SWDIO pin (PB12)
+ * Read 32 bits of data through SWDIO pin
  *
  * Input : dataRead is the pointer to the place where data is stored (maximum 32 bits of data)
  * 
