@@ -17,12 +17,14 @@
 
 //-------------------------- SWD-DP Register --------------------------------
 #define WDERRCLR 0x08
+//#define WDERRCLR SWDRegister_Write(Address, APnDP, ACK, data);
 
 //IDCODE Register
 void readIDCODEReg();
 
 //CONTROL/STATUS Register
 void ctrlStatusReg(int RnW);
+void writeDataToSelectReg(uint32_t data);
 
 //ABORT Register
 void writeAbortReg();

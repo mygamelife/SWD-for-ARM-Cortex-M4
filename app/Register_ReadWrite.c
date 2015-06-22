@@ -93,7 +93,6 @@ void writeDataToSelectReg(uint32_t data)  {
   //write request
   writeAbortReg();
 
- 
   turnAround_ToRead();
   SWDIO_InputMode();
 
@@ -101,7 +100,6 @@ void writeDataToSelectReg(uint32_t data)  {
 
   turnAround_ToWrite();
   SWDIO_OutputMode();
-  
 
   send32bit(data);
   sendBit(1); //Parity bit
@@ -112,45 +110,45 @@ void writeDataToSelectReg(uint32_t data)  {
 void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
 {
 	int SWD_Request = 0 , parity = 0;
-	
+
 	SWD_Request = getSWD_Request(Address,APnDP,WRITE);
 	parity = calculateParity_32bitData(data); //calculate parity before initiating transfer
-	
+
 	send8bit(SWD_Request);
-	
+
 	turnAround_ToRead();
 	SWDIO_InputMode();
 
 	read3bit(ACK);
-	
+
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
-	
+
 	send32bit(data);
 	sendBit(parity);
-	
+
 	extraIdleClock(8);
 }
 
 void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data)
 {
 	int SWD_Request = 0  ;
-	
+
 	SWD_Request = getSWD_Request(Address,APnDP,READ);
-	
+
 	send8bit(SWD_Request);
-	
+
 	turnAround_ToRead();
 	SWDIO_InputMode();
 
 	read3bit(ACK);
-	
+
 	read32bit(data);
 	*Parity = readBit();
 
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
-	
+
 	extraIdleClock(8);
 }
 

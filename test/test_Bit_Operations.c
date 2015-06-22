@@ -2,14 +2,9 @@
 #include "mock_IO_Operations.h"
 #include "Bit_Operations.h"
 
-void setUp(void)
-{
-}
+void setUp(void){}
 
-void tearDown(void)
-{
-}
-
+void tearDown(void){}
 
 void test_sendBit_data_1_should_call_SWDIO_High_SWCLK_OFF_SWCLK_ON()
 {

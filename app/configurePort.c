@@ -19,8 +19,6 @@ void configureClock()
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
 	HAL_GPIO_Init(SWD_PORT,&GpioInfo);
-
-
 }
 
 /**
