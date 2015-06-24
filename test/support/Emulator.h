@@ -12,4 +12,6 @@ void emulateTurnAroundWrite();
 void emulateSwdOutput();
 void emulateSwdInput();
 void emulateIdleClock(int numOfClocks);
+void emulateLineReset(int numOfClocks);
+void emulateResetTarget();
 #endif // Emulator_H

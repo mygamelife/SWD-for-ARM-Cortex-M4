@@ -40,7 +40,6 @@ void SWD_Initialisation()
  */
 void switchJTAGtoSWD()
 {
-	//SWDIO_OutputMode();
 	lineReset(55);
 	send16bit(0xE79E);
 	lineReset(55);

@@ -188,59 +188,37 @@ void test_writeDataToSelectReg_should_execute_same_sequence_as_wrote_in_the_func
  ------------------------------------------------------------------------------------------------------
  |      1       |    1      |    0     |     1      |     0     |     0       |    0      |     1     |
  ******************************************************************************************************/
-void test_SWDRegister_Write_given_Address_0x4_AP_Write_data_0xFFFFFFFF_should_send_SWD_Request_and_WriteData()
+void test_SWDRegister_Write_given_Address_0x4_AP_Write_data_0xFFFFFFFF()
 {
 	int i = 0 , ACK = 0;
 	uint32_t dataToSend = 0xFFFFFFFF ;
 
 	//send 0x8B
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
+	emulateWrite(0x8B,8);
 
 	//turnAround_ToRead
-	SWCLK_OFF_Expect();
+	emulateTurnAroundRead();
 
 	//Switch to Input
-	SWDIO_InputMode_Expect();
+	emulateSwdInput();
 
 	//read ACK
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
+	emulateRead(4,3);
 
 	//turnAround_ToWrite
-	SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
+	emulateTurnAroundWrite();
 
 	//SWDIO_Output mode
-	SWDIO_OutputMode_Expect();
+	emulateSwdOutput();
 
 	//send 32bits data 0xFFFFFFFF
-	for (i = 0 ; i < 32 ; i ++)
-	{
-		SWDIO_High_Expect();
-		SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	}
+	emulateWrite(0xFFFFFFFF,32);
 
 	//send parity
-	SWDIO_Low_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	emulateWrite(0,1);
 
 	//-----------extraIdleClock-------------
-	SWDIO_Low_Expect();
-
-	for(i = 0; i < 8; i++)
-	{
-		SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	}
+	emulateIdleClock(8);
 
 	SWDRegister_Write(0x4,AP,&ACK,0xFFFFFFFF);
 	TEST_ASSERT_EQUAL(1,ACK);
@@ -251,83 +229,22 @@ void test_SWDRegister_Write_given_Address_0x4_AP_Write_data_0xFFFFFFFF_should_se
  ------------------------------------------------------------------------------------------------------
  |      1       |    1      |   1     |     1      |     0     |     1       |    0      |     1     |
  ******************************************************************************************************/
-void test_SWDRegister_RW_given_Address_0x4_AP_READ_data_0xFFFFFFFF_should_send_SWD_Request_and_ReadData()
-{
-	int i , parity = 0 , ACK = 0;
-	uint32_t dataRead = 0 ;
-
-	//send 0xAF
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	//turnAround_ToRead
-	SWCLK_OFF_Expect();
-
-	//Switch to Input
-	SWDIO_InputMode_Expect();
-
-	//read ACK
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-
-
-	//read 32bits data 0xFFFFFFFF
-	for (i = 0 ; i < 32 ; i ++)
-	{
-		SWCLK_ON_Expect();SWCLK_OFF_Expect();
-		readSWDIO_Pin_ExpectAndReturn(1);
-	}
-
-	//read 1 bit parity
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();
-	readSWDIO_Pin_ExpectAndReturn(1);
-
-	//turnAround_ToWrite
-	SWCLK_ON_Expect(); SWCLK_OFF_Expect(); SWCLK_ON_Expect();
-
-	//switch to output mode
-	SWDIO_OutputMode_Expect();
-
-	//-----------extraIdleClock-------------
-	SWDIO_Low_Expect();
-
-	for(i = 0; i < 8; i++)
-	{
-		SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	}
-  //-----------extraIdleClock-------------
-
-	SWDRegister_Read(0x4,AP,&ACK,&parity, &dataRead);
-
-	TEST_ASSERT_EQUAL(1,ACK);
-	TEST_ASSERT_EQUAL(0xFFFFFFFF,dataRead);
-	TEST_ASSERT_EQUAL(1,parity);
-}
-
-void test_SWDRegisterRead() {
+void test_SWDRegisterRead_given_Address_0x4_AP_READ() {
 	int parity = 0 , ACK = 0;
 	uint32_t dataRead = 0 ;
   
-  //send 0xB1
-  emulateWrite(0xAF, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x80, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
+	//send 0xAF
+	emulateWrite(0xAF, 8); //SWD 8bit protocol
+	emulateTurnAroundRead();
+	emulateSwdInput();
+	emulateRead(0x4, 3); //Acknowledgement
+	emulateRead(0x80, 32); //Read DATA (LSB)
+	emulateRead(0x1, 1); //Parity
+	emulateTurnAroundWrite();
+	emulateSwdOutput();
+	emulateIdleClock(8);
   
-  SWDRegister_Read(0x4,AP,&ACK,&parity, &dataRead);
+	SWDRegister_Read(0x4,AP,&ACK,&parity, &dataRead);
 
 	TEST_ASSERT_EQUAL(1,ACK);
 	TEST_ASSERT_EQUAL(1,parity);  

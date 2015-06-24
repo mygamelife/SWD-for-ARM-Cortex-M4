@@ -66,3 +66,24 @@ void emulateIdleClock(int numOfClocks)  {
 		SWCLK_OFF_Expect();SWCLK_ON_Expect();
 	}
 }
+
+void emulateLineReset(int numOfClocks)
+{
+	int i ;
+	
+	if (numOfClocks < 50 )
+		numOfClocks = 50 ;
+	
+	//lineReset
+	SWDIO_High_Expect();
+	for (i = 0 ; i < numOfClocks ; i ++)
+	{	SWCLK_OFF_Expect();
+		SWCLK_ON_Expect();
+	}
+}
+
+void emulateResetTarget()
+{
+	ResetPin_Low_Expect();
+	ResetPin_High_Expect();
+}

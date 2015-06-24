@@ -2,6 +2,8 @@
 #include "unity.h"
 #include "Emulator.h"
 #include "Clock.h"
+#include "Reset.h"
+#include "Delay.h"
 #include "Bit_Operations.h"
 #include "mock_IO_Operations.h"
 #include "mock_configurePort.h"
@@ -88,4 +90,18 @@ void test_emulateIdleClock_should_generate_SWDIO_low_and_SWDCLK_OFF_ON_8_times()
   emulateIdleClock(8);
   
   extraIdleClock(8);
+}
+
+void test_emulateLineReset_given_60clock_should_generate_clock_cycles_with_SWDIO_High()
+{
+	emulateLineReset(60);
+	
+	lineReset(60);
+}
+
+void test_emulateResetTarget_should_call_ResetPinLow_ResetPin_High()
+{
+	emulateResetTarget();
+	
+	resetTarget();
 }

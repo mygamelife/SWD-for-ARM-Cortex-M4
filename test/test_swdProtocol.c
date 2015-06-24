@@ -1,13 +1,13 @@
 #include "unity.h"
-#include "mock_IO_Operations.h"
-#include "mock_configurePort.h"
+#include "Emulator.h"
 #include "Bit_Operations.h"
 #include "swd_Utilities.h"
 #include "Clock.h"
 #include "Delay.h"
 #include "Reset.h"
 #include "swdProtocol.h"
-#include "Register_ReadWrite.h"
+#include "mock_IO_Operations.h"
+#include "mock_configurePort.h"
 
 void setUp(void)
 {
@@ -21,50 +21,19 @@ void test_switchJTAGtoSWD_should_call_SWDIO_Output_lineReset_send0xE79E_lineRese
 {
 	int i = 0 ;
 
-	//SWDIO_OutputMode_Expect();
 
 	//lineReset
-	SWDIO_High_Expect();
-	for (i = 0 ; i < 55 ; i ++)
-	{	SWCLK_OFF_Expect();
-		SWCLK_ON_Expect();
-	}
+	emulateLineReset(55);
 
 	//0xE79E = 1110 0111 1001 1110
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
+	emulateWrite(0xE79E,16)
 
 
 	//lineReset
-	SWDIO_High_Expect();
-	for (i = 0 ; i < 55 ; i ++)
-	{	SWCLK_OFF_Expect();
-		SWCLK_ON_Expect();
-	}
+	emulateLineReset(55);
 
 	//extraIdleClock
-	SWDIO_Low_Expect();
-
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	emulateIdleClock(3);
 
 	switchJTAGtoSWD();
 }
@@ -73,139 +42,45 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 {
 	int i ;
 
-
-	//switch to OutputMode
-	//SWDIO_OutputMode_Expect();
-
 	//lineReset
-	SWDIO_High_Expect();
-	for (i = 0 ; i < 55 ; i ++)
-	{
-		SWCLK_OFF_Expect();
-		SWCLK_ON_Expect();
-	}
+	emulateLineReset(55);
 
 	//0xE79E = 1110 0111 1001 1110
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
+	emulateWrite(0xE79E,16)
 
 
 	//lineReset
-	SWDIO_High_Expect();
-	for (i = 0 ; i < 55 ; i ++)
-	{	SWCLK_OFF_Expect();
-		SWCLK_ON_Expect();
-	}
+	emulateLineReset(55);
 
 	//extraIdleClock
-	SWDIO_Low_Expect();
-
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	emulateIdleClock(3);
 
 	//send 0xA5
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
-	SWDIO_Low_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 0
-	SWDIO_High_Expect()	;SWCLK_OFF_Expect();SWCLK_ON_Expect(); // 1
+	emulateWrite(0xA5,8)
 
 	//turnAround_ToRead
-	SWCLK_OFF_Expect();
+	emulateTurnAroundRead();
 	
 	//SWDIO Input mode
-	SWDIO_InputMode_Expect();
+	emulateSwdInput();
 
 	//read ACK
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
+	emulateRead(4,3);
 
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1); // LSB
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1); // E
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1); // E
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1); // 2
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);;
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0); // 8
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0); // 0
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0); // 5
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1); // D
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1); // 4
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
+	//read 32 bits IDCODE
+	emulateRead(0xEE2805D4, 32);
 
 	//read Parity
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
+	emulateRead(0,1);
 
 	//turnAround_ToWrite
-	SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
-	
+	emulateTurnAroundWrite();
 	
 	//SWDIO_Output mode
-	SWDIO_OutputMode_Expect();
+	emulateSwdOutput();
 
 	//extraIdleClock
-	SWDIO_Low_Expect();
-
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();SWCLK_ON_Expect();
+	emulateIdleClock(8);
 
 
 	SWD_Initialisation();
