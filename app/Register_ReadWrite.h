@@ -37,4 +37,6 @@ void writeSelectReg();
 void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
 void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data);
 
+//-------------------------- MEM-AP Register --------------------------------
+void selectRegisterBank(uint32_t registerBank);
 #endif // Register_ReadWrite_H

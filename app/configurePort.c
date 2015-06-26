@@ -29,12 +29,12 @@ void configureTargetResetPin()
 {
 	GPIO_InitTypeDef GpioInfo;
 
-	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD ;
+	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD;
 	GpioInfo.Pin = SWDnRST_PIN ;
 	GpioInfo.Pull = GPIO_PULLUP ;
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
-	HAL_GPIO_Init(SWD_PORT,&GpioInfo);
+	HAL_GPIO_Init(SWD_PORT, &GpioInfo);
 }
 
 /**

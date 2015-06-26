@@ -21,14 +21,14 @@
 
 /**
  *	Action          Value
- * -------------------------------------------------------------------
- * START         Always  1
- * AP/DP1        DP  = 0,   AP  = 1
- * RW            W   = 0,   R   = 1
- * Addr[2:3]     Refer Register Address
- * Parity        APnDP + RW + Addr2 + Addr3 Even 1's = 0, Odd 1's = 1
- * STOP          Always  1
- * PARK          Always  1
+ *  -------------------------------------------------------------------
+ *  START         Always  1
+ *  AP/DP1        DP  = 0,   AP  = 1
+ *  RW            W   = 0,   R   = 1
+ *  Addr[2:3]     Refer Register Address
+ *  Parity        APnDP + RW + Addr2 + Addr3 Even 1's = 0, Odd 1's = 1
+ *  STOP          Always  1
+ *  PARK          Always  1
  */
 
 /**
@@ -152,5 +152,17 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	extraIdleClock(8);
 }
 
+void selectRegisterBank(uint32_t registerBank)	{
+	int ack = 0, parity = 0;
+	uint32_t ctrlStatusRegData = 0x50000000  ,CTRLSTAT_READDATA = 0, errorFlag = 0;
+
+	errorFlag = checkErrorFlag();
+	if(errorFlag != 0)
+		SWDRegister_Write(0x00, DP, &ack, errorFlag); //Write to AP ABORT Register clear error flag
+
+	SWDRegister_Write(0x04, DP, &ack, ctrlStatusRegData);//system & debug power up request
+	//SWDRegister_Read(0x04, DP, &ack, &parity, &CTRLSTAT_READDATA);
+	SWDRegister_Write(0x08, DP, &ack, registerBank); //Access SELECT register and select APBANK
+}
 
 

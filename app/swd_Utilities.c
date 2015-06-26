@@ -163,9 +163,9 @@ uint32_t checkErrorFlag()  {
 
 /**
  * Take action according to the acknowledgement response
- * Receive OK_RESPONSE do nothing
- * Receive WAIT_RESPONSE write 1 bit to DAPABORT in AP ABORT Register
- * Receive FAULT_RESPONSE write 1 bit to AP ABORT Register clear error flog 
+ * + Receive OK_RESPONSE do nothing
+ * + Receive WAIT_RESPONSE write 1 bit to DAPABORT in AP ABORT Register
+ * + Receive FAULT_RESPONSE write 1 bit to AP ABORT Register clear error flog 
  *
  * Input : ackResponse is the acknowledgement value sent by target
  *
