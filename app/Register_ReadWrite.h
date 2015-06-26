@@ -10,6 +10,8 @@
 
 #define IDCODE_REG 0x0
 #define ABORT_REG 0x0
+#define RDBUFF_REG 0xC
+#define CSW_REG 0x0
 #define TAR_REG 0x4
 #define CTRLSTAT_REG 0x4
 #define DRW_REG 0xC

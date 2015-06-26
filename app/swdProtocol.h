@@ -11,4 +11,7 @@
 void switchJTAGtoSWD();
 void SWD_Initialisation();
 
+void SYS_DBG_PowerUp();
+void SYS_DBG_PowerDown();
+
 #endif // swdProtocol_H

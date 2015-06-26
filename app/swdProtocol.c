@@ -46,3 +46,19 @@ void switchJTAGtoSWD()
 
 	extraIdleClock(3);
 }
+
+//Power up system and debug power domain
+void SYS_DBG_PowerUp()
+{
+	int ACK = 0 ;
+
+	SWDRegister_Write(CTRLSTAT_REG,DP,&ACK,0x50000000);
+}
+
+//Power down system and debug power domain
+void SYS_DBG_PowerDown()
+{
+	int ACK = 0 ;
+
+	SWDRegister_Write(CTRLSTAT_REG,DP,&ACK,0);
+}
