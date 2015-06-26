@@ -18,7 +18,6 @@
 #define WAIT_RESPONSE    2
 #define FAULT_RESPONSE   3
 #define NO_RESPONSE      4
-#define CLRDAPABOT      0x1
 
 #include <stdint.h>
 #include "Register_ReadWrite.h"
@@ -29,5 +28,5 @@ int checkAckResponse(int ackValue);
 uint32_t checkErrorFlag();
 
 void getSWD_AddressBit(int *Address_bit3,int *Address_bit2,int Address);
-void takeActionToAckResponse(int ackResponse);
+void swdClearFlags(int ackResponse);
 #endif // swd_Utilities_H

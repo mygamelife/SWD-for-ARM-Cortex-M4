@@ -300,7 +300,6 @@ void test_checkErrorFlag_should_return_0x1E_when_bit_7_5_4_1_of_the_readData_is_
  * |      1      |    0      |    0     |     0      |     0     |     0       |    0      |     1     |
  * *****************************************************************************************************
  */
-/*
 void test_takeActionToAckResponse_given_WDERRCLR_bit_set_to_1_should_write_0x1000000_to_AP_ABORT_register() {
   int i = 0, data = 0;
 
@@ -326,10 +325,9 @@ void test_takeActionToAckResponse_given_WDERRCLR_bit_set_to_1_should_write_0x100
   emulateWrite(0x1, 1); //Parity
   emulateIdleClock(8);
   
-  takeActionToAckResponse(FAULT_RESPONSE);
-}*/
+  swdClearFlags(FAULT_RESPONSE);
+}
 
-/*
 void test_takeActionToAckResponse_given_WAIT_RESPOND_should_write_CLRDAPABOT_to_AP_ABORT_Register() {
   int i = 0, data = 0;
 
@@ -344,5 +342,5 @@ void test_takeActionToAckResponse_given_WAIT_RESPOND_should_write_CLRDAPABOT_to_
   emulateWrite(0x1, 1); //Parity
   emulateIdleClock(8);
   
-  takeActionToAckResponse(WAIT_RESPONSE);
-}*/
+  swdClearFlags(WAIT_RESPONSE);
+}

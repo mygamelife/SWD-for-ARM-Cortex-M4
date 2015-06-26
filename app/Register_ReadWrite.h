@@ -32,19 +32,22 @@
 #define DP_SELECT     0x08
 #define RDBUFF        0x0C
 
-#define readSwdCtrlStatus(ack, parity, readData) SWDRegister_Read(DP_CTRL_STAT, DP, ack, parity, readData);
-
 //CONTROL/STATUS Register Error Flag Mask
 #define SWD_WDATAERR_MASK     (1 << 7)
 #define SWD_STICKYERR_MASK    (1 << 5)
 #define SWD_STICKYCMP_MASK    (1 << 4)
 #define SWD_STICKYORUN_MASK   (1 << 1)
 
+#define swdReadCtrlStatus(ack, parity, readData)    SWDRegister_Read(DP_CTRL_STAT, DP, ack, parity, readData);
+
 //ABORT Register Clear Error Flag
 #define WDERRCLR      (1 << 3)
 #define STKERRCLR     (1 << 2)
 #define STKCMPCLR     (1 << 1)
 #define ORUNERRCLR    (1 << 4)
+#define DAPABOT       (1 << 0)
+
+#define swdWriteAbort(ack, errorFlag)               SWDRegister_Write(DP_ABORT, DP, ack, errorFlag);
 
 //#define WDERRCLR SWDRegister_Write(Address, APnDP, ACK, data);
 

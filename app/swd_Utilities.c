@@ -144,7 +144,7 @@ uint32_t checkErrorFlag()  {
   uint32_t readData = 0, errorFlag = 0;
 
   //Access and read CTRL/STATUS Register
-  readSwdCtrlStatus(&ack, &parity, &readData);
+  swdReadCtrlStatus(&ack, &parity, &readData);
 
   if(readData & SWD_WDATAERR_MASK)
     errorFlag = errorFlag | WDERRCLR;
@@ -171,7 +171,7 @@ uint32_t checkErrorFlag()  {
  *
  * Return : None
  */
-void takeActionToAckResponse(int ackResponse) {
+void swdClearFlags(int ackResponse) {
   int ack = 0;
   uint32_t errorFlag = 0;
 
@@ -181,12 +181,12 @@ void takeActionToAckResponse(int ackResponse) {
       break;
 
     case  WAIT_RESPONSE :
-      SWDRegister_Write(0x00, DP, &ack, CLRDAPABOT); //Clear DAPABORT bit
+      swdWriteAbort(&ack, DAPABOT); //Clear DAPABORT bit
       break;
 
     case  FAULT_RESPONSE  :
       errorFlag = checkErrorFlag();
-      SWDRegister_Write(0x00, DP, &ack, errorFlag); //Write data to AP ABORT Register
+      swdWriteAbort(&ack, errorFlag); //Clear error flag
       break;
   }
 }
