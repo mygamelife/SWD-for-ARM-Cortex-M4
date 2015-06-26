@@ -25,20 +25,20 @@
       <target file="startup_stm32f429xx.o" lastModified="14e2e0f8398">
          <source file="..\..\..\app\startup_stm32f429xx.s" lastModified="14e11679ffd"/>
       </target>
-      <target file="Delay.o" lastModified="14e2e0f8389">
-         <source file="..\..\..\app\Delay.c" lastModified="14e11679fdd"/>
-      </target>
-      <target file="Register_ReadWrite.o" lastModified="14e2e0f8425">
-         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e2ddaac03"/>
-      </target>
-      <target file="Bit_Operations.o" lastModified="14e2e0f8166">
-         <source file="..\..\..\app\Bit_Operations.c" lastModified="14e1168ab55"/>
+      <target file="Register_ReadWrite.o" lastModified="14e2ebc1fc6">
+         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e2ebc18f6"/>
       </target>
       <target file="stm32f4xx_hal_cortex.o" lastModified="14e2e0f8638">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c" lastModified="14c0ebff33c"/>
       </target>
-      <target file="main.o" lastModified="14e2e14df02">
-         <source file="..\..\..\app\main.c" lastModified="14e2e14d82c"/>
+      <target file="Bit_Operations.o" lastModified="14e2e0f8166">
+         <source file="..\..\..\app\Bit_Operations.c" lastModified="14e1168ab55"/>
+      </target>
+      <target file="Delay.o" lastModified="14e2e0f8389">
+         <source file="..\..\..\app\Delay.c" lastModified="14e11679fdd"/>
+      </target>
+      <target file="main.o" lastModified="14e2eb9ea58">
+         <source file="..\..\..\app\main.c" lastModified="14e2eb86410"/>
       </target>
       <target file="stm32f4xx_hal_gpio.o" lastModified="14e2e0f8771">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" lastModified="14c0ebff197"/>

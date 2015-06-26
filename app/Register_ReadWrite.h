@@ -14,9 +14,38 @@
 #define CTRLSTAT_REG 0x4
 #define DRW_REG 0xC
 
+/**Register Address
+ *  Address        READ          Write
+ *  --------------------------------------
+ *  0x00          IDCODE        ABORT
+ *  0x04          CTRL/STAT     CTRL/STAT
+ *  0x08          RESEND        SELECT
+ *  0x0C          RDBUFF        N/A
+ */
 
 //-------------------------- SWD-DP Register --------------------------------
-#define WDERRCLR 0x08
+//DP Register
+#define DP_IDCODE     0x00
+#define DP_ABORT      0x00
+#define DP_CTRL_STAT  0x04
+#define DP_RESEND     0x08
+#define DP_SELECT     0x08
+#define RDBUFF        0x0C
+
+#define readSwdCtrlStatus(ack, parity, readData) SWDRegister_Read(DP_CTRL_STAT, DP, ack, parity, readData);
+
+//CONTROL/STATUS Register Error Flag Mask
+#define SWD_WDATAERR_MASK     (1 << 7)
+#define SWD_STICKYERR_MASK    (1 << 5)
+#define SWD_STICKYCMP_MASK    (1 << 4)
+#define SWD_STICKYORUN_MASK   (1 << 1)
+
+//ABORT Register Clear Error Flag
+#define WDERRCLR      (1 << 3)
+#define STKERRCLR     (1 << 2)
+#define STKCMPCLR     (1 << 1)
+#define ORUNERRCLR    (1 << 4)
+
 //#define WDERRCLR SWDRegister_Write(Address, APnDP, ACK, data);
 
 //IDCODE Register

@@ -30,7 +30,7 @@
          <include file="..\..\..\app\IO_Operations.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_gpio.h"/>
       </source>
-      <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e2ddaac03">
+      <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e2ebc18f6">
          <include file="..\..\..\app\Register_ReadWrite.h"/>
       </source>
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_i2c.h" lastModified="14c0ebff446">
@@ -183,7 +183,7 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h" lastModified="14c0ebffc51">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\main.c" lastModified="14e2e14d82c">
+      <source file="..\..\..\app\main.c" lastModified="14e2eb86410">
          <include file="..\..\..\app\swdProtocol.h"/>
          <include file="..\..\..\app\Register_ReadWrite.h"/>
       </source>

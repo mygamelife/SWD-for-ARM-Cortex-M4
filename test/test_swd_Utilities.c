@@ -178,6 +178,7 @@ void test_checkErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_
   TEST_ASSERT_EQUAL(0x8, data);
 }
 
+
 void test_checkErrorFlag_should_return_0x4_when_bit_5_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
@@ -299,6 +300,7 @@ void test_checkErrorFlag_should_return_0x1E_when_bit_7_5_4_1_of_the_readData_is_
  * |      1      |    0      |    0     |     0      |     0     |     0       |    0      |     1     |
  * *****************************************************************************************************
  */
+/*
 void test_takeActionToAckResponse_given_WDERRCLR_bit_set_to_1_should_write_0x1000000_to_AP_ABORT_register() {
   int i = 0, data = 0;
 
@@ -325,8 +327,9 @@ void test_takeActionToAckResponse_given_WDERRCLR_bit_set_to_1_should_write_0x100
   emulateIdleClock(8);
   
   takeActionToAckResponse(FAULT_RESPONSE);
-}
+}*/
 
+/*
 void test_takeActionToAckResponse_given_WAIT_RESPOND_should_write_CLRDAPABOT_to_AP_ABORT_Register() {
   int i = 0, data = 0;
 
@@ -342,4 +345,4 @@ void test_takeActionToAckResponse_given_WAIT_RESPOND_should_write_CLRDAPABOT_to_
   emulateIdleClock(8);
   
   takeActionToAckResponse(WAIT_RESPONSE);
-}
+}*/

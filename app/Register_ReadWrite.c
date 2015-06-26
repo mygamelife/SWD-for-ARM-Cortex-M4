@@ -125,7 +125,8 @@ void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
 	SWDIO_OutputMode();
 
 	send32bit(data);
-	sendBit(parity);
+	//sendBit(parity);
+	sendBit(1);
 
 	extraIdleClock(8);
 }
@@ -152,17 +153,22 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	extraIdleClock(8);
 }
 
+/*
+ * other than IDCODE, CTRL/STAT or ABORT, result in a FAULT response
+ */
 void selectRegisterBank(uint32_t registerBank)	{
 	int ack = 0, parity = 0;
 	uint32_t ctrlStatusRegData = 0x50000000  ,CTRLSTAT_READDATA = 0, errorFlag = 0;
+
+	SWDRegister_Write(0x04, DP, &ack, ctrlStatusRegData);//system & debug power up request
+	SWDRegister_Read(0x04, DP, &ack, &parity, &CTRLSTAT_READDATA);
 
 	errorFlag = checkErrorFlag();
 	if(errorFlag != 0)
 		SWDRegister_Write(0x00, DP, &ack, errorFlag); //Write to AP ABORT Register clear error flag
 
-	SWDRegister_Write(0x04, DP, &ack, ctrlStatusRegData);//system & debug power up request
-	//SWDRegister_Read(0x04, DP, &ack, &parity, &CTRLSTAT_READDATA);
-	SWDRegister_Write(0x08, DP, &ack, registerBank); //Access SELECT register and select APBANK
+	SWDRegister_Read(0x04, DP, &ack, &parity, &CTRLSTAT_READDATA);
+	//SWDRegister_Write(0x08, DP, &ack, registerBank); //Access SELECT register and select APBANK
 }
 
 

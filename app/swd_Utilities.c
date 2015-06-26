@@ -125,7 +125,7 @@ int checkAckResponse(int ackValue)  {
 }
 
 /**
- * Check error flag from CTRL/STATUS Register and set the clear error flag bit accordingly 
+ * Check error flag from CTRL/STATUS Register and set the clear error flag bit accordingly
  * Write 1 to the ABORT Register bit to clear the error flag bit set in CTRL/STATUS Register
  *
  *    CTRL/STATUS Register        ABORT Register
@@ -142,22 +142,22 @@ int checkAckResponse(int ackValue)  {
 uint32_t checkErrorFlag()  {
   int ack = 0, parity = 0;
   uint32_t readData = 0, errorFlag = 0;
-  
+
   //Access and read CTRL/STATUS Register
-  SWDRegister_Read(0x4, DP, &ack, &parity, &readData);
-  
-  if(readData & (1 << 7)) //WDATAERR
-    errorFlag = errorFlag | (1 << 3);//set WDERRCLR
-    
-  if(readData & (1 << 5)) //STICKYERR 
-    errorFlag = errorFlag | (1 << 2);//set STKERRCLR
-    
-  if(readData & (1 << 4)) //STICKYCMP 
-    errorFlag = errorFlag | (1 << 1);//set STKCMPCLR
-   
-  if(readData & (1 << 1)) //STICKYORUN  
-    errorFlag = errorFlag | (1 << 4);//set ORUNERRCLR
-  
+  readSwdCtrlStatus(&ack, &parity, &readData);
+
+  if(readData & SWD_WDATAERR_MASK)
+    errorFlag = errorFlag | WDERRCLR;
+
+  if(readData & SWD_STICKYERR_MASK)
+    errorFlag = errorFlag | STKERRCLR;
+
+  if(readData & SWD_STICKYCMP_MASK)
+    errorFlag = errorFlag | STKCMPCLR;
+
+  if(readData & SWD_STICKYORUN_MASK)
+    errorFlag = errorFlag | ORUNERRCLR;
+
   return errorFlag;
 }
 
@@ -165,7 +165,7 @@ uint32_t checkErrorFlag()  {
  * Take action according to the acknowledgement response
  * + Receive OK_RESPONSE do nothing
  * + Receive WAIT_RESPONSE write 1 bit to DAPABORT in AP ABORT Register
- * + Receive FAULT_RESPONSE write 1 bit to AP ABORT Register clear error flog 
+ * + Receive FAULT_RESPONSE write 1 bit to AP ABORT Register clear error flog
  *
  * Input : ackResponse is the acknowledgement value sent by target
  *
@@ -174,16 +174,16 @@ uint32_t checkErrorFlag()  {
 void takeActionToAckResponse(int ackResponse) {
   int ack = 0;
   uint32_t errorFlag = 0;
-  
+
   switch(ackResponse) {
     case  OK_RESPONSE :
       //Do nothing
       break;
-      
+
     case  WAIT_RESPONSE :
       SWDRegister_Write(0x00, DP, &ack, CLRDAPABOT); //Clear DAPABORT bit
       break;
-      
+
     case  FAULT_RESPONSE  :
       errorFlag = checkErrorFlag();
       SWDRegister_Write(0x00, DP, &ack, errorFlag); //Write data to AP ABORT Register

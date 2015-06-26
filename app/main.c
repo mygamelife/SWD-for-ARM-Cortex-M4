@@ -29,13 +29,13 @@ int main(void)
 	SWD_Initialisation();
 
 	selectRegisterBank(0xF0);
-	SWDRegister_Read(0x0C, AP, &ack, &parity, &dummyRead); //discard previous AP
-	SWDRegister_Read(0x0C, AP, &ack, &parity, &IDR); //IDR
+	//SWDRegister_Read(0x0C, AP, &ack, &parity, &dummyRead); //discard previous AP
+	//SWDRegister_Read(0x0C, AP, &ack, &parity, &IDR); //IDR
 
-	selectRegisterBank(0x00);
-	SWDRegister_Write(0x00, AP, &ack, CSW_data); //Select 32bit memory access size in CSW register
-	SWDRegister_Read(0x00, AP, &ack, &parity, &dummyRead); //discard previous AP
-	SWDRegister_Read(0x00, AP, &ack, &parity, &CSW); //CSW
+	//selectRegisterBank(0x00);
+	//SWDRegister_Write(0x00, AP, &ack, CSW_data); //Select 32bit memory access size in CSW register
+	//SWDRegister_Read(0x00, AP, &ack, &parity, &dummyRead); //discard previous AP
+	//SWDRegister_Read(0x00, AP, &ack, &parity, &CSW); //CSW
 
 	/*
 	//Step 1 enable MSC_WRITECTRL
@@ -59,13 +59,14 @@ int main(void)
 	SWDRegister_Write(0x0C, AP, &ack, 0x8); //DRW
 	*/
 
+	/*
 	SWDRegister_Write(0x04, AP, &ack, 0x00020000); //TAR
 	SWDRegister_Read(0x04, AP, &ack, &parity, &dummyRead);
 	SWDRegister_Read(0x04, AP, &ack, &parity, &TAR);
 
 	SWDRegister_Write(0x0C, AP, &ack, 0x55667788); //DRW
 	SWDRegister_Read(0x0C, AP, &ack, &parity, &dummyRead);
-	SWDRegister_Read(0x0C, AP, &ack, &parity, &DRW);
+	SWDRegister_Read(0x0C, AP, &ack, &parity, &DRW);*/
 
 	//SWDRegister_Read(0x0C, DP, &ack, &parity, &TAR); //TAR
 
