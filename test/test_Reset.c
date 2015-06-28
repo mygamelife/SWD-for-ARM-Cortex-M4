@@ -1,8 +1,11 @@
 #include "unity.h"
 #include "Emulator.h"
 #include "Clock.h"
-#include "Delay.h"
 #include "Reset.h"
+#include "Delay.h"
+#include "swd_Utilities.h"
+#include "Register_ReadWrite.h"
+#include "Bit_Operations.h"
 #include "mock_IO_Operations.h"
 #include "mock_configurePort.h"
 

@@ -39,4 +39,11 @@ void writeSelectReg();
 void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
 void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data);
 
+int Memory_Read(uint32_t Address,uint32_t *dataRead);
+int Memory_Write(uint32_t Address,uint32_t WriteData);
+
+int SWD_ReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
+
+int DiscardDummyData(uint32_t Address);
+
 #endif // Register_ReadWrite_H

@@ -250,3 +250,49 @@ void test_SWDRegisterRead_given_Address_0x4_AP_READ() {
 	TEST_ASSERT_EQUAL(1,parity);  
 	TEST_ASSERT_EQUAL(0x1000000,dataRead);
 }
+
+void test_SWD_ReadAP_should_call_SWDRegister_Read_2times()
+{
+	int ACK = 0 , Parity = 0 ;
+	uint32_t dataRead = 0 ;
+	
+	emulateSWDRegister_Read(TAR_REG,AP,4,1,0x10);
+	emulateSWDRegister_Read(TAR_REG,AP,4,1,0x88112233);
+	
+	SWD_ReadAP(TAR_REG,&ACK,&Parity,&dataRead);
+	
+	TEST_ASSERT_EQUAL(MSB_LSB_Conversion(0x88112233),dataRead);
+	TEST_ASSERT_EQUAL(1,ACK);
+	TEST_ASSERT_EQUAL(1,Parity);
+}
+
+
+void test_Memory_Read_given_Address_0x12345678_should_write_address_to_TAR_and_read_data_from_DRW()
+{
+	uint32_t dataRead = 0 ;
+	
+	//Write memory address to TAR
+	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
+
+	//Read and Discard dummy data
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0xAABBCCDD);
+	
+	//Read actual data from DRW
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x10);
+	
+	Memory_Read(0x12345678,&dataRead);
+	
+	TEST_ASSERT_EQUAL(MSB_LSB_Conversion(0x10),dataRead);
+}
+
+void test_Memory_Write_given_Address_0x12345678_Data_0x87654321_should_Write_Address_to_TAR_and_data_to_DRW()
+{
+	//Write memory address to TAR
+	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateSWDRegister_Write(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	Memory_Write(0x12345678,0x87654321);
+}

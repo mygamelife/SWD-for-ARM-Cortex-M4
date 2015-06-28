@@ -20,7 +20,6 @@ int main(void)
 
 	SWD_Initialisation();
 
-	SYS_DBG_PowerUp();
 	//Note : implement code to check system and debug power up status here just in case, value expected 0xF0000000
 
 	//Configure Control/Status Word Register CSW
@@ -127,9 +126,6 @@ int main(void)
 	//Disable CPU debug mode
 	SWDRegister_Write(TAR_REG,AP,&ack,0xE000EDF0);
 	SWDRegister_Write(DRW_REG,AP,&ack,0xA05F0000);
-
-	SYS_DBG_PowerDown();
-
 
 	while(1)
 	{

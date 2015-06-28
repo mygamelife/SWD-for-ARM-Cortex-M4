@@ -69,6 +69,7 @@ int readBit()
 void readBits(uint32_t *dataRead,int numberOfBits)
 {
 	int i , bitValue ;
+	*dataRead = 0 ; // clear to make sure it is 0 first
 	
 	for (i=0 ; i < numberOfBits ; i++)
 	{

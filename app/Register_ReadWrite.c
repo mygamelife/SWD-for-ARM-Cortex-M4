@@ -144,12 +144,42 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	read3bit(ACK);
 
 	read32bit(data);
+	
 	*Parity = readBit();
 
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
 
 	extraIdleClock(8);
+	
+}
+
+int Memory_Read(uint32_t Address,uint32_t *dataRead)
+{
+	int ACK = 0, Parity = 0 ;
+	
+	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
+	SWD_ReadAP(DRW_REG,&ACK,&Parity,dataRead);
+	
+	return 0 ;
+}
+
+int Memory_Write(uint32_t Address,uint32_t WriteData)
+{
+	int ACK = 0, Parity = 0 ;
+	
+	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
+	SWDRegister_Write(DRW_REG,AP,&ACK,WriteData);
+	
+	return 0 ;
+}
+
+int SWD_ReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
+{
+	SWDRegister_Read(Address,AP,ACK,Parity,data);
+	SWDRegister_Read(Address,AP,ACK,Parity,data);
+	
+	return 0 ;
 }
 
 
