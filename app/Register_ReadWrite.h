@@ -44,6 +44,5 @@ int Memory_Write(uint32_t Address,uint32_t WriteData);
 
 int SWD_ReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
 
-int DiscardDummyData(uint32_t Address);
 
 #endif // Register_ReadWrite_H
