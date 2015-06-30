@@ -31,82 +31,6 @@
  *  PARK          Always  1
  */
 
-/**
- * Access CTRL/STATUS register by sending SWD-DP request
- */
-void ctrlStatusReg(int RnW) {
-  int SWD_Request;
-
-  SWD_Request = getSWD_Request(0x04, DP, RnW);
-  send8bit(SWD_Request);
-}
-
-/**
- * --------CAUTION-----------
- * It is read-only register
- * --------------------------
- * Read IDCODE register by sending SWD-DP request
- */
-void readIDCODEReg() {
-  int SWD_Request;
-
-  SWD_Request = getSWD_Request(0x00, DP, READ);
-  send8bit(SWD_Request);
-}
-
-/**
- * --------CAUTION-----------
- * It is write-only register
- * --------------------------
- * Write IDCODE register by sending SWD-DP request
- */
-void writeAbortReg()  {
-  int SWD_Request;
-
-  SWD_Request = getSWD_Request(0x00, DP, WRITE);
-  send8bit(SWD_Request);
-}
-
-/**
- * --------CAUTION-----------
- * It is write-only register
- * --------------------------
- * Write IDCODE register by sending SWD-DP request
- */
-void writeSelectReg()  {
-  int SWD_Request;
-
-  SWD_Request = getSWD_Request(0x08, DP, WRITE);
-  send8bit(SWD_Request);
-}
-
-/** writeDataToSelectReg is a function to write data into the SELECT REGISTER
- *
- * input :  data is the 32 bit size data that will be write into SELECT REGISTER
- *          to perform certain task
- *
- * return : NONE
- */
-void writeDataToSelectReg(uint32_t data)  {
-  int ack = 0;
-
-  //write request
-  writeAbortReg();
-
-  turnAround_ToRead();
-  SWDIO_InputMode();
-
-  read3bit(&ack);
-
-  turnAround_ToWrite();
-  SWDIO_OutputMode();
-
-  send32bit(data);
-  sendBit(1); //Parity bit
-
-  extraIdleClock(8);
-}
-
 void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
 {
 	int SWD_Request = 0 , parity = 0;
@@ -125,8 +49,7 @@ void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
 	SWDIO_OutputMode();
 
 	send32bit(data);
-	//sendBit(parity);
-	sendBit(1);
+	sendBit(parity);
 
 	extraIdleClock(8);
 }
@@ -153,22 +76,36 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	extraIdleClock(8);
 }
 
-/*
- * other than IDCODE, CTRL/STAT or ABORT, result in a FAULT response
+/*  powerUpSystemAndDebug is function to set CDBGPWRUPREQ(bit 28) and CSYSPWRUPREQ(bit 30)
+ *  in CTRL_STATUS register to power up system and debug before using any AP
+ * 
+ *  before function end it check if there is any set error flag in the register
+ *  if there is any error it clear error flag by setting 1 in ABORT register
+ *
+ *  input   : NONE
+ *  return  : NONE
  */
-void selectRegisterBank(uint32_t registerBank)	{
-	int ack = 0, parity = 0;
-	uint32_t ctrlStatusRegData = 0x50000000  ,CTRLSTAT_READDATA = 0, errorFlag = 0;
-
-	SWDRegister_Write(0x04, DP, &ack, ctrlStatusRegData);//system & debug power up request
-	SWDRegister_Read(0x04, DP, &ack, &parity, &CTRLSTAT_READDATA);
+void powerUpSystemAndDebug()  {
+  int ack = 0;
+  uint32_t errorFlag = 0;
+  
+	swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
 
 	errorFlag = checkErrorFlag();
 	if(errorFlag != 0)
-		SWDRegister_Write(0x00, DP, &ack, errorFlag); //Write to AP ABORT Register clear error flag
+		swdWriteAbort(&ack, errorFlag); //Write to AP ABORT Register clear error flag
+}
 
-	SWDRegister_Read(0x04, DP, &ack, &parity, &CTRLSTAT_READDATA);
-	//SWDRegister_Write(0x08, DP, &ack, registerBank); //Access SELECT register and select APBANK
+/*
+ * 
+ */
+void readAHB_IDR(uint32_t data_IDR)	{
+  int ack = 0, idr = 0, dummyRead = 0;
+  
+	powerUpSystemAndDebug();
+  swdWriteSelect(&ack, BANK_F);
+	SWDRegister_Read(0x0C, AP, &ack, &parity, &dummyRead); //discard previous AP
+	SWDRegister_Read(0x0C, AP, &ack, &parity, &idr); //IDR
 }
 
 

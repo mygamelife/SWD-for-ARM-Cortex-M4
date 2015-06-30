@@ -13,179 +13,6 @@ void tearDown(void){}
  /******************************************************************************************************
  |  Start bit   | 	APnDP   |   RW     |    Addr2   |   Addr3   |   Parity    |   Stop    |   Park    |
  ------------------------------------------------------------------------------------------------------
- |      1       |    0      |    0     |     1      |     0     |     1       |    0      |     1     |
- ******************************************************************************************************/
-void test_writeCtrlStatusReg_request_10010101_should_be_send(void)
-{
-  //DP = 0, Write = 0, Addr = 0x04
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	ctrlStatusReg(WRITE);
-}
-
- /******************************************************************************************************
- |  Start bit   | 	APnDP   |   RW     |    Addr2   |   Addr3   |   Parity    |   Stop    |   Park    |
- ------------------------------------------------------------------------------------------------------
- |      1       |    0      |   1     |     1      |     0     |     0       |    0      |     1     |
- ******************************************************************************************************/
-void test_readCtrlStatusReg_request_10010101_should_be_sent(void)
-{
-  //DP = 0, Read = 1, Addr = 0x04
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	ctrlStatusReg(READ);
-}
-
- /******************************************************************************************************
- |  Start bit   | 	APnDP   |   RW     |    Addr2   |   Addr3   |   Parity    |   Stop    |   Park    |
- ------------------------------------------------------------------------------------------------------
- |      1       |    0      |    1     |     0      |     0     |     1       |    0      |     1     |
- ******************************************************************************************************/
-void test_readIDCODEReg_request_10010101_should_be_send(void)
-{
-  //DP = 0, Read = 1, Addr = 0x00
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	readIDCODEReg();
-}
-
- /******************************************************************************************************
- |  Start bit   | 	APnDP   |   RW     |    Addr2   |   Addr3   |   Parity    |   Stop    |   Park    |
- ------------------------------------------------------------------------------------------------------
- |      1       |    0      |    0     |     0      |     0     |     0       |    0      |     1     |
- ******************************************************************************************************/
-void test_writeAbortReg_request_10000001_should_be_send(void)
-{
-  //DP = 0, Write = 0, Addr = 0x00
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	writeAbortReg();
-}
-
-void test_writeDataToSelectReg_should_execute_same_sequence_as_wrote_in_the_function()
-{
-  int i = 0;
-	//send 0x81
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  //0
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect(); //1
-
-	//turnAround_ToRead
-	SWCLK_OFF_Expect();
-
-	//Switch to Input
-	SWDIO_InputMode_Expect();
-
-	//read ACK
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(1);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-	SWCLK_ON_Expect();SWCLK_OFF_Expect();	readSWDIO_Pin_ExpectAndReturn(0);
-
-	//turnAround_ToWrite
-	SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
-
-	//SWDIO_Output mode
-	SWDIO_OutputMode_Expect();
-
-	//Data
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // LSB
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 8
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();  // 0
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	SWDIO_Low_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	//read Parity is 1
-	SWDIO_High_Expect();SWCLK_OFF_Expect();SWCLK_ON_Expect();
-
-	//-----------extraIdleClock-------------
-	SWDIO_Low_Expect();
-
-	for(i = 0; i < 8; i++)  {
-		SWCLK_OFF_Expect();SWCLK_ON_Expect();
-	}
-	//-----------extraIdleClock-------------
-
-  writeDataToSelectReg(WDERRCLR);
-}
-
-
- /******************************************************************************************************
- |  Start bit   | 	APnDP   |   RW     |    Addr2   |   Addr3   |   Parity    |   Stop    |   Park    |
- ------------------------------------------------------------------------------------------------------
  |      1       |    1      |    0     |     1      |     0     |     0       |    0      |     1     |
  ******************************************************************************************************/
 void test_SWDRegister_Write_given_Address_0x4_AP_Write_data_0xFFFFFFFF_should_send_SWD_Request_and_WriteData()
@@ -332,4 +159,67 @@ void test_SWDRegisterRead() {
 	TEST_ASSERT_EQUAL(1,ACK);
 	TEST_ASSERT_EQUAL(1,parity);  
 	TEST_ASSERT_EQUAL(0x1000000,dataRead);
+}
+
+void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_and_check_error_flag() {
+  //Write CTR/STATUS 
+  emulateWrite(0xA9, 8); //SWD 8bit protocol
+  emulateTurnAroundRead();
+  emulateSwdInput();
+  emulateRead(0x4, 3); //Acknowledgement
+  emulateTurnAroundWrite();
+  emulateSwdOutput();  
+  emulateWrite(POWERUP_SYSTEM, 32); //Write DATA (LSB)
+  emulateWrite(0x0, 1); //Parity
+  emulateIdleClock(8);
+  
+  //Check error flag
+  emulateWrite(0x8D, 8); //SWD 8bit protocol
+  emulateTurnAroundRead();
+  emulateSwdInput();
+  emulateRead(0x4, 3); //Acknowledgement
+  emulateRead(0xA, 32); //Read DATA (LSB)
+  emulateRead(0x0, 1); //Parity
+  emulateTurnAroundWrite();
+  emulateSwdOutput();
+  emulateIdleClock(8);
+
+  powerUpSystemAndDebug();
+}
+
+void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_then_check_error_flag_and_send_0x8_to_ABORT() {
+  //Write CTR/STATUS 
+  emulateWrite(0xA9, 8); //SWD 8bit protocol
+  emulateTurnAroundRead();
+  emulateSwdInput();
+  emulateRead(0x4, 3); //Acknowledgement
+  emulateTurnAroundWrite();
+  emulateSwdOutput();  
+  emulateWrite(POWERUP_SYSTEM, 32); //Write DATA (LSB)
+  emulateWrite(0x0, 1); //Parity
+  emulateIdleClock(8);
+  
+  //Check error flag <-- Expect error flag happen here
+  emulateWrite(0x8D, 8); //SWD 8bit protocol
+  emulateTurnAroundRead();
+  emulateSwdInput();
+  emulateRead(0x4, 3); //Acknowledgement
+  emulateRead(0x100000A, 32); //Read DATA (LSB)
+  emulateRead(0x1, 1); //Parity
+  emulateTurnAroundWrite();
+  emulateSwdOutput();
+  emulateIdleClock(8);
+  
+  //Write ABORT
+  emulateWrite(0x81, 8); //SWD 8bit protocol
+  emulateTurnAroundRead();
+  emulateSwdInput();
+  emulateRead(0x4, 3); //Acknowledgement
+  emulateTurnAroundWrite();
+  emulateSwdOutput();  
+  emulateWrite(WDERRCLR, 32); //Write DATA (LSB)
+  emulateWrite(0x1, 1); //Parity
+  emulateIdleClock(8);
+
+  powerUpSystemAndDebug();
 }

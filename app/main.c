@@ -28,10 +28,6 @@ int main(void)
 
 	SWD_Initialisation();
 
-	selectRegisterBank(0xF0);
-	//SWDRegister_Read(0x0C, AP, &ack, &parity, &dummyRead); //discard previous AP
-	//SWDRegister_Read(0x0C, AP, &ack, &parity, &IDR); //IDR
-
 	//selectRegisterBank(0x00);
 	//SWDRegister_Write(0x00, AP, &ack, CSW_data); //Select 32bit memory access size in CSW register
 	//SWDRegister_Read(0x00, AP, &ack, &parity, &dummyRead); //discard previous AP

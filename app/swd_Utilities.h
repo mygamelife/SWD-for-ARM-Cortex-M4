@@ -1,6 +1,9 @@
 #ifndef swd_Utilities_H
 #define swd_Utilities_H
 
+#include <stdint.h>
+#include "Register_ReadWrite.h"
+
 //SWD Protocol bit sequence
 #define DP 0
 #define AP 1
@@ -19,8 +22,6 @@
 #define FAULT_RESPONSE   3
 #define NO_RESPONSE      4
 
-#include <stdint.h>
-#include "Register_ReadWrite.h"
 int calculateParity_SWDRequest(int Address_bit3,int Address_bit2,int APnDP, int ReadWrite);
 int calculateParity_32bitData(uint32_t data);
 int getSWD_Request(int Address,int APnDP,int ReadWrite);
