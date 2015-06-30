@@ -154,7 +154,7 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	
 }
 
-int Memory_Read(uint32_t Address,uint32_t *dataRead)
+int MemoryAccess_Read(uint32_t Address,uint32_t *dataRead)
 {
 	int ACK = 0, Parity = 0 ;
 	
@@ -164,7 +164,7 @@ int Memory_Read(uint32_t Address,uint32_t *dataRead)
 	return 0 ;
 }
 
-int Memory_Write(uint32_t Address,uint32_t WriteData)
+int MemoryAccess_Write(uint32_t Address,uint32_t WriteData)
 {
 	int ACK = 0, Parity = 0 ;
 	
