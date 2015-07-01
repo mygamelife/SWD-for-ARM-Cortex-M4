@@ -2,7 +2,11 @@
 #include "unity.h"
 #include "Emulator.h"
 #include "Clock.h"
+#include "Reset.h"
+#include "Delay.h"
+#include "swd_Utilities.h"
 #include "Bit_Operations.h"
+#include "Register_ReadWrite.h"
 #include "mock_IO_Operations.h"
 #include "mock_configurePort.h"
 
@@ -13,6 +17,17 @@ void setUp(void)
 void tearDown(void)
 {
 }
+
+void test_MSB_LSB_Conversion_given_0xEE2805D4_should_return_0x2BA01477()
+{
+	TEST_ASSERT_EQUAL(0x2BA01477,MSB_LSB_Conversion(0xEE2805D4));
+}
+
+void test_MSB_LSB_Conversion_given_0x2BA01477_should_return_0xEE2805D4()
+{
+	TEST_ASSERT_EQUAL(0xEE2805D4,MSB_LSB_Conversion(0x2BA01477));
+}
+
 
 void test_emulateWrite_given_0x2_and_number_of_bits_2()
 {
@@ -88,4 +103,41 @@ void test_emulateIdleClock_should_generate_SWDIO_low_and_SWDCLK_OFF_ON_8_times()
   emulateIdleClock(8);
   
   extraIdleClock(8);
+}
+
+void test_emulateLineReset_given_60clock_should_generate_clock_cycles_with_SWDIO_High()
+{
+	emulateLineReset(60);
+	
+	lineReset(60);
+}
+
+void test_emulateResetTarget_should_call_ResetPinLow_ResetPin_High()
+{
+	emulateResetTarget();
+	
+	resetTarget();
+}
+
+void test_emulateSWDRegister_Write_should_send_SWD_Request_readACK_and_Write_data()
+{
+	int ACK = 0 ;
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,0x2BA01477);
+	SWDRegister_Write(TAR_REG,AP,&ACK,0x2BA01477);
+	
+	TEST_ASSERT_EQUAL(1,ACK);
+}
+
+void test_emulateSWDRegister_Read_should_send_SWD_Request_readACK_and_readData_readParity()
+{
+	int ACK = 0 , Parity = 0;
+	uint32_t dataRead ;
+	
+	emulateSWDRegister_Read(TAR_REG,AP,4,1,0xEE2805D4);
+	SWDRegister_Read(TAR_REG,AP,&ACK,&Parity,&dataRead);
+	
+	TEST_ASSERT_EQUAL(0x2BA01477,dataRead);
+	TEST_ASSERT_EQUAL(1,ACK);
+	TEST_ASSERT_EQUAL(1,Parity);
 }

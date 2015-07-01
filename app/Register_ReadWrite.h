@@ -10,9 +10,24 @@
 
 #define IDCODE_REG 0x0
 #define ABORT_REG 0x0
-#define TAR_REG 0x4
+#define RDBUFF_REG 0xC
 #define CTRLSTAT_REG 0x4
-#define DRW_REG 0xC
+
+//Debug Core Register
+#define DHCSR     ((uint32_t)0xE000EDF0)    //Debug Halting Control Status Register
+#define DCRSR     ((uint32_t)0xE000EDF4)    //Debug Core Register Selector Register
+#define DCRDR     ((uint32_t)0xE000EDF8)    //Debug Core Register Data Register
+#define DEMCR     ((uint32_t)0xE000EDFC)    //Debug Exception and Monitor Control Register
+
+//MEM-AP register
+#define CSW_REG           0x0
+#define TAR_REG           0x4
+#define IDR_REG           0xC
+#define DRW_REG           0xC
+#define SIZE_BYTE         0x1
+#define SIZE_HALFWORD     0x2
+#define SIZE_WORD         0x3
+#define ROM_TABLE         0xE00FF000
 
 //DP Register
 #define DP_IDCODE     0x00
@@ -27,7 +42,7 @@
 #define SWD_STICKYERR_MASK    (1 << 5)
 #define SWD_STICKYCMP_MASK    (1 << 4)
 #define SWD_STICKYORUN_MASK   (1 << 1)
-#define POWERUP_SYSTEM        0x50000000
+#define POWERUP_SYSTEM        ((uint32_t)0x50000000)
 
 #define swdReadCtrlStatus(ack, parity, readData)    SWDRegister_Read(DP_CTRL_STAT, DP, ack, parity, readData);
 #define swdWriteCtrlStatus(ack, writeData)          SWDRegister_Write(DP_CTRL_STAT, DP, ack, writeData);
@@ -53,8 +68,12 @@ void powerUpSystemAndDebug();
 void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
 void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data);
 
-
 //-------------------------------- AHB-AP Register --------------------------------------------
-void readAHB_IDR(uint32_t data_IDR);
+void readAHB_IDR(uint32_t *data_IDR);
+
+int MemoryAccess_Read(uint32_t Address,uint32_t *dataRead);
+int MemoryAccess_Write(uint32_t Address,uint32_t WriteData);
+
+int SWD_ReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
 
 #endif // Register_ReadWrite_H

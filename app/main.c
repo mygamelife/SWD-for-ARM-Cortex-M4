@@ -13,61 +13,22 @@
 int main(void)
 {
 	int ack = 0, parity = 0;
-
-	uint32_t dummyRead = 0 ;
-
-	uint32_t ctrlStatusRegData = 0x50000000  ,CTRLSTAT_READDATA =0, selectAPBank = 0xF0;
-	uint32_t IDR = 0, CSW = 0, TAR = 0, DRW = 0;
-	uint32_t CSW_data = 0x22000002;
-	uint32_t TAR_addr = 0xE000EDF0;
-	uint32_t DRW_data = 0xA05F0003;
-	//uint32_t DP_Select_data = 0x0 ;
+	uint32_t data_IDR = 0, readData_CSW = 0, readDummy = 0, read_DHCSR = 0;
 
 	configure_IOPorts();
 	//resetTarget();
 
 	SWD_Initialisation();
+	readAHB_IDR(&data_IDR);
 
-	//selectRegisterBank(0x00);
-	//SWDRegister_Write(0x00, AP, &ack, CSW_data); //Select 32bit memory access size in CSW register
-	//SWDRegister_Read(0x00, AP, &ack, &parity, &dummyRead); //discard previous AP
-	//SWDRegister_Read(0x00, AP, &ack, &parity, &CSW); //CSW
+	swdWriteSelect(&ack, BANK_0);
+	SWDRegister_Write(CSW_REG,AP,&ack, 0x23000042);
+	SWD_ReadAP(CSW_REG, &ack, &parity, &readData_CSW);
 
-	/*
-	//Step 1 enable MSC_WRITECTRL
-	SWDRegister_Write(0x04, AP, &ack, MSC_WRITECTRL); //TAR
-	SWDRegister_Write(0x0C, AP, &ack, 0x1); //DRW
+	SWDRegister_Write(TAR_REG, AP, &ack, DHCSR);
+	SWDRegister_Write(DRW_REG,AP,&ack,0xA05F0003);
 
-	//Step 2 write MSC_ADDRB
-	SWDRegister_Write(0x04, AP, &ack, MSC_ADDRB); //TAR
-	SWDRegister_Write(0x0C, AP, &ack, 0x400C0080); //DRW
-
-	//Step 3 Load MSC_ADDRB into ADDR
-	SWDRegister_Write(0x04, AP, &ack, MSC_WRITECMD); //TAR
-	SWDRegister_Write(0x0C, AP, &ack, 0x1); //DRW
-
-	//Step 4 Write the word to MSC_WDATA
-	SWDRegister_Write(0x04, AP, &ack, MSC_WDATA); //TAR
-	SWDRegister_Write(0x0C, AP, &ack, 0xABCD000); //DRW
-
-	//Step 5 write a 1 to bit WRITEONCE in MSC_WRITECMD
-	SWDRegister_Write(0x04, AP, &ack, MSC_WRITECMD); //TAR
-	SWDRegister_Write(0x0C, AP, &ack, 0x8); //DRW
-	*/
-
-	/*
-	SWDRegister_Write(0x04, AP, &ack, 0x00020000); //TAR
-	SWDRegister_Read(0x04, AP, &ack, &parity, &dummyRead);
-	SWDRegister_Read(0x04, AP, &ack, &parity, &TAR);
-
-	SWDRegister_Write(0x0C, AP, &ack, 0x55667788); //DRW
-	SWDRegister_Read(0x0C, AP, &ack, &parity, &dummyRead);
-	SWDRegister_Read(0x0C, AP, &ack, &parity, &DRW);*/
-
-	//SWDRegister_Read(0x0C, DP, &ack, &parity, &TAR); //TAR
-
-
-
+	SWD_ReadAP(DRW_REG, &ack, &parity, &read_DHCSR);
 
 	while(1)
 	{
