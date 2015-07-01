@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project version="2G - 2.0.2" name="SWD-for-ARM-Cortex-M4">
   <Target name="SerialWireDebug" isCurrent="1">
-    <Device manufacturerId="9" manufacturerName="ST" chipId="287" chipName="STM32F429ZI" boardId="" boardName="" coreId="4" coreName="Cortex M4"/>
+    <Device manufacturerId="9" manufacturerName="ST" chipId="287" chipName="STM32F429ZI" boardId="" boardName="" boardUrl="" coreId="4" coreName="Cortex M4"/>
     <BuildOption>
       <Compile>
         <Option name="OptimizationLevel" value="0"/>
@@ -63,7 +63,7 @@
       <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="1"/>
       <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
       <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Erase Effected"/>
-      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:\Users\Shengli\AppData\Roaming\CooCox\CoIDE\config\flash\CooCox-Flash\CoIDE_STM32F4xx_2048K\STM32F4xx_2048.elf"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:\Users\susan_000\AppData\Roaming\CooCox\CoIDE\config\flash\CooCox-Flash\CoIDE_STM32F4xx_2048K\STM32F4xx_2048.elf"/>
     </DebugOption>
     <ExcludeFile/>
   </Target>

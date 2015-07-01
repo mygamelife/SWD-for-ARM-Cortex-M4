@@ -14,22 +14,15 @@
  */
 void SWD_Initialisation()
 {
-	int ACK = 0, Parity = 0  ;
-	uint32_t IDCODE = 0 ;
+	int ack = 0, parity = 0;
+	uint32_t idcode = 0, errorFlag = 0;
 
 	switchJTAGtoSWD();
-	readIDCODEReg();
+	SWDRegister_Read(DP_IDCODE, DP, &ack, &parity, &idcode);
 
-	turnAround_ToRead();
-	SWDIO_InputMode();
-	
-	read3bit(&ACK);
-	read32bit(&IDCODE);
-	Parity = readBit();
-
-	turnAround_ToWrite();
-	SWDIO_OutputMode();
-	extraIdleClock(8);
+	errorFlag = checkErrorFlag();
+	if(errorFlag != 0)
+		swdWriteAbort(&ack, errorFlag); //Write to AP ABORT Register clear error flag
 }
 
 /**
