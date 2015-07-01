@@ -1,3 +1,4 @@
 build/*
+app/main.c
 !build/README.txt
 /output/
