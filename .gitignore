@@ -1,9 +1,10 @@
 build/*
+Debug/*
 app/main.c
 *.cogui
 *.comarker
 *.comemgui
 *.coproj
-Debug/*
+!Debug/README.txt
 !build/README.txt
 /output/
