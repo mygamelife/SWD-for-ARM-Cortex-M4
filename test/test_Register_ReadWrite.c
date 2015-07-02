@@ -95,15 +95,12 @@ void test_SWD_ReadAP_should_call_SWDRegister_Read_2times()
 
 void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_and_check_error_flag() {
   emulateSWDRegister_Write(DP_CTRL_STAT, DP, 1, POWERUP_SYSTEM);
-  emulateSWDRegister_Read(DP_CTRL_STAT, DP, 1, 0, MSB_LSB_Conversion(POWERUP_SYSTEM));
 
   powerUpSystemAndDebug();
 }
 
 void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_then_check_error_flag_and_send_0x8_to_ABORT() {
   emulateSWDRegister_Write(DP_CTRL_STAT, DP, 1, POWERUP_SYSTEM);
-  emulateSWDRegister_Read(DP_CTRL_STAT, DP, 1, 1, 0x100000A);
-  emulateSWDRegister_Write(DP_ABORT, DP, 1, WDERRCLR);
 
   powerUpSystemAndDebug();
 }
@@ -138,14 +135,40 @@ void test_MemoryAccess_Write_given_Address_0x12345678_Data_0x87654321_should_Wri
 	MemoryAccess_Write(0x12345678,0x87654321);
 }
 
-void Xtest_readAHB_IDR()
+void test_readAHB_IDR_should_clear_flags_after_readSelect_and_readAP()
 {
-	//Write memory address to TAR
-	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
-	
-	//Write data to DRW
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x87654321);
-	
-	//Write data to DRW
-	MemoryAccess_Write(0x12345678,0x87654321);
+  uint32_t data_IDR = 0;
+	emulateSWDRegister_Write(DP_CTRL_STAT, DP, OK, POWERUP_SYSTEM);
+	emulateSWDRegister_Write(DP_SELECT, DP, OK, BANK_F);
+	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
+	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
+  
+  readAHB_IDR(&data_IDR);
+  TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
+}
+
+void test_readAHB_IDR_return_WAIT_RESPONSE_should_retries_DPABORT_and_resend()
+{
+  uint32_t data_IDR = 0;
+	emulateSWDRegister_Write(DP_CTRL_STAT, DP, OK, POWERUP_SYSTEM);
+	emulateSWDRegister_Write(DP_SELECT, DP, OK, BANK_F);
+	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+  
+  //Retries
+  emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+  //Retries
+  emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+  //Retries
+  emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+  
+  emulateSWDRegister_Write(DP_ABORT, DP, OK, DAPABOT);
+  emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
+	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
+  
+  readAHB_IDR(&data_IDR);
+  TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
 }

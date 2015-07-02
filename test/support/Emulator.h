@@ -6,6 +6,10 @@
 #include "mock_IO_Operations.h"
 #include "mock_configurePort.h"
 
+#define OK      0x4
+#define WAIT    0x2
+#define FAULT   0x1
+
 uint32_t MSB_LSB_Conversion(uint32_t input);
 
 void emulateRead(int data, int numOfBits);

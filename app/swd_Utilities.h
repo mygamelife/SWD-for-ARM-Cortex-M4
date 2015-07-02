@@ -14,20 +14,20 @@
 #define PARKBIT 1
 
 //Acknowledgement response
-#define OK      0x1
-#define WAIT    0x2
-#define FAULT   0x4
-#define OK_RESPONSE      1
-#define WAIT_RESPONSE    2
-#define FAULT_RESPONSE   3
-#define NO_RESPONSE      4
+#define OK_RESPONSE      0x1
+#define WAIT_RESPONSE    0x2
+#define FAULT_RESPONSE   0x4
+#define NO_RESPONSE      -1
 
 int calculateParity_SWDRequest(int Address_bit3,int Address_bit2,int APnDP, int ReadWrite);
 int calculateParity_32bitData(uint32_t data);
 int getSWD_Request(int Address,int APnDP,int ReadWrite);
-int checkAckResponse(int ackValue);
-uint32_t checkErrorFlag();
 
 void getSWD_AddressBit(int *Address_bit3,int *Address_bit2,int Address);
-void swdClearFlags(int ackResponse);
+
+uint32_t swdCheckErrorFlag();
+void swdClearFlags(int ackResponse, int readWrite, int address, int AP_DP, int parity, uint32_t data);
+int retriesSwdReadWrite(int readWrite, int address, int AP_DP, int parity, uint32_t data);
+int isDpRead(int readWrite, int AP_DP);
+int isApRead(int readWrite, int AP_DP);
 #endif // swd_Utilities_H

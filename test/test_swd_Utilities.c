@@ -140,27 +140,7 @@ void test_getSWD_Request_given_Address0x04_DP_READ_should_return_0x8D()
 	TEST_ASSERT_EQUAL(0x8D,getSWD_Request(0x04,DP,READ));
 }
 
-void test_checkAckResponse_given_ackValue_OK_should_return_OK_RESPONSE(){
-
-  TEST_ASSERT_EQUAL(OK_RESPONSE, checkAckResponse(OK));
-}
-
-void test_checkAckResponse_given_ackValue_WAIT_should_return_WAIT_RESPONSE(){
-
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, checkAckResponse(WAIT));
-}
-
-void test_checkAckResponse_given_ackValue_FAULT_should_return_FAULT_RESPONSE(){
-
-  TEST_ASSERT_EQUAL(FAULT_RESPONSE, checkAckResponse(FAULT));
-}
-
-void test_checkAckResponse_given_ackValue_0x9_should_return_NO_RESPONSE(){
-
-  TEST_ASSERT_EQUAL(NO_RESPONSE, checkAckResponse(0x9));
-}
-
-void test_checkErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -173,13 +153,13 @@ void test_checkErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_
   emulateSwdOutput();
   emulateIdleClock(8);
 
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0x8, data);
 }
 
 
-void test_checkErrorFlag_should_return_0x4_when_bit_5_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0x4_when_bit_5_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -192,12 +172,12 @@ void test_checkErrorFlag_should_return_0x4_when_bit_5_of_the_readData_is_set_to_
   emulateSwdOutput();
   emulateIdleClock(8);
 
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0x4, data);
 }
 
-void test_checkErrorFlag_should_return_0x2_when_bit_4_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0x2_when_bit_4_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -210,12 +190,12 @@ void test_checkErrorFlag_should_return_0x2_when_bit_4_of_the_readData_is_set_to_
   emulateSwdOutput();
   emulateIdleClock(8);
 
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0x2, data);
 }
 
-void test_checkErrorFlag_should_return_0x10_when_bit_1_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0x10_when_bit_1_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -228,12 +208,12 @@ void test_checkErrorFlag_should_return_0x10_when_bit_1_of_the_readData_is_set_to
   emulateSwdOutput();
   emulateIdleClock(8);
 
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0x10, data);
 }
 
-void test_checkErrorFlag_should_return_0xC_when_bit_7_5_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0xC_when_bit_7_5_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -246,12 +226,12 @@ void test_checkErrorFlag_should_return_0xC_when_bit_7_5_of_the_readData_is_set_t
   emulateSwdOutput();
   emulateIdleClock(8);
 
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0xC, data);
 }
 
-void test_checkErrorFlag_should_return_0xE_when_bit_7_5_4_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0xE_when_bit_7_5_4_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -263,12 +243,12 @@ void test_checkErrorFlag_should_return_0xE_when_bit_7_5_4_of_the_readData_is_set
   emulateTurnAroundWrite();
   emulateSwdOutput();
   emulateIdleClock(8);
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0xE, data);
 }
 
-void test_checkErrorFlag_should_return_0x1E_when_bit_7_5_4_1_of_the_readData_is_set_to_1() {
+void test_swdCheckErrorFlag_should_return_0x1E_when_bit_7_5_4_1_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -280,9 +260,47 @@ void test_checkErrorFlag_should_return_0x1E_when_bit_7_5_4_1_of_the_readData_is_
   emulateTurnAroundWrite();
   emulateSwdOutput();
   emulateIdleClock(8);
-  data = checkErrorFlag();
+  data = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(0x1E, data);
+}
+
+void test_isApRead_given_read_and_AP_should_return_1()  {
+  int result = isApRead(READ, AP);
+  TEST_ASSERT_EQUAL(1, result);
+}
+
+void test_isApRead_given_Write_and_AP_should_return_0()  {
+  int result = isApRead(WRITE, AP);
+  TEST_ASSERT_EQUAL(0, result);
+}
+
+void test_isApRead_given_read_and_DP_should_return_0()  {
+  int result = isApRead(READ, DP);
+  TEST_ASSERT_EQUAL(0, result);
+}
+
+void test_retriesSwdReadWrite_given_read_operation_should_read_3_times_and_return_acknowledgement()  {
+  int parity = 0, result = 0;
+  uint32_t readData = 0;
+  
+  emulateSWDRegister_Read(DP_SELECT, DP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateSWDRegister_Read(DP_SELECT, DP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateSWDRegister_Read(DP_SELECT, DP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  
+  result = retriesSwdReadWrite(READ, DP_SELECT, DP, parity, readData);
+  TEST_ASSERT_EQUAL(WAIT_RESPONSE, result);
+}
+
+void test_retriesSwdReadWrite_given_write_operation_should_read_3_times_and_return_acknowledgement()  {
+  int parity = 0, result = 0;
+  uint32_t readData = 0;
+  
+  emulateSWDRegister_Write(CSW_REG, AP, WAIT, 0xDEADBEEF);
+  emulateSWDRegister_Write(CSW_REG, AP, OK, 0xDEADBEEF);
+  
+  result = retriesSwdReadWrite(WRITE, CSW_REG, AP, parity, 0xDEADBEEF);
+  TEST_ASSERT_EQUAL(OK_RESPONSE, result);
 }
 
 /*******************************************************************************************************
@@ -325,22 +343,37 @@ void test_swdClearFlags_given_WDERRCLR_bit_set_to_1_should_write_0x1000000_to_AP
   emulateWrite(0x1, 1); //Parity
   emulateIdleClock(8);
   
-  swdClearFlags(FAULT_RESPONSE);
+  swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
 }
 
-void test_swdClearFlags_given_WAIT_RESPOND_should_write_CLRDAPABOT_to_AP_ABORT_Register() {
-  int i = 0, data = 0;
-
-  //Write AP ABORT Register
-  emulateWrite(0x81, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateTurnAroundWrite();
-  emulateSwdOutput();  
-  emulateWrite(0x1, 32); //Write DATA (LSB)
-  emulateWrite(0x1, 1); //Parity
-  emulateIdleClock(8);
+void test_swdClearFlags_given_WAIT_RESPOND_should_retries_3_times_and_abort() {
+  int parity = 0;
+  uint32_t readData = 0;
   
-  swdClearFlags(WAIT_RESPONSE);
+  //First AP read
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  //Second AP read
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  //Third AP read
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  
+  emulateSWDRegister_Write(DP_ABORT, DP, OK, DAPABOT);
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  
+  swdClearFlags(WAIT_RESPONSE, READ, TAR_REG, AP, parity, readData);
+}
+
+void test_swdClearFlags_given_WAIT_RESPOND_should_write_retries_3_times_if_success_dont_abort() {
+  int parity = 0;
+  uint32_t readData = 0;
+  
+  emulateSWDRegister_Write(DRW_REG, AP, WAIT, 0xDEADBEEF);
+  emulateSWDRegister_Write(DRW_REG, AP, WAIT, 0xDEADBEEF);
+  emulateSWDRegister_Write(DRW_REG, AP, OK, 0xDEADBEEF);
+  
+  swdClearFlags(WAIT_RESPONSE, WRITE, DRW_REG, AP, parity, 0xDEADBEEF);
 }
