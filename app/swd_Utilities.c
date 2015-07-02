@@ -196,7 +196,7 @@ int retriesSwdReadWrite(int readWrite, int address, int AP_DP, int parity, uint3
  •  + R CTRL/STAT register
  •  + W ABORT register
  *
- * SW-DP must not issue a WAIT response to the following requests :
+ * SW-DP must not issue a FAULT response to the following requests :
  *  + R/W IDCODE register
  •  + R/W CTRL/STAT register
  •  + R/W ABORT register
