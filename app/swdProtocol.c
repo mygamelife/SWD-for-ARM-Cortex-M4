@@ -19,10 +19,6 @@ void SWD_Initialisation()
 
 	switchJTAGtoSWD();
 	SWDRegister_Read(DP_IDCODE, DP, &ack, &parity, &idcode);
-
-	errorFlag = checkErrorFlag();
-	if(errorFlag != 0)
-		swdWriteAbort(&ack, errorFlag); //Write to AP ABORT Register clear error flag
 }
 
 /**

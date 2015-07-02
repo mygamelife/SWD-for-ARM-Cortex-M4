@@ -12,11 +12,11 @@
 
 int main(void)
 {
-	int ack = 0, parity = 0;
+ 	int ack = 0, parity = 0;
 	uint32_t data_IDR = 0, readData_CSW = 0, readDummy = 0, read_DHCSR = 0;
 
 	configure_IOPorts();
-	//resetTarget();
+	resetTarget();
 
 	SWD_Initialisation();
 	readAHB_IDR(&data_IDR);
@@ -28,7 +28,13 @@ int main(void)
 	SWDRegister_Write(TAR_REG, AP, &ack, DHCSR);
 	SWDRegister_Write(DRW_REG,AP,&ack,0xA05F0003);
 
+	SWD_ReadAP(TAR_REG, &ack, &parity, &readDummy);
 	SWD_ReadAP(DRW_REG, &ack, &parity, &read_DHCSR);
+
+	SWDRegister_Write(TAR_REG, AP, &ack, 0x2000002C);
+	//SWDRegister_Write(DRW_REG,AP,&ack,0x11111111);
+
+	SWD_ReadAP(DRW_REG, &ack, &parity, &readDummy);
 
 	while(1)
 	{

@@ -78,7 +78,5 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	//extraIdleClock
 	emulateIdleClock(8);
   
-  emulateSWDRegister_Read(DP_CTRL_STAT, DP, 1, 0, 0x0);
-  
 	SWD_Initialisation();
 }
