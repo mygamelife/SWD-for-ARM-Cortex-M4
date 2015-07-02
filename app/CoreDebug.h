@@ -13,7 +13,7 @@
 #define SET_CORE_HALT 0xA05F0003
 
 #define CORE_DEBUG_MASK 0x1
-#define CORE_HALT_MASK 0x3
+#define CORE_HALT_MASK 0x00020000
 
 #define TRUE 1
 #define FALSE 0

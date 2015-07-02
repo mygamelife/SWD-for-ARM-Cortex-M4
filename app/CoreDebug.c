@@ -38,7 +38,7 @@ int isCore_DebugMode(uint32_t data)
 int isCore_Halted(uint32_t data)
 {
 	
-	if ((data & CORE_HALT_MASK) == 3)
+	if ((data & CORE_HALT_MASK) == CORE_HALT_MASK )
 		return TRUE ;
 	else 
 		return FALSE ;

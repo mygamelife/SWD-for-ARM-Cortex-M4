@@ -34,6 +34,7 @@
 
 #define FP_COMP_Address_MASK		0x1FFFFFFC
 #define FP_COMP_Enable				1
+#define FP_REMAP_Address_MASK		0x1FFFFFC0
 
 #define ENABLE_FPB 0x00000003
 #define FPB_MASK 1
@@ -41,6 +42,10 @@
 #define FALSE 0
 
 int FPB_Enable();
-int isFPB_Enabled(uint32_t data);
+int configure_FP_COMP(uint32_t COMP_no,uint32_t address,int Matching_mode);
+int configure_FP_REMAP(uint32_t SRAM_REMAP_address);
 uint32_t get_FP_COMP_WriteValue(uint32_t address,int Matching_mode);
+
+int isFPB_Enabled(uint32_t data);
+int isFP_COMP_Updated(uint32_t dataWrote,uint32_t dataRead);
 #endif // FPB_Unit_H

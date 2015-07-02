@@ -27,25 +27,17 @@ void test_isCore_DebugMode_given_bit0_is_0_should_return_0_or_FALSE()
 	TEST_ASSERT_EQUAL(FALSE,isCore_DebugMode(0x12345670));
 }
 
-void test_isCore_Halted_given_bit1_is_1_bit0_is_1_should_return_1_or_TRUE()
+void test_isCore_Halted_given_bit17_is_1should_return_1_or_TRUE()
 {
 	TEST_ASSERT_EQUAL(TRUE,isCore_Halted(0xA05F0003));
 }
 
-void test_isCore_Halted_given_bit1_is_1_bit0_is_0_should_return_0_or_FALSE()
+void test_isCore_Halted_given_bit17_0_should_return_0_for_FALSE()
 {
-	TEST_ASSERT_EQUAL(FALSE,isCore_Halted(0xA05F0002));
+	TEST_ASSERT_EQUAL(FALSE,isCore_Halted(0xA0500002));
 }
 
-void test_isCore_Halted_given_bit1_is_0_bit0_is_1_should_return_0_or_FALSE()
-{
-	TEST_ASSERT_EQUAL(FALSE,isCore_Halted(0x1));
-}
 
-void test_isCore_Halted_given_bit1_is_0_bit0_is_0_should_return_0_or_FALSE()
-{
-	TEST_ASSERT_EQUAL(FALSE,isCore_Halted(0xA05F0000));
-}
 
 void test_setCore_DebugMode_should_return_1_if_processor_enter_debug_mode()
 {
@@ -231,7 +223,7 @@ void test_setCore_Halt_should_return_1_if_processor_is_Halted()
 	emulateTurnAroundRead();
 	emulateSwdInput();
 	emulateRead(0x4,3); 
-	emulateRead(0xC0000000,32); 
+	emulateRead(MSB_LSB_Conversion(0x30030003),32); 
 	emulateRead(0x1,1); 
 	emulateTurnAroundWrite();
 	emulateSwdOutput();
