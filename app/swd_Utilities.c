@@ -102,29 +102,6 @@ int getSWD_Request(int Address,int APnDP,int ReadWrite)
 }
 
 /**
- * Get acknowledgement value from target and verify the response status
- *
- * Input : ackValue is the acknowledgement value sent by target
- *
- * Return : OK_RESPONSE if the ackValue is b'001 (1)
- *          WAIT_RESPONSE if the ackValue is b'010 (2)
- *          FAULT_RESPONSE if the ackValue is b'100 (4)
- *          NO_RESPONSE if the ackValue is b'xxx
- */
-int checkAckResponse(int ackValue)  {
-  if(ackValue == OK)
-    return OK_RESPONSE;
-
-  else if(ackValue == WAIT)
-    return WAIT_RESPONSE;
-
-  else if(ackValue == FAULT)
-    return FAULT_RESPONSE;
-
-  else  return NO_RESPONSE;
-}
-
-/**
  * Check error flag from CTRL/STATUS Register and set the clear error flag bit accordingly
  * Write 1 to the ABORT Register bit to clear the error flag bit set in CTRL/STATUS Register
  *
@@ -139,7 +116,7 @@ int checkAckResponse(int ackValue)  {
  *
  * Return : errorFlag is the bit sequence needed to clear the error flag in ABORT register
  */
-uint32_t checkErrorFlag()  {
+uint32_t swdCheckErrorFlag()  {
   int ack = 0, parity = 0;
   uint32_t readData = 0, errorFlag = 0;
 
@@ -161,18 +138,79 @@ uint32_t checkErrorFlag()  {
   return errorFlag;
 }
 
+int isDpRead(int readWrite, int AP_DP)  {
+  if(readWrite == READ && AP_DP == DP)
+    return 1;
+  
+  else return 0;
+}
+
+int isApRead(int readWrite, int AP_DP)  {
+  if(readWrite == READ && AP_DP == AP)
+    return 1;
+  
+  else return 0;
+}
+
 /**
- * Take action according to the acknowledgement response
- * + Receive OK_RESPONSE do nothing
- * + Receive WAIT_RESPONSE write 1 bit to DAPABORT in AP ABORT Register
- * + Receive FAULT_RESPONSE write 1 bit to AP ABORT Register clear error flog
- * + other than IDCODE, CTRL/STAT or ABORT, result in a FAULT response
+ * retriesSwdReadWrite retries 3 times
  *
  * Input : ackResponse is the acknowledgement value sent by target
  *
  * Return : None
  */
-void swdClearFlags(int ackResponse) {
+int retriesSwdReadWrite(int readWrite, int address, int AP_DP, int parity, uint32_t data)  {
+  int ack = 0, count = 0;
+  
+  while(count != 3) {
+    if(isDpRead(readWrite,AP_DP)) {
+      SWDRegister_Read(address, AP_DP, &ack, &parity, &data);
+      if(ack == OK_RESPONSE)
+        break;
+    }
+    
+    else if(isApRead(readWrite,AP_DP)) {
+      SWD_ReadAP(address, &ack, &parity, &data);
+      if(ack == OK_RESPONSE)
+        break;
+    }
+
+    else if(readWrite == WRITE) {
+      SWDRegister_Write(address, AP_DP, &ack, data);
+      if(ack == OK_RESPONSE)
+        break;
+    }
+    count++;
+  }
+  
+  return ack;
+}
+
+/**
+ * Clear flag according to the acknowledgement response user should pass in the current transaction
+ * information (int ackResponse, int readWrite, int address, int AP_DP, int parity, uint32_t data)
+ * for retries purpose
+ *
+ * SW-DP must not issue a WAIT response to the following requests :
+ *  + R IDCODE register
+ •  + R CTRL/STAT register
+ •  + W ABORT register
+ *
+ * SW-DP must not issue a WAIT response to the following requests :
+ *  + R/W IDCODE register
+ •  + R/W CTRL/STAT register
+ •  + R/W ABORT register
+ *
+ * Input : ackResponse is the acknowledgement value sent by target
+ *         readWrite is the current transaction operation R/W
+ *         address is the current transaction address
+ *         AP_DP is the current transaction register AP/DP
+ *         parity is the current transaction parity
+ *         data is the current transaction read/write 32bit data
+ *
+ * Return : None
+ */
+void swdClearFlags(int ackResponse, int readWrite, int address, int AP_DP, int parity, uint32_t data) {
   int ack = 0;
   uint32_t errorFlag = 0;
 
@@ -182,11 +220,24 @@ void swdClearFlags(int ackResponse) {
       break;
 
     case  WAIT_RESPONSE :
-      swdWriteAbort(&ack, DAPABOT); //Clear DAPABORT bit
+      ack = retriesSwdReadWrite(readWrite, address, AP_DP, parity, data);
+      if(ack == WAIT_RESPONSE)  {
+        swdWriteAbort(&ack, DAPABOT); //Clear DAPABORT bit
+        
+        //RESEND original operation after DP ABORT
+        if(isDpRead(readWrite, AP_DP))
+          SWDRegister_Read(address, AP_DP, &ack, &parity, &data);
+
+        else if(isApRead(readWrite, AP_DP))
+          SWD_ReadAP(address, &ack, &parity, &data);        
+        
+        else if (readWrite == WRITE)
+          SWDRegister_Write(address, AP_DP, &ack, data);
+      }
       break;
 
     case  FAULT_RESPONSE  :
-      errorFlag = checkErrorFlag();
+      errorFlag = swdCheckErrorFlag();
       swdWriteAbort(&ack, errorFlag); //Clear error flag
       break;
   }

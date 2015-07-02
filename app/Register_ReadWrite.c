@@ -121,9 +121,6 @@ void powerUpSystemAndDebug()  {
   uint32_t errorFlag = 0;
   
 	swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
-	errorFlag = checkErrorFlag();
-	if(errorFlag != 0)
-		swdWriteAbort(&ack, errorFlag); //Write to AP ABORT Register clear error flag
 }
 
 /*  readAHB_IDR is a function to access MEM-AP register and select BankF read the register IDR
@@ -135,8 +132,12 @@ void readAHB_IDR(uint32_t *data_IDR)	{
   int ack = 0, parity = 0;
   
   powerUpSystemAndDebug();
+  
   swdWriteSelect(&ack, BANK_F);
+  swdClearFlags(ack, WRITE, DP_SELECT, DP, parity, BANK_F);
+  
   SWD_ReadAP(IDR_REG, &ack, &parity, data_IDR);
+  swdClearFlags(ack, READ, IDR_REG, AP, parity, (uint32_t)data_IDR);
 }
 
 
