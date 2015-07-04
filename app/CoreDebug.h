@@ -23,7 +23,7 @@ typedef enum
 	STATUS_RETIRED_INSTRUCTION,
 	STATUS_LOCKEDUP,
 	STATUS_SLEEPING,
-	STATUS_HALTED = 0x00020000,
+	STATUS_HALTED 
 }CoreStatus ;
 
 
@@ -52,8 +52,8 @@ typedef enum
 #define FALSE 0
 #define TRUE 1
 
-int SetCore(CoreControl corecontrol);
-int IsCore(CoreControl corecontrol,uint32_t dataRead);
-uint32_t Get_Core_WriteValue(CoreControl corecontrol);
+int setCore(CoreControl corecontrol);
+int isCore(CoreControl corecontrol,uint32_t dataRead);
+uint32_t get_Core_WriteValue(CoreControl corecontrol);
 
 #endif // CoreDebug_H

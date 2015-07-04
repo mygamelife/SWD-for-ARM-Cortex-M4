@@ -41,7 +41,7 @@
 #define TRUE 1
 #define FALSE 0
 
-int FPB_Enable();
+int enable_FPB();
 int configure_FP_COMP(uint32_t COMP_no,uint32_t address,int Matching_mode);
 int configure_FP_REMAP(uint32_t SRAM_REMAP_address);
 uint32_t get_FP_COMP_WriteValue(uint32_t address,int Matching_mode);

@@ -1,21 +1,21 @@
 #include "CoreDebug.h"
 
-int SetCore(CoreControl corecontrol)
+int setCore(CoreControl corecontrol)
 {
 	int status =  0 ;
 	uint32_t data = 0 , dataRead = 0;
 	
-	data = Get_Core_WriteValue(corecontrol);
+	data = get_Core_WriteValue(corecontrol);
 	
 	memoryAccessWrite(DHCSR_REG,data);
 	memoryAccessRead(DHCSR_REG,&dataRead);
 	
-	status = IsCore(corecontrol,dataRead);
+	status = isCore(corecontrol,dataRead);
 	
 	return status ;
 }
 
-int IsCore(CoreControl corecontrol,uint32_t dataRead)
+int isCore(CoreControl corecontrol,uint32_t dataRead)
 {
 	int response = FALSE ;
 		
@@ -49,7 +49,7 @@ int IsCore(CoreControl corecontrol,uint32_t dataRead)
 	return response ;
 }
 
-uint32_t Get_Core_WriteValue(CoreControl corecontrol)
+uint32_t get_Core_WriteValue(CoreControl corecontrol)
 {
 	uint32_t data = 0 ;
 	
