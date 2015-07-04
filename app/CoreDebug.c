@@ -1,45 +1,80 @@
 #include "CoreDebug.h"
 
-int setCore_DebugMode()
+int SetCore(CoreControl corecontrol)
 {
-	uint32_t dataRead = 0;
-	int ACK = 0 , status = 0 ;
-		
-	MemoryAccess_Write(DHCSR_REG,SET_CORE_DEBUG);
-	MemoryAccess_Read(DHCSR_REG,&dataRead);
-
-	status = isCore_DebugMode(dataRead);
+	int status =  0 ;
+	uint32_t data = 0 , dataRead = 0;
 	
-	return status;
-}
-
-int setCore_Halt()
-{
-	uint32_t dataRead = 0;
-	int ACK = 0, status = 0;
+	data = Get_Core_WriteValue(corecontrol);
 	
-	MemoryAccess_Write(DHCSR_REG,SET_CORE_HALT);
+	MemoryAccess_Write(DHCSR_REG,data);
 	MemoryAccess_Read(DHCSR_REG,&dataRead);
 	
-	status = isCore_Halted(dataRead);
-	
+	status = IsCore(corecontrol,dataRead);
 	
 	return status ;
 }
 
-int isCore_DebugMode(uint32_t data)
+int IsCore(CoreControl corecontrol,uint32_t dataRead)
 {
-	if ((data & CORE_DEBUG_MASK) == 1)
-		return TRUE ;
-	else 
-		return FALSE ;
+	int response = FALSE ;
+		
+	switch(corecontrol)
+	{
+		case CORE_DEBUG_MODE 	:
+									if ((dataRead & CORE_DEBUG_MASK) ==	CORE_DEBUG_bit_SET)
+										response = TRUE ;
+									break ;
+		
+		case CORE_DEBUG_HALT :
+									if ((dataRead & CORE_DEBUG_HALT_MASK) == CORE_DEBUG_HALT_bit_SET)
+										response = TRUE ;
+									break ;					
+		case CORE_SINGLE_STEP	:
+									if ((dataRead & CORE_STEP_MASK) == CORE_STEP_bit_SET)
+										response = TRUE ;
+									break ;
+		case CORE_MASK_INTERRUPT:
+									if ((dataRead & CORE_MASKINT_MASK) == CORE_MASKINT_bit_SET)
+										response = TRUE ;
+									break ;
+		/*case CORE_SNAP_STALL	:
+									if ((dataRead & CORE_SNAPSTALL_MASK) == CORE_SNAPSTALL_bit_SET)
+										response = TRUE ;
+									break ;
+		*/
+		default : break ;
+	}
+	
+	return response ;
 }
 
-int isCore_Halted(uint32_t data)
+uint32_t Get_Core_WriteValue(CoreControl corecontrol)
 {
+	uint32_t data = 0 ;
 	
-	if ((data & CORE_HALT_MASK) == CORE_HALT_MASK )
-		return TRUE ;
-	else 
-		return FALSE ;
+	switch(corecontrol)
+	{
+		case CORE_DEBUG_MODE 	:
+									data = SET_CORE_DEBUG ;
+									break ;
+		
+		case CORE_DEBUG_HALT	:
+									data = SET_CORE_DEBUG_HALT ;
+									break ;
+								
+		case CORE_SINGLE_STEP	:
+									data = SET_CORE_STEP ;
+									break ;
+		case CORE_MASK_INTERRUPT:
+									data = SET_CORE_MASKINT ;
+									break ;
+		/*case CORE_SNAP_STALL	:
+									data = SET_CORE_SNAPSTALL ;
+									break ;
+		*/
+		default : break ;
+	}
+	
+	return data ;
 }

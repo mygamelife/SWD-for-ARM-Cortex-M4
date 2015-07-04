@@ -8,20 +8,52 @@
 #include "Bit_Operations.h"
 #include "Register_ReadWrite.h"
 
-#define DHCSR_REG 0xE000EDF0
-#define SET_CORE_DEBUG 0xA05F0001
-#define SET_CORE_HALT 0xA05F0003
+typedef enum 
+{
+	CORE_DEBUG_MODE,
+	CORE_DEBUG_HALT,
+	CORE_SINGLE_STEP,
+	CORE_MASK_INTERRUPT,
+	CORE_SNAP_STALL
+}CoreControl ;
 
-#define CORE_DEBUG_MASK 0x1
-#define CORE_HALT_MASK 0x00020000
+typedef enum
+{
+	STATUS_RESET,
+	STATUS_RETIRED_INSTRUCTION,
+	STATUS_LOCKEDUP,
+	STATUS_SLEEPING,
+	STATUS_HALTED = 0x00020000,
+}CoreStatus ;
 
-#define TRUE 1
+
+
+#define DHCSR_REG 		0xE000EDF0
+#define DFSR_REG		0xE000ED30
+
+#define SET_CORE_DEBUG 			0xA05F0001
+#define SET_CORE_DEBUG_HALT 	0xA05F0003
+#define SET_CORE_STEP			0xA05F0007
+#define SET_CORE_MASKINT		0xA05F000B
+#define SET_CORE_SNAPSTALL		0xA05F0023
+
+#define CORE_DEBUG_MASK	 		0x00000001
+#define CORE_DEBUG_HALT_MASK 	0x00020003
+#define CORE_STEP_MASK			0x00000007
+#define CORE_MASKINT_MASK		0x0002000B
+#define CORE_SNAPSTALL_MASK		0x00020023
+
+#define CORE_DEBUG_bit_SET		0x00000001
+#define CORE_DEBUG_HALT_bit_SET	0x00020003
+#define CORE_STEP_bit_SET		0x00000007
+#define CORE_MASKINT_bit_SET	0x0002000B
+#define CORE_SNAPSTALL_bit_SET	0x00020023
+	
 #define FALSE 0
+#define TRUE 1
 
-int setCore_DebugMode();
-int setCore_Halt();
-
-int isCore_DebugMode();
-int isCore_Halted();
+int SetCore(CoreControl corecontrol);
+int IsCore(CoreControl corecontrol,uint32_t dataRead);
+uint32_t Get_Core_WriteValue(CoreControl corecontrol);
 
 #endif // CoreDebug_H
