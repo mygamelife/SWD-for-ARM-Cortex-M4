@@ -28,8 +28,8 @@ typedef enum
 
 
 
-#define DHCSR_REG 		0xE000EDF0
-#define DFSR_REG		0xE000ED30
+#define DHCSR_REG     0xE000EDF0
+#define DFSR_REG      0xE000ED30
 
 #define SET_CORE_DEBUG 			0xA05F0001
 #define SET_CORE_DEBUG_HALT 	0xA05F0003

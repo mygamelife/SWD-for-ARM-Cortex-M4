@@ -12,8 +12,8 @@
 #define SWCLK_OFF()			HAL_GPIO_WritePin(SWD_PORT, SWDCLK_PIN, GPIO_PIN_RESET)
 #define SWDIO_High()		HAL_GPIO_WritePin(SWD_PORT, SWDIO_PIN, GPIO_PIN_SET)
 #define SWDIO_Low()			HAL_GPIO_WritePin(SWD_PORT, SWDIO_PIN, GPIO_PIN_RESET)
-#define ResetPin_High()		HAL_GPIO_WritePin(SWD_PORT, SWDnRST_PIN, GPIO_PIN_SET)
-#define ResetPin_Low()		HAL_GPIO_WritePin(SWD_PORT, SWDnRST_PIN, GPIO_PIN_RESET)
+#define ResetPin_High()		HAL_GPIO_WritePin(SWD_PORT, SWDNRST_PIN, GPIO_PIN_SET)
+#define ResetPin_Low()		HAL_GPIO_WritePin(SWD_PORT, SWDNRST_PIN, GPIO_PIN_RESET)
 
 #else
 void SWCLK_ON();

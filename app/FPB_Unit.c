@@ -5,8 +5,8 @@ int FPB_Enable()
 	uint32_t dataRead = 0;
 	int ACK = 0 , status = 0 ;
 		
-	MemoryAccess_Write(FPB_REG,ENABLE_FPB);
-	MemoryAccess_Read(FPB_REG,&dataRead);
+	memoryAccessWrite(FPB_REG,ENABLE_FPB);
+	memoryAccessRead(FPB_REG,&dataRead);
 
 	status = isFPB_Enabled(dataRead);
 	
@@ -20,8 +20,8 @@ int configure_FP_COMP(uint32_t COMP_no,uint32_t address,int Matching_mode)
 	
 	dataToWrite = get_FP_COMP_WriteValue(address,Matching_mode);
 	
-	MemoryAccess_Write(COMP_no,dataToWrite);
-	MemoryAccess_Read(COMP_no,&dataRead);
+	memoryAccessWrite(COMP_no,dataToWrite);
+	memoryAccessRead(COMP_no,&dataRead);
 
 	status = isFP_COMP_Updated(dataToWrite,dataRead);
 	

@@ -16,7 +16,7 @@
  *  0x00          IDCODE        ABORT
  *  0x04          CTRL/STAT     CTRL/STAT
  *  0x08          RESEND        SELECT
- *  0x0C          RDBUFF        N/A
+ *  0x0C          RDBUFF_REG        N/A
  */
 
 /**
@@ -78,17 +78,17 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	
 }
 
-int MemoryAccess_Read(uint32_t Address,uint32_t *dataRead)
+int memoryAccessRead(uint32_t Address,uint32_t *dataRead)
 {
 	int ACK = 0, Parity = 0 ;
 	
 	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
-	SWD_ReadAP(DRW_REG,&ACK,&Parity,dataRead);
+	swdReadAP(DRW_REG,&ACK,&Parity,dataRead);
 	
 	return 0 ;
 }
 
-int MemoryAccess_Write(uint32_t Address,uint32_t WriteData)
+int memoryAccessWrite(uint32_t Address,uint32_t WriteData)
 {
 	int ACK = 0, Parity = 0 ;
 	
@@ -98,7 +98,7 @@ int MemoryAccess_Write(uint32_t Address,uint32_t WriteData)
 	return 0 ;
 }
 
-int SWD_ReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
+int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
 {
 	uint32_t discardPreviousRead = 0;
 	SWDRegister_Read(Address,AP,ACK,Parity,&discardPreviousRead);
@@ -128,15 +128,15 @@ void powerUpSystemAndDebug()  {
  *  input   : data_IDR is the variable pass-in by user to store the IDR
  *  return  : NONE
  */
-void readAHB_IDR(uint32_t *data_IDR)	{
+void readAhbIDR(uint32_t *data_IDR)	{
   int ack = 0, parity = 0;
   
   powerUpSystemAndDebug();
   
   swdWriteSelect(&ack, BANK_F);
-  swdClearFlags(ack, WRITE, DP_SELECT, DP, parity, BANK_F);
+  swdClearFlags(ack, WRITE, SELECT_REG, DP, parity, BANK_F);
   
-  SWD_ReadAP(IDR_REG, &ack, &parity, data_IDR);
+  swdReadAP(IDR_REG, &ack, &parity, data_IDR);
   swdClearFlags(ack, READ, IDR_REG, AP, parity, (uint32_t)data_IDR);
 }
 

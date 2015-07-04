@@ -7,8 +7,8 @@ int SetCore(CoreControl corecontrol)
 	
 	data = Get_Core_WriteValue(corecontrol);
 	
-	MemoryAccess_Write(DHCSR_REG,data);
-	MemoryAccess_Read(DHCSR_REG,&dataRead);
+	memoryAccessWrite(DHCSR_REG,data);
+	memoryAccessRead(DHCSR_REG,&dataRead);
 	
 	status = IsCore(corecontrol,dataRead);
 	
