@@ -5,8 +5,8 @@ int setCore_DebugMode()
 	uint32_t dataRead = 0;
 	int ACK = 0 , status = 0 ;
 		
-	MemoryAccess_Write(DHCSR_REG,SET_CORE_DEBUG);
-	MemoryAccess_Read(DHCSR_REG,&dataRead);
+	memoryAccessWrite(DHCSR_REG,SET_CORE_DEBUG);
+	memoryAccessRead(DHCSR_REG,&dataRead);
 
 	status = isCore_DebugMode(dataRead);
 	
@@ -18,8 +18,8 @@ int setCore_Halt()
 	uint32_t dataRead = 0;
 	int ACK = 0, status = 0;
 	
-	MemoryAccess_Write(DHCSR_REG,SET_CORE_HALT);
-	MemoryAccess_Read(DHCSR_REG,&dataRead);
+	memoryAccessWrite(DHCSR_REG,SET_CORE_HALT);
+	memoryAccessRead(DHCSR_REG,&dataRead);
 	
 	status = isCore_Halted(dataRead);
 	

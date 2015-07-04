@@ -26,8 +26,13 @@ int getSWD_Request(int Address,int APnDP,int ReadWrite);
 void getSWD_AddressBit(int *Address_bit3,int *Address_bit2,int Address);
 
 uint32_t swdCheckErrorFlag();
-void swdClearFlags(int ackResponse, int readWrite, int address, int AP_DP, int parity, uint32_t data);
-int retriesSwdReadWrite(int readWrite, int address, int AP_DP, int parity, uint32_t data);
-int isDpRead(int readWrite, int AP_DP);
-int isApRead(int readWrite, int AP_DP);
+void swdClearFlags(int ackResponse, int readOrWrite, int address, int APorDP, int parity, uint32_t data);
+
+#define resendSwdDpOperation(readOrWrite, address, ack, parity, data)   swdReadWriteDpWithRetries(readOrWrite, address, ack, parity, data, 1);
+#define resendSwdApOperation(readOrWrite, address, ack, parity, data)   swdReadWriteApWithRetries(readOrWrite, address, ack, parity, data, 1);
+void swdReadWriteDpWithRetries(int readOrWrite, int address, int *ack, int *parity, uint32_t *data, int counter);
+void swdReadWriteApWithRetries(int readOrWrite, int address, int *ack, int *parity, uint32_t *data, int counter);
+
+int retriesSwdOperation(int readOrWrite, int address, int APorDP, int *parity, uint32_t *data, int numOfRetires);
+void resendSwdOperation(int readOrWrite, int address, int APorDP, int *parity, uint32_t *data);
 #endif // swd_Utilities_H

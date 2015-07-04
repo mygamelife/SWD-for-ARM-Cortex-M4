@@ -138,51 +138,83 @@ uint32_t swdCheckErrorFlag()  {
   return errorFlag;
 }
 
-int isDpRead(int readWrite, int AP_DP)  {
-  if(readWrite == READ && AP_DP == DP)
-    return 1;
-  
-  else return 0;
-}
-
-int isApRead(int readWrite, int AP_DP)  {
-  if(readWrite == READ && AP_DP == AP)
-    return 1;
-  
-  else return 0;
-}
-
 /**
- * retriesSwdReadWrite retries 3 times
+ * swdReadWriteDpWithRetries retries DP read/write operation
  *
- * Input : ackResponse is the acknowledgement value sent by target
+ * Input : readOrWrite is the user define variable READ/WRITE
+ *         address is the address location to read/write
+ *         ack is the acknowledgement of the transaction
+ *         parity is the parity of the data
+ *         data is the read/write 32bit data
+ *         counter to store the number of retries value
  *
  * Return : None
  */
-int retriesSwdReadWrite(int readWrite, int address, int AP_DP, int parity, uint32_t data)  {
-  int ack = 0, count = 0;
-  
-  while(count != 3) {
-    if(isDpRead(readWrite,AP_DP)) {
-      SWDRegister_Read(address, AP_DP, &ack, &parity, &data);
-      if(ack == OK_RESPONSE)
-        break;
-    }
-    
-    else if(isApRead(readWrite,AP_DP)) {
-      SWD_ReadAP(address, &ack, &parity, &data);
-      if(ack == OK_RESPONSE)
+void swdReadWriteDpWithRetries(int readOrWrite, int address, int *ack, int *parity, uint32_t *data, int counter) {
+  while(counter--)  {    
+    if(readOrWrite == READ) {
+      swdReadDP(address, ack, parity, data);
+      if((*ack ) == OK_RESPONSE)
         break;
     }
 
-    else if(readWrite == WRITE) {
-      SWDRegister_Write(address, AP_DP, &ack, data);
-      if(ack == OK_RESPONSE)
+    else if(readOrWrite == WRITE) {
+      swdWriteDP(address, ack, *data);
+      if((*ack ) == OK_RESPONSE)
         break;
     }
-    count++;
   }
+}
+
+/**
+ * swdReadWriteApWithRetries retries AP read/write operation
+ *
+ * Input : readOrWrite is the user define variable READ/WRITE
+ *         address is the address location to read/write
+ *         ack is the acknowledgement of the transaction
+ *         parity is the parity of the data
+ *         data is the read/write 32bit data
+ *         counter to store the number of retries value
+ *
+ * Return : None
+ */
+void swdReadWriteApWithRetries(int readOrWrite, int address, int *ack, int *parity, uint32_t *data, int counter) {
+  while(counter--)  {    
+    if(readOrWrite == READ) {
+      swdReadAP(address, ack, parity, data);
+      if((*ack ) == OK_RESPONSE)
+        break;
+    }
+
+    else if(readOrWrite == WRITE) {
+      swdWriteAP(address, ack, *data);
+      if((*ack ) == OK_RESPONSE)
+        break;
+    }
+  }
+}
+
+/**
+ * retriesSwdOperation is a function to retry the same operation after receive WAIT_RESPONSE
+ *
+ * Input : readOrWrite is the user define variable READ/WRITE
+ *         address is the address location to read/write
+ *         ack is the acknowledgement of the transaction
+ *         parity is the parity of the data
+ *         data is the read/write 32bit data
+ *         counter to store the number of retries value
+ *
+ * Return : ack is the acknowledgement status
+ */
+int retriesSwdOperation(int readOrWrite, int address, int APorDP, int *parity, uint32_t *data, int numOfRetires)  {
+  int ack = 0, count = 0;
   
+  if(APorDP == DP)
+    swdReadWriteDpWithRetries(readOrWrite, address, &ack, parity, data, numOfRetires);
+    
+  else if(APorDP == AP)
+    swdReadWriteApWithRetries(readOrWrite, address, &ack, parity, data, numOfRetires);
+
   return ack;
 }
 
@@ -210,7 +242,7 @@ int retriesSwdReadWrite(int readWrite, int address, int AP_DP, int parity, uint3
  *
  * Return : None
  */
-void swdClearFlags(int ackResponse, int readWrite, int address, int AP_DP, int parity, uint32_t data) {
+void swdClearFlags(int ackResponse, int readOrWrite, int address, int APorDP, int parity, uint32_t data) {
   int ack = 0;
   uint32_t errorFlag = 0;
 
@@ -220,19 +252,20 @@ void swdClearFlags(int ackResponse, int readWrite, int address, int AP_DP, int p
       break;
 
     case  WAIT_RESPONSE :
-      ack = retriesSwdReadWrite(readWrite, address, AP_DP, parity, data);
+      ack = retriesSwdOperation(readOrWrite, address, APorDP, &parity, &data, 3);
+      
+      //clear DAPABORT and resend if acknowledge still WAIT_RESPONSE
       if(ack == WAIT_RESPONSE)  {
-        swdWriteAbort(&ack, DAPABOT); //Clear DAPABORT bit
+        swdWriteAbort(&ack, DAPABOT);
         
-        //RESEND original operation after DP ABORT
-        if(isDpRead(readWrite, AP_DP))
-          SWDRegister_Read(address, AP_DP, &ack, &parity, &data);
-
-        else if(isApRead(readWrite, AP_DP))
-          SWD_ReadAP(address, &ack, &parity, &data);        
+        //RESEND DP/AP operation
+        if(APorDP == DP)  {
+          resendSwdDpOperation(readOrWrite, address, &ack, &parity, &data);
+        }
         
-        else if (readWrite == WRITE)
-          SWDRegister_Write(address, AP_DP, &ack, data);
+        else if(APorDP == AP) {
+          resendSwdApOperation(readOrWrite, address, &ack, &parity, &data);
+        }
       }
       break;
 

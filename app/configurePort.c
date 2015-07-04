@@ -30,7 +30,7 @@ void configureTargetResetPin()
 	GPIO_InitTypeDef GpioInfo;
 
 	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD;
-	GpioInfo.Pin = SWDnRST_PIN ;
+	GpioInfo.Pin = SWDNRST_PIN;
 	GpioInfo.Pull = GPIO_PULLUP ;
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 

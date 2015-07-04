@@ -19,6 +19,7 @@ int main(void)
 	resetTarget();
 
 	SWD_Initialisation();
+
 	readAHB_IDR(&data_IDR);
 
 	swdWriteSelect(&ack, BANK_0);
@@ -31,7 +32,7 @@ int main(void)
 	SWD_ReadAP(TAR_REG, &ack, &parity, &readDummy);
 	SWD_ReadAP(DRW_REG, &ack, &parity, &read_DHCSR);
 
-	SWDRegister_Write(TAR_REG, AP, &ack, 0x2000002C);
+	SWDRegister_Write(TAR_REG, AP, &ack, 0x2000004C);
 	//SWDRegister_Write(DRW_REG,AP,&ack,0x11111111);
 
 	SWD_ReadAP(DRW_REG, &ack, &parity, &readDummy);

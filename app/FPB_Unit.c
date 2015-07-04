@@ -5,8 +5,8 @@ int FPB_Enable()
 	uint32_t dataRead = 0;
 	int ACK = 0 , status = 0 ;
 		
-	MemoryAccess_Write(FPB_REG,ENABLE_FPB);
-	MemoryAccess_Read(FPB_REG,&dataRead);
+	memoryAccessWrite(FPB_REG,ENABLE_FPB);
+	memoryAccessRead(FPB_REG,&dataRead);
 
 	status = isFPB_Enabled(dataRead);
 	
