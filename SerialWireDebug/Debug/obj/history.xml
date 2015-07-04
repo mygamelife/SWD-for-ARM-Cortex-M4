@@ -1,53 +1,53 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc 4.8.1 mingw32 -mcpu=cortex-m4 -mthumb -g2 -Wall -O0 -c -DSTM32F429ZI -DSTM32F429xx -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\app -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4 -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include -I..\..\..\..\..\..\..\Desktop">
-      <target file="IO_Operations.o" lastModified="14e52d5f91d">
+      <target file="IO_Operations.o" lastModified="14e58e0d561">
          <source file="..\..\..\app\IO_Operations.c" lastModified="14e518ce2c0"/>
       </target>
-      <target file="stm32f4xx_hal_rcc.o" lastModified="14e52d5fa46">
+      <target file="stm32f4xx_hal_rcc.o" lastModified="14e58e0d66b">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.c" lastModified="14c0ebff252"/>
       </target>
-      <target file="stm32f4xx_hal.o" lastModified="14e52d5f9a9">
+      <target file="stm32f4xx_hal.o" lastModified="14e58e0d5de">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.c" lastModified="14c0ebff2fe"/>
       </target>
-      <target file="system_stm32f4xx.o" lastModified="14e52d5fb11">
+      <target file="system_stm32f4xx.o" lastModified="14e58e0d736">
          <source file="..\..\..\app\system_stm32f4xx.c" lastModified="14e518ce2d0"/>
       </target>
-      <target file="swdProtocol.o" lastModified="14e52d5f7e4">
-         <source file="..\..\..\app\swdProtocol.c" lastModified="14e518ce2d0"/>
+      <target file="swdProtocol.o" lastModified="14e58e0d419">
+         <source file="..\..\..\app\swdProtocol.c" lastModified="14e58cd95aa"/>
       </target>
-      <target file="Clock.o" lastModified="14e52d5f767">
+      <target file="Clock.o" lastModified="14e58e0d3ac">
          <source file="..\..\..\app\Clock.c" lastModified="14e518ce2c0"/>
       </target>
-      <target file="Reset.o" lastModified="14e52d5fc88">
+      <target file="Reset.o" lastModified="14e58e0d88e">
          <source file="..\..\..\app\Reset.c" lastModified="14e52d5ee2f"/>
       </target>
-      <target file="startup_stm32f429xx.o" lastModified="14e52d5f832">
+      <target file="startup_stm32f429xx.o" lastModified="14e58e0d477">
          <source file="..\..\..\app\startup_stm32f429xx.s" lastModified="14e518ce2d0"/>
       </target>
-      <target file="stm32f4xx_hal_cortex.o" lastModified="14e52d5fac3">
+      <target file="stm32f4xx_hal_cortex.o" lastModified="14e58e0d6e8">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c" lastModified="14c0ebff33c"/>
       </target>
-      <target file="Bit_Operations.o" lastModified="14e52d5f5f0">
+      <target file="Bit_Operations.o" lastModified="14e58e0d254">
          <source file="..\..\..\app\Bit_Operations.c" lastModified="14e518ce2c0"/>
       </target>
-      <target file="Register_ReadWrite.o" lastModified="14e52d5f8af">
-         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e518ce2c0"/>
+      <target file="Register_ReadWrite.o" lastModified="14e58e0d4f4">
+         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e58cfa593"/>
       </target>
-      <target file="Delay.o" lastModified="14e52d5f823">
+      <target file="Delay.o" lastModified="14e58e0d457">
          <source file="..\..\..\app\Delay.c" lastModified="14e518ce2c0"/>
       </target>
-      <target file="main.o" lastModified="14e52d5f6fa">
-         <source file="..\..\..\app\main.c" lastModified="14e52d3db8a"/>
+      <target file="main.o" lastModified="14e58e0d33e">
+         <source file="..\..\..\app\main.c" lastModified="14e58dea528"/>
       </target>
-      <target file="stm32f4xx_hal_gpio.o" lastModified="14e52d5fc0b">
+      <target file="stm32f4xx_hal_gpio.o" lastModified="14e58e0d820">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" lastModified="14c0ebff197"/>
       </target>
-      <target file="configurePort.o" lastModified="14e52d5fb8e">
+      <target file="configurePort.o" lastModified="14e58e0d7a3">
          <source file="..\..\..\app\configurePort.c" lastModified="14e5206e081"/>
       </target>
-      <target file="swd_Utilities.o" lastModified="14e52d5f68c">
-         <source file="..\..\..\app\swd_Utilities.c" lastModified="14e518ce2d0"/>
+      <target file="swd_Utilities.o" lastModified="14e58e0d2d1">
+         <source file="..\..\..\app\swd_Utilities.c" lastModified="14e58b1aee9"/>
       </target>
    </processor>
 </history>
