@@ -182,3 +182,221 @@ void test_setCore_CORE_DEBUG_HALT_should_write_0xA05F0003_to_DHCSR_and_return_tr
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x03030003));
 	TEST_ASSERT_EQUAL(TRUE,setCore(CORE_DEBUG_HALT));
 }
+
+/*-------------------------------------------------------------------------------*/
+
+void test_init_DebugEvent_should_set_all_data_to_0()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
+/*-------------------------------------------------------------------------------*/
+ /******************************************************************************************************
+	Debug Fault Status Register , DFSR
+ 
+	Bits[31:5] --- RESERVED
+
+	Bit[4]		--- EXTERNAL
+	Bit[3]		--- VCATCH
+	Bit[2]		--- DWTTRAP
+	Bit[1]		--- BKPT
+	Bit[0]		--- HALTED
+	
+ ******************************************************************************************************/
+//Testing Bit[0]
+void test_update_DebugEvent_should_assert_HALTED_if_bit0_is_1()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	update_DebugEvent(&debugEvent,0x1);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+}
+
+void test_update_DebugEvent_should_deassert_HALTED_if_bit0_is_0()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.HALTED = 1 ;
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+	
+	update_DebugEvent(&debugEvent,0);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
+//Testing Bit[1]
+void test_update_DebugEvent_should_assert_BKPT_if_bit1_is_1()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	update_DebugEvent(&debugEvent,0x2);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
+void test_update_DebugEvent_should_deassert_BKPT_if_bit1_is_0()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.BKPT = 1 ;
+	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
+	
+	update_DebugEvent(&debugEvent,0x1);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+}
+
+//Testing Bit[2]
+void test_update_DebugEvent_should_assert_DWTTRAP_if_bit2_is_1()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	update_DebugEvent(&debugEvent,0x4);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(1,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
+void test_update_DebugEvent_should_deassert_DWTTRAP_if_bit2_is_0()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.DWTTRAP = 1 ;
+	TEST_ASSERT_EQUAL(1,debugEvent.DWTTRAP);
+	
+	update_DebugEvent(&debugEvent,0x3);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+}
+
+//Testing Bit[3]
+void test_update_DebugEvent_should_assert_VCATCH_if_bit3_is_1()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	update_DebugEvent(&debugEvent,0x8);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(1,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
+void test_update_DebugEvent_should_deassert_VCATCH_if_bit3_is_0()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.VCATCH = 1 ;
+	TEST_ASSERT_EQUAL(1,debugEvent.VCATCH);
+	
+	update_DebugEvent(&debugEvent,0x7);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(1,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+}
+
+//Testing Bit[4]
+void test_update_DebugEvent_should_assert_EXTERNAL_if_bit4_is_1()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	update_DebugEvent(&debugEvent,0x10);
+	
+	TEST_ASSERT_EQUAL(1,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
+void test_update_DebugEvent_should_deassert_EXTERNAL_if_bit4_is_0()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.EXTERNAL = 1 ;
+	TEST_ASSERT_EQUAL(1,debugEvent.EXTERNAL);
+	
+	update_DebugEvent(&debugEvent,0xF);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(1,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(1,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+}
+
+/*-------------------------------------------------------------------------------*/
+
+void test_check_DebugEvent_should_read_DFSR_and_update_DebugEvent()
+{
+	DebugEvent debugEvent ;
+	init_DebugEvent(&debugEvent);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DFSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x2345671F));
+	
+	check_DebugEvent(&debugEvent);
+	
+	TEST_ASSERT_EQUAL(1,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(1,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(1,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+}
