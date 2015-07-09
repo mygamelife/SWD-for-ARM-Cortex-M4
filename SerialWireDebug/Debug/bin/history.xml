@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=SWD-for-ARM-Cortex-M4.map -O0 --gc-sections -LC:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4 -TC:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/stm32f429zi_flash.ld -g">
+      <target file="SWD-for-ARM-Cortex-M4.elf" lastModified="14e737301b5">
+         <source file="..\obj\stm32f429i_discovery.o" lastModified="14e7372ff92"/>
+         <source file="..\obj\SystemConfigure.o" lastModified="14e7372f4f2"/>
+         <source file="..\obj\Bit_Operations.o" lastModified="14e7372f573"/>
+         <source file="..\obj\stm32f4xx_hal_flash_ex.o" lastModified="14e7372fb92"/>
+         <source file="..\obj\CoreDebug.o" lastModified="14e7372f644"/>
+         <source file="..\obj\stm32f4xx_hal_pwr_ex.o" lastModified="14e7372fde4"/>
+         <source file="..\obj\Reset.o" lastModified="14e7372fd77"/>
+         <source file="..\obj\stm32f4xx_hal_spi.o" lastModified="14e7372f35b"/>
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14e7372fd19"/>
+         <source file="..\obj\Clock.o" lastModified="14e7372f704"/>
+         <source file="..\obj\stm32f4xx_hal_flash_ramfunc.o" lastModified="14e7372f3b9"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14e7372fb15"/>
+         <source file="..\obj\swdProtocol.o" lastModified="14e7372f7ca"/>
+         <source file="..\obj\configurePort.o" lastModified="14e7372fcac"/>
+         <source file="..\obj\swd_Utilities.o" lastModified="14e7372f5de"/>
+         <source file="..\obj\IO_Operations.o" lastModified="14e7372fa2b"/>
+         <source file="..\obj\Register_ReadWrite.o" lastModified="14e7372f960"/>
+         <source file="..\obj\main.o" lastModified="14e7372f6a5"/>
+         <source file="..\obj\stm32f4xx_hal_pwr.o" lastModified="14e7372f8a4"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="14e7372fc00"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="14e7372f8f3"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14e7372fc4e"/>
+         <source file="..\obj\stm32f4xx_hal_dma.o" lastModified="14e7372ff0d"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14e7372fa98"/>
+         <source file="..\obj\Delay.o" lastModified="14e7372f8e3"/>
+         <source file="..\obj\stm32f4xx_it.o" lastModified="14e7372f76c"/>
+         <source file="..\obj\Flash.o" lastModified="14e7372f9cd"/>
+         <source file="..\obj\stm32f4xx_hal_flash.o" lastModified="14e7372f837"/>
+         <source file="..\obj\stm32f4xx_hal_i2c.o" lastModified="14e7372f484"/>
+      </target>
+   </processor>
+</history>
