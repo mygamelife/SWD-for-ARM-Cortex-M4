@@ -1,6 +1,6 @@
 #include "FPB_Unit.h"
 
-int FPB_Enable()
+int enable_FPB()
 {
 	uint32_t dataRead = 0;
 	int ACK = 0 , status = 0 ;

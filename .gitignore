@@ -7,5 +7,4 @@ app/main.c
 *.cogui
 *.comarker
 *.comemgui
-*.coproj
 /output/

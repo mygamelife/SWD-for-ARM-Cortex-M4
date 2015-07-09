@@ -2,7 +2,7 @@
 <breakpoints>
 <breakpoint enabled="true" persistant="true" registered="true">
 <resource path="/SWD-for-ARM-Cortex-M4/Code/main.c" type="1"/>
-<marker lineNumber="26" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
+<marker lineNumber="17" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
 <attrib name="enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.condition" value=""/>
 <attrib name="org.eclipse.debug.core.id" value="org.eclipse.cdt.debug.core"/>
@@ -16,8 +16,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\app\main.c"/>
-<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
 </breakpoint>
 </breakpoints>
