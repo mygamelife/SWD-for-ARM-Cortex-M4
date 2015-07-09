@@ -1,14 +1,6 @@
 #include "Flash.h"
 
-#define __IO volatile
-
-/** (Erase/Read/Write Area are defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) **/
-#define FLASH_USER_START_ADDR     ADDR_FLASH_SECTOR_13
-#define FLASH_USER_END_ADDR       ADDR_FLASH_SECTOR_14
-
 static FLASH_EraseInitTypeDef EraseInitStruct;
-static void Error_Handler(void);
-static uint32_t GetSector(uint32_t Address);
 static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
 
 /**
@@ -18,14 +10,26 @@ static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
   * input :  typeErase
   *            + FLASH_TYPEERASE_SECTORS      
   *            + FLASH_TYPEERASE_MASSERASE
+  *
   *          banks parameter can be one of the following values:
   *            + FLASH_BANK_1: Bank1 to be erased
   *            + FLASH_BANK_2: Bank2 to be erased
   *            + FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
   *
+  *          voltageRange is the device voltage range which defines the erase parallelism.  
+  *          This parameter can be one of the following values:
+  *            + FLASH_VOLTAGE_RANGE_1: when the device voltage range is 1.8V to 2.1V, 
+  *                                     the operation will be done by byte (8-bit) 
+  *            + FLASH_VOLTAGE_RANGE_2: when the device voltage range is 2.1V to 2.7V,
+  *                                     the operation will be done by half word (16-bit)
+  *            + FLASH_VOLTAGE_RANGE_3: when the device voltage range is 2.7V to 3.6V,
+  *                                     the operation will be done by word (32-bit)
+  *            + FLASH_VOLTAGE_RANGE_4: when the device voltage range is 2.7V to 3.6V + External Vpp, 
+  *                                     the operation will be done by double word (64-bit)
+  *
   * output :   NONE
   */
-void eraseFlashMemory(uint32_t typeErase, uint32_t banks) {
+void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange) {
   FLASH_ErrorTypeDef CHECK_SECTOR_ERROR = 0;
   uint32_t firstSector = 0, numOfSectors = 0, sectorError = 0;
   
@@ -40,7 +44,7 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks) {
   /* Fill EraseInit structure */
   EraseInitStruct.TypeErase = typeErase;
   /* VoltageRange value can be modify please refer to datasheet for the voltage range */
-  EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+  EraseInitStruct.VoltageRange = voltageRange;
   EraseInitStruct.Banks = banks;
   EraseInitStruct.Sector = firstSector;
   EraseInitStruct.NbSectors = numOfSectors;
@@ -52,7 +56,7 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks) {
   if(HAL_FLASHEx_Erase(&EraseInitStruct, &sectorError) != HAL_OK)
   { 
     /* If CHECK_SECTOR_ERROR is 0 means selected sector has not been erased correctly*/
-    CHECK_SECTOR_ERROR = sectorError;
+    //CHECK_SECTOR_ERROR = sectorError;
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     Error_Handler();
@@ -72,53 +76,58 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks) {
   *            + FLASH_TYPEPROGRAM_HALFWORD
   *            + FLASH_TYPEPROGRAM_WORD
   *            + FLASH_TYPEPROGRAM_DOUBLEWORD
+  *
   *         typeErase
   *            + FLASH_TYPEERASE_SECTORS      
   *            + FLASH_TYPEERASE_MASSERASE
+  *
   *         data is a 32-bit data define by user
   *
   * output :   NONE
   */
 void writeToFlash(uint32_t typeProgram, uint32_t data) {
-  uint32_t Address = 0;
-  Address = FLASH_USER_START_ADDR;
+  uint32_t address = 0;
+  address = FLASH_USER_START_ADDR;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
   
   /* Write data into user selected area here */
-  while (Address < FLASH_USER_END_ADDR)
+  while (address < FLASH_USER_END_ADDR)
   {
-    if (HAL_FLASH_Program(typeProgram, Address, data) == HAL_OK)
+    if (HAL_FLASH_Program(typeProgram, address, data) == HAL_OK)
     {
-      Address = Address + 4;
+      address = address + 4;
     }
     else
     {
       /* While error occur during erase process error will be handle here */
       FLASH_ERROR_CODE = HAL_FLASH_GetError();
       Error_Handler();
+      break;
     }
   }
 
   /* Lock the Flash to disable the flash control register access (recommended
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
-  
-  verifyWriteData(FLASH_USER_START_ADDR, data);
+
+  #ifndef TEST
+    verifyWriteData(FLASH_USER_START_ADDR, data);
+  #endif  
 }
 
 /**
-  * verifyWriteData is a function to verify the data is correctly programmed into flash
+  * verifyWriteData is a function to verify the flashed data is program correctly as expected
   * If data programmed correctly LED3 will turn on
   * Else LED4 will turn on to indicate data is not programmed correctly
   *
   * input : startAddress is the starting address to program it is define by user
-  *         flashedData is a 32-bit data define by user
+  *         dataToVerify is a 32-bit data use to verify the flashed data
   *
   * output :   NONE
   */
-void verifyWriteData(uint32_t startAddress, uint32_t flashedData)  {
+void verifyWriteData(uint32_t startAddress, uint32_t dataToVerify)  {
 	__IO uint32_t data32 = 0, MemoryProgramStatus = 0;
 	uint32_t address = 0;
   
@@ -126,13 +135,14 @@ void verifyWriteData(uint32_t startAddress, uint32_t flashedData)  {
       MemoryProgramStatus = 0: data programmed correctly
       MemoryProgramStatus != 0: number of words not programmed correctly ******/
   address = startAddress;
-  MemoryProgramStatus = 0x0;
 
+  MemoryProgramStatus = 0x0;
+  
   while (address < FLASH_USER_END_ADDR)
   {
-    data32 = *(__IO uint32_t*)address;
+    data32 = readFromFlash(address);
 
-    if (data32 != flashedData)
+    if (data32 != dataToVerify)
     {
       MemoryProgramStatus++;
     }
@@ -150,7 +160,22 @@ void verifyWriteData(uint32_t startAddress, uint32_t flashedData)  {
   {
     /* Error detected. Switch on LED4 */
     Error_Handler();
-  }  
+  }
+}
+
+/**
+  * readFromFlash is a function to read the data from the corresponding address and return the value
+  *
+  * input : address is the starting address to program it is define by user
+  *
+  * output :  data32 is the value store inside the address
+  */
+__IO uint32_t readFromFlash(uint32_t address)  {
+	__IO uint32_t data32 = 0;
+  
+  data32 = *(__IO uint32_t*)address;
+  
+  return data32;
 }
 
 /**
@@ -158,7 +183,7 @@ void verifyWriteData(uint32_t startAddress, uint32_t flashedData)  {
   * @param  None
   * @retval The sector of a given address
   */
-static uint32_t GetSector(uint32_t Address)
+uint32_t GetSector(uint32_t Address)
 {
   uint32_t sector = 0;
   
@@ -254,9 +279,9 @@ static uint32_t GetSector(uint32_t Address)
   {
     sector = FLASH_SECTOR_22;  
   }
-  else/*(Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_23))*/
+  else /*(Address < FLASH_USER_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_23))*/
   {
-    sector = FLASH_SECTOR_23;  
+    sector = FLASH_SECTOR_23;      
   }
 
   return sector;
@@ -267,13 +292,14 @@ static uint32_t GetSector(uint32_t Address)
   * @param  None
   * @retval None
   */
-static void Error_Handler(void)
+void Error_Handler(void)
 {
   /* Turn LED4 on */
   BSP_LED_On(LED4);
-  while(1)
-  {
-  }
+  
+  #ifndef TEST
+    while(1)  {}
+  #endif
 }
 
 

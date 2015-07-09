@@ -214,7 +214,7 @@
       <source file="..\..\..\app\swdProtocol.c" lastModified="14e591170cb">
          <include file="..\..\..\app\swdProtocol.h"/>
       </source>
-      <source file="..\..\..\app\main.c" lastModified="14e6dfb82c0">
+      <source file="..\..\..\app\main.c" lastModified="14e736325e2">
          <include file="..\..\..\app\swdProtocol.h"/>
          <include file="..\..\..\app\CoreDebug.h"/>
          <include file="..\..\..\test\support\stm32f429i_discovery.h"/>
@@ -301,9 +301,12 @@
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_wwdg.h" lastModified="14c0ebffb48">
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
       </source>
-      <source file="..\..\..\app\Flash.h" lastModified="14e6df7f873">
+      <source file="..\..\..\app\Flash.h" lastModified="14e7371e61c">
          <include file="..\..\..\test\support\stdint.h"/>
          <include file="..\..\..\test\support\stm32f429i_discovery.h"/>
+         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash.h"/>
+         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ex.h"/>
+         <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_flash_ramfunc.h"/>
       </source>
       <source file="..\..\..\test\support\stm32f4xx_hal_flash_ex.h" lastModified="14c0ebffc51">
          <include file="..\..\..\test\support\stm32f4xx_hal_def.h"/>
@@ -322,7 +325,7 @@
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_def.h"/>
          <include file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_i2s_ex.h"/>
       </source>
-      <source file="..\..\..\app\Flash.c" lastModified="14e6df5c709">
+      <source file="..\..\..\app\Flash.c" lastModified="14e7372e4b4">
          <include file="..\..\..\app\Flash.h"/>
       </source>
       <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_sdram.h" lastModified="14c0ebffc80">

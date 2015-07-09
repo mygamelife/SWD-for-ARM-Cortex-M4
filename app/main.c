@@ -7,21 +7,12 @@
 
 int main(void)
 {
-	/*
- 	int ack = 0, parity = 0, status = 0;
-	uint32_t data_IDR = 0, readData_CSW = 0, readDummy = 0, read_DHCSR = 0;
+	uint32_t FlashData = 0;
 
-	configure_IOPorts();
-	resetTarget();
-	SWD_Initialisation();
-
-	readAhbIDR(&data_IDR);
-	swdWriteSelect(&ack, BANK_0);
-	SWDRegister_Write(CSW_REG,AP,&ack, 0x23000042);
-*/
 	FlashSystemConfig();
 	sectorErase();
 	writeToFlash(FLASH_TYPEPROGRAM_WORD, 0xABCDABCD);
+	FlashData = readFromFlash(FLASH_USER_START_ADDR);
 
 	while(1)
 	{
