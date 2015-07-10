@@ -22,13 +22,27 @@ void test_flash_GetSector_given_FLASH_SECTOR_0_should_select_FLASH_SECTOR_0()  {
   TEST_ASSERT_EQUAL(FLASH_SECTOR_0, sector);
 }
 
-/* BUG the SECTOR address provide by STM32F4xxx example is incorrect from the STM32F4xxx document
 void test_flash_GetSector_given_flash_address_out_of_the_sector_boundary_should_return_0()  {
   uint32_t sector = 0;
   
-  sector = GetSector(0x77777777);
+  BSP_LED_On_Expect(LED4);
+  sector = GetSector(0x8200003);
   TEST_ASSERT_EQUAL(0, sector);
-}*/
+}
+
+void test_flash_GetSector_given_flash_sector_23_should_return_23()  {
+  uint32_t sector = 0;
+  
+  sector = GetSector(ADDR_FLASH_SECTOR_23);
+  TEST_ASSERT_EQUAL(FLASH_SECTOR_23, sector);
+}
+
+void test_flash_GetSector_given_last_address_of_flash_sector_23_should_return_23()  {
+  uint32_t sector = 0;
+  
+  sector = GetSector(0x081FFFFF);
+  TEST_ASSERT_EQUAL(FLASH_SECTOR_23, sector);
+}
 
 void test_eraseFlashMemory_given_FLASH_TYPEERASE_SECTORS_should_perform_sector_erase()  {
   uint32_t sector = 0, sectorError = 0;

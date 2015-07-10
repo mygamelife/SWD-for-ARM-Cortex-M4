@@ -178,7 +178,7 @@ __IO uint32_t readFromFlash(uint32_t address)  {
   return data32;
 }
 
-/**
+/** 2 Mbyte dual bank organization can choose between sector 0 - sector 23
   * @brief  Gets the sector of a given address
   * @param  None
   * @retval The sector of a given address
@@ -279,11 +279,16 @@ uint32_t GetSector(uint32_t Address)
   {
     sector = FLASH_SECTOR_22;  
   }
-  else /*(Address < FLASH_USER_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_23))*/
+  else if((Address >= FLASH_SECTOR_23) && (Address <= ADDR_FLASH_SECTOR_24))
   {
     sector = FLASH_SECTOR_23;      
   }
-
+  else
+  {
+    FLASH_ERROR_CODE = INVALID_SECTOR_ADDR;
+    Error_Handler();
+  }
+  
   return sector;
 }
 
