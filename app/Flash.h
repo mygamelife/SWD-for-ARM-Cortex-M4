@@ -10,17 +10,16 @@
 typedef uint32_t FLASH_ErrorTypeDef;
 
 #define __IO volatile
-#define INVALID_SECTOR_ADDR 0x0
 
 /** (Erase/Read/Write Area are defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) **/
-#define FLASH_USER_START_ADDR       ADDR_FLASH_SECTOR_13
-#define FLASH_USER_END_ADDR         ADDR_FLASH_SECTOR_14
-#define FLASH_USER_VOLTAGE_RANGE    FLASH_VOLTAGE_RANGE_3
+#define FLASH_USER_START_ADDR       	ADDR_FLASH_SECTOR_13
+#define FLASH_USER_END_ADDR         	ADDR_FLASH_SECTOR_14
+#define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
-#define sectorErase()               eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, \
-                                                      FLASH_USER_VOLTAGE_RANGE);
-#define massErase(banks)            eraseFlashMemory(FLASH_TYPEERASE_MASSERASE, banks, \
-                                                      FLASH_USER_VOLTAGE_RANGE);
+#define sectorErase()               	eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, \
+														FLASH_USER_VOLTAGE_RANGE);
+#define massErase(banks)            	eraseFlashMemory(FLASH_TYPEERASE_MASSERASE, banks, \
+														FLASH_USER_VOLTAGE_RANGE);
 
 /* Base address of the Flash sectors Bank 1 */
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbytes */
@@ -49,7 +48,7 @@ typedef uint32_t FLASH_ErrorTypeDef;
 #define ADDR_FLASH_SECTOR_21     ((uint32_t)0x081A0000) /* Base @ of Sector 9, 128 Kbytes  */
 #define ADDR_FLASH_SECTOR_22     ((uint32_t)0x081C0000) /* Base @ of Sector 10, 128 Kbytes */
 #define ADDR_FLASH_SECTOR_23     ((uint32_t)0x081E0000) /* Base @ of Sector 11, 128 Kbytes */
-#define ADDR_FLASH_SECTOR_24     ((uint32_t)0x081FFFFF) /*address within sector 23 use to terminate address not withint sector*/
+//#define ADDR_FLASH_SECTOR_24     ((uint32_t)0x081FFFFF) /*address within sector 23 use to terminate address not withint sector*/
 
 uint32_t GetSector(uint32_t Address);
 void Error_Handler(void);

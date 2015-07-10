@@ -7,13 +7,12 @@
 
 int main(void)
 {
-	uint32_t FlashData = 0;
+	uint32_t FlashData = 0, readErrorCode = 0;
 
 	FlashSystemConfig();
 	sectorErase();
 	writeToFlash(FLASH_TYPEPROGRAM_WORD, 0xABCDABCD);
 	FlashData = readFromFlash(FLASH_USER_START_ADDR);
-
 	while(1)
 	{
 	}

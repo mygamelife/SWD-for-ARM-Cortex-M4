@@ -30,7 +30,6 @@ static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
   * output :   NONE
   */
 void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange) {
-  FLASH_ErrorTypeDef CHECK_SECTOR_ERROR = 0;
   uint32_t firstSector = 0, numOfSectors = 0, sectorError = 0;
   
   /* Unlock the Flash to enable the flash control register access */ 
@@ -56,7 +55,6 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange)
   if(HAL_FLASHEx_Erase(&EraseInitStruct, &sectorError) != HAL_OK)
   { 
     /* If CHECK_SECTOR_ERROR is 0 means selected sector has not been erased correctly*/
-    //CHECK_SECTOR_ERROR = sectorError;
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     Error_Handler();
@@ -142,6 +140,7 @@ void verifyWriteData(uint32_t startAddress, uint32_t dataToVerify)  {
   {
     data32 = readFromFlash(address);
 
+    /* Check if they are the same */
     if (data32 != dataToVerify)
     {
       MemoryProgramStatus++;
@@ -279,14 +278,9 @@ uint32_t GetSector(uint32_t Address)
   {
     sector = FLASH_SECTOR_22;  
   }
-  else if((Address >= FLASH_SECTOR_23) && (Address <= ADDR_FLASH_SECTOR_24))
+  else /*((Address >= FLASH_SECTOR_23) && (Address <= ADDR_FLASH_SECTOR_24))*/
   {
     sector = FLASH_SECTOR_23;      
-  }
-  else
-  {
-    FLASH_ERROR_CODE = INVALID_SECTOR_ADDR;
-    Error_Handler();
   }
   
   return sector;
@@ -299,9 +293,13 @@ uint32_t GetSector(uint32_t Address)
   */
 void Error_Handler(void)
 {
+  uint32_t CHECK_ERROR_CODE = 0;
+
+  CHECK_ERROR_CODE = FLASH_ERROR_CODE;
+
   /* Turn LED4 on */
   BSP_LED_On(LED4);
-  
+
   #ifndef TEST
     while(1)  {}
   #endif

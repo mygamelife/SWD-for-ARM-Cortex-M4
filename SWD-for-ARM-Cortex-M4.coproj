@@ -80,9 +80,9 @@
     <File name="Code/CoreDebug.c" path="app/CoreDebug.c" type="1"/>
     <File name="STM32F4" path="" type="2"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c" type="1"/>
+    <File name="Code/Reset.c" path="app/Reset.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_spi.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_conf.h" path="test/support/stm32f4xx_hal_conf.h" type="1"/>
-    <File name="Code/Reset.c" path="app/Reset.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h" type="1"/>
     <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c" type="1"/>

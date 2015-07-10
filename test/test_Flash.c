@@ -22,14 +22,6 @@ void test_flash_GetSector_given_FLASH_SECTOR_0_should_select_FLASH_SECTOR_0()  {
   TEST_ASSERT_EQUAL(FLASH_SECTOR_0, sector);
 }
 
-void test_flash_GetSector_given_flash_address_out_of_the_sector_boundary_should_return_0()  {
-  uint32_t sector = 0;
-  
-  BSP_LED_On_Expect(LED4);
-  sector = GetSector(0x8200003);
-  TEST_ASSERT_EQUAL(0, sector);
-}
-
 void test_flash_GetSector_given_flash_sector_23_should_return_23()  {
   uint32_t sector = 0;
   
