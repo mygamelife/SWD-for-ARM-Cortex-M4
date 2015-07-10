@@ -26,6 +26,7 @@ int getSWD_Request(int Address,int APnDP,int ReadWrite);
 void getSWD_AddressBit(int *Address_bit3,int *Address_bit2,int Address);
 
 uint32_t swdCheckErrorFlag();
+void swdClearErrorFlagInAbort(uint32_t errorFlag);
 void swdClearFlags(int ackResponse, int readOrWrite, int address, int APorDP, int parity, uint32_t data);
 
 #define resendSwdDpOperation(readOrWrite, address, ack, parity, data)   swdReadWriteDpWithRetries(readOrWrite, address, ack, parity, data, 1);

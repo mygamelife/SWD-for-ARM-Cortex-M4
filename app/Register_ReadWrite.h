@@ -32,23 +32,31 @@
 #define SELECT_REG        0x08
 #define RDBUFF_REG        0x0C
 
-//CONTROL_STATUS Register
-#define SWD_WDATAERR_MASK     (1 << 7)
-#define SWD_STICKYERR_MASK    (1 << 5)
-#define SWD_STICKYCMP_MASK    (1 << 4)
-#define SWD_STICKYORUN_MASK   (1 << 1)
+/* CONTROL_STATUS Register Error Mask */
+#define SWD_STICKYORUN_MASK           ((uint32_t)0x00000002)
+#define SWD_STICKYCMP_MASK            ((uint32_t)0x00000010)
+#define SWD_STICKYERR_MASK            ((uint32_t)0x00000020)
+#define SWD_WDATAERR_MASK             ((uint32_t)0x00000080)
+
+/* CONTROL_STATUS Register Error Flag */
+#define SWD_STICKYORUN_ERROR_FLAG     0x00
+#define SWD_STICKYCMP_ERROR_FLAG      0x01
+#define SWD_STICKY_ERROR_FLAG         0x02
+#define SWD_WDATA_ERROR_FLAG          0x03
+
+/* CONTROL_STATUS Register bit set */
 #define POWERUP_SYSTEM        ((uint32_t)0x50000000)
 
 #define swdReadCtrlStatus(ack, parity, readData)    SWDRegister_Read(CTRLSTAT_REG, DP, ack, parity, readData);
 #define swdWriteCtrlStatus(ack, writeData)          SWDRegister_Write(CTRLSTAT_REG, DP, ack, writeData);
 void powerUpSystemAndDebug();
 
-//ABORT Register
-#define WDERRCLR      (1 << 3)
-#define STKERRCLR     (1 << 2)
-#define STKCMPCLR     (1 << 1)
-#define ORUNERRCLR    (1 << 4)
-#define DAPABOT       (1 << 0)
+/* ABORT Register clear flag */
+#define SWD_DAPABORT_CLEAR_FLAG       ((uint32_t)0x00000001)
+#define SWD_STKCMP_CLEAR_FLAG         ((uint32_t)0x00000002)
+#define SWD_STKERR_CLEAR_FLAG         ((uint32_t)0x00000004)
+#define SWD_WDERR_CLEAR_FLAG          ((uint32_t)0x00000008)
+#define SWD_ORUNERR_CLEAR_FLAG        ((uint32_t)0x00000010)
 
 #define swdWriteAbort(ack, writeData)   SWDRegister_Write(ABORT_REG, DP, ack, writeData);
 
@@ -63,6 +71,7 @@ void powerUpSystemAndDebug();
 #define swdReadDP(address, ack, parity, data)     SWDRegister_Read(address, DP, ack, parity, data);
 #define swdWriteDP(address, ack, data)            SWDRegister_Write(address, DP, ack, data);
 #define swdWriteAP(address, ack, data)            SWDRegister_Write(address, AP, ack, data);
+
 void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
 void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data);
 

@@ -16,7 +16,7 @@
  *  0x00          IDCODE        ABORT
  *  0x04          CTRL/STAT     CTRL/STAT
  *  0x08          RESEND        SELECT
- *  0x0C          RDBUFF_REG        N/A
+ *  0x0C          RDBUFF_REG    N/A
  */
 
 /**
@@ -68,34 +68,34 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 	read3bit(ACK);
 
 	read32bit(data);
-	
+
 	*Parity = readBit();
 
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
 
 	extraIdleClock(8);
-	
+
 }
 
-int memoryAccessRead(uint32_t Address,uint32_t *dataRead)
+int memoryAccessRead(uint32_t Address, uint32_t *dataRead)
 {
 	int ACK = 0, Parity = 0 ;
-	
-	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
+
+  swdWriteAP(TAR_REG, &ACK, Address);
 	swdReadAP(DRW_REG,&ACK,&Parity,dataRead);
-	
-	return 0 ;
+
+	return 0;
 }
 
-int memoryAccessWrite(uint32_t Address,uint32_t WriteData)
+int memoryAccessWrite(uint32_t Address, uint32_t WriteData)
 {
 	int ACK = 0, Parity = 0 ;
-	
-	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
-	SWDRegister_Write(DRW_REG,AP,&ACK,WriteData);
-	
-	return 0 ;
+
+  swdWriteAP(TAR_REG, &ACK, Address);
+  swdWriteAP(DRW_REG, &ACK, WriteData);
+
+	return 0;
 }
 
 int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
@@ -103,13 +103,13 @@ int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
 	uint32_t discardPreviousRead = 0;
 	SWDRegister_Read(Address,AP,ACK,Parity,&discardPreviousRead);
 	SWDRegister_Read(Address,AP,ACK,Parity,data);
-	
+
 	return 0 ;
 }
 
 /*  powerUpSystemAndDebug is function to set CDBGPWRUPREQ(bit 28) and CSYSPWRUPREQ(bit 30)
  *  in CTRL_STATUS register to power up system and debug before using any AP
- * 
+ *
  *  before function end it check if there is any set error flag in the register
  *  if there is any error it clear error flag by setting 1 in ABORT register
  *
@@ -119,23 +119,23 @@ int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
 void powerUpSystemAndDebug()  {
   int ack = 0;
   uint32_t errorFlag = 0;
-  
+
 	swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
 }
 
-/*  readAHB_IDR is a function to access MEM-AP register and select BankF read the register IDR
+/*  readAHB_IDR is a function to access AHB-AP (based on the implementation of MEM-AP) register and select BankF read the register IDR
  *
  *  input   : data_IDR is the variable pass-in by user to store the IDR
  *  return  : NONE
  */
 void readAhbIDR(uint32_t *data_IDR)	{
   int ack = 0, parity = 0;
-  
+
   powerUpSystemAndDebug();
-  
+
   swdWriteSelect(&ack, BANK_F);
   swdClearFlags(ack, WRITE, SELECT_REG, DP, parity, BANK_F);
-  
+
   swdReadAP(IDR_REG, &ack, &parity, data_IDR);
   swdClearFlags(ack, READ, IDR_REG, AP, parity, (uint32_t)data_IDR);
 }

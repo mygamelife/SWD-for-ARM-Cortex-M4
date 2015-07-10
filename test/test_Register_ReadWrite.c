@@ -105,36 +105,6 @@ void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_t
   powerUpSystemAndDebug();
 }
 
-void test_memoryAccessRead_given_Address_0x12345678_should_write_address_to_TAR_and_read_data_from_DRW()
-{
-	uint32_t dataRead = 0 ;
-	
-	//Write memory address to TAR
-	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
-
-	//Read and Discard dummy data
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0xAABBCCDD);
-	
-	//Read actual data from DRW
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x10);
-	
-	memoryAccessRead(0x12345678,&dataRead);
-	
-	TEST_ASSERT_EQUAL(MSB_LSB_Conversion(0x10),dataRead);
-}
-
-void test_memoryAccessWrite_given_Address_0x12345678_Data_0x87654321_should_Write_Address_to_TAR_and_data_to_DRW()
-{
-	//Write memory address to TAR
-	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
-	
-	//Write data to DRW
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x87654321);
-	
-	//Write data to DRW
-	memoryAccessWrite(0x12345678,0x87654321);
-}
-
 void test_readAhbIDR_should_clear_flags_after_readSelect_and_readAP()
 {
   uint32_t data_IDR = 0;
@@ -165,10 +135,40 @@ void test_readAhbIDR_return_WAIT_RESPONSE_should_retries_DPABORT_and_resend()
   emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
 	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
   
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, DAPABOT);
+  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
   emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
 	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
   
   readAhbIDR(&data_IDR);
   TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
+}
+
+void test_memoryAccessRead_given_Address_0x12345678_should_write_address_to_TAR_and_read_data_from_DRW()
+{
+	uint32_t dataRead = 0 ;
+	
+	//Write memory address to TAR
+	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
+
+	//Read and Discard dummy data
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0xAABBCCDD);
+	
+	//Read actual data from DRW
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x10);
+	
+	memoryAccessRead(0x12345678,&dataRead);
+	
+	TEST_ASSERT_EQUAL(MSB_LSB_Conversion(0x10),dataRead);
+}
+
+void test_memoryAccessWrite_given_Address_0x12345678_Data_0x87654321_should_Write_Address_to_TAR_and_data_to_DRW()
+{
+	//Write memory address to TAR
+	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateSWDRegister_Write(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	memoryAccessWrite(0x12345678,0x87654321);
 }
