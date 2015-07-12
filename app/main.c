@@ -1,20 +1,39 @@
 #include "swdProtocol.h"
-#include "CoreDebug.h"
-#include "stm32f429i_discovery.h"
-#include "Flash.h"
-#include "SystemConfigure.h"
 #include "Register_ReadWrite.h"
+#include "CoreDebug.h"
+#include "FPB_Unit.h"
 
 int main(void)
 {
-	uint32_t FlashData = 0;
+ 	int ack = 0, parity = 0;
+ 	uint32_t errorFlag = 0, dataRead = 0 ;
+ 	CoreStatus coreStatus;
+ 	DebugEvent debugEvent;
 
-	FlashSystemConfig();
-	sectorErase();
-	writeToFlash(FLASH_TYPEPROGRAM_WORD, 0xABCDABCD);
-	FlashData = readFromFlash(FLASH_USER_START_ADDR);
 
+	configure_IOPorts();
+	resetTarget();
+
+	SWD_Initialisation();
+
+	errorFlag = swdCheckErrorFlag() ;
+	swdWriteAbort(&ack, errorFlag); //Clear error flag
+	swdWriteSelect(&ack, BANK_0);
+	
+	powerUpSystemAndDebug();
+	SWDRegister_Write(CSW_REG,AP,&ack, 0x23000042);
+
+	setCore(CORE_DEBUG_MODE,&coreStatus);
+
+//	enable_FPB();
+
+//	set_InstructionBKPT(InstructionCOMP_0,0x80002ee,Match_32bits);
+
+	write_CoreRegister(ARM_R0,&coreStatus,0xA55A);
+	read_CoreRegister(ARM_R0,&coreStatus,dataRead);
 	while(1)
 	{
+
 	}
+
 }
