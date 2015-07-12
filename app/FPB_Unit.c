@@ -5,8 +5,8 @@ int enable_FPB()
 	uint32_t dataRead = 0;
 	int ACK = 0 , status = 0 ;
 		
-	memoryAccessWrite(FPB_REG,ENABLE_FPB);
-	memoryAccessRead(FPB_REG,&dataRead);
+	memoryAccessWrite(FP_CTRL,ENABLE_FPB);
+	memoryAccessRead(FP_CTRL,&dataRead);
 
 	status = isFPB_Enabled(dataRead);
 	
@@ -28,7 +28,18 @@ int configure_FP_COMP(uint32_t COMP_no,uint32_t address,int Matching_mode)
 	return status ;
 }
 
-int configure_FP_REMAP(uint32_t SRAM_REMAP_address);
+int configure_FP_REMAP(uint32_t SRAM_REMAP_address)
+{
+	uint32_t dataToWrite = 0, dataRead = 0 ;
+	int status = 0 ;
+	
+	dataToWrite = get_FP_REMAP_WriteValue(SRAM_REMAP_address);
+	
+	memoryAccessWrite(FP_REMAP,dataToWrite);
+	memoryAccessRead(FP_REMAP,&dataRead);
+	
+	return status ;
+}
 
 int set_InstructionBKPT(uint32_t InstructionCOMP_no,uint32_t address,int Matching_mode)
 {
@@ -74,5 +85,14 @@ uint32_t get_FP_COMP_WriteValue(uint32_t address,int Matching_mode)
 	
 	data = Matching_mode + Address + FP_COMP_Enable;
 	
+	return data ;
+}
+
+uint32_t get_FP_REMAP_WriteValue(uint32_t address)
+{
+	uint32_t data = 0 , Address;
+	Address = address & FP_REMAP_Address_MASK ; //Bits[31:29] & Bit[5:0] are now  0
+	
+	data = Address ;
 	return data ;
 }

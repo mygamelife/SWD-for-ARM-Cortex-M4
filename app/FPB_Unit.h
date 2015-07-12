@@ -7,7 +7,8 @@
 #include "Bit_Operations.h"
 #include "Register_ReadWrite.h"
 
-#define FPB_REG 	0xE0002000
+#define FP_CTRL 	0xE0002000
+#define FP_REMAP	0xE0002004
 #define FP_COMP0	0xE0002008
 #define FP_COMP1	0xE000200C
 #define FP_COMP2	0xE0002010
@@ -44,7 +45,9 @@
 int enable_FPB();
 int configure_FP_COMP(uint32_t COMP_no,uint32_t address,int Matching_mode);
 int configure_FP_REMAP(uint32_t SRAM_REMAP_address);
+
 uint32_t get_FP_COMP_WriteValue(uint32_t address,int Matching_mode);
+uint32_t get_FP_REMAP_WriteValue(uint32_t address);
 
 int isFPB_Enabled(uint32_t data);
 int isFP_COMP_Updated(uint32_t dataWrote,uint32_t dataRead);
