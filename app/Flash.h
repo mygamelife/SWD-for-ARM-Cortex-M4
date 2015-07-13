@@ -2,7 +2,7 @@
 #define Flash_H
 
 #include <stdint.h>
-#include "stm32f429i_discovery.h"
+#include "configurePort.h"
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"
 #include "stm32f4xx_hal_flash_ramfunc.h"
@@ -12,8 +12,8 @@ typedef uint32_t FLASH_ErrorTypeDef;
 #define __IO volatile
 
 /** (Erase/Read/Write Area are defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) **/
-#define FLASH_USER_START_ADDR       	ADDR_FLASH_SECTOR_13
-#define FLASH_USER_END_ADDR         	ADDR_FLASH_SECTOR_14
+#define FLASH_USER_START_ADDR       	ADDR_FLASH_SECTOR_21
+#define FLASH_USER_END_ADDR         	ADDR_FLASH_SECTOR_23
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
 #define sectorErase()               	eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, \
@@ -51,9 +51,12 @@ typedef uint32_t FLASH_ErrorTypeDef;
 //#define ADDR_FLASH_SECTOR_24     ((uint32_t)0x081FFFFF) /*address within sector 23 use to terminate address not withint sector*/
 
 uint32_t GetSector(uint32_t Address);
+uint32_t getDataFromRam(uint32_t address);
+__IO uint32_t readFromFlash(uint32_t startAddress);
 void Error_Handler(void);
 void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange);
 void writeToFlash(uint32_t typeProgram, uint32_t data);
 void verifyWriteData(uint32_t startAddress, uint32_t dataToVerify);
-__IO uint32_t readFromFlash(uint32_t startAddress);
+void copyFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length);
+void verifyDataFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length);
 #endif // Flash_H

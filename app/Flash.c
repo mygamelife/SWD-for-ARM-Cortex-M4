@@ -75,10 +75,6 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange)
   *            + FLASH_TYPEPROGRAM_WORD
   *            + FLASH_TYPEPROGRAM_DOUBLEWORD
   *
-  *         typeErase
-  *            + FLASH_TYPEERASE_SECTORS      
-  *            + FLASH_TYPEERASE_MASSERASE
-  *
   *         data is a 32-bit data define by user
   *
   * output :   NONE
@@ -112,7 +108,7 @@ void writeToFlash(uint32_t typeProgram, uint32_t data) {
 
   #ifndef TEST
     verifyWriteData(FLASH_USER_START_ADDR, data);
-  #endif  
+  #endif
 }
 
 /**
@@ -153,7 +149,7 @@ void verifyWriteData(uint32_t startAddress, uint32_t dataToVerify)  {
   if (MemoryProgramStatus == 0)
   {
     /* No error detected. Switch on LED3 */
-    BSP_LED_On(LED3);
+	  turnOnLED3();
   }
   else
   {
@@ -298,11 +294,117 @@ void Error_Handler(void)
   CHECK_ERROR_CODE = FLASH_ERROR_CODE;
 
   /* Turn LED4 on */
-  BSP_LED_On(LED4);
+  turnOnLED4();
 
   #ifndef TEST
     while(1)  {}
   #endif
 }
 
+/**
+  * getDataFromRam is a function get data from SRAM
+  *
+  * input : Address is the sram address
+  *
+  * output : data32 is data in sram
+  */
+uint32_t getDataFromRam(uint32_t address)	{
+  __IO uint32_t data32 = 0;
 
+  data32 = *(__IO uint32_t *)address;
+
+  return data32;
+}
+
+/**
+  * copyFromRamToFlash is a function copy data from SRAM to FLASH
+  *
+  * input : *src is a source address of SRAM
+  *			*dest is the destination address of FLASH
+  *			length use to determine how large is the data
+  *
+  * output :   NONE
+  */
+void copyFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length) {
+  int i;
+  __IO uint32_t data32 = 0;
+  __IO uint32_t FLASH_Addr = 0, SRAM_Addr = 0;
+
+  /* Assign src and dest to a template variable */
+  SRAM_Addr	 = (__IO uint32_t)src;
+  FLASH_Addr = (__IO uint32_t)dest;
+
+  /* Unlock the Flash to enable the flash control register access */
+  HAL_FLASH_Unlock();
+
+  /* Copy data to flash */
+  for(i = 0; i < length; i += 4)	{
+	  data32 = *(__IO uint32_t *)SRAM_Addr;
+
+	  if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_Addr, data32) != HAL_OK)	{
+		 Error_Handler();
+		 break;
+	  }
+	  FLASH_Addr = FLASH_Addr + 4;
+	  SRAM_Addr	 = SRAM_Addr + 4;
+  }
+
+  /* Lock the Flash to disable the flash control register access (recommended
+     to protect the FLASH memory against possible unwanted operation) */
+  HAL_FLASH_Lock();
+
+  #ifndef TEST
+    verifyDataFromRamToFlash(src, dest, length);
+  #endif
+}
+
+/**
+  * verifyDataFromRamToFlash is a function to verify the data is correctly copy
+  * to flash from SRAM
+  *
+  * If data programmed correctly LED3 will turn on
+  * Else LED4 will turn on to indicate data is not programmed correctly
+  *
+  * input : *src is the starting address to program it is define by user
+  *         *dest is a 32-bit data use to verify the flashed data
+  *			length determine how large is the data
+  *
+  * output :   NONE
+  */
+void verifyDataFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length)  {
+  __IO uint32_t data32 = 0, memoryProgramStatus = 0, dataSRAM = 0;
+  __IO uint32_t SRAM_Addr = 0, FLASH_Addr = 0;
+  int i;
+
+  /* Check if the programmed data is OK
+      MemoryProgramStatus = 0: data programmed correctly
+      MemoryProgramStatus != 0: number of words not programmed correctly ******/
+  memoryProgramStatus = 0x0;
+
+  SRAM_Addr	 = (__IO uint32_t)src;
+  FLASH_Addr = (__IO uint32_t)dest;
+
+  /* Compare data in flash with sram  */
+  for(i = 0; i < length; i += 4)	{
+	  data32 	= 	*(__IO uint32_t *)FLASH_Addr;
+	  dataSRAM 	= 	*(__IO uint32_t *)SRAM_Addr;
+
+	  if (data32 != dataSRAM)	{
+		  memoryProgramStatus++;
+	  }
+	  FLASH_Addr = FLASH_Addr + 4;
+	  SRAM_Addr  = SRAM_Addr + 4;
+  }
+
+  /* Check if there is an issue to program data */
+  if (memoryProgramStatus == 0)
+  {
+    /* No error detected. Switch on LED3 */
+	  turnOnLED3();
+  }
+  else
+  {
+    /* Error detected. Switch on LED4 */
+    Error_Handler();
+  }
+}

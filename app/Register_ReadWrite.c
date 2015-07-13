@@ -82,7 +82,7 @@ int memoryAccessRead(uint32_t Address, uint32_t *dataRead)
 {
 	int ACK = 0, Parity = 0 ;
 
-  swdWriteAP(TAR_REG, &ACK, Address);
+	swdWriteAP(TAR_REG, &ACK, Address);
 	swdReadAP(DRW_REG,&ACK,&Parity,dataRead);
 
 	return 0;
@@ -120,7 +120,7 @@ void powerUpSystemAndDebug()  {
   int ack = 0;
   uint32_t errorFlag = 0;
 
-	swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
+  swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
 }
 
 /*  readAHB_IDR is a function to access AHB-AP (based on the implementation of MEM-AP) register and select BankF read the register IDR
@@ -140,4 +140,18 @@ void readAhbIDR(uint32_t *data_IDR)	{
   swdClearFlags(ack, READ, IDR_REG, AP, parity, (uint32_t)data_IDR);
 }
 
-
+/** swdSetMemorySize is a function to set the memory access size bit in CSW register
+  *
+  * input   : memorySize can be one of the following value
+  *             + CSW_BYTE_SIZE
+  *             + CSW_HALFWORD_SIZE
+  *             + CSW_WORD_SIZE
+  *
+  * return  : NONE
+  */
+void swdSetMemorySize(uint32_t memorySize)  {
+  int ack = 0;
+  
+  swdWriteSelect(&ack, BANK_0);
+  swdWriteAP(CSW_REG, &ack, memorySize);
+}

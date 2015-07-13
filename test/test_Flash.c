@@ -1,6 +1,6 @@
 #include "unity.h"
 #include "Flash.h"
-#include "mock_stm32f429i_discovery.h"
+#include "mock_configurePort.h"
 #include "mock_stm32f4xx_hal_flash.h"
 #include "mock_stm32f4xx_hal_flash_ex.h"
 #include "mock_stm32f4xx_hal_flash_ramfunc.h"
@@ -10,8 +10,7 @@ void setUp(void){}
 void tearDown(void){}
 
 void test_flash_Error_Handler_should_turn_on_LED4()  {
-  
-  BSP_LED_On_Expect(LED4);
+  turnOnLED4_Expect();
   Error_Handler();
 }
 
@@ -54,7 +53,7 @@ void test_eraseFlashMemory_if_Flash_Erase_return_HAL_ERROR_func_should_fail()  {
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
   HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_ERROR);
   HAL_FLASH_GetError_ExpectAndReturn(HAL_ERROR);
-  BSP_LED_On_Expect(LED4);
+  turnOnLED4_Expect();
   HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
   eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, FLASH_VOLTAGE_RANGE_3);
@@ -76,7 +75,7 @@ void test_writeToFlash_if_Flash_Program_return_HAL_ERROR_program_should_stop_and
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
   HAL_FLASH_Program_IgnoreAndReturn(HAL_ERROR);
   HAL_FLASH_GetError_ExpectAndReturn(HAL_ERROR);
-  BSP_LED_On_Expect(LED4);
+  turnOnLED4_Expect();
   HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
   writeToFlash(FLASH_TYPEPROGRAM_WORD, 0xDEADBEEF);

@@ -172,3 +172,14 @@ void test_memoryAccessWrite_given_Address_0x12345678_Data_0x87654321_should_Writ
 	//Write data to DRW
 	memoryAccessWrite(0x12345678,0x87654321);
 }
+
+void test_swdSetMemorySize_given_CSW_WORD_SIZE_should_select_BANK_0_and_set_CSW_register()
+{
+	//Write BANK_0 to select register
+	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_0);
+	
+	//Write CSW_WORD_SIZE to csw register
+	emulateSWDRegister_Write(CSW_REG, AP, OK, CSW_WORD_SIZE);
+	
+	swdSetMemorySize(CSW_WORD_SIZE);
+}

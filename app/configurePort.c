@@ -83,3 +83,18 @@ void configure_IOPorts()
 
 	//delay(10,1,1);
 }
+
+/**
+  * Configure LED3 and LED4 for debug purpose
+  *
+  */
+void configureLED()	{
+  GPIO_InitTypeDef GpioInfo ;
+
+  GpioInfo.Mode = GPIO_MODE_OUTPUT_PP ;
+  GpioInfo.Pin = GPIO_PIN_13 | GPIO_PIN_14; // Init PG13 and PG14
+  GpioInfo.Pull = GPIO_NOPULL ;
+  GpioInfo.Speed = GPIO_SPEED_HIGH ;
+
+  HAL_GPIO_Init(GPIOG,&GpioInfo);  //Init LED1 on PG13 , lED 2 on PG14
+}
