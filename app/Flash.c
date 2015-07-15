@@ -79,15 +79,15 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange)
   *
   * output :   NONE
   */
-void writeToFlash(uint32_t typeProgram, uint32_t data) {
+void writeToFlash(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data) {
   uint32_t address = 0;
-  address = FLASH_USER_START_ADDR;
+  address = startAddr;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
   
   /* Write data into user selected area here */
-  while (address < FLASH_USER_END_ADDR)
+  while (address < endAddr)
   {
     if (HAL_FLASH_Program(typeProgram, address, data) == HAL_OK)
     {
@@ -105,9 +105,9 @@ void writeToFlash(uint32_t typeProgram, uint32_t data) {
   /* Lock the Flash to disable the flash control register access (recommended
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
-
+  
   #ifndef TEST
-    verifyWriteData(FLASH_USER_START_ADDR, data);
+    verifyWriteData(startAddr, endAddr, data);
   #endif
 }
 
@@ -121,18 +121,18 @@ void writeToFlash(uint32_t typeProgram, uint32_t data) {
   *
   * output :   NONE
   */
-void verifyWriteData(uint32_t startAddress, uint32_t dataToVerify)  {
+void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
 	__IO uint32_t data32 = 0, MemoryProgramStatus = 0;
 	uint32_t address = 0;
   
   /* Check if the programmed data is OK
       MemoryProgramStatus = 0: data programmed correctly
       MemoryProgramStatus != 0: number of words not programmed correctly ******/
-  address = startAddress;
+  address = startAddr;
 
   MemoryProgramStatus = 0x0;
   
-  while (address < FLASH_USER_END_ADDR)
+  while (address < endAddr)
   {
     data32 = readFromFlash(address);
 
@@ -169,7 +169,6 @@ __IO uint32_t readFromFlash(uint32_t address)  {
 	__IO uint32_t data32 = 0;
   
   data32 = *(__IO uint32_t*)address;
-  
   return data32;
 }
 
@@ -302,21 +301,6 @@ void Error_Handler(void)
 }
 
 /**
-  * getDataFromRam is a function get data from SRAM
-  *
-  * input : Address is the sram address
-  *
-  * output : data32 is data in sram
-  */
-uint32_t getDataFromRam(uint32_t address)	{
-  __IO uint32_t data32 = 0;
-
-  data32 = *(__IO uint32_t *)address;
-
-  return data32;
-}
-
-/**
   * copyFromRamToFlash is a function copy data from SRAM to FLASH
   *
   * input : *src is a source address of SRAM
@@ -325,15 +309,15 @@ uint32_t getDataFromRam(uint32_t address)	{
   *
   * output :   NONE
   */
-void copyFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length) {
+void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
   int i;
   __IO uint32_t data32 = 0;
-  __IO uint32_t FLASH_Addr = 0, SRAM_Addr = 0;
+  uint32_t FLASH_Addr = 0, SRAM_Addr = 0;
 
   /* Assign src and dest to a template variable */
-  SRAM_Addr	 = (__IO uint32_t)src;
-  FLASH_Addr = (__IO uint32_t)dest;
-
+  SRAM_Addr	 = src;
+  FLASH_Addr = dest;
+  
   /* Unlock the Flash to enable the flash control register access */
   HAL_FLASH_Unlock();
 
@@ -345,6 +329,7 @@ void copyFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length) {
 		 Error_Handler();
 		 break;
 	  }
+    
 	  FLASH_Addr = FLASH_Addr + 4;
 	  SRAM_Addr	 = SRAM_Addr + 4;
   }
@@ -371,27 +356,30 @@ void copyFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length) {
   *
   * output :   NONE
   */
-void verifyDataFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length)  {
-  __IO uint32_t data32 = 0, memoryProgramStatus = 0, dataSRAM = 0;
-  __IO uint32_t SRAM_Addr = 0, FLASH_Addr = 0;
-  int i;
+void verifyDataFromRamToFlash(uint32_t src, uint32_t dest, int length)  {
+  int i = 0;
+  __IO uint32_t dataFlash = 0, dataSRAM = 0, memoryProgramStatus = 0;
+  uint32_t SRAM_Addr = 0, FLASH_Addr = 0;
 
   /* Check if the programmed data is OK
       MemoryProgramStatus = 0: data programmed correctly
       MemoryProgramStatus != 0: number of words not programmed correctly ******/
   memoryProgramStatus = 0x0;
 
-  SRAM_Addr	 = (__IO uint32_t)src;
-  FLASH_Addr = (__IO uint32_t)dest;
+  SRAM_Addr	 = src;
+  FLASH_Addr = dest;
 
   /* Compare data in flash with sram  */
-  for(i = 0; i < length; i += 4)	{
-	  data32 	= 	*(__IO uint32_t *)FLASH_Addr;
-	  dataSRAM 	= 	*(__IO uint32_t *)SRAM_Addr;
+  for(i; i < length; i += 4)	{
+    
+    /* get data from Flash & SRAM  */
+	  dataFlash    = *(__IO uint32_t *)FLASH_Addr;
+	  dataSRAM 	= *(__IO uint32_t *)SRAM_Addr;
 
-	  if (data32 != dataSRAM)	{
+	  if (dataFlash != dataSRAM)	{
 		  memoryProgramStatus++;
 	  }
+    
 	  FLASH_Addr = FLASH_Addr + 4;
 	  SRAM_Addr  = SRAM_Addr + 4;
   }

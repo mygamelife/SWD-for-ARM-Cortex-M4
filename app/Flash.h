@@ -17,9 +17,9 @@ typedef uint32_t FLASH_ErrorTypeDef;
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
 #define sectorErase()               	eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, \
-														FLASH_USER_VOLTAGE_RANGE);
+                                                      FLASH_USER_VOLTAGE_RANGE);
 #define massErase(banks)            	eraseFlashMemory(FLASH_TYPEERASE_MASSERASE, banks, \
-														FLASH_USER_VOLTAGE_RANGE);
+                                                      FLASH_USER_VOLTAGE_RANGE);
 
 /* Base address of the Flash sectors Bank 1 */
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbytes */
@@ -55,8 +55,8 @@ uint32_t getDataFromRam(uint32_t address);
 __IO uint32_t readFromFlash(uint32_t startAddress);
 void Error_Handler(void);
 void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange);
-void writeToFlash(uint32_t typeProgram, uint32_t data);
-void verifyWriteData(uint32_t startAddress, uint32_t dataToVerify);
-void copyFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length);
-void verifyDataFromRamToFlash(__IO uint32_t *src, __IO uint32_t *dest, int length);
+void writeToFlash(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
+void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
+void copyFromRamToFlash(uint32_t src, uint32_t dest, int length);
+void verifyDataFromRamToFlash(uint32_t src, uint32_t dest, int length);
 #endif // Flash_H
