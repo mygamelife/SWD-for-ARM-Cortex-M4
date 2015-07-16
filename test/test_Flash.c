@@ -35,28 +35,30 @@ void test_flash_GetSector_given_last_address_of_flash_sector_23_should_return_23
   TEST_ASSERT_EQUAL(FLASH_SECTOR_23, sector);
 }
 
-void test_eraseFlashMemory_given_FLASH_TYPEERASE_SECTORS_should_perform_sector_erase()  {
-  uint32_t sector = 0, sectorError = 0;
-  uint32_t firstSector = 0, numOfSectors = 0;
-  
+void test_sectorErase_given_sector_12_and_sector_13()  {
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
   HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK);
   HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
-  
-  eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, FLASH_VOLTAGE_RANGE_3);
+
+  sectorErase(ADDR_FLASH_SECTOR_12, ADDR_FLASH_SECTOR_13);
 }
 
-void test_eraseFlashMemory_if_Flash_Erase_return_HAL_ERROR_func_should_fail()  {
-  uint32_t sector = 0, sectorError = 0;
-  uint32_t firstSector = 0, numOfSectors = 0;
-  
+void test_sectorErase_error_occus_during_erase_process_should_turnOnLED4()  {
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
   HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_ERROR);
   HAL_FLASH_GetError_ExpectAndReturn(HAL_ERROR);
   turnOnLED4_Expect();
   HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
-  eraseFlashMemory(FLASH_TYPEERASE_SECTORS, 0, FLASH_VOLTAGE_RANGE_3);
+  sectorErase(ADDR_FLASH_SECTOR_12, ADDR_FLASH_SECTOR_13);
+}
+
+void test_massErase_given_bank_2_should_erase_whole_bank_2()  {
+  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
+  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK);
+  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
+  
+  massErase(FLASH_BANK_2);
 }
 
 void test_writeToFlash_given_data_0xABCDABCD_should_write_into_address_0()  {

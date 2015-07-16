@@ -29,16 +29,17 @@ static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
   *
   * output :   NONE
   */
-void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange) {
+void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange,
+                      uint32_t userStartAddress, uint32_t userEndAddress) {
   uint32_t firstSector = 0, numOfSectors = 0, sectorError = 0;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
 
   /* Get the 1st sector to erase */
-  firstSector = GetSector(FLASH_USER_START_ADDR);
+  firstSector = GetSector(userStartAddress);
   /* Get the number of sector to erase from 1st sector*/
-  numOfSectors = GetSector(FLASH_USER_END_ADDR) - firstSector + 1;
+  numOfSectors = GetSector(userEndAddress) - firstSector + 1;
 
   /* Fill EraseInit structure */
   EraseInitStruct.TypeErase = typeErase;
@@ -134,7 +135,7 @@ void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify
   
   while (address < endAddr)
   {
-    data32 = readFromFlash(address);
+    data32 = (__IO uint32_t)readFromFlash(address);
 
     /* Check if they are the same */
     if (data32 != dataToVerify)
@@ -165,7 +166,7 @@ void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify
   *
   * output :  data32 is the value store inside the address
   */
-__IO uint32_t readFromFlash(uint32_t address)  {
+uint32_t readFromFlash(uint32_t address)  {
 	__IO uint32_t data32 = 0;
   
   data32 = *(__IO uint32_t*)address;
@@ -304,8 +305,8 @@ void Error_Handler(void)
   * copyFromRamToFlash is a function copy data from SRAM to FLASH
   *
   * input : *src is a source address of SRAM
-  *			*dest is the destination address of FLASH
-  *			length use to determine how large is the data
+  *         *dest is the destination address of FLASH
+  *         length use to determine how large is the data
   *
   * output :   NONE
   */
@@ -352,7 +353,7 @@ void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
   *
   * input : *src is the starting address to program it is define by user
   *         *dest is a 32-bit data use to verify the flashed data
-  *			length determine how large is the data
+  *         length determine how large is the data
   *
   * output :   NONE
   */
