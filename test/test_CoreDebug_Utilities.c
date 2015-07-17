@@ -649,7 +649,7 @@ void test_get_Core_WriteValue_given_CORE_SNAPSTALL_should_return_0xA05F0007_or_S
 }
 
 /*----------------------------get_CoreRegisterAccess_WriteValue----------------------------*/
-
+/*
 void test_get_CoreRegisterAccess_WriteValue_given_R0_read_should_return_0()
 {
 	TEST_ASSERT_EQUAL(0,get_CoreRegisterAccess_WriteValue(R0,CoreRegister_Read));
@@ -668,4 +668,4 @@ void test_get_CoreRegisterAccess_WriteValue_given_R12_write_should_return_0x1000
 void test_get_CoreRegisterAccess_WriteValue_given_FP_REGS31_read_should_return_0x5F()
 {
 	TEST_ASSERT_EQUAL(0x5F,get_CoreRegisterAccess_WriteValue(FP_REGS31,CoreRegister_Read));
-}
+}*/
