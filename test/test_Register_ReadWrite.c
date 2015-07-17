@@ -173,13 +173,39 @@ void test_memoryAccessWrite_given_Address_0x12345678_Data_0x87654321_should_Writ
 	memoryAccessWrite(0x12345678,0x87654321);
 }
 
-void test_swdSetMemorySize_given_CSW_WORD_SIZE_should_select_BANK_0_and_set_CSW_register()
+void test_swdWriteCSW_given_CSW_WORD_SIZE_should_select_BANK_0_and_set_CSW_register()
 {
+  int ack = 0;
+  uint32_t CSW_BIT_SET = 0;
+  
+  CSW_BIT_SET = CSW_DEFAULT_MASK | CSW_WORD_SIZE;
+  
 	//Write BANK_0 to select register
 	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_0);
 	
 	//Write CSW_WORD_SIZE to csw register
-	emulateSWDRegister_Write(CSW_REG, AP, OK, CSW_WORD_SIZE);
+	emulateSWDRegister_Write(CSW_REG, AP, OK, CSW_BIT_SET);
 	
-	swdSetMemorySize(CSW_WORD_SIZE);
+	swdWriteCSW(&ack, CSW_BIT_SET);
+  
+  TEST_ASSERT_EQUAL(1, ack);
+}
+
+void test_swdWriteCSW_given_CSW_WORD_SIZE_and_Enable_ADDR_INC()
+{
+  int ack = 0;
+  uint32_t CSW_BIT_SET = 0;
+  
+  CSW_BIT_SET = CSW_DEFAULT_MASK | CSW_WORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED;
+  
+	//Write BANK_0 to select register
+	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_0);
+	
+	//Write CSW_WORD_SIZE to csw register
+	emulateSWDRegister_Write(CSW_REG, AP, OK, CSW_BIT_SET);
+	
+	swdWriteCSW(&ack, CSW_BIT_SET);
+  
+  TEST_ASSERT_EQUAL(1, ack);
+  TEST_ASSERT_EQUAL(0x23000062, CSW_BIT_SET);
 }

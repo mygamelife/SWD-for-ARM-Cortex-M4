@@ -70,9 +70,12 @@
 /** SELECT Register bit set
   */
 #define CSW_DEFAULT_MASK              ((uint32_t)0x23000040)
-#define CSW_BYTE_SIZE                 ((uint32_t)0x00000000) + CSW_DEFAULT_MASK
-#define CSW_HALFWORD_SIZE             ((uint32_t)0x00000001) + CSW_DEFAULT_MASK
-#define CSW_WORD_SIZE                 ((uint32_t)0x00000002) + CSW_DEFAULT_MASK
+#define CSW_BYTE_SIZE                 ((uint32_t)0x00000000)
+#define CSW_HALFWORD_SIZE             ((uint32_t)0x00000001)
+#define CSW_WORD_SIZE                 ((uint32_t)0x00000002)
+#define CSW_DISABLE_ADDR_INC          ((uint32_t)0x00000000)
+#define CSW_ENABLE_ADDR_INC_SINGLE    ((uint32_t)0x00000010)
+#define CSW_ENABLE_ADDR_INC_PACKED    ((uint32_t)0x00000020)
 
 /**-------------------------------- SWD-DP Register Function-----------------------------------
   */
@@ -95,6 +98,5 @@ int memoryAccessRead(uint32_t Address,uint32_t *dataRead);
 int memoryAccessWrite(uint32_t Address,uint32_t WriteData);
 int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
 void readAhbIDR(uint32_t *data_IDR);
-void swdSetMemorySize(uint32_t memorySize);
-
+void swdWriteCSW(int *ack, uint32_t cswBitSet);
 #endif // Register_ReadWrite_H

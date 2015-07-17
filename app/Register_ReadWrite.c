@@ -142,16 +142,20 @@ void readAhbIDR(uint32_t *data_IDR)	{
 
 /** swdSetMemorySize is a function to set the memory access size bit in CSW register
   *
-  * input   : memorySize can be one of the following value
+  * input   : cswBitSet can be one of the following value
   *             + CSW_BYTE_SIZE
   *             + CSW_HALFWORD_SIZE
   *             + CSW_WORD_SIZE
+  *             + CSW_DISABLE_ADDR_INC
+  *             + CSW_ENABLE_ADDR_INC_SINGLE
+  *             + CSW_ENABLE_ADDR_INC_PACKED
   *
   * return  : NONE
   */
-void swdSetMemorySize(uint32_t memorySize)  {
-  int ack = 0;
+void swdWriteCSW(int *ack, uint32_t cswBitSet)  {
+  /* Select Bank register 0 */
+  swdWriteSelect(ack, BANK_0);
   
-  swdWriteSelect(&ack, BANK_0);
-  swdWriteAP(CSW_REG, &ack, memorySize);
+  /* Write cswBitSet into CSW register */
+  swdWriteAP(CSW_REG, ack, cswBitSet);
 }
