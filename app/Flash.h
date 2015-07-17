@@ -9,7 +9,7 @@
 
 typedef uint32_t FLASH_ErrorTypeDef;
 
-//#define __IO volatile
+#define __IO volatile
 
 /** (Erase/Read/Write Area are defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) **/
 #define FLASH_USER_START_ADDR       	ADDR_FLASH_SECTOR_21
@@ -22,7 +22,7 @@ typedef uint32_t FLASH_ErrorTypeDef;
                                         
 #define massErase(banks) \
         eraseFlashMemory(FLASH_TYPEERASE_MASSERASE, banks, FLASH_USER_VOLTAGE_RANGE, \
-                        0, 0);
+        		0, 0);
 
 /* Base address of the Flash sectors Bank 1 */
 #define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base @ of Sector 0, 16 Kbytes */
