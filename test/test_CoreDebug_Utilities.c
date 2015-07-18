@@ -741,6 +741,7 @@ void test_get_CoreRegisterAccess_WriteValue_given_R12_write_should_return_0x1000
 void test_get_CoreRegisterAccess_WriteValue_given_FP_REGS31_read_should_return_0x5F()
 {
 	TEST_ASSERT_EQUAL(0x5F,get_CoreRegisterAccess_WriteValue(FP_REGS31,CoreRegister_Read));
+
 }
 
 /*-------------------------get_DebugExceptionMonitorControl_WriteValue----------------------------*/

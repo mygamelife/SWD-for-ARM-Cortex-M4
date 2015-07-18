@@ -4,11 +4,15 @@
 #include "Clock.h"
 #include "Reset.h"
 #include "Delay.h"
+#include "Flash.h"
 #include "swd_Utilities.h"
 #include "Bit_Operations.h"
 #include "Register_ReadWrite.h"
 #include "mock_IO_Operations.h"
 #include "mock_configurePort.h"
+#include "mock_stm32f4xx_hal_flash.h"
+#include "mock_stm32f4xx_hal_flash_ex.h"
+#include "mock_stm32f4xx_hal_flash_ramfunc.h"
 
 void setUp(void)
 {

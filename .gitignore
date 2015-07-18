@@ -1,10 +1,12 @@
 build/*
 !build/README.txt
-SerialWireDebug/Debug/*
+SerialWireDebug/Debug/bin/*
+SerialWireDebug/Debug/obj/*
 !SerialWireDebug/Debug/bin/README.txt
 !SerialWireDebug/Debug/obj/README.txt
 app/main.c
 *.cogui
 *.comarker
 *.comemgui
+*.coproj
 /output/

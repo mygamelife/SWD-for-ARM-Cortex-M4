@@ -176,116 +176,44 @@ void test_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_
   emulateSwdOutput();
   emulateIdleClock(8);
 
-  data = swdCheckErrorFlag();
+void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_readData_is_set_to_1() {
+  uint32_t flag = 0;
 
-  TEST_ASSERT_EQUAL(0x8, data);
+
+	emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x80));
+
+  flag = swdCheckErrorFlag();
+  TEST_ASSERT_EQUAL(SWD_WDATA_ERROR_FLAG, flag);
 }
 
+void test_swdCheckErrorFlag_should_return_SWD_STICKYERR_FLAG_when_bit_5_of_the_readData_is_set_to_1() {
+  uint32_t flag = 0;
 
-void test_swdCheckErrorFlag_should_return_0x4_when_bit_5_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
+  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x20));
 
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x4000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
+  flag = swdCheckErrorFlag();
 
-  data = swdCheckErrorFlag();
-
-  TEST_ASSERT_EQUAL(0x4, data);
+  TEST_ASSERT_EQUAL(SWD_STICKY_ERROR_FLAG, flag);
 }
 
-void test_swdCheckErrorFlag_should_return_0x2_when_bit_4_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
+void test_swdCheckErrorFlag_should_return_SWD_STICKYCMP_FLAG_when_bit_4_of_the_readData_is_set_to_1() {
+  uint32_t flag = 0;
 
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x8000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
+  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x10));
 
-  data = swdCheckErrorFlag();
+  flag = swdCheckErrorFlag();
 
-  TEST_ASSERT_EQUAL(0x2, data);
+  TEST_ASSERT_EQUAL(SWD_STICKYCMP_ERROR_FLAG, flag);
 }
 
-void test_swdCheckErrorFlag_should_return_0x10_when_bit_1_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
+void test_swdCheckErrorFlag_should_return_SWD_STICKYORUN_FLAG_when_bit_1_of_the_readData_is_set_to_1() {
+  uint32_t flag = 0;
 
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x40000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
+  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x02));
 
-  data = swdCheckErrorFlag();
+  flag = swdCheckErrorFlag();
 
-  TEST_ASSERT_EQUAL(0x10, data);
-}
-
-void test_swdCheckErrorFlag_should_return_0xC_when_bit_7_5_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
-
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x5000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
-
-  data = swdCheckErrorFlag();
-
-  TEST_ASSERT_EQUAL(0xC, data);
-}
-
-void test_swdCheckErrorFlag_should_return_0xE_when_bit_7_5_4_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
-
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0xD000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
-  data = swdCheckErrorFlag();
-
-  TEST_ASSERT_EQUAL(0xE, data);
-}
-
-void test_swdCheckErrorFlag_should_return_0x1E_when_bit_7_5_4_1_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
-
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x4D000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
-  data = swdCheckErrorFlag();
-
-  TEST_ASSERT_EQUAL(0x1E, data);
+  TEST_ASSERT_EQUAL(SWD_STICKYORUN_ERROR_FLAG, flag);
 }
 
 void test_swdReadDpWithRetries_should_repeat_readDP_transfer_3_times()  {
@@ -397,30 +325,20 @@ void test_retriesSwdOperation_given_read_operation_should_read_DP_6_times_and_re
   TEST_ASSERT_EQUAL(0xA123A, readData);
 }
 
-void test_swdClearFlags_given_WDERRCLR_bit_set_to_1_should_write_0x1000000_to_AP_ABORT_register() {
+void test_swdClearFlags_given_WDERR_FLAG_bit_set_to_1_should_write_SWD_WDERR_CLEAR_FLAG_to_AP_ABORT_register() {
   int i = 0, data = 0;
 
-  //Read CTRL/STAT Register
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x1000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
+  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x80));
+  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_WDERR_CLEAR_FLAG);
   
-  //Write AP ABORT Register
-  emulateWrite(0x81, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateTurnAroundWrite();
-  emulateSwdOutput();  
-  emulateWrite(0x8, 32); //Write DATA (LSB)
-  emulateWrite(0x1, 1); //Parity
-  emulateIdleClock(8);
+  swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
+}
+
+void test_swdClearFlags_given_STICKYCMP_FLAG_bit_set_to_1_should_write_SWD_STKCMP_CLEAR_FLAG_to_AP_ABORT_register() {
+  int i = 0, data = 0;
+
+  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x10));
+  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_STKCMP_CLEAR_FLAG);
   
   swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
 }
@@ -439,7 +357,7 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_retries_3_times_and_abort() {
   emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
   emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
   
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, DAPABOT);
+  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
   emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
   emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
   
@@ -465,7 +383,7 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_DP_read_retries_3_times_abort_
   emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
   emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
   
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, DAPABOT);
+  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
   
   emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
   

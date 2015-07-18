@@ -123,8 +123,40 @@ int getSWD_Request(int Address,int APnDP,int ReadWrite)
 }
 
 /**
- * Check error flag from CTRL/STATUS Register and set the clear error flag bit accordingly
- * Write 1 to the ABORT Register bit to clear the error flag bit set in CTRL/STATUS Register
+ * Check error flag from CTRL/STATUS Register and return the error flag
+ *
+ * Input : NONE
+ *
+ * Return : errorFlag can be one of the following value
+ *            + SWD_STICKYORUN_ERROR_FLAG   0x00
+ *            + SWD_STICKYCMP_ERROR_FLAG    0x01
+ *            + SWD_STICKYERR_ERROR_FLAG    0x02
+ *            + SWD_WDATAERR_ERROR_FLAG     0x03
+ */
+uint32_t swdCheckErrorFlag()  {
+  int ack = 0, parity = 0;
+  uint32_t readData = 0, errorFlag = 0;
+
+  //Access and read CTRL/STATUS Register
+  swdReadCtrlStatus(&ack, &parity, &readData);
+  
+  if(readData & SWD_WDATAERR_MASK)
+    errorFlag = SWD_WDATA_ERROR_FLAG;
+
+  else if(readData & SWD_STICKYERR_MASK)
+    errorFlag = SWD_STICKY_ERROR_FLAG;
+
+  else if(readData & SWD_STICKYCMP_MASK)
+    errorFlag = SWD_STICKYCMP_ERROR_FLAG;
+
+  else if(readData & SWD_STICKYORUN_MASK)
+    errorFlag = SWD_STICKYORUN_ERROR_FLAG;
+
+  return errorFlag;
+}
+
+/**
+ * Check error flag and set the clear error flag bit accordingly and write into ABORT register
  *
  *    CTRL/STATUS Register        ABORT Register
  * ---------------------------------------------------
@@ -133,30 +165,27 @@ int getSWD_Request(int Address,int APnDP,int ReadWrite)
  *    STICKYCMP   [bit 4]         STKCMPCLR   [bit 1]
  *    STICKYORUN  [bit 1]         ORUNERRCLR  [bit 4]
  *
- * Input : NONE
+ * Input : errorFlag contain the actual error flag that need to be clear
  *
- * Return : errorFlag is the bit sequence needed to clear the error flag in ABORT register
+ * Return : NONE
  */
-uint32_t swdCheckErrorFlag()  {
-  int ack = 0, parity = 0;
-  uint32_t readData = 0, errorFlag = 0;
-
-  //Access and read CTRL/STATUS Register
-  swdReadCtrlStatus(&ack, &parity, &readData);
-
-  if(readData & SWD_WDATAERR_MASK)
-    errorFlag = errorFlag | WDERRCLR;
-
-  if(readData & SWD_STICKYERR_MASK)
-    errorFlag = errorFlag | STKERRCLR;
-
-  if(readData & SWD_STICKYCMP_MASK)
-    errorFlag = errorFlag | STKCMPCLR;
-
-  if(readData & SWD_STICKYORUN_MASK)
-    errorFlag = errorFlag | ORUNERRCLR;
-
-  return errorFlag;
+void swdClearErrorFlagInAbort(uint32_t errorFlag)  {
+  int ack = 0;
+  uint32_t clearFlag = 0;
+  
+  if(errorFlag == SWD_STICKYORUN_ERROR_FLAG)
+    clearFlag = SWD_ORUNERR_CLEAR_FLAG;
+  
+  else if(errorFlag == SWD_STICKYCMP_ERROR_FLAG)
+    clearFlag = SWD_STKCMP_CLEAR_FLAG;
+  
+  else if(errorFlag == SWD_STICKY_ERROR_FLAG)
+    clearFlag = SWD_STKERR_CLEAR_FLAG;
+  
+  else if(errorFlag == SWD_WDATA_ERROR_FLAG)
+    clearFlag = SWD_WDERR_CLEAR_FLAG;
+  
+  swdWriteAbort(&ack, clearFlag);
 }
 
 /**
@@ -277,7 +306,7 @@ void swdClearFlags(int ackResponse, int readOrWrite, int address, int APorDP, in
       
       //clear DAPABORT and resend if acknowledge still WAIT_RESPONSE
       if(ack == WAIT_RESPONSE)  {
-        swdWriteAbort(&ack, DAPABOT);
+        swdWriteAbort(&ack, SWD_DAPABORT_CLEAR_FLAG);
         
         //RESEND DP/AP operation
         if(APorDP == DP)  {
@@ -292,7 +321,7 @@ void swdClearFlags(int ackResponse, int readOrWrite, int address, int APorDP, in
 
     case  FAULT_RESPONSE  :
       errorFlag = swdCheckErrorFlag();
-      swdWriteAbort(&ack, errorFlag); //Clear error flag
+      swdClearErrorFlagInAbort(errorFlag); //Clear error flag
       break;
   }
 }
