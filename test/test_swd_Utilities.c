@@ -1,7 +1,8 @@
-#include "stdint.h"
+#include <stdint.h>
 #include "unity.h"
 #include "Clock.h"
 #include "Emulator.h"
+#include "Misc_Utilities.h"
 #include "swd_Utilities.h"
 #include "Bit_Operations.h"
 #include "Register_ReadWrite.h"
@@ -138,6 +139,28 @@ void test_getSWD_Request_given_Address0x04_DP_READ_should_return_0x8D()
 
 
 	TEST_ASSERT_EQUAL(0x8D,getSWD_Request(0x04,DP,READ));
+}
+
+void test_compare_ParityWithData_given_0xFFFFFFFF_parity_0_should_return_ERR_NO_ERR()
+{
+	ErrorCode error;
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,compare_ParityWithData(0xFFFFFFFF,0));
+}
+
+void test_compare_ParityWithData_given_0x0_parity_0_should_return_ERR_NO_ERR()
+{
+	TEST_ASSERT_EQUAL(ERR_NOERROR,compare_ParityWithData(0,0));
+}
+
+void test_compare_ParityWithData_given_0xFFFFFFFF_parity_1_should_return_ERR_INVALID_PARITY_RECEIVED()
+{
+	TEST_ASSERT_EQUAL(ERR_INVALID_PARITY_RECEIVED,compare_ParityWithData(0xFFFFFFFF,1));
+}
+
+void test_compare_ParityWithData_given_0x1_parity_0_should_return_ERR_INVALID_PARITY_RECEIVED()
+{
+	TEST_ASSERT_EQUAL(ERR_INVALID_PARITY_RECEIVED,compare_ParityWithData(0x1,0));
 }
 
 void test_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
