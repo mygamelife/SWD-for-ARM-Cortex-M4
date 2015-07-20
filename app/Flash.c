@@ -339,6 +339,10 @@ void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
 
+  /* Update next start flash and sram address */
+  *(__IO uint32_t*)SWD_FLASH_START_ADDRESS	= FLASH_Addr;
+  *(__IO uint32_t*)SWD_SRAM_START_ADDRESS	= SRAM_Addr;
+
   #ifndef TEST
     verifyDataFromRamToFlash(src, dest, length);
   #endif

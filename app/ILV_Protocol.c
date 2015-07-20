@@ -11,15 +11,15 @@ static uint32_t targetStatus = 0;
   *
   * output  : NONE
   */
-void load_SectorErase_Instruction(uint32_t startAddress, uint32_t endAddress)  {
+void Load_SectorErase_Instruction(uint32_t startAddress, uint32_t endAddress)  {
   /* Continues wait for target to release */
   do  {
     memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
   } while(targetStatus != TARGET_OK);
   
   /* load flash start and end address to sram */
-  memoryAccessWrite(SWD_START_ADDRESS, startAddress);
-  memoryAccessWrite(SWD_END_ADDRESS, endAddress);
+  memoryAccessWrite(SWD_FLASH_START_ADDRESS, startAddress);
+  memoryAccessWrite(SWD_FLASH_END_ADDRESS, endAddress);
   
   /* load instruction to sram */
   memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_SECTOR_ERASE);
@@ -36,7 +36,7 @@ void load_SectorErase_Instruction(uint32_t startAddress, uint32_t endAddress)  {
   *
   * output  : NONE
   */
-void load_MassErase_Instruction(uint32_t bankSelect)  {
+void Load_MassErase_Instruction(uint32_t bankSelect)  {
   /* Continues wait for target to release */
   do  {
     memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
@@ -47,4 +47,32 @@ void load_MassErase_Instruction(uint32_t bankSelect)  {
   
   /* load instruction to sram */
   memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
+}
+
+/**
+  * Load_Copy_Instruction is a function copy data from src (SRAM) to dest (Flash)
+  *
+  * input   : src is the beginning SRAM address contain all the information
+  *           dest is the flash address all the information need to copy over there
+  *           length is to determine how many words need to copy over
+  *
+  * output  : NONE
+  */
+void Load_Copy_Instruction(uint32_t src, uint32_t dest, int length) {
+  /* Continues wait for target to release */
+  do  {
+    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+  } while(targetStatus != TARGET_OK);
+
+  /* load SRAM start address into sram */
+  memoryAccessWrite(SWD_SRAM_START_ADDRESS, src);
+  
+  /* load Flash start address into sram */
+  memoryAccessWrite(SWD_FLASH_START_ADDRESS, dest);
+  
+  /* load length into sram */
+	memoryAccessWrite(SWD_DATA_LENGTH, length);
+
+	/* load copy instructoin into sram */
+	memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_COPY);
 }

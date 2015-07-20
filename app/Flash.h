@@ -2,6 +2,7 @@
 #define Flash_H
 
 #include <stdint.h>
+#include "swdStub.h"
 #include "configurePort.h"
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"

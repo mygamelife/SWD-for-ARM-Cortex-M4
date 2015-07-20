@@ -1,7 +1,8 @@
 #include "swdStub.h"
 
-static __IO uint32_t FlashStartAddress = 0;
-static __IO uint32_t FlashEndAddress = 0;
+static __IO uint32_t Flash_Start_Address = 0;
+static __IO uint32_t Flash_End_Address = 0;
+static __IO uint32_t SRAM_Start_Address = 0;
 static int DataLength = 0;
 
 /**
@@ -34,13 +35,16 @@ void stubCopy(void) {
   /* Inform probe now target is busy */
   *(__IO uint32_t*)SWD_TARGET_STATUS  = TARGET_BUSY;
   
-  /* Extract user start address from sram */
-  FlashStartAddress = *(__IO uint32_t*)SWD_START_ADDRESS;
+  /* Extract flash destination address from sram */
+  Flash_Start_Address = *(__IO uint32_t*)SWD_FLASH_START_ADDRESS;
+  
+  /* Extract SRAM source address from sram */
+  SRAM_Start_Address = *(__IO uint32_t*)SWD_SRAM_START_ADDRESS;
   
   /* Extract DataLength from sram */
   DataLength  = *(__IO int*)SWD_DATA_LENGTH;
   
-  copyFromRamToFlash(SWD_DATA32, FlashStartAddress, DataLength);
+  copyFromRamToFlash(SRAM_Start_Address, Flash_Start_Address, DataLength);
   
   /* Clear instruction prevent keep copy */
   *(__IO uint32_t*)SWD_INSTRUCTION    = INSTRUCTION_CLEAR;
@@ -60,13 +64,13 @@ void stubSectorErase(void)  {
   *(__IO uint32_t*)SWD_TARGET_STATUS  = TARGET_BUSY;
   
   /* Extract user start address from sram */
-  FlashStartAddress = *(__IO uint32_t*)SWD_START_ADDRESS;
+  Flash_Start_Address = *(__IO uint32_t*)SWD_FLASH_START_ADDRESS;
   
   /* Extract user start address from sram */
-  FlashEndAddress   = *(__IO uint32_t*)SWD_END_ADDRESS;
+  Flash_End_Address = *(__IO uint32_t*)SWD_FLASH_END_ADDRESS;
   
   /* Perform sector erase here */
-  sectorErase(FlashStartAddress, FlashEndAddress);
+  sectorErase(Flash_Start_Address, Flash_End_Address);
   
   /* Turn off verify checking LED */
   turnOffLED3();

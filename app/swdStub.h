@@ -11,10 +11,11 @@
 #define SWD_INSTRUCTION                   ((uint32_t)0x20000000)
 #define SWD_BANK_SELECT                   ((uint32_t)0x20000004)
 #define SWD_DATA_LENGTH                   ((uint32_t)0x20000008)
-#define SWD_START_ADDRESS                 ((uint32_t)0x2000000C)
-#define SWD_END_ADDRESS                   ((uint32_t)0x20000010)
-#define SWD_TARGET_STATUS                 ((uint32_t)0x20000014)
-#define SWD_DATA32                        ((uint32_t)0x20000800)
+#define SWD_FLASH_START_ADDRESS           ((uint32_t)0x2000000C)
+#define SWD_FLASH_END_ADDRESS             ((uint32_t)0x20000010)
+#define SWD_SRAM_START_ADDRESS            ((uint32_t)0x20000014)
+#define SWD_TARGET_STATUS                 ((uint32_t)0x20000018)
+#define SWD_SRAM_DATA32_ADDRESS           ((uint32_t)0x20000800)
 
 /** SWD Instruction 
   */
