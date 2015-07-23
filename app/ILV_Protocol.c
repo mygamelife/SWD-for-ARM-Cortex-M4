@@ -11,7 +11,7 @@ static uint32_t targetStatus = 0;
   *
   * output  : NONE
   */
-void Load_SectorErase_Instruction(uint32_t startAddress, uint32_t endAddress)  {
+void Load_EraseSector_Instruction(uint32_t startAddress, uint32_t endAddress)  {
   /* Continues wait for target to release */
   do  {
     memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
