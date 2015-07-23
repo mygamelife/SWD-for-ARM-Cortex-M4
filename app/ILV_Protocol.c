@@ -22,7 +22,7 @@ void Load_SectorErase_Instruction(uint32_t startAddress, uint32_t endAddress)  {
   memoryAccessWrite(SWD_FLASH_END_ADDRESS, endAddress);
   
   /* load instruction to sram */
-  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_SECTOR_ERASE);
+  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
 }
 
 /**

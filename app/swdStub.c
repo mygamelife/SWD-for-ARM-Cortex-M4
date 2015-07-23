@@ -17,7 +17,7 @@ void swdStub(uint32_t swdInstruction) {
       stubCopy();
       break;
     
-    case INSTRUCTION_SECTOR_ERASE :
+    case INSTRUCTION_ERASE_SECTOR :
       stubEraseSector();
       break;
   

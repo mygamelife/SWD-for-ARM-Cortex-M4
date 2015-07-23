@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include "Flash.h"
+#include "SRAM.h"
 
 /** SWD Instruction address 
   */
@@ -24,7 +25,7 @@
 #define MASS_ERASE_BANK_2                 ((uint32_t)0x00000002)
 #define MASS_ERASE_BOTH_BANK              ((uint32_t)0x00000003)
 #define INSTRUCTION_COPY                  ((uint32_t)0x00000010)
-#define INSTRUCTION_SECTOR_ERASE          ((uint32_t)0x00000011)
+#define INSTRUCTION_ERASE_SECTOR          ((uint32_t)0x00000011)
 #define INSTRUCTION_MASS_ERASE            ((uint32_t)0x00000012)
 
 /** SWD target response
