@@ -16,7 +16,6 @@ uint8_t aTxBuffer[] = {0xAA,0xBB};//"Hello World";
 uint8_t aRxBuffer[11];
 
 /* Private function prototypes -----------------------------------------------*/
-static void SystemClock_Config(void);
 static void Error_Handler(void);
 static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
 
@@ -36,15 +35,17 @@ void test_Uart(void)
        - Set NVIC Group Priority to 4
        - Global MSP (MCU Support Package) initialization
      */
-  HAL_Init();
+  #if !defined(TEST)
+    HAL_Init();
 
-  /* Configure LED3 and LED4 */
-  BSP_LED_Init(LED3);
-  BSP_LED_Init(LED4);
+    /* Configure LED3 and LED4 */
+    BSP_LED_Init(LED3);
+    BSP_LED_Init(LED4);
 
-  InitUartPorts();
-  /* Configure the system clock to 180 MHz */
-  SystemClock_Config();
+    InitUartPorts();
+    /* Configure the system clock to 180 MHz */
+    //SystemClock_Config();
+  #endif
 
   /*##-1- Configure the UART peripheral ######################################*/
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
@@ -91,7 +92,9 @@ void test_Uart(void)
   /* Turn LED3 on: Transfer in transmission process is correct */
   /* then Off for next transmission */
   BSP_LED_On(LED3);
-  HAL_Delay(200);
+  #if !defined(TEST)
+    HAL_Delay(200);
+  #endif
   BSP_LED_Off(LED3);
   
   /*##-3- Put UART peripheral in reception process ###########################*/  
@@ -103,7 +106,9 @@ void test_Uart(void)
   /* Turn LED3 on: Transfer in transmission process is correct */
   /* then Off for next transmission */
   BSP_LED_On(LED3);
-  delay(200, 1, 1);
+  #if !defined(TEST)
+    HAL_Delay(200);
+  #endif
   BSP_LED_Off(LED3);
   
 #else
@@ -141,84 +146,10 @@ void test_Uart(void)
     BSP_LED_Toggle(LED3);
     
     /* Wait for 40ms */
+  #if !defined(TEST)
     HAL_Delay(40);
+  #endif
   }
-}
-
-/**
-  * @brief  System Clock Configuration
-  *         The system Clock is configured as follow : 
-  *            System Clock source            = PLL (HSE)
-  *            SYSCLK(Hz)                     = 180000000
-  *            HCLK(Hz)                       = 180000000
-  *            AHB Prescaler                  = 1
-  *            APB1 Prescaler                 = 4
-  *            APB2 Prescaler                 = 2
-  *            HSE Frequency(Hz)              = 8000000
-  *            PLL_M                          = 8
-  *            PLL_N                          = 360
-  *            PLL_P                          = 2
-  *            PLL_Q                          = 7
-  *            VDD(V)                         = 3.3
-  *            Main regulator output voltage  = Scale1 mode
-  *            Flash Latency(WS)              = 5
-  * @param  None
-  * @retval None
-  */
-static void SystemClock_Config(void)
-{
-  RCC_ClkInitTypeDef RCC_ClkInitStruct;
-  RCC_OscInitTypeDef RCC_OscInitStruct;
-
-  /* Enable Power Control clock */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  
-  /* The voltage scaling allows optimizing the power consumption when the device is 
-     clocked below the maximum system frequency, to update the voltage scaling value 
-     regarding system frequency refer to product datasheet.  */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-  
-  /* Enable HSE Oscillator and activate PLL with HSE as source */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
-  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
-  RCC_OscInitStruct.PLL.PLLM = 8;
-  RCC_OscInitStruct.PLL.PLLN = 360;
-  RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
-  RCC_OscInitStruct.PLL.PLLQ = 7;
-  if(HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  /* Activate the Over-Drive mode */
-  HAL_PWREx_EnableOverDrive();
- 
-  /* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2 
-     clocks dividers */
-  RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV4;  
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV2;  
-  if(HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_5) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-/**
-  * @brief  UART error callbacks
-  * @param  UartHandle: UART handle
-  * @note   This example shows a simple way to report transfer error, and you can
-  *         add your own implementation.
-  * @retval None
-  */
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *UartHandle)
-{
-  /* Turn LED4 on: Transfer error in reception/transmission process */
-  BSP_LED_On(LED4); 
 }
 
 /**

@@ -3,6 +3,7 @@
 #include "Delay.h"
 #include "mock_configurePort.h"
 #include "mock_stm32f4xx_hal_uart.h"
+#include "mock_stm32f429i_discovery.h"
 
 void setUp(void)
 {

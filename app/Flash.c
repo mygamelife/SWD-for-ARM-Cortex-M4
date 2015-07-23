@@ -132,7 +132,7 @@ void Flash_Write(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uin
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
   
-  #ifndef TEST
+  #if !defined(TEST)
     Flash_Verify(startAddr, endAddr, data);
   #endif
 }
@@ -329,7 +329,7 @@ void Flash_Error_Handler(void)
   /* Turn LED4 on */
   turnOnLED4();
 
-  #ifndef TEST
+  #if !defined(TEST)
     while(1)  {}
   #endif
 }
@@ -372,7 +372,7 @@ void Flash_CopyFromSramToFlash(uint32_t src, uint32_t dest, int length) {
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
 
-  #ifndef TEST
+  #if !defined(TEST)
     Flash_VerifyDataFromSramToFlash(src, dest, length);
   #endif
 }
@@ -431,3 +431,16 @@ void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
   }
 }
 
+/** Flash_WriteToTarget
+  *
+  */
+void Flash_WriteToTarget(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data) {
+  
+}
+
+/** Flash_WriteToTarget
+  *
+  */
+uint32_t Flash_ReadFromTarget(uint32_t startAddress)  {
+  
+}

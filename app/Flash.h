@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "swdStub.h"
-#include "configurePort.h"
+#include "Register_ReadWrite.h"
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"
 #include "stm32f4xx_hal_flash_ramfunc.h"

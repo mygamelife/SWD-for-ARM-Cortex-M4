@@ -101,7 +101,7 @@ void configureLED()	{
   HAL_GPIO_Init(GPIOG,&GpioInfo);  //Init LED1 on PG13 , lED 2 on PG14
 }
 
-void initButton(){
+void initButton() {
   GPIO_InitTypeDef pushButton;
 
   BUTTON_CLK_ENABLE();

@@ -6,8 +6,8 @@
 
 /** SWD Instruction address 
   */
-#define TWO_KBYTES                        2000 //2k byte
-#define FOUR_KBYTES                       40002 //4k byte
+#define TWO_KBYTES                        2048 //2k byte
+#define FOUR_KBYTES                       4096 //4k byte
 #define SWD_INSTRUCTION                   ((uint32_t)0x20000000)
 #define SWD_BANK_SELECT                   ((uint32_t)0x20000004)
 #define SWD_DATA_LENGTH                   ((uint32_t)0x20000008)
@@ -32,8 +32,8 @@
 #define TARGET_OK                         ((uint32_t)0x00000000)
 #define TARGET_BUSY                       ((uint32_t)0x00000001)
 
-void swdStub(uint32_t swdInstruction);
-void stubCopy(void);
-void stubSectorErase(void);
-void stubMassErase(void);
+//void swdStub(uint32_t swdInstruction);
+void stubCopy(uint32_t SRAM_Start_Address, uint32_t Flash_Start_Address, int length);
+void stubEraseSector(uint32_t Flash_Start_Address, uint32_t Flash_End_Address);
+void stubMassErase(uint32_t bankSelect);
 #endif // swdStub_H
