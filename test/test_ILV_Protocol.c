@@ -47,7 +47,7 @@ void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_bef
   emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_INSTRUCTION);
 	emulateSWDRegister_Write(DRW_REG,AP,OK,INSTRUCTION_ERASE_SECTOR);
   
-  Load_SectorErase_Instruction(ADDR_FLASH_SECTOR_20, ADDR_FLASH_SECTOR_22);
+  Load_EraseSector_Instruction(ADDR_FLASH_SECTOR_20, ADDR_FLASH_SECTOR_22);
 }
 
 void test_load_MassErase_Instruction_should_wait_untill_target_response_OK_before_load_instruction(void)

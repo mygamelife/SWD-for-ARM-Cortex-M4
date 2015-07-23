@@ -52,7 +52,6 @@ typedef uint32_t FLASH_ErrorTypeDef;
 
 uint32_t Flash_GetSector(uint32_t Address);
 uint32_t Flash_Read(uint32_t startAddress);
-uint32_t Flash_ReadFromTarget(uint32_t startAddress);
 
 void Flash_Error_Handler(void);
 void Flash_MassErase(uint32_t banks);
@@ -61,5 +60,4 @@ void Flash_Write(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uin
 void Flash_Verify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
 void Flash_CopyFromSramToFlash(uint32_t src, uint32_t dest, int length);
 void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length);
-void Flash_WriteToTarget(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
 #endif // Flash_H

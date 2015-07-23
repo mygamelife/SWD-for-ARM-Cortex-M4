@@ -441,17 +441,3 @@ void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
     Flash_Error_Handler();
   }
 }
-
-/** Flash_WriteToTarget
-  *
-  */
-void Flash_WriteToTarget(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data) {
-  
-}
-
-/** Flash_WriteToTarget
-  *
-  */
-uint32_t Flash_ReadFromTarget(uint32_t startAddress)  {
-  
-}
