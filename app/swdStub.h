@@ -32,8 +32,8 @@
 #define TARGET_OK                         ((uint32_t)0x00000000)
 #define TARGET_BUSY                       ((uint32_t)0x00000001)
 
-//void swdStub(uint32_t swdInstruction);
-void stubCopy(uint32_t SRAM_Start_Address, uint32_t Flash_Start_Address, int length);
-void stubEraseSector(uint32_t Flash_Start_Address, uint32_t Flash_End_Address);
-void stubMassErase(uint32_t bankSelect);
+void swdStub(uint32_t swdInstruction);
+void stubCopy();
+void stubEraseSector();
+void stubMassErase();
 #endif // swdStub_H

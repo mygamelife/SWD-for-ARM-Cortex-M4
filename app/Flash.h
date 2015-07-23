@@ -1,17 +1,24 @@
 #ifndef Flash_H
 #define Flash_H
 
+#if !defined(TEST)
+	#include "stm32f4xx_hal.h"
+#endif
+
 #include <stdint.h>
 #include "swdStub.h"
+#include "LED.h"
 #include "Register_ReadWrite.h"
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"
 #include "stm32f4xx_hal_flash_ramfunc.h"
+#include "stm32f429i_discovery.h"
 
 typedef uint32_t FLASH_ErrorTypeDef;
 
 #define __IO volatile
 
+#define DELAY	3000
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
 /* Base address of the Flash sectors Bank 1 */

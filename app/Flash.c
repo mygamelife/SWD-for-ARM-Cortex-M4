@@ -3,6 +3,8 @@
 static FLASH_EraseInitTypeDef EraseInitStruct;
 static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
 static uint32_t SectorError = 0;
+static int timeExpired = 1;
+static State state = START;
 
 /**
   * Flash_MassErase use to perform bank 1, 2 erase or full chip erase both bank
@@ -150,6 +152,7 @@ void Flash_Write(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uin
 void Flash_Verify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
 	__IO uint32_t data32 = 0, MemoryProgramStatus = 0;
 	uint32_t address = 0;
+	__IO uint32_t tick = 0;
   
   /* Check if the programmed data is OK
       MemoryProgramStatus = 0: data programmed correctly
@@ -175,7 +178,11 @@ void Flash_Verify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  
   if (MemoryProgramStatus == 0)
   {
     /* No error detected. Switch on LED3 */
-	  turnOnLED3();
+    #if !defined(TEST)
+      while(timeExpired)	{
+        LED3_Blink(&state, &timeExpired);
+      }
+    #endif
   }
   else
   {
@@ -393,7 +400,7 @@ void Flash_CopyFromSramToFlash(uint32_t src, uint32_t dest, int length) {
 void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
   int i = 0;
   __IO uint32_t dataFlash = 0, dataSRAM = 0, memoryProgramStatus = 0;
-  uint32_t SRAM_Addr = 0, FLASH_Addr = 0;
+  uint32_t SRAM_Addr = 0, FLASH_Addr = 0, tickstart = 0;
 
   /* Check if the programmed data is OK
       MemoryProgramStatus = 0: data programmed correctly
@@ -422,7 +429,11 @@ void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
   if (memoryProgramStatus == 0)
   {
     /* No error detected. Switch on LED3 */
-	  turnOnLED3();
+    #if !defined(TEST)
+      while(timeExpired)	{
+        LED3_Blink(&state, &timeExpired);
+      }
+    #endif
   }
   else
   {
