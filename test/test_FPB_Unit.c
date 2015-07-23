@@ -112,7 +112,7 @@ void test_read_FPBControl_should_read_FP_CTRL_will_return_ERR_INVALID_PARITY_REC
 
 }
 /*--------------------------------------------configure_FP_COMP-----------------------------------------*/
-
+//Enable
 void test_configure_FP_COMP_given_FP_COMP2_Match_32bits_should_write_and_read_FPCOMP2_and_return_ERR_NOERROR_if_data_is_the_same_and_updateFPBInfo()
 {
 	FPBInfo fpbInfo ;
@@ -120,13 +120,13 @@ void test_configure_FP_COMP_given_FP_COMP2_Match_32bits_should_write_and_read_FP
 	init_FPBInfo(&fpbInfo);
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,FP_COMP2);
-	emulateSWDRegister_Write(DRW_REG,AP,4,get_FP_COMP_WriteValue(0x10000000,Match_32bits));
+	emulateSWDRegister_Write(DRW_REG,AP,4,get_FP_COMP_WriteValue(0x10000000,Match_32bits,Enable));
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,FP_COMP2);
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x12345677));
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(get_FP_COMP_WriteValue(0x10000000,Match_32bits)));
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(get_FP_COMP_WriteValue(0x10000000,Match_32bits,Enable)));
 	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_FP_COMP(&fpbInfo,FP_COMP2,0x10000000,Match_32bits));
+	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_FP_COMP(&fpbInfo,FP_COMP2,0x10000000,Match_32bits,Enable));
 	TEST_ASSERT_EQUAL(0x10000000,fpbInfo.compInfo[2]->address);
 	TEST_ASSERT_EQUAL(Enable,fpbInfo.compInfo[2]->EnableDisable);
 	TEST_ASSERT_EQUAL(Match_32bits,fpbInfo.compInfo[2]->matchingMode);
@@ -139,13 +139,13 @@ void test_configure_FP_COMP_given_FP_COMP2_Match_Upper16bits_should_write_and_re
 	init_FPBInfo(&fpbInfo);
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,FP_COMP2);
-	emulateSWDRegister_Write(DRW_REG,AP,4,get_FP_COMP_WriteValue(0x10000000,Match_Upper16bits));
+	emulateSWDRegister_Write(DRW_REG,AP,4,get_FP_COMP_WriteValue(0x10000000,Match_Upper16bits,Enable));
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,FP_COMP2);
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x12345677));
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(get_FP_COMP_WriteValue(0x10000000,Match_Upper16bits)));
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(get_FP_COMP_WriteValue(0x10000000,Match_Upper16bits,Enable)));
 	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_FP_COMP(&fpbInfo,FP_COMP2,0x10000000,Match_Upper16bits));
+	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_FP_COMP(&fpbInfo,FP_COMP2,0x10000000,Match_Upper16bits,Enable));
 	TEST_ASSERT_EQUAL(0x10000002,fpbInfo.compInfo[2]->address);
 	TEST_ASSERT_EQUAL(Enable,fpbInfo.compInfo[2]->EnableDisable);
 	TEST_ASSERT_EQUAL(Match_Upper16bits,fpbInfo.compInfo[2]->matchingMode);
@@ -159,7 +159,7 @@ void test_configure_FP_COMP_given_FP_COMP100_should_return_ERR_INVALID_COMPARATO
 
 	uint32_t FP_COMP100 = 100;
 	
-	TEST_ASSERT_EQUAL(ERR_INVALID_COMPARATOR,configure_FP_COMP(&fpbInfo,FP_COMP100,0x10000000,Match_Upper16bits));
+	TEST_ASSERT_EQUAL(ERR_INVALID_COMPARATOR,configure_FP_COMP(&fpbInfo,FP_COMP100,0x10000000,Match_Upper16bits,Enable));
 
 }
 

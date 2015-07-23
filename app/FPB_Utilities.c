@@ -210,16 +210,20 @@ uint32_t get_FP_CTRL_WriteValue(int EnableDisable)
  *					Match_Lower16bits	Set breakpoint on lower halfword
  *					Match_Upper16bits	Set breakpoint on upper halfword
  *					Match_32bits		Set breakpoint on both upper and lower halfword
+ *			EnableDisable is use to enable / disable the comparator
+ *				Possible value :
+ *					Enable 				enable the comparator
+ *					Disable				disable the comparator
  *
  * Output :	return 32 bits of  to be written into FlashPatch Comparator Register, FP_COMP
  *
  */
-uint32_t get_FP_COMP_WriteValue(uint32_t address,int matchingMode)
+uint32_t get_FP_COMP_WriteValue(uint32_t address,int matchingMode,int EnableDisable)
 {
 	uint32_t data = 0 , Address;
 	Address = address & FP_COMP_ADDRESS_MASK  ; //Bits[31:29] & Bits[1:0] are now 0
 	
-	data = matchingMode + Address + FP_COMP_ENABLE;
+	data = matchingMode + Address + EnableDisable;
 	
 	return data ;
 }

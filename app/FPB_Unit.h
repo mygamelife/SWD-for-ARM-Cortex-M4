@@ -21,11 +21,14 @@
 int control_FPB(FPBInfo *fpbInfo,int EnableDisable);
 int read_FPBControl(FPBInfo *fpbInfo);
 
-int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int matchingMode);
+int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int matchingMode,int EnableDisable);
 int configure_FP_REMAP(FPBInfo *fpbInfo,uint32_t SRAM_REMAP_address);
 
 int set_InstructionBKPT(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t address,int matchingMode);
 int set_InstructionREMAP(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t address);
 int set_LiteralREMAP(FPBInfo *fpbInfo,uint32_t LiteralCOMP_no,uint32_t address);
+
+int disable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no);
+int reenable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no);
 
 #endif // FPB_Unit_H

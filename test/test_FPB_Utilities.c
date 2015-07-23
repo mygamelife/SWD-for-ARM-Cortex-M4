@@ -306,17 +306,27 @@ void test_get_FP_CTRL_WriteValue_given_Disable_should_return_Disable_FPB()
 	TEST_ASSERT_EQUAL(DISABLE_FPB,get_FP_CTRL_WriteValue(Disable));
 }
 /*---------------------------------------get_FP_COMP_WriteValue-----------------------------------*/
-
+//Enable
 void test_get_FP_COMP_WriteValue_given_address_0x1FFFFFFF_MatchingMode_REMAP_should_return_0x1FFFFFFD()
 {
-	TEST_ASSERT_EQUAL(0x1FFFFFFD,get_FP_COMP_WriteValue(0x1FFFFFFF,Match_REMAP));
+	TEST_ASSERT_EQUAL(0x1FFFFFFD,get_FP_COMP_WriteValue(0x1FFFFFFF,Match_REMAP,Enable));
 }
 
 void test_get_FP_COMP_WriteValue_given_address_0xCA1B2C35_MatchingMode_Match_32bits_should_return_0xCA1B2C35()
 {
-	TEST_ASSERT_EQUAL(0xCA1B2C35,get_FP_COMP_WriteValue(0xCA1B2C35,Match_32bits));
+	TEST_ASSERT_EQUAL(0xCA1B2C35,get_FP_COMP_WriteValue(0xCA1B2C35,Match_32bits,Enable));
 }
 
+//Disable
+void test_get_FP_COMP_WriteValue_given_address_0x1FFFFFFF_MatchingMode_REMAP_should_return_0x1FFFFFFC()
+{
+	TEST_ASSERT_EQUAL(0x1FFFFFFC,get_FP_COMP_WriteValue(0x1FFFFFFF,Match_REMAP,Disable));
+}
+
+void test_get_FP_COMP_WriteValue_given_address_0xCA1B2C35_MatchingMode_Match_32bits_should_return_0xCA1B2C34()
+{
+	TEST_ASSERT_EQUAL(0xCA1B2C34,get_FP_COMP_WriteValue(0xCA1B2C35,Match_32bits,Disable));
+}
 /*---------------------------------------get_FP_REMAP_WriteValue-----------------------------------*/
 
 void test_get_FP_REMAP_WriteValue_given_address_0x0A1B2C37_should_clear_bits31_till_29_and_bits4_till_0_and_return_0x0A1B2C20()

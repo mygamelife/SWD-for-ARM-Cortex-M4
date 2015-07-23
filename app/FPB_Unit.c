@@ -75,12 +75,17 @@ int read_FPBControl(FPBInfo *fpbInfo)
  *					Match_Upper16bits	Set breakpoint on upper halfword (Bits[1:0] are 0b10)				(Setting this mode for LiteralCOMPn will be ignored by hardware)
  *					Match_32bits		Set breakpoint on both upper and lower halfword						(Setting this mode for LiteralCOMPn will be ignored by hardware)
  *
+ *			EnableDisable is use to enable / disable the comparator
+ *				Possible value :
+ *					Enable 				enable the comparator
+ *					Disable				disable the comparator
+ *
  * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
  *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
  * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
  *			return ERR_INVALID_COMPARATOR if the selected comparator is not valid/found in the device
  */
-int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int matchingMode)
+int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int matchingMode,int EnableDisable)
 {
 	uint32_t dataToWrite = 0, dataRead = 0 ;
 	int status = 0, number = 0 ;
@@ -90,7 +95,7 @@ int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int mat
 	if(number == ERR_INVALID_COMPARATOR)
 		return number ;
 	
-	dataToWrite = get_FP_COMP_WriteValue(address,matchingMode);
+	dataToWrite = get_FP_COMP_WriteValue(address,matchingMode,EnableDisable);
 	
 	memoryAccessWrite(COMP_no,dataToWrite);
 	status = memoryAccessRead(COMP_no,&dataRead);
@@ -162,7 +167,7 @@ int configure_FP_REMAP(FPBInfo *fpbInfo,uint32_t SRAM_REMAP_address)
 int set_InstructionBKPT(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t address,int matchingMode)
 {
 	int status = 0 ;
-	status = configure_FP_COMP(fpbInfo,InstructionCOMP_no,address,matchingMode);
+	status = configure_FP_COMP(fpbInfo,InstructionCOMP_no,address,matchingMode,Enable);
 	return status ;
 }
 
@@ -186,7 +191,7 @@ int set_InstructionBKPT(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t ad
 int set_InstructionREMAP(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t address)
 {
 	int status = 0 ;
-	status = configure_FP_COMP(fpbInfo,InstructionCOMP_no,address,Match_REMAP);
+	status = configure_FP_COMP(fpbInfo,InstructionCOMP_no,address,Match_REMAP,Enable);
 	return status ;
 }
 
@@ -207,7 +212,70 @@ int set_InstructionREMAP(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t a
 int set_LiteralREMAP(FPBInfo *fpbInfo,uint32_t LiteralCOMP_no,uint32_t address)
 {
 	int status = 0 ;
-	status = configure_FP_COMP(fpbInfo,LiteralCOMP_no,address,Match_REMAP);
+	status = configure_FP_COMP(fpbInfo,LiteralCOMP_no,address,Match_REMAP,Enable);
 	return status ;
 }
 
+
+
+/**
+ * Disable the selected FP Comparator and preserve the address and matching mode set inside
+ * 
+ * Input : 	fpbInfo is a pointer to FPBInfo which contain information about the selected Comparator
+ *			COMP_no is the comparator number being configured
+ *				Possible values : 
+ *					InstructionCOMP_0				LiteralCOMP_0
+ *					InstructionCOMP_1				LiteralCOMP_1
+ *					InstructionCOMP_2
+ *					InstructionCOMP_4
+ *					InstructionCOMP_5
+ *
+ * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
+ *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
+ *			return ERR_INVALID_COMPARATOR if the selected comparator is not valid/found in the device
+ */
+int disable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no)
+{
+	int status = 0 , number = 0  ;
+	uint32_t address = 0 , matchingMode = 0 ;
+	
+	number = get_ComparatorInfoNumber(COMP_no);
+	address = fpbInfo->compInfo[number]->address ;
+	matchingMode = fpbInfo->compInfo[number]->matchingMode ;
+	
+	status = configure_FP_COMP(fpbInfo,COMP_no,address,matchingMode,Disable);
+	
+	return status ;
+}
+
+/**
+ * Re-enable the selected previously disabled comparator
+ * 
+ * Input : 	fpbInfo is a pointer to FPBInfo which contain information about the selected Comparator
+ *			COMP_no is the comparator number being configured
+ *				Possible values : 
+ *					InstructionCOMP_0				LiteralCOMP_0
+ *					InstructionCOMP_1				LiteralCOMP_1
+ *					InstructionCOMP_2
+ *					InstructionCOMP_4
+ *					InstructionCOMP_5
+ *
+ * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
+ *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
+ *			return ERR_INVALID_COMPARATOR if the selected comparator is not valid/found in the device
+ */
+int reenable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no)
+{
+	int status = 0 , number = 0  ;
+	uint32_t address = 0 , matchingMode = 0 ;
+	
+	number = get_ComparatorInfoNumber(COMP_no);
+	address = fpbInfo->compInfo[number]->address ;
+	matchingMode = fpbInfo->compInfo[number]->matchingMode ;
+	
+	status = configure_FP_COMP(fpbInfo,COMP_no,address,matchingMode,Enable);
+	
+	return status ;
+}

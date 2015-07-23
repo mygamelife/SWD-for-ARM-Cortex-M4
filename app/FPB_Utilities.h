@@ -50,7 +50,6 @@ struct ComparatorInfo
 #define FP_COMP_ADDRESS_MASK		0x1FFFFFFC
 #define FP_COMP_MATCH_MASK			0xC0000000
 #define FP_COMP_ENABLE_MASK			1
-#define FP_COMP_ENABLE				1
 #define FP_REMAP_Address_MASK		0x1FFFFFE0
 #define FP_REMAP_ReadAddress_MASK	0x3FFFFFE0
 
@@ -80,7 +79,7 @@ int isFP_REMAP_Updated(uint32_t dataWrote,uint32_t dataRead);
 int isFP_COMP_Updated(uint32_t dataWrote,uint32_t dataRead);
 
 uint32_t get_FP_CTRL_WriteValue(int EnableDisable);
-uint32_t get_FP_COMP_WriteValue(uint32_t address,int matchingMode);
+uint32_t get_FP_COMP_WriteValue(uint32_t address,int matchingMode,int EnableDisable);
 uint32_t get_FP_REMAP_WriteValue(uint32_t address);
 int get_ComparatorInfoNumber(uint32_t COMP_no);
 
