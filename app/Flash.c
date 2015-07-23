@@ -2,6 +2,49 @@
 
 static FLASH_EraseInitTypeDef EraseInitStruct;
 static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
+static uint32_t SectorError = 0;
+
+/**
+  * Flash_MassErase use to perform bank 1, 2 erase or full chip erase both bank
+  *
+  * Note : if banks value not the expected value as shown below it will select 
+  *        the default value FLASH_BANK_2
+  *        
+  * input     : banks parameter can be one of the following values:
+  *               - FLASH_BANK_1: Bank1 to be erased
+  *               - FLASH_BANK_2: Bank2 to be erased
+  *               - FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
+  *
+  * return    : NONE
+  */
+void Flash_MassErase(uint32_t banks)  {
+  /* Unlock the Flash to enable the flash control register access */ 
+  HAL_FLASH_Unlock();
+  
+  /* Fill EraseInit structure */
+  EraseInitStruct.TypeErase     = FLASH_TYPEERASE_MASSERASE;
+  /* VoltageRange value can be modify please refer to datasheet for the voltage range */
+  EraseInitStruct.VoltageRange  = FLASH_USER_VOLTAGE_RANGE;
+  EraseInitStruct.Banks         = banks;  
+  
+  /* Note: If an erase operation in Flash memory also concerns data in the data or instruction cache,
+     you have to make sure that these data are rewritten before they are accessed during code
+     execution. If this cannot be done safely, it is recommended to flush the caches by setting the
+     DCRST and ICRST bits in the FLASH_CR register. */
+  if(HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK)
+  { 
+    /** While error occur during erase process error will be handle here **/
+    FLASH_ERROR_CODE = HAL_FLASH_GetError();
+    
+    #if !defined(TEST)
+      Error_Handler();
+    #endif
+  }
+  
+  /** Lock the Flash to disable the flash control register access (recommended
+      to protect the FLASH memory against possible unwanted operation) **/
+  HAL_FLASH_Lock();
+}
 
 /**
   * eraseFlashMemory is used to erase memory in flash can either sector or mass erase
@@ -10,52 +53,33 @@ static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
   * input :  typeErase
   *            + FLASH_TYPEERASE_SECTORS      
   *            + FLASH_TYPEERASE_MASSERASE
-  *
-  *          banks parameter can be one of the following values:
-  *            + FLASH_BANK_1: Bank1 to be erased
-  *            + FLASH_BANK_2: Bank2 to be erased
-  *            + FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
-  *
-  *          voltageRange is the device voltage range which defines the erase parallelism.  
-  *          This parameter can be one of the following values:
-  *            + FLASH_VOLTAGE_RANGE_1: when the device voltage range is 1.8V to 2.1V, 
-  *                                     the operation will be done by byte (8-bit) 
-  *            + FLASH_VOLTAGE_RANGE_2: when the device voltage range is 2.1V to 2.7V,
-  *                                     the operation will be done by half word (16-bit)
-  *            + FLASH_VOLTAGE_RANGE_3: when the device voltage range is 2.7V to 3.6V,
-  *                                     the operation will be done by word (32-bit)
-  *            + FLASH_VOLTAGE_RANGE_4: when the device voltage range is 2.7V to 3.6V + External Vpp, 
-  *                                     the operation will be done by double word (64-bit)
-  *
   * output :   NONE
   */
-void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange,
-                      uint32_t userStartAddress, uint32_t userEndAddress) {
-  uint32_t firstSector = 0, numOfSectors = 0, sectorError = 0;
+
+void Flash_EraseSector(uint32_t StartSector, uint32_t EndSector)  {
+  uint32_t firstSector = 0, numOfSectors = 0;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
 
   /* Get the 1st sector to erase */
-  firstSector = GetSector(userStartAddress);
+  firstSector = GetSector(StartSector);
   /* Get the number of sector to erase from 1st sector*/
-  numOfSectors = GetSector(userEndAddress) - firstSector + 1;
+  numOfSectors = GetSector(EndSector) - firstSector + 1;
 
   /* Fill EraseInit structure */
-  EraseInitStruct.TypeErase = typeErase;
+  EraseInitStruct.TypeErase     = FLASH_TYPEERASE_SECTORS;
   /* VoltageRange value can be modify please refer to datasheet for the voltage range */
-  EraseInitStruct.VoltageRange = voltageRange;
-  EraseInitStruct.Banks = banks;
-  EraseInitStruct.Sector = firstSector;
-  EraseInitStruct.NbSectors = numOfSectors;
+  EraseInitStruct.VoltageRange  = FLASH_USER_VOLTAGE_RANGE;
+  EraseInitStruct.Sector        = firstSector;
+  EraseInitStruct.NbSectors     = numOfSectors;
   
   /* Note: If an erase operation in Flash memory also concerns data in the data or instruction cache,
      you have to make sure that these data are rewritten before they are accessed during code
      execution. If this cannot be done safely, it is recommended to flush the caches by setting the
      DCRST and ICRST bits in the FLASH_CR register. */
-  if(HAL_FLASHEx_Erase(&EraseInitStruct, &sectorError) != HAL_OK)
+  if(HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK)
   { 
-    /* If CHECK_SECTOR_ERROR is 0 means selected sector has not been erased correctly*/
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     Error_Handler();
@@ -63,7 +87,7 @@ void eraseFlashMemory(uint32_t typeErase, uint32_t banks, uint32_t voltageRange,
 
   /** Lock the Flash to disable the flash control register access (recommended
      to protect the FLASH memory against possible unwanted operation) **/
-  HAL_FLASH_Lock();
+  HAL_FLASH_Lock();  
 }
 
 /**
@@ -284,6 +308,14 @@ uint32_t GetSector(uint32_t Address)
 
 /**
   * @brief  This function is executed in case of error occurrence.
+  * HAL_FLASH_ERROR_NONE         ((uint32_t)0x00000000)    *! No error                      
+  * HAL_FLASH_ERROR_RD           ((uint32_t)0x00000001)    *! Read Protection error         
+  * HAL_FLASH_ERROR_PGS          ((uint32_t)0x00000002)    *! Programming Sequence error    
+  * HAL_FLASH_ERROR_PGP          ((uint32_t)0x00000004)    *! Programming Parallelism error 
+  * HAL_FLASH_ERROR_PGA          ((uint32_t)0x00000008)    *! Programming Alignment error   
+  * HAL_FLASH_ERROR_WRP          ((uint32_t)0x00000010)    *! Write protection error        
+  * HAL_FLASH_ERROR_OPERATION    ((uint32_t)0x00000020)    *! Operation Error               
+  *
   * @param  None
   * @retval None
   */
@@ -340,8 +372,8 @@ void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
   HAL_FLASH_Lock();
 
   /* Update next start flash and sram address */
-  *(__IO uint32_t*)SWD_FLASH_START_ADDRESS	= FLASH_Addr;
-  *(__IO uint32_t*)SWD_SRAM_START_ADDRESS	= SRAM_Addr;
+  //*(__IO uint32_t*)SWD_FLASH_START_ADDRESS	= FLASH_Addr;
+  //*(__IO uint32_t*)SWD_SRAM_START_ADDRESS	= SRAM_Addr;
 
   #ifndef TEST
     verifyDataFromRamToFlash(src, dest, length);
@@ -401,3 +433,4 @@ void verifyDataFromRamToFlash(uint32_t src, uint32_t dest, int length)  {
     Error_Handler();
   }
 }
+

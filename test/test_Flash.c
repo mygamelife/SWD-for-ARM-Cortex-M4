@@ -35,32 +35,6 @@ void test_flash_GetSector_given_last_address_of_flash_sector_23_should_return_23
   TEST_ASSERT_EQUAL(FLASH_SECTOR_23, sector);
 }
 
-void test_sectorErase_given_sector_12_and_sector_13()  {
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK);
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
-
-  sectorErase(ADDR_FLASH_SECTOR_12, ADDR_FLASH_SECTOR_13);
-}
-
-void test_sectorErase_error_occus_during_erase_process_should_turnOnLED4()  {
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_ERROR);
-  HAL_FLASH_GetError_ExpectAndReturn(HAL_ERROR);
-  turnOnLED4_Expect();
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
-  
-  sectorErase(ADDR_FLASH_SECTOR_12, ADDR_FLASH_SECTOR_13);
-}
-
-void test_massErase_given_bank_2_should_erase_whole_bank_2()  {
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK);
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
-  
-  massErase(FLASH_BANK_2);
-}
-
 void test_writeToFlash_given_data_0xABCDABCD_should_write_into_address_0()  {
   uint32_t sector = 0, data = 0x11223344;
 
@@ -109,4 +83,29 @@ void test_readFromFlash_given_pBEEF_address_should_get_the_data_0xBEEF()  {
   
   result = readFromFlash((uint32_t)pBEEF);
   TEST_ASSERT_EQUAL(result, beef);
+}
+
+void test_Flash_MassErase_given_bank2_should_erase_whole_bank_2() {
+  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
+  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK);
+  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
+  
+  Flash_MassErase(FLASH_BANK_2);
+}
+
+void test_Flash_MassErase_if_error_occur_should_call_HAL_Get_Error() {
+  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
+  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_ERROR);
+  HAL_FLASH_GetError_ExpectAndReturn(HAL_FLASH_ERROR_OPERATION);
+  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
+  
+  Flash_MassErase(FLASH_BANK_2);
+}
+
+void test_Flash_EraseSector_given_StartSector_15_and_EndSector_20() {
+  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
+  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK);
+  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
+  
+  Flash_EraseSector(ADDR_FLASH_SECTOR_15, ADDR_FLASH_SECTOR_20);
 }

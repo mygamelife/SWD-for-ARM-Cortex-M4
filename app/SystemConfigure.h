@@ -5,9 +5,9 @@
 #include "stm32f4xx_hal_pwr.h"
 #include "stm32f4xx_hal_pwr_ex.h"
 #include "stm32f4xx_hal_rcc.h"
-#include "stm32f4xx_hal_rcc_ex.h"
-#include "stm32f429i_discovery.h"
+//#include "stm32f4xx_hal_rcc_ex.h"
 
+void SystemClock_Config(void);
 void FlashSystemConfig(void);
 
 #endif // SystemConfigure_H
