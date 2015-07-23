@@ -119,3 +119,21 @@ void stubMassErase(void)  {
   /* Tell probe now target is ready for next instruction */
   SRAM_Write(SWD_TARGET_STATUS, TARGET_OK);
 }
+
+void targetMain() {
+  __IO uint32_t swdInstruction = 0;
+  
+  /* Initialize hardware and configure system clock */
+  #if !defined(TEST)
+	FlashSystemConfig();
+  #endif
+  
+	/* Initialize target status */
+	SRAM_Write(SWD_TARGET_STATUS, TARGET_OK);
+
+  while(1)
+  {
+    swdInstruction = (__IO uint32_t)SRAM_Read(SWD_INSTRUCTION);
+    swdStub(swdInstruction);
+  }
+}

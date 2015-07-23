@@ -5,6 +5,10 @@
 #include "Flash.h"
 #include "SRAM.h"
 
+#if !defined(TEST)
+#include "SystemConfigure.h"
+#endif
+
 /** SWD Instruction address 
   */
 #define TWO_KBYTES                        2048 //2k byte
@@ -37,4 +41,5 @@ void swdStub(uint32_t swdInstruction);
 void stubCopy();
 void stubEraseSector();
 void stubMassErase();
+void targetMain();
 #endif // swdStub_H

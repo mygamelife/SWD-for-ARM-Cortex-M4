@@ -1,11 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc 4.8.1 mingw32 -mcpu=cortex-m4 -mthumb -g2 -Wall -O0 -c -DSTM32F429ZI -DSTM32F429xx -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\app -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Projects\STM32F429I-Discovery\Templates -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Projects\STM32F429I-Discovery\Templates\Inc -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Projects\STM32F429I-Discovery -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers -I..\..\..\..\..\..\..\Desktop -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Inc -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\test -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4 -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\BSP -I..\..\..\..\..\..\..\Desktop\STM32Cube_FW_F4_V1.5.0\Drivers\CMSIS\Include -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\test\support -I..\..\..\..\..\..\..\Desktop\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\BSP\STM32F429I-Discovery">
+      <target file="Flash.o" lastModified="14ebbdadd1e">
+         <source file="..\..\..\app\Flash.c" lastModified="14ebbb8da6e"/>
+      </target>
       <target file="stm32f4xx_hal_spi.o" lastModified="14ebbbe7865">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.c" lastModified="14c0ebff38a"/>
-      </target>
-      <target file="Flash.o" lastModified="14ebbbe8093">
-         <source file="..\..\..\app\Flash.c" lastModified="14ebbb8da6e"/>
       </target>
       <target file="CoreDebug.o" lastModified="14ebbbe7c91">
          <source file="..\..\..\app\CoreDebug.c" lastModified="14e9c2e899a"/>
@@ -13,7 +13,7 @@
       <target file="stm32f4xx_hal_uart.o" lastModified="14ebbbe7bba">
          <source file="..\..\..\..\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_uart.c" lastModified="14c0ebff34c"/>
       </target>
-      <target file="LED.o" lastModified="14ebbbe8717">
+      <target file="LED.o" lastModified="14ebbdadd92">
          <source file="..\..\..\app\LED.c" lastModified="14ebba45df6"/>
       </target>
       <target file="Bit_Operations.o" lastModified="14ebbbe7a9a">
@@ -34,7 +34,7 @@
       <target file="IO_Operations.o" lastModified="14ebbbe8103">
          <source file="..\..\..\app\IO_Operations.c" lastModified="14e591170bb"/>
       </target>
-      <target file="SRAM.o" lastModified="14ebbbecbb7">
+      <target file="SRAM.o" lastModified="14ebbdadc95">
          <source file="..\..\..\app\SRAM.c" lastModified="14ebb2c4bd5"/>
       </target>
       <target file="Delay.o" lastModified="14ebbbe7f8d">
@@ -49,8 +49,8 @@
       <target file="swdProtocol.o" lastModified="14ebbbe7e3f">
          <source file="..\..\..\app\swdProtocol.c" lastModified="14e591170cb"/>
       </target>
-      <target file="swdStub.o" lastModified="14ebbbe7c26">
-         <source file="..\..\..\app\swdStub.c" lastModified="14ebbbdb0e3"/>
+      <target file="swdStub.o" lastModified="14ebbdadbb9">
+         <source file="..\..\..\app\swdStub.c" lastModified="14ebbda57b5"/>
       </target>
       <target file="stm32f4xx_hal_pwr_ex.o" lastModified="14ebbbe856b">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr_ex.c" lastModified="14c0ebff436"/>
@@ -73,14 +73,14 @@
       <target file="Register_ReadWrite.o" lastModified="14ebbbe8017">
          <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14e9bfa301a"/>
       </target>
-      <target file="Clock.o" lastModified="14ebbbe7d6a">
-         <source file="..\..\..\app\Clock.c" lastModified="14e591170ab"/>
+      <target file="stm32f429i_discovery.o" lastModified="14ebbbe87a4">
+         <source file="..\..\..\..\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\BSP\STM32F429I-Discovery\stm32f429i_discovery.c" lastModified="14c0ec0181b"/>
       </target>
       <target file="startup_stm32f429xx.o" lastModified="14ebbbe7fa6">
          <source file="..\..\..\app\startup_stm32f429xx.s" lastModified="14e5cd5f687"/>
       </target>
-      <target file="stm32f429i_discovery.o" lastModified="14ebbbe87a4">
-         <source file="..\..\..\..\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Drivers\BSP\STM32F429I-Discovery\stm32f429i_discovery.c" lastModified="14c0ec0181b"/>
+      <target file="Clock.o" lastModified="14ebbbe7d6a">
+         <source file="..\..\..\app\Clock.c" lastModified="14e591170ab"/>
       </target>
       <target file="configurePort.o" lastModified="14ebbbe83c6">
          <source file="..\..\..\app\configurePort.c" lastModified="14ebb4a5021"/>
@@ -100,8 +100,8 @@
       <target file="stm32f4xx_hal_gpio.o" lastModified="14ebbbe8436">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" lastModified="14c0ebff197"/>
       </target>
-      <target file="main.o" lastModified="14ebbce1566">
-         <source file="..\..\..\app\main.c" lastModified="14ebbccbd40"/>
+      <target file="main.o" lastModified="14ebbdadc23">
+         <source file="..\..\..\app\main.c" lastModified="14ebbdac845"/>
       </target>
    </processor>
 </history>
