@@ -37,7 +37,7 @@ void Flash_MassErase(uint32_t banks)  {
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     
     #if !defined(TEST)
-      Error_Handler();
+      Flash_Error_Handler();
     #endif
   }
   
@@ -56,16 +56,16 @@ void Flash_MassErase(uint32_t banks)  {
   * output :   NONE
   */
 
-void Flash_EraseSector(uint32_t StartSector, uint32_t EndSector)  {
+void Flash_EraseSector(uint32_t startSector, uint32_t endSector)  {
   uint32_t firstSector = 0, numOfSectors = 0;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
 
   /* Get the 1st sector to erase */
-  firstSector = GetSector(StartSector);
+  firstSector = Flash_GetSector(startSector);
   /* Get the number of sector to erase from 1st sector*/
-  numOfSectors = GetSector(EndSector) - firstSector + 1;
+  numOfSectors = Flash_GetSector(endSector) - firstSector + 1;
 
   /* Fill EraseInit structure */
   EraseInitStruct.TypeErase     = FLASH_TYPEERASE_SECTORS;
@@ -82,7 +82,7 @@ void Flash_EraseSector(uint32_t StartSector, uint32_t EndSector)  {
   { 
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
-    Error_Handler();
+    Flash_Error_Handler();
   }
 
   /** Lock the Flash to disable the flash control register access (recommended
@@ -104,8 +104,9 @@ void Flash_EraseSector(uint32_t StartSector, uint32_t EndSector)  {
   *
   * output :   NONE
   */
-void writeToFlash(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data) {
+void Flash_Write(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data) {
   uint32_t address = 0;
+  
   address = startAddr;
   
   /* Unlock the Flash to enable the flash control register access */ 
@@ -122,7 +123,7 @@ void writeToFlash(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, ui
     {
       /* While error occur during erase process error will be handle here */
       FLASH_ERROR_CODE = HAL_FLASH_GetError();
-      Error_Handler();
+      Flash_Error_Handler();
       break;
     }
   }
@@ -132,7 +133,7 @@ void writeToFlash(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, ui
   HAL_FLASH_Lock();
   
   #ifndef TEST
-    verifyWriteData(startAddr, endAddr, data);
+    Flash_Verify(startAddr, endAddr, data);
   #endif
 }
 
@@ -146,7 +147,7 @@ void writeToFlash(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, ui
   *
   * output :   NONE
   */
-void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
+void Flash_Verify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
 	__IO uint32_t data32 = 0, MemoryProgramStatus = 0;
 	uint32_t address = 0;
   
@@ -159,7 +160,7 @@ void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify
   
   while (address < endAddr)
   {
-    data32 = (__IO uint32_t)readFromFlash(address);
+    data32 = (__IO uint32_t)Flash_Read(address);
 
     /* Check if they are the same */
     if (data32 != dataToVerify)
@@ -179,18 +180,18 @@ void verifyWriteData(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify
   else
   {
     /* Error detected. Switch on LED4 */
-    Error_Handler();
+    Flash_Error_Handler();
   }
 }
 
 /**
-  * readFromFlash is a function to read the data from the corresponding address and return the value
+  * Flash_Read is a function to read the data from the corresponding address and return the value
   *
   * input : address is the starting address to program it is define by user
   *
   * output :  data32 is the value store inside the address
   */
-uint32_t readFromFlash(uint32_t address)  {
+uint32_t Flash_Read(uint32_t address)  {
 	__IO uint32_t data32 = 0;
   
   data32 = *(__IO uint32_t*)address;
@@ -202,7 +203,7 @@ uint32_t readFromFlash(uint32_t address)  {
   * @param  None
   * @retval The sector of a given address
   */
-uint32_t GetSector(uint32_t Address)
+uint32_t Flash_GetSector(uint32_t Address)
 {
   uint32_t sector = 0;
   
@@ -319,7 +320,7 @@ uint32_t GetSector(uint32_t Address)
   * @param  None
   * @retval None
   */
-void Error_Handler(void)
+void Flash_Error_Handler(void)
 {
   uint32_t CHECK_ERROR_CODE = 0;
 
@@ -334,7 +335,7 @@ void Error_Handler(void)
 }
 
 /**
-  * copyFromRamToFlash is a function copy data from SRAM to FLASH
+  * Flash_CopyFromSramToFlash is a function copy data from SRAM to FLASH
   *
   * input : *src is a source address of SRAM
   *         *dest is the destination address of FLASH
@@ -342,7 +343,7 @@ void Error_Handler(void)
   *
   * output :   NONE
   */
-void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
+void Flash_CopyFromSramToFlash(uint32_t src, uint32_t dest, int length) {
   int i;
   __IO uint32_t data32 = 0;
   uint32_t FLASH_Addr = 0, SRAM_Addr = 0;
@@ -359,7 +360,7 @@ void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
 	  data32 = *(__IO uint32_t *)SRAM_Addr;
 
 	  if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_Addr, data32) != HAL_OK)	{
-		 Error_Handler();
+		 Flash_Error_Handler();
 		 break;
 	  }
     
@@ -371,12 +372,8 @@ void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
 
-  /* Update next start flash and sram address */
-  //*(__IO uint32_t*)SWD_FLASH_START_ADDRESS	= FLASH_Addr;
-  //*(__IO uint32_t*)SWD_SRAM_START_ADDRESS	= SRAM_Addr;
-
   #ifndef TEST
-    verifyDataFromRamToFlash(src, dest, length);
+    Flash_VerifyDataFromSramToFlash(src, dest, length);
   #endif
 }
 
@@ -393,7 +390,7 @@ void copyFromRamToFlash(uint32_t src, uint32_t dest, int length) {
   *
   * output :   NONE
   */
-void verifyDataFromRamToFlash(uint32_t src, uint32_t dest, int length)  {
+void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
   int i = 0;
   __IO uint32_t dataFlash = 0, dataSRAM = 0, memoryProgramStatus = 0;
   uint32_t SRAM_Addr = 0, FLASH_Addr = 0;
@@ -410,7 +407,7 @@ void verifyDataFromRamToFlash(uint32_t src, uint32_t dest, int length)  {
   for(i; i < length; i += 4)	{
     
     /* get data from Flash & SRAM  */
-	  dataFlash    = *(__IO uint32_t *)FLASH_Addr;
+	  dataFlash = *(__IO uint32_t *)FLASH_Addr;
 	  dataSRAM 	= *(__IO uint32_t *)SRAM_Addr;
 
 	  if (dataFlash != dataSRAM)	{
@@ -430,7 +427,7 @@ void verifyDataFromRamToFlash(uint32_t src, uint32_t dest, int length)  {
   else
   {
     /* Error detected. Switch on LED4 */
-    Error_Handler();
+    Flash_Error_Handler();
   }
 }
 
