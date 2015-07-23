@@ -24,7 +24,7 @@ void test_stubEraseSector_should_get_start_and_end_flash_address_and_call_Flash_
   SRAM_Write_Expect(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
   SRAM_Write_Expect(SWD_TARGET_STATUS, TARGET_OK);
   
-	stubEraseSector();
+  stubEraseSector();
 }
 
 void test_stubMassErase_should_get_bank_select_from_SRAM_and_call_Flash_MassErase_func()  {
@@ -38,7 +38,7 @@ void test_stubMassErase_should_get_bank_select_from_SRAM_and_call_Flash_MassEras
   SRAM_Write_Expect(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
   SRAM_Write_Expect(SWD_TARGET_STATUS, TARGET_OK);
   
-	stubMassErase();
+  stubMassErase();
 }
 
 void test_stubCopy_should_get_flash_sram_start_address_length_and_call_Flash_Copy_func()  {
@@ -54,5 +54,5 @@ void test_stubCopy_should_get_flash_sram_start_address_length_and_call_Flash_Cop
   SRAM_Write_Expect(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
   SRAM_Write_Expect(SWD_TARGET_STATUS, TARGET_OK);
   
-	stubCopy();
+  stubCopy();
 }
