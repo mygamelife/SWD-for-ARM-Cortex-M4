@@ -4,6 +4,7 @@ static __IO uint32_t Flash_Start_Address = 0;
 static __IO uint32_t Flash_End_Address = 0;
 static __IO uint32_t SRAM_Start_Address = 0;
 static __IO uint32_t bankSelect = 0;
+static uint32_t targetStatus = 0;
 
 /**
   * swdStub is small program routine take instruction from swd probe and response
@@ -37,24 +38,24 @@ void stubCopy(void) {
   uint32_t length = 0;
   
   /* Change target status to busy to prevent other function to interrupt */
-  SRAM_Write(SWD_TARGET_STATUS, TARGET_BUSY);
+  sramWrite(SWD_TARGET_STATUS, TARGET_BUSY);
   
   /* Read SRAM source address from sram */
-  SRAM_Start_Address  = (__IO uint32_t)SRAM_Read(SWD_SRAM_START_ADDRESS);
+  SRAM_Start_Address  = (__IO uint32_t)sramRead(SWD_SRAM_START_ADDRESS);
   
   /* Read flash destination address from sram */
-  Flash_Start_Address = (__IO uint32_t)SRAM_Read(SWD_FLASH_START_ADDRESS);
+  Flash_Start_Address = (__IO uint32_t)sramRead(SWD_FLASH_START_ADDRESS);
   
   /* Read Data Length from sram */
-  length  = (__IO int)SRAM_Read(SWD_DATA_LENGTH);
+  length  = (__IO int)sramRead(SWD_DATA_LENGTH);
   
-  Flash_CopyFromSramToFlash(SRAM_Start_Address, Flash_Start_Address, length);
+  flashCopyFromSramToFlash(SRAM_Start_Address, Flash_Start_Address, length);
   
   /* Clear instruction prevent keep erase */
-  SRAM_Write(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
+  sramWrite(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
   
   /* Tell probe now target is ready for next instruction */
-  SRAM_Write(SWD_TARGET_STATUS, TARGET_OK);
+  sramWrite(SWD_TARGET_STATUS, TARGET_OK);
 }
 
 /**
@@ -66,21 +67,21 @@ void stubCopy(void) {
   */
 void stubEraseSector(void)  {
   /* Change target status to busy to prevent other function to interrupt */
-  SRAM_Write(SWD_TARGET_STATUS, TARGET_BUSY);
+  sramWrite(SWD_TARGET_STATUS, TARGET_BUSY);
   
   /* Read user start address from sram */
-  Flash_Start_Address = (__IO uint32_t)SRAM_Read(SWD_FLASH_START_ADDRESS);
+  Flash_Start_Address = (__IO uint32_t)sramRead(SWD_FLASH_START_ADDRESS);
   
   /* Read user end address from sram */
-  Flash_End_Address = (__IO uint32_t)SRAM_Read(SWD_FLASH_END_ADDRESS);
+  Flash_End_Address = (__IO uint32_t)sramRead(SWD_FLASH_END_ADDRESS);
   
-  Flash_EraseSector(Flash_Start_Address, Flash_End_Address);
+  flashEraseSector(Flash_Start_Address, Flash_End_Address);
   
   /* Clear instruction prevent keep erase */
-  SRAM_Write(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
+  sramWrite(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
   
   /* Tell probe now target is ready for next instruction */
-  SRAM_Write(SWD_TARGET_STATUS, TARGET_OK);
+  sramWrite(SWD_TARGET_STATUS, TARGET_OK);
 }
 
 /**
@@ -92,11 +93,11 @@ void stubEraseSector(void)  {
   */
 void stubMassErase(void)  {
   /* Change target status to busy to prevent other function to interrupt */
-  SRAM_Write(SWD_TARGET_STATUS, TARGET_BUSY);
+  sramWrite(SWD_TARGET_STATUS, TARGET_BUSY);
   
   /** Check MASS_ERASE_BANK_SELECT it
     * determine which bank need to be erase */
-  bankSelect = (__IO uint32_t)SRAM_Read(SWD_BANK_SELECT);
+  bankSelect = (__IO uint32_t)sramRead(SWD_BANK_SELECT);
     
   if(bankSelect == MASS_ERASE_BANK_1){
     bankSelect = FLASH_BANK_1;
@@ -111,13 +112,13 @@ void stubMassErase(void)  {
   }
   
   /* Perform mass erase here */
-  Flash_MassErase(bankSelect);
+  flashMassErase(bankSelect);
     
   /* Clear instruction prevent keep erase */
-  SRAM_Write(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
+  sramWrite(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
 
   /* Tell probe now target is ready for next instruction */
-  SRAM_Write(SWD_TARGET_STATUS, TARGET_OK);
+  sramWrite(SWD_TARGET_STATUS, TARGET_OK);
 }
 
 void targetMain() {
@@ -129,11 +130,86 @@ void targetMain() {
   #endif
   
 	/* Initialize target status */
-	SRAM_Write(SWD_TARGET_STATUS, TARGET_OK);
+	sramWrite(SWD_TARGET_STATUS, TARGET_OK);
 
   while(1)
   {
-    swdInstruction = (__IO uint32_t)SRAM_Read(SWD_INSTRUCTION);
+    swdInstruction = (__IO uint32_t)sramRead(SWD_INSTRUCTION);
     swdStub(swdInstruction);
   }
+}
+
+/**
+  * load_SectorErase_Instruction is a function to load the sector erase
+  * instruction into SRAM to tell the swdStub
+  *
+  * input   : startAddress is the address to begin erase
+  *           endAddress is the address to end erase
+  *
+  * output  : NONE
+  */
+void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress)  {
+  /* Continues wait for target to release */
+  do  {
+    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+  } while(targetStatus != TARGET_OK);
+  
+  /* load flash start and end address to sram */
+  memoryAccessWrite(SWD_FLASH_START_ADDRESS, startAddress);
+  memoryAccessWrite(SWD_FLASH_END_ADDRESS, endAddress);
+  
+  /* load instruction to sram */
+  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
+}
+
+/**
+  * loadMassEraseInstruction is a function to load the mass erase
+  * instruction into SRAM to tell the swdStub
+  *
+  * input   : bankSelect can be one of the following value
+  *            + FLASH_BANK_1: Bank1 to be erased
+  *            + FLASH_BANK_2: Bank2 to be erased
+  *            + FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
+  *
+  * output  : NONE
+  */
+void loadMassEraseInstruction(uint32_t bankSelect)  {
+  /* Continues wait for target to release */
+  do  {
+    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+  } while(targetStatus != TARGET_OK);
+  
+  /* load bank select to sram */
+  memoryAccessWrite(SWD_BANK_SELECT, bankSelect);
+  
+  /* load instruction to sram */
+  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
+}
+
+/**
+  * loadCopyInstruction is a function copy data from src (SRAM) to dest (Flash)
+  *
+  * input   : src is the beginning SRAM address contain all the information
+  *           dest is the flash address all the information need to copy over there
+  *           length is to determine how many words need to copy over
+  *
+  * output  : NONE
+  */
+void loadCopyInstruction(uint32_t src, uint32_t dest, int length) {
+  /* Continues wait for target to release */
+  do  {
+    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+  } while(targetStatus != TARGET_OK);
+
+  /* load SRAM start address into sram */
+  memoryAccessWrite(SWD_SRAM_START_ADDRESS, src);
+  
+  /* load Flash start address into sram */
+  memoryAccessWrite(SWD_FLASH_START_ADDRESS, dest);
+  
+  /* load length into sram */
+  memoryAccessWrite(SWD_DATA_LENGTH, length);
+
+	/* load copy instructoin into sram */
+  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_COPY);
 }

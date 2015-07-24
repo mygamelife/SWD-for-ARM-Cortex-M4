@@ -42,4 +42,7 @@ void stubCopy();
 void stubEraseSector();
 void stubMassErase();
 void targetMain();
+void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress);
+void loadMassEraseInstruction(uint32_t bankSelect);
+void loadCopyInstruction(uint32_t sramStartAddr, uint32_t flashStartAddr, int length);
 #endif // swdStub_H

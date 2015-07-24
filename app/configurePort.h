@@ -21,7 +21,7 @@
 #define SWDIO_PIN 			GPIO_PIN_12
 #define SWDCLK_PIN			GPIO_PIN_11
 #define SWDNRST_PIN			GPIO_PIN_8
-#define SWD_PORT        GPIOC
+#define SWD_PORT			GPIOC
 
 #define CLK_EN()	do{								\
 							__GPIOA_CLK_ENABLE();	\

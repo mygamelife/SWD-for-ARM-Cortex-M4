@@ -50,14 +50,14 @@ typedef uint32_t FLASH_ErrorTypeDef;
 #define ADDR_FLASH_SECTOR_23     ((uint32_t)0x081E0000) /* Base @ of Sector 11, 128 Kbytes */
 //#define ADDR_FLASH_SECTOR_24     ((uint32_t)0x081FFFFF) /*address within sector 23 use to terminate address not withint sector*/
 
-uint32_t Flash_GetSector(uint32_t Address);
-uint32_t Flash_Read(uint32_t startAddress);
+uint32_t flashGetSector(uint32_t Address);
+uint32_t flashRead(uint32_t startAddress);
 
-void Flash_Error_Handler(void);
-void Flash_MassErase(uint32_t banks);
-void Flash_EraseSector(uint32_t startSector, uint32_t endSector);
-void Flash_Write(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
-void Flash_Verify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
-void Flash_CopyFromSramToFlash(uint32_t src, uint32_t dest, int length);
-void Flash_VerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length);
+void flashErrorHandler(void);
+void flashMassErase(uint32_t banks);
+void flashEraseSector(uint32_t startSector, uint32_t endSector);
+void flashWrite(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
+void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
+void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int length);
+void flashVerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length);
 #endif // Flash_H
