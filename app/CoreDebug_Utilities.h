@@ -4,9 +4,10 @@
 #include <stdint.h>
 #include "Misc_Utilities.h"
 
+#define SET_CORE_NORMAL			0xA05F0000
 #define SET_CORE_DEBUG 			0xA05F0001
 #define SET_CORE_DEBUG_HALT 	0xA05F0003
-#define SET_CORE_STEP			0xA05F0007
+#define SET_CORE_STEP			0xA05F0005
 #define SET_CORE_MASKINT		0xA05F000B
 #define SET_CORE_SNAPSTALL		0xA05F0023
 
@@ -53,6 +54,7 @@ typedef struct DebugMonitorStatus DebugMonitorStatus ;
 
 typedef enum 
 {
+	CORE_NORMAL_MODE,
 	CORE_DEBUG_MODE,
 	CORE_DEBUG_HALT,
 	CORE_SINGLE_STEP,

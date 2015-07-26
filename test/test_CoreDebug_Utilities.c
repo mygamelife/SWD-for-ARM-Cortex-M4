@@ -11,6 +11,65 @@ void tearDown(void)
 }
 
 /*-----------------------------------isCore-----------------------------------------*/
+//CORE_NORMAL_MODE
+void test_isCore_given_CORE_NORMAL_given_CoreStatus_0_should_return_ERR_NOERROR()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,isCore(CORE_NORMAL_MODE,&coreStatus));
+}
+
+void test_isCore_given_CORE_NORMAL_given_C_DEBUGEN_1_should_return_ERR_CORECONTROL_FAILED()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.C_DEBUGEN = 1;
+	
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_NORMAL_MODE,&coreStatus));
+}
+
+void test_isCore_given_CORE_NORMAL_given_C_MASKINT_1_should_return_ERR_CORECONTROL_FAILED()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.C_MASKINTS = 1;
+	
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_NORMAL_MODE,&coreStatus));
+}
+
+void test_isCore_given_CORE_NORMAL_given_C_HALT_1_should_return_ERR_CORECONTROL_FAILED()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.C_HALT = 1 ;
+	
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_NORMAL_MODE,&coreStatus));
+}
+
+void test_isCore_given_CORE_NORMAL_given_C_STEP_1_should_return_ERR_CORECONTROL_FAILED()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.C_STEP = 1;
+	
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_NORMAL_MODE,&coreStatus));
+}
+
+void test_isCore_given_CORE_NORMAL_given_S_HALT_1_should_return_ERR_CORECONTROL_FAILED()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.S_HALT = 1;
+	
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_NORMAL_MODE,&coreStatus));
+}
+
 //CORE_DEBUG_MODE
 void test_isCore_given_CORE_DEBUG_MODE_given_C_DEBUGEN_1_should_return_ERR_NOERROR()
 {
@@ -22,7 +81,7 @@ void test_isCore_given_CORE_DEBUG_MODE_given_C_DEBUGEN_1_should_return_ERR_NOERR
 	TEST_ASSERT_EQUAL(ERR_NOERROR,isCore(CORE_DEBUG_MODE,&coreStatus));
 }
 
-void test_isCore_given_CORE_DEBUG_MODE_data_C_DEBUGEN_0_should_return_FALSE()
+void test_isCore_given_CORE_DEBUG_MODE_data_C_DEBUGEN_0_should_ERR_CORECONTROL_FAILED()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -689,6 +748,11 @@ void test_update_DebugEventStatus_should_given_0xFFFFFFFF_should_assert_all_VC()
  
 /*-------------------------------get_Core_WriteValue-----------------------------------------*/
 
+void test_get_Core_WriteValue_given_CORE_NORMAL_MODE_should_return_0xA05F0000_or_SET_CORE_NORMAL()
+{
+	TEST_ASSERT_EQUAL(0xA05F0000,get_Core_WriteValue(CORE_NORMAL_MODE));
+	TEST_ASSERT_EQUAL(SET_CORE_NORMAL,get_Core_WriteValue(CORE_NORMAL_MODE));
+}
 
 void test_get_Core_WriteValue_given_CORE_DEBUG_MODE_should_return_0xA05F0001_or_SET_CORE_DEBUG()
 {
@@ -702,9 +766,9 @@ void test_get_Core_WriteValue_given_CORE_DEBUG_HALT_should_return_0xA05F0003_or_
 	TEST_ASSERT_EQUAL(SET_CORE_DEBUG_HALT,get_Core_WriteValue(CORE_DEBUG_HALT));
 }
 
-void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_should_return_0xA05F0007_or_SET_CORE_STEP()
+void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_should_return_0xA05F0005_or_SET_CORE_STEP()
 {
-	TEST_ASSERT_EQUAL(0xA05F0007,get_Core_WriteValue(CORE_SINGLE_STEP));
+	TEST_ASSERT_EQUAL(0xA05F0005,get_Core_WriteValue(CORE_SINGLE_STEP));
 	TEST_ASSERT_EQUAL(SET_CORE_STEP,get_Core_WriteValue(CORE_SINGLE_STEP));
 }
 

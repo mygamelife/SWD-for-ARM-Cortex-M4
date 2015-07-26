@@ -15,6 +15,11 @@ int isCore(CoreControl coreControl,CoreStatus *coreStatus)
 
 	switch(coreControl)
 	{
+		case CORE_NORMAL_MODE	:
+									status = (coreStatus->S_HALT | coreStatus->C_DEBUGEN | coreStatus->C_HALT | coreStatus->C_STEP | coreStatus->C_MASKINTS | coreStatus->C_STEP );
+									status = !status ;
+									break ;
+		
 		case CORE_DEBUG_MODE 	:
 									status = coreStatus->C_DEBUGEN ;
 									break ;
@@ -261,6 +266,9 @@ uint32_t get_Core_WriteValue(CoreControl corecontrol)
 	
 	switch(corecontrol)
 	{
+		case CORE_NORMAL_MODE	:
+									data = SET_CORE_NORMAL;
+									break ;
 		case CORE_DEBUG_MODE 	:
 									data = SET_CORE_DEBUG ;
 									break ;

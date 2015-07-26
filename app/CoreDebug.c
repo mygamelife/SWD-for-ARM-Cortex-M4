@@ -115,6 +115,7 @@ int clear_DebugEvent(DebugEvent *debugEvent)
 	data = get_ClearDebugEvent_WriteValue(debugEvent);
 	
 	memoryAccessWrite(DFSR_REG,data);
+	status = check_DebugTrapStatus(debugEvent);
 	
 	return status ;
 }
