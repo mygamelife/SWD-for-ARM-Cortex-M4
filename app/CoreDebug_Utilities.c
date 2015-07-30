@@ -15,26 +15,30 @@ int isCore(CoreControl coreControl,CoreStatus *coreStatus)
 
 	switch(coreControl)
 	{
-		case CORE_NORMAL_MODE	:
-									status = (coreStatus->S_HALT | coreStatus->C_DEBUGEN | coreStatus->C_HALT | coreStatus->C_STEP | coreStatus->C_MASKINTS | coreStatus->C_STEP );
-									status = !status ;
-									break ;
+		case CORE_NORMAL_MODE			:
+											status = (coreStatus->S_HALT | coreStatus->C_DEBUGEN | coreStatus->C_HALT | coreStatus->C_STEP | coreStatus->C_MASKINTS | coreStatus->C_STEP );
+											status = !status ;
+											break ;
 		
-		case CORE_DEBUG_MODE 	:
-									status = coreStatus->C_DEBUGEN ;
-									break ;
-		case CORE_DEBUG_HALT :
-									status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT) ;
-									break ;					
-		case CORE_SINGLE_STEP	:
-									status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP);
-									break ;
-		case CORE_MASK_INTERRUPT:
-									status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_MASKINTS) ;
-									break ;
-		case CORE_SNAPSTALL	:
-									status = (coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_SNAPSTALL);
-									break ;
+		case CORE_DEBUG_MODE 			:
+											status = coreStatus->C_DEBUGEN ;
+											break ;
+		case CORE_DEBUG_HALT 			:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT) ;
+											break ;					
+		case CORE_SINGLE_STEP_NOMASKINT	:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP);
+											break ;
+		case CORE_SINGLE_STEP_MASKINT	:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP & coreStatus->C_MASKINTS);
+											break ;									
+											
+		case CORE_MASK_INTERRUPT		:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_MASKINTS) ;
+											break ;
+		case CORE_SNAPSTALL				:
+											status = (coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_SNAPSTALL);
+											break ;
 		
 		default : break ;
 	}
@@ -266,26 +270,31 @@ uint32_t get_Core_WriteValue(CoreControl corecontrol)
 	
 	switch(corecontrol)
 	{
-		case CORE_NORMAL_MODE	:
-									data = SET_CORE_NORMAL;
-									break ;
-		case CORE_DEBUG_MODE 	:
-									data = SET_CORE_DEBUG ;
-									break ;
+		case CORE_NORMAL_MODE			:
+											data = SET_CORE_NORMAL;
+											break ;
+		case CORE_DEBUG_MODE 			:
+											data = SET_CORE_DEBUG ;
+											break ;
 		
-		case CORE_DEBUG_HALT	:
-									data = SET_CORE_DEBUG_HALT ;
-									break ;
+		case CORE_DEBUG_HALT			:
+											data = SET_CORE_DEBUG_HALT ;
+											break ;
 								
-		case CORE_SINGLE_STEP	:
-									data = SET_CORE_STEP ;
-									break ;
-		case CORE_MASK_INTERRUPT:
-									data = SET_CORE_MASKINT ;
-									break ;
-		case CORE_SNAPSTALL	:
-									data = SET_CORE_SNAPSTALL ;
-									break ;
+		case CORE_SINGLE_STEP_NOMASKINT	:
+											data = SET_CORE_STEP_NOMASKINT ;
+											break ;
+	
+		case CORE_SINGLE_STEP_MASKINT	:
+											data = SET_CORE_STEP_MASKINT ;
+											break ;
+									
+		case CORE_MASK_INTERRUPT		:
+											data = SET_CORE_MASKINT ;
+											break ;
+		case CORE_SNAPSTALL				:
+											data = SET_CORE_SNAPSTALL ;
+											break ;
 		
 		default : break ;
 	}
@@ -374,6 +383,30 @@ uint32_t get_ClearDebugEvent_WriteValue(DebugEvent *debugEvent)
 	data += debugEvent->DWTTRAP 	<< Bit_2 ;
 	data += debugEvent->BKPT 		<< Bit_1 ;
 	data += debugEvent->HALTED 				 ;
+	
+	return data ;
+}
+
+/**
+ *	Use to get the value of the data going to be written into Debug Exception Monitor Status Register, DEMCRto clear debug trap
+ *	Set the member of DebugEvent to clear 
+ *	
+ *	Input : debugTrap contains the debug trap which is going to be cleared
+ *	
+ *	Output : return the 32bits data to be written into Debug Exception Monitor Status Register, DEMCRto clear debug trap
+ */
+uint32_t get_ClearDebugTrap_WriteValue(DebugTrap *debugTrap)
+{
+	uint32_t data = 0 ;
+	
+	data += !(debugTrap->VC_HARDERR)	<< Bit_10 ;
+	data += !(debugTrap->VC_INTERR) 	<< Bit_9 ;
+	data += !(debugTrap->VC_BUSERR) 	<< Bit_8 ;
+	data += !(debugTrap->VC_STATERR) 	<< Bit_7 ;
+	data += !(debugTrap->VC_CHKERR) 	<< Bit_6 ;
+	data += !(debugTrap->VC_NOCPERR) 	<< Bit_5 ;
+	data += !(debugTrap->VC_MMERR) 		<< Bit_4 ;
+	data += !(debugTrap->VC_CORERESET) 			 ;
 	
 	return data ;
 }

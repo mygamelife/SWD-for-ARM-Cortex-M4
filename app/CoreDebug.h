@@ -26,6 +26,7 @@ int check_DebugEvent(DebugEvent *debugEvent);
 int check_DebugTrapStatus(DebugTrap *debugTrap);
 
 int clear_DebugEvent(DebugEvent *debugEvent);
+int clear_DebugTrap(DebugTrap *debugTrap);
 
 int configure_DebugTrap(DebugTrap *debugTrap);
 

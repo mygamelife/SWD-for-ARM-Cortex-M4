@@ -60,8 +60,8 @@ void test_setCore_CORE_DEBUG_HALT_should_write_0xA05F0003_to_DHCSR_and_return_fa
 	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);	
 }
 
-//CORE_SINGLE_STEP
-void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_write_0xA05F0007_to_DHCSR_and_return_ERR_NOERROR_if_successful()
+//CORE_SINGLE_STEP_NOMASKINT
+void test_setCore_CORE_SINGLE_STEP_NOMASKINT_NOMASK_will_setCore_to_CORE_DEBUG_HALT_first_and_write_0xA05F0007_to_DHCSR_and_return_ERR_NOERROR_if_successful()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -73,14 +73,14 @@ void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_wri
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
 	
-	//Then only set to CORE_SINGLE_STEP
+	//Then only set to CORE_SINGLE_STEP_NOMASKINT
 	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_STEP);
+	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_STEP_NOMASKINT);
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x03030007));
-	TEST_ASSERT_EQUAL(TRUE,setCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(TRUE,setCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 	
 	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
 	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
@@ -88,7 +88,7 @@ void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_wri
 	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
 }
 
-void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_write_0xA05F0007_to_DHCSR_and_return_false_if_fail()
+void test_setCore_CORE_SINGLE_STEP_NOMASKINT_will_setCore_to_CORE_DEBUG_HALT_first_and_write_0xA05F0007_to_DHCSR_and_return_false_if_fail()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -100,14 +100,14 @@ void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_wri
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
 	
-	//Then only set to CORE_SINGLE_STEP
+	//Then only set to CORE_SINGLE_STEP_NOMASKINT
 	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_STEP);
+	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_STEP_NOMASKINT);
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030000));
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.C_DEBUGEN);
 	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
@@ -115,7 +115,7 @@ void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_wri
 	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
 }
 
-void test_setCore_CORE_SINGLE_STEP_but_setCore_to_CORE_DEBUG_HALT_failed_will_not_setCore_to_CORE_SINGLE_STEP()
+void test_setCore_CORE_SINGLE_STEP_NOMASKINT_but_setCore_to_CORE_DEBUG_HALT_failed_will_not_setCore_to_CORE_SINGLE_STEP_NOMASKINT_NOMASK()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -127,14 +127,14 @@ void test_setCore_CORE_SINGLE_STEP_but_setCore_to_CORE_DEBUG_HALT_failed_will_no
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030000));
 	
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 	
 	
 }
 
 /*--------------------------------setCore_Exception-----------------------------------------*/
 
-void test_setCore_Exception_given_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
+void test_setCore_Exception_given_CORE_SINGLE_STEP_NOMASKINT_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -146,7 +146,22 @@ void test_setCore_Exception_given_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HA
 	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
 	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
 	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
+}
+
+void test_setCore_Exception_given_CORE_SINGLE_STEP_MASKINT_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_SINGLE_STEP_MASKINT,&coreStatus));
 }
 
 void test_setCore_Exception_given_CORE_MASK_INTERRUPT_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
@@ -241,6 +256,35 @@ void test_check_DebugEvent_should_read_DFSR_and_update_DebugEvent()
 	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
 }
 
+/***************************************clear_DebugEvent***************************************************/
+
+void test_clear_DebugEvent_should_write_to_DFSR_to_clear_and_update_DebugEvent()
+{
+	DebugEvent debugEvent ;
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.EXTERNAL = 1 ;
+	debugEvent.VCATCH = 1 ;
+	debugEvent.DWTTRAP = 1 ;
+	debugEvent.BKPT = 1 ;
+	debugEvent.HALTED = 1 ;
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DFSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,0X1F);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DFSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x0));
+	
+	clear_DebugEvent(&debugEvent);
+	
+	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
+	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
+	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
+	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
+	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+}
+
 /***************************************check_DebugTrapStatus***************************************************/
 /******************************************************************************************************
 	Debug Exception and Monitor Control Register, DEMCR
@@ -277,4 +321,40 @@ void test_check_DebugTrapStatus_should_read_DEMCR_and_update_DebugTrap()
 	TEST_ASSERT_EQUAL(0,debugTrap.VC_MMERR);
 	TEST_ASSERT_EQUAL(1,debugTrap.VC_CORERESET);
 
+}
+
+/***************************************clear_DebugTrap***************************************************/
+void test_clear_DebugTrap_should_write_to_DEMCR_to_clear_and_update_DebugTrap()
+{
+	DebugTrap debugTrap ;
+	init_DebugTrap(&debugTrap);
+	
+	debugTrap.VC_HARDERR = 1; 
+	debugTrap.VC_INTERR = 1; 
+	debugTrap.VC_BUSERR = 1; 
+	debugTrap.VC_STATERR = 1; 
+	debugTrap.VC_CHKERR = 1; 
+	debugTrap.VC_NOCPERR = 1; 
+	debugTrap.VC_MMERR = 1; 
+	debugTrap.VC_CORERESET = 1; 
+	
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,0);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
+	
+	clear_DebugTrap(&debugTrap);
+	
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_HARDERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_INTERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_BUSERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_STATERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_CHKERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_NOCPERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_MMERR);
+	TEST_ASSERT_EQUAL(0,debugTrap.VC_CORERESET);
+	
 }

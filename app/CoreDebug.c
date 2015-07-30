@@ -7,7 +7,7 @@
  *				Possible value :
  *					CORE_DEBUG_MODE 		Enable debug mode
  *					CORE_DEBUG_HALT			Enable halting debug mode
- *					CORE_SINGLE_STEP		Enable processor single stepping
+ *					CORE_SINGLE_STEP_NOMASKINT_NOMASK		Enable processor single stepping
  *					CORE_MASK_INTERRUPT		Enable masking of PendSV,SysTick and external configurable interrupts
  *					CORE_SNAPSTALL			Force to enter imprecise debug mode (Used when processor is stalled )
  *
@@ -44,7 +44,7 @@ int setCore(CoreControl coreControl,CoreStatus *coreStatus)
 }
 
 /**
- *	Manages exception when setting CORE_SINGLE_STEP and CORE_MASK_INTERRUPT mode as the core must be already in CORE_DEBUG_HALT mode
+ *	Manages exception when setting CORE_SINGLE_STEP_NOMASKINT_NOMASK and CORE_MASK_INTERRUPT mode as the core must be already in CORE_DEBUG_HALT mode
  *	
  *	Input : coreControl is the mode to be applied to the core
  *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
@@ -55,7 +55,7 @@ int setCore(CoreControl coreControl,CoreStatus *coreStatus)
  */
 int setCore_Exception(CoreControl coreControl,CoreStatus *coreStatus)
 {	
-	if (coreControl == CORE_SINGLE_STEP || coreControl == CORE_MASK_INTERRUPT)
+	if (coreControl == CORE_SINGLE_STEP_NOMASKINT || coreControl == CORE_SINGLE_STEP_MASKINT || coreControl == CORE_MASK_INTERRUPT)
 	{
 		return(setCore(CORE_DEBUG_HALT,coreStatus));
 	}
@@ -107,6 +107,14 @@ int check_DebugEvent(DebugEvent *debugEvent)
 	return status ;
 }
 
+/**
+ *	Clear the debug event set in the debugEvent structure
+ *	
+ *	Input :  debugEvent is a pointer to DebugEvent which store the event going to be cleared (1 = going to be clear)
+ *
+ *	Output : return ERR_NOERROR if the operation completed successfully
+ *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ */
 int clear_DebugEvent(DebugEvent *debugEvent)
 {
 	int status =  0 ;
@@ -115,15 +123,15 @@ int clear_DebugEvent(DebugEvent *debugEvent)
 	data = get_ClearDebugEvent_WriteValue(debugEvent);
 	
 	memoryAccessWrite(DFSR_REG,data);
-	status = check_DebugTrapStatus(debugEvent);
+	status = check_DebugEvent(debugEvent);
 	
 	return status ;
 }
 
 /**
- *	Check for enabled/activated vectorCatch by reading DEMCR_REG and update the vectorCatch structure
+ *	Check for enabled/activated vector catch by reading DEMCR_REG and update the debugTrap structure
  *	
- *	Input : vectorCatch is a pointer to VectorCatch which store whether the debug trap is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
+ *	Input : debugTrap is a pointer to DebugTrap which store whether the vector catch is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
  *
  *	Output : return ERR_NOERROR if the operation completed successfully
  *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
@@ -139,6 +147,27 @@ int check_DebugTrapStatus(DebugTrap *debugTrap)
 	status = memoryAccessRead(DEMCR_REG,&dataRead);
 	update_DebugTrapStatus(debugTrap,dataRead);
 	
+	return status ;
+}
+
+/**
+ *	Check for enabled/activated vector catch by reading DEMCR_REG and update the debugTrap structure
+ *	
+ *	Input : debugTrap is a pointer to DebugTrap which store which vector catch is going to be disabled(1 = going to be disabled)
+ *
+ *	Output : return ERR_NOERROR if the operation completed successfully
+ *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ */
+int clear_DebugTrap(DebugTrap *debugTrap)
+{
+	int status =  0 ;
+	uint32_t data = 0 ;
+	
+	data = get_ClearDebugTrap_WriteValue(debugTrap);
+	
+	memoryAccessWrite(DEMCR_REG,data);
+	status = check_DebugTrapStatus(debugTrap);
+
 	return status ;
 }
 

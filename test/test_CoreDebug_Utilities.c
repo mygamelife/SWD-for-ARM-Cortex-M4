@@ -150,8 +150,8 @@ void test_isCore_given_CORE_DEBUG_HALT_C_DEBUGEN_1_C_HALT_0_S_HALT_1_should_retu
 	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_DEBUG_HALT,&coreStatus));
 }
 
-//CORE_SINGLE_STEP
-void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_1_should_return_ERR_NOERROR()
+//CORE_SINGLE_STEP_NOMASKINT
+void test_isCore_given_CORE_SINGLE_STEP_NOMASKINT_NOMASK_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_1_should_return_ERR_NOERROR()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -161,10 +161,10 @@ void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_1_s
 	coreStatus.S_HALT = 1;
 	coreStatus.C_STEP = 1 ;
 	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,isCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_NOERROR,isCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 }
 
-void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_0_C_HALT_0_C_STEP_0_S_HALT_0_should_return_ERR_CORECONTROL_FAILED()
+void test_isCore_given_CORE_SINGLE_STEP_NOMASKINT_NOMASK_C_DEBUGEN_0_C_HALT_0_C_STEP_0_S_HALT_0_should_return_ERR_CORECONTROL_FAILED()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -174,10 +174,10 @@ void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_0_C_HALT_0_C_STEP_0_S_HALT_0_s
 	coreStatus.S_HALT = 0;
 	coreStatus.C_STEP = 0 ;
 	
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 }
 
-void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_0_C_HALT_0_C_STEP_1_S_HALT_0_should_return_ERR_CORECONTROL_FAILED()
+void test_isCore_given_CORE_SINGLE_STEP_NOMASKINT_C_DEBUGEN_0_C_HALT_0_C_STEP_1_S_HALT_0_should_return_ERR_CORECONTROL_FAILED()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -187,10 +187,10 @@ void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_0_C_HALT_0_C_STEP_1_S_HALT_0_s
 	coreStatus.S_HALT = 0;
 	coreStatus.C_STEP = 1 ;
 	
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 }
 
-void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_0_should_return_ERR_CORECONTROL_FAILED()
+void test_isCore_given_CORE_SINGLE_STEP_NOMASKIN_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_0_should_return_ERR_CORECONTROL_FAILED()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -200,8 +200,38 @@ void test_isCore_given_CORE_SINGLE_STEP_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_0_s
 	coreStatus.S_HALT = 0;
 	coreStatus.C_STEP = 1 ;
 	
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP,&coreStatus));
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP_NOMASKINT,&coreStatus));
 }
+
+//CORE_SINGLE_STEP_NOMASKINT
+void test_isCore_given_CORE_SINGLE_STEP_NOMASKINT_NOMASK_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_1_C_MASKINT_1_should_return_ERR_NOERROR()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.C_DEBUGEN = 1;
+	coreStatus.C_HALT = 1;
+	coreStatus.S_HALT = 1;
+	coreStatus.C_STEP = 1 ;
+	coreStatus.C_MASKINTS = 1 ;
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,isCore(CORE_SINGLE_STEP_MASKINT,&coreStatus));
+}
+
+void test_isCore_given_CORE_SINGLE_STEP_NOMASKINT_NOMASK_C_DEBUGEN_1_C_HALT_1_C_STEP_1_S_HALT_1_C_MASKINT_0_should_return_ERR_CORECONTROL_FAILED()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus(&coreStatus);
+	
+	coreStatus.C_DEBUGEN = 1;
+	coreStatus.C_HALT = 1;
+	coreStatus.S_HALT = 1;
+	coreStatus.C_STEP = 1 ;
+	coreStatus.C_MASKINTS = 0 ;
+	
+	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,isCore(CORE_SINGLE_STEP_MASKINT,&coreStatus));
+}
+
 
 //CORE_MASK_INTERRUPT
 void test_isCore_given_CORE_MASK_INTERRUPT_C_DEBUGEN_1_C_HALT_1_C_MASKINT_1_S_HALT_1_should_return_ERR_NOERROR()
@@ -766,13 +796,20 @@ void test_get_Core_WriteValue_given_CORE_DEBUG_HALT_should_return_0xA05F0003_or_
 	TEST_ASSERT_EQUAL(SET_CORE_DEBUG_HALT,get_Core_WriteValue(CORE_DEBUG_HALT));
 }
 
-void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_should_return_0xA05F0005_or_SET_CORE_STEP()
+void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_NOMASKINT_should_return_0xA05F0005_or_SET_CORE_STEP_NOMASKINT()
 {
-	TEST_ASSERT_EQUAL(0xA05F0005,get_Core_WriteValue(CORE_SINGLE_STEP));
-	TEST_ASSERT_EQUAL(SET_CORE_STEP,get_Core_WriteValue(CORE_SINGLE_STEP));
+	TEST_ASSERT_EQUAL(0xA05F0005,get_Core_WriteValue(CORE_SINGLE_STEP_NOMASKINT));
+	TEST_ASSERT_EQUAL(SET_CORE_STEP_NOMASKINT,get_Core_WriteValue(CORE_SINGLE_STEP_NOMASKINT));
 }
 
-void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_should_return_0xA05F0007_or_SET_CORE_MASKINT()
+void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_MASKINT_should_return_0xA05F000D_or_SET_CORE_STEP_MASKINT()
+{
+	TEST_ASSERT_EQUAL(0xA05F000D,get_Core_WriteValue(CORE_SINGLE_STEP_MASKINT));
+	TEST_ASSERT_EQUAL(SET_CORE_STEP_MASKINT,get_Core_WriteValue(CORE_SINGLE_STEP_MASKINT));
+}
+
+
+void test_get_Core_WriteValue_given_CORE_SINGLE_STEP_NOMASKINT_NOMASK_should_return_0xA05F0007_or_SET_CORE_MASKINT()
 {
 	TEST_ASSERT_EQUAL(0xA05F000B,get_Core_WriteValue(CORE_MASK_INTERRUPT));
 	TEST_ASSERT_EQUAL(SET_CORE_MASKINT,get_Core_WriteValue(CORE_MASK_INTERRUPT));
@@ -857,4 +894,86 @@ void test_get_DebugExceptionMonitorControl_WriteValue_given_DebugMonitor_STEP_de
 	debugTrap.VC_HARDERR = 1;
 	
 	TEST_ASSERT_EQUAL(0x01005411,get_DebugExceptionMonitorControl_WriteValue(DebugMonitor_STEP,&debugTrap,ENABLE_DWT_ITM));
+}
+
+
+/*-------------------------get_ClearDebugEvent_WriteValue----------------------------*/
+void test_get_ClearDebugEvent_WriteValue_given_EXTERNAL_1_VCATCH_1_should_return_0x18()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	debugEvent.EXTERNAL = 1; 
+	debugEvent.VCATCH = 1; 
+	
+	TEST_ASSERT_EQUAL(0x18,get_ClearDebugEvent_WriteValue(&debugEvent));
+}
+
+void test_get_ClearDebugEvent_WriteValue_given_HALTED_1_VCATCH_1_should_return_0x1()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	debugEvent.HALTED = 1; 
+	
+	TEST_ASSERT_EQUAL(0x1,get_ClearDebugEvent_WriteValue(&debugEvent));
+}
+
+void test_get_ClearDebugEvent_WriteValue_given_all_1_should_return_0x1F()
+{
+	DebugEvent debugEvent ;
+	
+	init_DebugEvent(&debugEvent);
+	
+	debugEvent.EXTERNAL = 1; 
+	debugEvent.VCATCH = 1; 
+	debugEvent.DWTTRAP = 1; 
+	debugEvent.BKPT = 1; 
+	debugEvent.HALTED = 1; 
+	
+	TEST_ASSERT_EQUAL(0x1F,get_ClearDebugEvent_WriteValue(&debugEvent));
+}
+
+
+/*-------------------------get_ClearDebugTrap_WriteValue----------------------------*/
+void test_get_ClearDebugTrap_WriteValue_given_VC_HARDERR_1_should_return_0x3F1()
+{
+	DebugTrap debugTrap ;
+	
+	init_DebugTrap(&debugTrap);
+	
+	debugTrap.VC_HARDERR = 1; 
+	
+	TEST_ASSERT_EQUAL(0x3F1,get_ClearDebugTrap_WriteValue(&debugTrap));
+}
+
+void test_get_ClearDebugTrap_WriteValue_given_HARDERR_INTERR_BUSERR_1_should_return_0xF1()
+{
+	DebugTrap debugTrap ;
+	
+	init_DebugTrap(&debugTrap);
+	
+	debugTrap.VC_HARDERR = 1; 
+	debugTrap.VC_INTERR = 1; 
+	debugTrap.VC_BUSERR = 1; 
+	
+	TEST_ASSERT_EQUAL(0xF1,get_ClearDebugTrap_WriteValue(&debugTrap));
+}
+
+void test_get_ClearDebugTrap_WriteValue_given_all_1_should_return_0()
+{
+	DebugTrap debugTrap ;
+	
+	init_DebugTrap(&debugTrap);
+	
+	debugTrap.VC_HARDERR = 1; 
+	debugTrap.VC_INTERR = 1; 
+	debugTrap.VC_BUSERR = 1; 
+	debugTrap.VC_STATERR = 1; 
+	debugTrap.VC_CHKERR = 1; 
+	debugTrap.VC_NOCPERR = 1; 
+	debugTrap.VC_MMERR = 1; 
+	debugTrap.VC_CORERESET = 1; 
+	
+	TEST_ASSERT_EQUAL(0x0,get_ClearDebugTrap_WriteValue(&debugTrap));
 }
