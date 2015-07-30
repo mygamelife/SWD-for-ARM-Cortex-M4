@@ -29,11 +29,47 @@
 #define DWT_MASK3 	0xE0001054
 #define DWT_FUNC3	0xE0001058
 
-#define NOT_SUPPORTED 	0
-#define SUPPORTED 		1
+#define NUMCOMP_MASK		0xF0000000
+#define NOTRCPKT_MASK		0x8000000
+#define NOEXTTRIG_MASK		0x4000000
+#define NOCYCCNT_MASK		0x2000000
+#define NOPRFCNT_MASK		0x1000000
+#define CYCEVTENA_MASK		0x400000
+#define FOLDEVTENA_MASK 	0x200000
+#define LSUEVTENA_MASK		0x100000
+#define SLEEPEVTENA_MASK 	0x80000
+#define EXCEVTENA_MASK		0x40000
+#define CPIEVTENA_MASK		0x20000
+#define EXCTRCENA_MASK		0x10000
+#define PCSAMPLENA_MASK 	0x1000
+#define SYNCTAP_MASK		0xC00
+#define CYCTAP_MASK			0x200
+#define POSTINIT_MASK		0x1E0
+#define POSTRESET_MASK		0x1E
+#define CYCCNTENA_MASK		0x1
 
-#define Enable 1 
+#define _8bitCounter_MASK	0XFF
+
+#define MATCHED_MASK		0x1000000
+#define DATAVADDR1_MASK		0xF0000
+#define DATAVADDR0_MASK		0xF000
+#define DATAVSIZE_MASK		0xC00
+#define LNK1ENA_MASK		0x200
+#define DATAVMATCH_MASK		0x100
+#define CYCMATCH_MASK		0x80
+#define EMITRANGE_MASK		0x20
+#define FUNCTION_MASK		0xF
+
+
+#define SUPPORTED 		0
+#define NOT_SUPPORTED 	1
+
+#define NOT_MATCH	0
+#define MATCH		1
+
 #define Disable 0
+#define Enable 1 
+
 
 typedef struct DWT_Info DWT_Info ;
 typedef struct DWT_ComparatorInfo DWT_ComparatorInfo ;
@@ -67,11 +103,11 @@ typedef enum
 {
 	DWTFunction_Disabled = 0 ,
 	ITM_SampleEmit_PC = 1 ,
-	ITM_Emit_AddressOffset = 100,
+	ITM_Emit_AddressOffset = 1,
 	ITM_Emit_DataRW = 2,
-	ITM_Emit_Data_AddressOffset_RW = 200 ,
+	ITM_Emit_Data_AddressOffset_RW = 2 ,
 	ITM_Sample_PC_DataValue_RW = 3,
-	ITM_Emit_AddressOffset_DataValue_RW = 300,
+	ITM_Emit_AddressOffset_DataValue_RW = 3,
 	Watchpoint_PCMatch  = 4,
 	Watchpoint_DataRead = 5,
 	Watchpoint_DataWrite = 6,
@@ -81,13 +117,13 @@ typedef enum
 	ETM_Trigger_DataWrite = 10,
 	ETM_TriggerDataReadWrite = 11,
 	Sample_DataRead =12,
-	Sample_DataAddressOffset_Read=1200,
+	Sample_DataAddressOffset_Read=12,
 	Sample_DataWrite =13,
-	Sample_DataAddressOffset_Write=1300,
+	Sample_DataAddressOffset_Write=13,
 	Sample_PC_Data_Read =14,
-	Sample_DataAddressOffset_Data_Read=1400,
+	Sample_DataAddressOffset_Data_Read=14,
 	Sample_PC_Data_Write =15,
-	Sample_DataAddressOffset_Data_Write=1500,
+	Sample_DataAddressOffset_Data_Write=15,
 }DWTFunction;
 
 typedef enum
@@ -112,6 +148,21 @@ typedef enum
 	Word  
 }DATAVSIZE;
 
+typedef enum
+{
+	Cycle = 0 ,
+	PC 
+} Enum32bitCounter;
+
+typedef enum
+{
+	CPI = 0,
+	ExceptionOverhead,
+	Sleep,
+	LSU,
+	FoldedInstruction
+} Enum8bitCounter;
+
 struct DWT_Info
 {
 	DWT_Control *dwtControl ;
@@ -130,13 +181,13 @@ struct DWT_Info
 struct EventStatus
 {
 	int CycleCountEvent ;
-	int FoldedInstructionCount ;
-	int LSUCount ;
-	int SleepCount ;
-	int ExceptionOverheadCount ;
-	int CPICount ;
-	int InterruptTracing ;
-	int PCSampling ;
+	int FoldedInstructionCountEvent  ;
+	int LSUCountEvent ;
+	int SleepCountEvent  ;
+	int ExceptionOverheadCountEvent  ;
+	int CPICountEvent  ;
+	int InterruptTracingEvent  ;
+	int PCSamplingEvent  ;
 };
 
 struct DWT_8bitCounter
@@ -195,21 +246,18 @@ void init_DWT32bitCounter(DWT_32bitCounter *counter);
 void init_DWTComparatorInfo(DWT_ComparatorInfo *dwtCompInfo,DWT_FunctionInfo *dwtFunction);
 void init_DWTFunctionInfo(DWT_FunctionInfo *dwtFunctionInfo);
 
+void configure_DWTEventGeneration(EventStatus *eventStatus,int CYCEVTENA,int FOLDEVTENA,int LSUEVTENA,int SLEEPEVTENA,int EXCEVTENA,int CPIEVTENA,int EXCTRCENA,int PCSAMPLEENA);
 
-void EnableDisable_EventStatus(EventStatus *eventStatus,int CYCEVTENA,int FOLDEVTENA,int LSUEVTENA,int SLEEPEVTENA,int EXCEVTENA,int CPIEVTENA,int EXCTRCENA,int PCSAMPLEENA);
-
-void update_DWTControl(DWT_Control *dwtControl,uint32_t dataRead);
-void update_EventStatus(EventStatus *eventStatus,uint32_t dataRead);
-void update_8bitCounter(DWT_8bitCounter *counter,uint32_t dataRead);
-void update_32bitCounter(DWT_32bitCounter *counter,uint32_t dataRead);
-void update_DWTComparatorInfo(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead,uint32_t maskRead);
-void update_DWTFunctionInfo(DWT_FunctionInfo *dwtFunctionInfo,uint32_t dataRead);
-
+void process_DWTControlData(DWT_Control *dwtControl,uint32_t dataRead);
+void process_EventStatusData(EventStatus *eventStatus,uint32_t dataRead);
+void process_8bitCounterData(DWT_8bitCounter *counter,uint32_t dataRead,Enum8bitCounter counterEnum);
+void process_32bitCounterData(DWT_32bitCounter *counter,uint32_t dataRead,Enum32bitCounter counterEnum);
+void process_DWTComparatorData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead,uint32_t maskRead,uint32_t functionRead);
+void process_DWTFunctionData(DWT_FunctionInfo *dwtFunctionInfo,uint32_t dataRead);
 
 
-uint32_t get_DWTMask_WriteValue(IgnoreMask mask);
-uint32_t get_DWTFunction_WriteValue(int firstLinkComp,int secondLinkComp,ComparisonMode mode,int EnableDisable_DataTrace,DWTFunction function);
-uint32_t get_DWTControl_WriteValue(EventStatus eventStatus,int cycTap,int posCnt,int postReset,int EnableDisable_CycleCountCounter);
+uint32_t get_DWTFunction_WriteValue(int firstLinkComp,int secondLinkComp,ComparisonMode mode,DATAVSIZE size,int EMITRANGE,DWTFunction function);
+uint32_t get_DWTControl_WriteValue(EventStatus *eventStatus,SyncTap syncTap,int cycTap,int posCnt,int postReset,int EnableDisable_CycleCountCounter);
 
 
 #endif // DWT_Utilities_H
