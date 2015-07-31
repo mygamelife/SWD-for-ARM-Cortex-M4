@@ -10,64 +10,19 @@
 <info part="DefaultEditorWorkbook">
 <folder appearance="1" expanded="2">
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="1"/>
 <part id="0"/>
-<part id="2"/>
-<part id="3"/>
-<part id="5"/>
-<part id="4"/>
-<part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" partName="configurePort.h" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/configurePort.h" title="configurePort.h" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/configurePort.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="190" selectionTopPixel="83"/>
-</editor>
 <editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/main.c" title="main.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1943" selectionTopPixel="540"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="FPB_Unit.c" partName="FPB_Unit.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/FPB_Unit.c" title="FPB_Unit.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/FPB_Unit.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/FPB_Unit.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="46" selectionOffset="9893" selectionTopPixel="3537"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="CoreDebug.h" partName="CoreDebug.h" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/CoreDebug.h" title="CoreDebug.h" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/CoreDebug.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="2" selectionOffset="872" selectionTopPixel="103"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="CoreDebug_Utilities.h" partName="CoreDebug_Utilities.h" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/CoreDebug_Utilities.h" title="CoreDebug_Utilities.h" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/CoreDebug_Utilities.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug_Utilities.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="607" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="CoreDebug_Utilities.c" partName="CoreDebug_Utilities.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/CoreDebug_Utilities.c" title="CoreDebug_Utilities.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/CoreDebug_Utilities.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug_Utilities.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1332" selectionTopPixel="391"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.c" partName="swdProtocol.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swdProtocol.c" title="swdProtocol.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swdProtocol.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/swdProtocol.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="826" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="swd_Utilities.c" partName="swd_Utilities.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swd_Utilities.c" title="swd_Utilities.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/swd_Utilities.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/swd_Utilities.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="24" selectionOffset="5276" selectionTopPixel="2451"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Reset.c" partName="Reset.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Reset.c" title="Reset.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/Reset.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Reset.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="15" selectionOffset="709" selectionTopPixel="35"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="DWT_Unit.c" partName="DWT_Unit.c" path="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/DWT_Unit.c" title="DWT_Unit.c" tooltip="C:/Users/Shengli/CoIDE/workspace/SerialWireDebug/app/DWT_Unit.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/DWT_Unit.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="278" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="170" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
-<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="23">
+<viewState CommonNavigator.LINKING_ENABLED="0" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="8">
 <expanded>
 <element path="/SWD-for-ARM-Cortex-M4"/>
 <element path="/SWD-for-ARM-Cortex-M4/Code"/>
@@ -75,7 +30,7 @@
 <element path="/SWD-for-ARM-Cortex-M4/Hardware"/>
 </expanded>
 <selection>
-<element path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
+<element path="/SWD-for-ARM-Cortex-M4/Hardware/system_stm32f4xx.h"/>
 </selection>
 </viewState>
 </view>
@@ -109,7 +64,7 @@
 <viewState/>
 </view>
 </views>
-<perspectives activePart="org.coocox.builder.ui.views.ProjectView" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspectives activePart="org.eclipse.cdt.ui.editor.CEditor" activePerspective="org.coocox.builder.perspective.CoBuilder">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
 <alwaysOnActionSet id="org.coocox.welcome.ui.actionSet"/>
@@ -235,55 +190,39 @@
 <view id="org.eclipse.debug.ui.RegisterView"/>
 <fastViewBars/>
 <viewLayoutRec closeable="false" id="org.eclipse.debug.ui.DebugView"/>
-<layout>
-<mainWindow>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1379f82">
-<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
-<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@1379f82">&#x0A;<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="858" ratioRight="286" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1379f82">
-<folder appearance="2" expanded="2">
-<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="858" ratioRight="286" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1379f82">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@10a5ced" ratio="0.5191898" ratioLeft="487" ratioRight="451" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1379f82">
-<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
-<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@10a5ced" ratio="0.5191898" ratioLeft="487" ratioRight="451" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1379f82">&#x0A;<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1bb1b9e" ratio="0.65030676" ratioLeft="742" ratioRight="399" relationship="2" relative="org.eclipse.ui.internal.ViewStack@10a5ced">
-<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">
-<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1bb1b9e" ratio="0.65030676" ratioLeft="742" ratioRight="399" relationship="2" relative="org.eclipse.ui.internal.ViewStack@10a5ced">&#x0A;<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
 <page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" label="Memory Browser"/>
 <page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
 <page content="org.eclipse.debug.ui.MemoryView" label="LabelNotFound"/>
 <page content="org.eclipse.debug.ui.ExpressionView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@32cd1a" ratio="0.7737035" ratioLeft="1477" ratioRight="432" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1379f82">
-<folder activePageID="org.eclipse.cdt.dsf.debug.ui.disassembly.view" appearance="2" expanded="2">
-<page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="Disassembly"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@32cd1a" ratio="0.7737035" ratioLeft="1477" ratioRight="432" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1379f82">&#x0A;<folder activePageID="org.eclipse.cdt.dsf.debug.ui.disassembly.view" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="Disassembly"/>
 <page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
 <page content="org.coocox.coassistant.view.CoAssistantView_debug" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
-<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
 <part id="1"/>
 </presentation>
 </folder>
@@ -306,25 +245,12 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/swdProtocol.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/DWT_Unit.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_def.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/DWT_Unit.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 </editors>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2580" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="127" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2512" y="0"/>
-</item>
-<item historyLabel="startup_stm32f429xx.s" index="1">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="127" y="0"/>
-</item>
-<item historyLabel="main.c" index="0">
-<position info="not_deleted" x="2957" y="0"/>
-</item>
 <item historyLabel="startup_stm32f429xx.s" index="1">
 <position info="not_deleted" x="0" y="0"/>
 </item>
@@ -454,8 +380,26 @@
 <item historyLabel="main.c" index="0">
 <position info="not_deleted" x="148" y="0"/>
 </item>
-<item active="true" historyLabel="DWT_Unit.c" index="9">
+<item historyLabel="DWT_Unit.c" index="9">
 <position info="not_deleted" x="278" y="0"/>
+</item>
+<item historyLabel="main.c" index="10">
+<position info="not_deleted" x="1943" y="0"/>
+</item>
+<item historyLabel="stm32f4xx_hal_def.h" index="11">
+<position info="not_deleted" x="2451" y="38"/>
+</item>
+<item historyLabel="configurePort.h" index="12">
+<position info="not_deleted" x="190" y="0"/>
+</item>
+<item historyLabel="DWT_Unit.c" index="13">
+<position info="not_deleted" x="278" y="0"/>
+</item>
+<item historyLabel="configurePort.h" index="12">
+<position info="not_deleted" x="190" y="0"/>
+</item>
+<item active="true" historyLabel="main.c" index="14">
+<position info="not_deleted" x="170" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -464,6 +408,9 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_def.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_def.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_def.h"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="DWT_Unit.c" tooltip="SWD-for-ARM-Cortex-M4/Code/DWT_Unit.c">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/DWT_Unit.c"/>
 </file>

@@ -73,10 +73,10 @@
     <File name="Code/Misc_Utilities.h" path="app/Misc_Utilities.h" type="1"/>
     <File name="Code/DWT_Utilities.h" path="app/DWT_Utilities.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal.h" path="app/Hardware/stm32f4xx_hal.h" type="1"/>
-    <File name="Code/Bit_Operations.c" path="app/Bit_Operations.c" type="1"/>
     <File name="Code/FPB_Unit.h" path="app/FPB_Unit.h" type="1"/>
-    <File name="Code/CoreDebug.c" path="app/CoreDebug.c" type="1"/>
+    <File name="Code/Bit_Operations.c" path="app/Bit_Operations.c" type="1"/>
     <File name="Code/DWT_Unit.c" path="app/DWT_Unit.c" type="1"/>
+    <File name="Code/CoreDebug.c" path="app/CoreDebug.c" type="1"/>
     <File name="Code/FPB_Utilities.h" path="app/FPB_Utilities.h" type="1"/>
     <File name="Core/core_cmSimd.h" path="app/Hardware/core_cmSimd.h" type="1"/>
     <File name="Hardware/system_stm32f4xx.h" path="app/Hardware/system_stm32f4xx.h" type="1"/>
@@ -118,14 +118,14 @@
     <File name="Code/swdProtocol.h" path="app/swdProtocol.h" type="1"/>
     <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
     <File name="Code/CoreDebug_Utilities.h" path="app/CoreDebug_Utilities.h" type="1"/>
-    <File name="Code/swd_Utilities.h" path="app/swd_Utilities.h" type="1"/>
     <File name="Code/Bit_Operations.h" path="app/Bit_Operations.h" type="1"/>
+    <File name="Code/swd_Utilities.h" path="app/swd_Utilities.h" type="1"/>
     <File name="Code/Misc_Utilities.c" path="app/Misc_Utilities.c" type="1"/>
     <File name="Code/Bit_ReadSend.h" path="app/Bit_ReadSend.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_gpio.h" path="app/Hardware/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.h" path="app/Hardware/stm32f4xx_hal_cortex.h" type="1"/>
-    <File name="Code/Reset.h" path="app/Reset.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_gpio.h" path="app/Hardware/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Core" path="" type="2"/>
+    <File name="Code/Reset.h" path="app/Reset.h" type="1"/>
   </Files>
   <Bookmarks/>
 </Project>
