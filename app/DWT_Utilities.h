@@ -60,6 +60,7 @@
 #define EMITRANGE_MASK		0x20
 #define FUNCTION_MASK		0xF
 
+#define DWTMASK_MASK		0xF
 
 #define SUPPORTED 		0
 #define NOT_SUPPORTED 	1
@@ -68,10 +69,10 @@
 #define MATCH		1
 
 #define Disable 0
-#define Enable 1 
+#define Enable 1
 
 
-typedef struct DWT_Info DWT_Info ;
+typedef struct DWTInfo DWTInfo ;
 typedef struct DWT_ComparatorInfo DWT_ComparatorInfo ;
 typedef struct DWT_FunctionInfo DWT_FunctionInfo ;
 typedef struct DWT_Control DWT_Control;
@@ -145,13 +146,13 @@ typedef enum
 {
 	Byte = 0,
 	Halfword,
-	Word  
+	Word
 }DATAVSIZE;
 
 typedef enum
 {
 	Cycle = 0 ,
-	PC 
+	PC
 } Enum32bitCounter;
 
 typedef enum
@@ -163,10 +164,10 @@ typedef enum
 	FoldedInstruction
 } Enum8bitCounter;
 
-struct DWT_Info
+struct DWTInfo
 {
 	DWT_Control *dwtControl ;
-	
+
 	DWT_32bitCounter *CycleCount ;
 	DWT_8bitCounter *CPICount ;
 	DWT_8bitCounter *ExceptionOverheadCount ;
@@ -174,8 +175,8 @@ struct DWT_Info
 	DWT_8bitCounter *LSUCount ;
 	DWT_8bitCounter *FoldedInstructionCount ;
 	DWT_32bitCounter *PCSample ;
-	
-	DWT_ComparatorInfo *dwtCompInfo[4] ;	
+
+	DWT_ComparatorInfo *dwtCompInfo[4] ;
 };
 
 struct EventStatus
@@ -203,7 +204,7 @@ struct DWT_32bitCounter
 	uint32_t currentValue ;
 };
 
-struct DWT_Control 
+struct DWT_Control
 {
 	int numberComparator;
 	int support_Tracing;
@@ -238,7 +239,7 @@ struct DWT_ComparatorInfo
 	DWT_FunctionInfo *dwtFunctionInfo ;
 };
 
-void init_DWTInfo(DWT_Info *dwtInfo);
+void init_DWTInfo(DWTInfo *dwtInfo);
 void init_DWTControl(DWT_Control *dwtControl);
 void init_EventStatus(EventStatus *eventStatus);
 void init_DWT8bitCounter(DWT_8bitCounter *counter);
@@ -252,12 +253,13 @@ void process_DWTControlData(DWT_Control *dwtControl,uint32_t dataRead);
 void process_EventStatusData(EventStatus *eventStatus,uint32_t dataRead);
 void process_8bitCounterData(DWT_8bitCounter *counter,uint32_t dataRead,Enum8bitCounter counterEnum);
 void process_32bitCounterData(DWT_32bitCounter *counter,uint32_t dataRead,Enum32bitCounter counterEnum);
-void process_DWTComparatorData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead,uint32_t maskRead,uint32_t functionRead);
+void process_DWTComparatorData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead);
+void process_DWTMaskData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead);
 void process_DWTFunctionData(DWT_FunctionInfo *dwtFunctionInfo,uint32_t dataRead);
 
 
 uint32_t get_DWTFunction_WriteValue(int firstLinkComp,int secondLinkComp,ComparisonMode mode,DATAVSIZE size,int EMITRANGE,DWTFunction function);
 uint32_t get_DWTControl_WriteValue(EventStatus *eventStatus,SyncTap syncTap,int cycTap,int posCnt,int postReset,int EnableDisable_CycleCountCounter);
 
-
+int get_DWTComparatorInfoNumber(uint32_t address);
 #endif // DWT_Utilities_H

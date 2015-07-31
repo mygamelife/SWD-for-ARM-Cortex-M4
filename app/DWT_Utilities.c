@@ -6,7 +6,7 @@
  *
  * Input : dwtInfo is a pointer to DWTInfo which store the information about the status of the whole DataWatchpoint and Trace Unit
  */
-void init_DWTInfo(DWT_Info *dwtInfo)
+void init_DWTInfo(DWTInfo *dwtInfo)
 {
 	static DWT_Control dwtCtrl ;
 	static DWT_8bitCounter cpi,exceptionOverhead,sleep,lsu,folderInstruction ;
@@ -297,19 +297,25 @@ void process_32bitCounterData(DWT_32bitCounter *counter,uint32_t dataRead,Enum32
 	numberAccess[counterEnum] ++ ;
 }
 
-/* Process data read from DWT Comparator,Mask and Function Registers and update DWTComparator Info
+/* Process data read from DWT Comparator and update DWTComparator Info
  *
  * Input : dwtCompInfo is a pointer to DWT Comparator Info which store the information about DWT Comparator,Mask and Function Registers
  *		   dataRead contains the data read from DWT Comparator
- *		   maskRead contains the data read from DWT Mask
- *		   functionRead contains the data read from DWT Function
  */
-void process_DWTComparatorData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead,uint32_t maskRead,uint32_t functionRead)
+void process_DWTComparatorData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead)
 {
 	dwtCompInfo->address = dataRead ;
-	dwtCompInfo->ignoreMask = maskRead ;
-	
-	process_DWTFunctionData(dwtCompInfo->dwtFunctionInfo,functionRead);
+}
+
+/* Process data read from DWT Mask and update DWTComparator Info
+ *
+ * Input : dwtCompInfo is a pointer to DWT Comparator Info which store the information about DWT Comparator,Mask and Function Registers
+ *		   dataRead contains the data read from DWT Mask
+ */
+void process_DWTMaskData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead)
+{
+	dataRead = dataRead & DWTMASK_MASK;
+	dwtCompInfo->ignoreMask = dataRead ;
 }
 
 /* Process data read from DWT Function Registers and update DWTFunctionInfo
@@ -436,4 +442,43 @@ uint32_t get_DWTControl_WriteValue(EventStatus *eventStatus,SyncTap syncTap,int 
 		 + (posCnt << 5) + (postReset << 1) + EnableDisable_CycleCountCounter ;
 	
 	return data ;
+}
+
+/* Use to get the number location of DWT ComparatorInfo for the selected register address
+ *
+ * Input : 	address is the address of DWTCOMPn or DWTMASKn or DWTFUNCn
+ *				Possible value :
+ *					DWT_COMP0	
+ *					DWT_COMP1	
+ *					DWT_COMP2	
+ *					DWT_COMP3	
+ *					
+ *				 	DWT_MASK0
+ *				 	DWT_MASK1
+ *				 	DWT_MASK2
+ *				 	DWT_MASK3
+ *				 	
+ *				 	DWT_FUNC0
+ *				 	DWT_FUNC1
+ *				 	DWT_FUNC2
+ *				 	DWT_FUNC3
+ *
+ * Output :	return number to the location of ComparatorInfo
+ *			return ERR_INVALID_COMPARATOR if comparator out of range
+ */
+int get_DWTComparatorInfoNumber(uint32_t address)
+{	
+	if (address == DWT_COMP0 || address == DWT_MASK0 || address == DWT_FUNC0)
+		return 0 ;
+	
+	if (address == DWT_COMP1 || address == DWT_MASK1 || address == DWT_FUNC1)
+		return 1 ;
+	
+	if (address == DWT_COMP2 || address == DWT_MASK2 || address == DWT_FUNC2)
+		return 2 ;
+	
+	if (address == DWT_COMP3 || address == DWT_MASK3 || address == DWT_FUNC3)
+		return 3 ;
+	
+	return ERR_INVALID_DWTREGISTER ;
 }

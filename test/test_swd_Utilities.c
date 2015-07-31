@@ -163,7 +163,7 @@ void test_compare_ParityWithData_given_0x1_parity_0_should_return_ERR_INVALID_PA
 	TEST_ASSERT_EQUAL(ERR_INVALID_PARITY_RECEIVED,compare_ParityWithData(0x1,0));
 }
 
-void test_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
+void xtest_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
   int i = 0, data = 0;
 
   emulateWrite(0x8D, 8); //SWD 8bit protocol
@@ -175,7 +175,7 @@ void test_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_
   emulateTurnAroundWrite();
   emulateSwdOutput();
   emulateIdleClock(8);
-
+}
 void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 

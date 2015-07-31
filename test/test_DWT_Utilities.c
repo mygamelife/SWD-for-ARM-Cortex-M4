@@ -125,7 +125,7 @@ void test_init_DWTCompratorInfo_should_initialise_DWTComparatorInfo_and_DWTFunct
 /*------------------init_DWTInfo--------------*/
 void test_init_DWTInfo_should_initialise_all_8bit_and_32bitcounters_DWTControl_and_DWTComparatorInfo_DWTFunctionInfo()
 {
-	DWT_Info dwtInfo;
+	DWTInfo dwtInfo;
 	
 	init_DWTInfo(&dwtInfo);
 	
@@ -391,53 +391,82 @@ void test_process_32bitCounterData_given_0x12345678_0x13579BDF_should_store_to_c
 }
 
 /*------------------process_DWTComparatorData--------------*/
-void test_process_DWTComparatorData_given_0x12345678_0xA_0xFFFFFFFF_should_update_address_mask_and_function_in_DWTComparator()
+void test_process_DWTComparatorData_given_0x12345678_should_update_address_in_DWTComparatorInfo()
 {
 	DWT_ComparatorInfo dwtCompInfo;
-	DWT_FunctionInfo dwtFunctionInfo ;
 	
-	init_DWTComparatorInfo(&dwtCompInfo,&dwtFunctionInfo);
-	
-	process_DWTComparatorData(&dwtCompInfo,0x12345678,0xA,0xFFFFFFFF);
+	process_DWTComparatorData(&dwtCompInfo,0x12345678);
 	
 	TEST_ASSERT_EQUAL(0x12345678,dwtCompInfo.address);
-	TEST_ASSERT_EQUAL(Ignore_Bit9_Bit0,dwtCompInfo.ignoreMask);
 	
-	TEST_ASSERT_EQUAL(MATCH,dwtCompInfo.dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0xF,dwtCompInfo.dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0xF,dwtCompInfo.dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(3,dwtCompInfo.dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(1,dwtCompInfo.dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(1,dwtCompInfo.dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(1,dwtCompInfo.dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(1,dwtCompInfo.dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Sample_PC_Data_Write,dwtCompInfo.dwtFunctionInfo->dwtFunction);
 }
 
-void test_process_DWTComparatorData_given_0x12345678_0xA_0xFEFAB8F0_should_update_address_mask_and_function_in_DWTComparator()
+void test_process_DWTComparatorData_given_0xFFFFFFFF_should_update_addressn_DWTComparatorInfo()
 {
 	DWT_ComparatorInfo dwtCompInfo;
-	DWT_FunctionInfo dwtFunctionInfo ;
 	
-	init_DWTComparatorInfo(&dwtCompInfo,&dwtFunctionInfo);
+	process_DWTComparatorData(&dwtCompInfo,0xFFFFFFFF);
 	
-	process_DWTComparatorData(&dwtCompInfo,0x12345678,0xA,0xFEFAB8F0);
-	
-	TEST_ASSERT_EQUAL(0x12345678,dwtCompInfo.address);
-	TEST_ASSERT_EQUAL(Ignore_Bit9_Bit0,dwtCompInfo.ignoreMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtCompInfo.dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0xA,dwtCompInfo.dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0xB,dwtCompInfo.dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(Word,dwtCompInfo.dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtCompInfo.dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtCompInfo.dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(1,dwtCompInfo.dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(1,dwtCompInfo.dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(DWTFunction_Disabled,dwtCompInfo.dwtFunctionInfo->dwtFunction);
+	TEST_ASSERT_EQUAL(0xFFFFFFFF,dwtCompInfo.address);
 }
+
+/*------------------process_DWTMaskData--------------*/
+void test_process_DWTMaskData_given_0x1should_update_ignoreMask_in_DWTComparatorInfo()
+{
+	DWT_ComparatorInfo dwtCompInfo;
+	
+	process_DWTMaskData(&dwtCompInfo,0x1);
+	
+	TEST_ASSERT_EQUAL(0x1,dwtCompInfo.ignoreMask);
+}
+
+void test_process_DWTMaskData_given_0xF_should_update_ignoreMask_in_DWTComparatorInfo()
+{
+	DWT_ComparatorInfo dwtCompInfo;
+	
+	process_DWTMaskData(&dwtCompInfo,0xF);
+	
+	TEST_ASSERT_EQUAL(0xF,dwtCompInfo.ignoreMask);
+}
+
 
 /*------------------process_DWTFunctionData--------------*/
+void test_process_DWTFunctionData_given_0xFFFFFFFF_should_update_DWTFunction()
+{
+	DWT_FunctionInfo dwtFunctionInfo ;
+	init_DWTFunctionInfo(&dwtFunctionInfo);
+	
+	process_DWTFunctionData(&dwtFunctionInfo,0xFFFFFFFF);
+	
+	TEST_ASSERT_EQUAL(MATCH,dwtFunctionInfo.MATCHED);
+	TEST_ASSERT_EQUAL(0xF,dwtFunctionInfo.DATAVADDR1);
+	TEST_ASSERT_EQUAL(0xF,dwtFunctionInfo.DATAVADDR0);
+	TEST_ASSERT_EQUAL(3,dwtFunctionInfo.dataSize);
+	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.LNK1ENA);
+	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.DATAVMATCH);
+	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.CYCMATCH);
+	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.EMITRANGE);
+	TEST_ASSERT_EQUAL(Sample_PC_Data_Write,dwtFunctionInfo.dwtFunction);
+}
+
+void test_process_DWTFunctionData_given_0xFEFAB8F0_should_update_DWTFunction()
+{
+	DWT_FunctionInfo dwtFunctionInfo ;
+	init_DWTFunctionInfo(&dwtFunctionInfo);
+	
+	process_DWTFunctionData(&dwtFunctionInfo,0xFEFAB8F0);
+	
+	TEST_ASSERT_EQUAL(NOT_MATCH,dwtFunctionInfo.MATCHED);
+	TEST_ASSERT_EQUAL(0xA,dwtFunctionInfo.DATAVADDR1);
+	TEST_ASSERT_EQUAL(0xB,dwtFunctionInfo.DATAVADDR0);
+	TEST_ASSERT_EQUAL(Word,dwtFunctionInfo.dataSize);
+	TEST_ASSERT_EQUAL(0,dwtFunctionInfo.LNK1ENA);
+	TEST_ASSERT_EQUAL(0,dwtFunctionInfo.DATAVMATCH);
+	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.CYCMATCH);
+	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.EMITRANGE);
+	TEST_ASSERT_EQUAL(DWTFunction_Disabled,dwtFunctionInfo.dwtFunction);
+}
+
 void test_process_DWTFunctionData_given_0x11111111_should_update_DWTFunction()
 {
 	DWT_FunctionInfo dwtFunctionInfo ;
@@ -475,4 +504,24 @@ void test_get_DWTControl_WriteValue_given_enable_all_event_Tap_CYCCNTbit24_cycTa
 	process_EventStatusData(&eventStatus,0x7F1000);
 	
 	TEST_ASSERT_EQUAL(0x007F1757,get_DWTControl_WriteValue(&eventStatus,Tap_CYCCNTbit24,1,0xA,0xB,Enable));
+}
+
+/*------------------get_DWTComparatorInfoNumber--------------*/
+void test_get_DWTComparatorInfoNumber_given_DWT_COMP0_DWT_MASK0_DWT_FUNC0_should_return_0()
+{
+	TEST_ASSERT_EQUAL(0,get_DWTComparatorInfoNumber(DWT_COMP0));
+	TEST_ASSERT_EQUAL(0,get_DWTComparatorInfoNumber(DWT_MASK0));
+	TEST_ASSERT_EQUAL(0,get_DWTComparatorInfoNumber(DWT_FUNC0));
+}
+
+
+void test_get_DWTComparatorInfoNumber_given_DWT_COMP3_DWT_MASK3_DWT_FUNC3_should_return_3()
+{
+	TEST_ASSERT_EQUAL(3,get_DWTComparatorInfoNumber(DWT_COMP3));
+	TEST_ASSERT_EQUAL(3,get_DWTComparatorInfoNumber(DWT_MASK3));
+	TEST_ASSERT_EQUAL(3,get_DWTComparatorInfoNumber(DWT_FUNC3));
+}
+void test_get_DWTComparatorInfoNumber_given_unknown_address_should_return_ERR_INVALID_DWTREGISTER()
+{
+	TEST_ASSERT_EQUAL(ERR_INVALID_DWTREGISTER,get_DWTComparatorInfoNumber(0x12345678));
 }
