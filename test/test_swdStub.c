@@ -4,7 +4,6 @@
 #include "Emulator.h"
 #include "mock_SRAM.h"
 #include "mock_Flash.h"
-#include "ILV_Protocol.h"
 #include "swd_Utilities.h"
 #include "Bit_Operations.h"
 #include "Register_ReadWrite.h"

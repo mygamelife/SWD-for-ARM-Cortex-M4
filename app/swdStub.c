@@ -1,11 +1,5 @@
 #include "swdStub.h"
 
-static __IO uint32_t Flash_Start_Address = 0;
-static __IO uint32_t Flash_End_Address = 0;
-static __IO uint32_t SRAM_Start_Address = 0;
-static __IO uint32_t bankSelect = 0;
-static uint32_t targetStatus = 0;
-
 /**
   * swdStub is small program routine take instruction from swd probe and response
   *
@@ -35,6 +29,10 @@ void swdStub(uint32_t swdInstruction) {
   * return  : NONE
   */
 void stubCopy(void) {
+  __IO uint32_t Flash_Start_Address = 0;
+  __IO uint32_t SRAM_Start_Address = 0;
+  uint32_t targetStatus = 0;
+
   uint32_t length = 0;
   
   /* Change target status to busy to prevent other function to interrupt */
@@ -66,6 +64,10 @@ void stubCopy(void) {
   * return  : NONE
   */
 void stubEraseSector(void)  {
+  __IO uint32_t Flash_Start_Address = 0;
+  __IO uint32_t Flash_End_Address = 0;
+  uint32_t targetStatus = 0;
+
   /* Change target status to busy to prevent other function to interrupt */
   sramWrite(SWD_TARGET_STATUS, TARGET_BUSY);
   
@@ -92,6 +94,9 @@ void stubEraseSector(void)  {
   * return  : NONE
   */
 void stubMassErase(void)  {
+  __IO uint32_t bankSelect = 0;
+  uint32_t targetStatus = 0;
+
   /* Change target status to busy to prevent other function to interrupt */
   sramWrite(SWD_TARGET_STATUS, TARGET_BUSY);
   
@@ -149,6 +154,7 @@ void targetMain() {
   * output  : NONE
   */
 void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress)  {
+  uint32_t targetStatus = 0;
   /* Continues wait for target to release */
   do  {
     memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
@@ -174,6 +180,7 @@ void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress)  {
   * output  : NONE
   */
 void loadMassEraseInstruction(uint32_t bankSelect)  {
+  uint32_t targetStatus = 0;
   /* Continues wait for target to release */
   do  {
     memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
@@ -196,6 +203,7 @@ void loadMassEraseInstruction(uint32_t bankSelect)  {
   * output  : NONE
   */
 void loadCopyInstruction(uint32_t src, uint32_t dest, int length) {
+  uint32_t targetStatus = 0;
   /* Continues wait for target to release */
   do  {
     memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);

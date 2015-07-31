@@ -121,7 +121,7 @@ uint32_t Button_GetState()	{
 /**
   *
   */
-void InitUartPorts()	{
+void configureUartPorts() {
   GPIO_InitTypeDef  GPIO_InitStruct;
 
   /*##-1- Enable peripherals and GPIO Clocks #################################*/

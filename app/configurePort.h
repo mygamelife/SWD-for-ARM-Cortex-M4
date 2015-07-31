@@ -21,7 +21,7 @@
 #define SWDIO_PIN 			GPIO_PIN_12
 #define SWDCLK_PIN			GPIO_PIN_11
 #define SWDNRST_PIN			GPIO_PIN_8
-#define SWD_PORT			GPIOC
+#define SWD_PORT        GPIOC
 
 #define CLK_EN()	do{								\
 							__GPIOA_CLK_ENABLE();	\
@@ -48,9 +48,9 @@
 #define USARTx_RX_AF                     GPIO_AF7_USART1
 
 /* Button configuration */
-#define BUTTON_CLK_ENABLE()				 __HAL_RCC_GPIOA_CLK_ENABLE()
-#define BUTTON_PORT						 GPIOA
-#define BUTTON_PIN						 GPIO_PIN_0
+#define BUTTON_CLK_ENABLE()              __HAL_RCC_GPIOA_CLK_ENABLE()
+#define BUTTON_PORT                      GPIOA
+#define BUTTON_PIN                       GPIO_PIN_0
 
 void configureClock();
 void configureTargetResetPin();
@@ -58,8 +58,9 @@ void SWDIO_OutputMode();
 void SWDIO_InputMode();
 
 void configure_IOPorts();
+void configureLED();
 void initButton();
 uint32_t Button_GetState();
-void InitUartPorts();
+void configureUartPorts();
 
 #endif // configurePort_H

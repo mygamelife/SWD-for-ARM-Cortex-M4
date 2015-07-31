@@ -14,13 +14,14 @@
 #include "stm32f429i_discovery.h"
 
 /* Size of Transmission buffer */
-#define TXBUFFERSIZE                     (COUNTOF(aTxBuffer))//(COUNTOF(aTxBuffer) - 1)
+//#define TXBUFFERSIZE                     (COUNTOF(aTxBuffer))//(COUNTOF(aTxBuffer) - 1)
 /* Size of Reception buffer */
-#define RXBUFFERSIZE                     TXBUFFERSIZE
+//#define RXBUFFERSIZE                     TXBUFFERSIZE
 
 /* Exported macro ------------------------------------------------------------*/
 #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
 
-void test_Uart(void);
+UART_HandleTypeDef *initUart(void);
+void errorHandler(void);
 
 #endif // UART_H
