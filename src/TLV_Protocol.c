@@ -59,9 +59,9 @@ TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value) {
   * input   : buffer is a array pointer to store data that need to be transmit
   *           tlvPacket is a TLV_TypeDef struct pointer
   *
-  * return  : NONE
+  * return  : return how many byte is packed into buffer
   */
-void tlvPackPacketIntoBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
+int tlvPackPacketIntoBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
   int i = 0;
   
   /* First byte of the buffer is reserved for type */
@@ -76,6 +76,9 @@ void tlvPackPacketIntoBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
   
   /* check sum locate at the last byte after type, length and value */
   buffer[tlvPacket->length + 2] = tlvCalculateCheckSum(tlvPacket->value, tlvPacket->length);
+  
+  /* type + length + data + checksum */
+  return i + 3;
 }
 
 /**
@@ -109,49 +112,31 @@ int tlvCheckProbeStatus(HANDLE hSerial, uint8_t size, uint8_t *rxBuffer) {
 /**
   * tlvHost
   */
-void tlvHost(TlvState *state)  {
-  int size = 0;
-  FILE *pFile;
-  TLV_TypeDef *tlv;
-  const char *comPort = "COM7";
-  uint8_t data[255], *txBuffer, *rxBuffer;
+void tlvHost(TlvState *state, HANDLE hSerial)  {
+  int size = 0; TLV_TypeDef *tlv;
+  uint8_t txBuffer[1024], rxBuffer[1024];
   
-  size = sizeof(data);
-  pFile = fopen("test/Data/SWD-for-ARM-Cortex-M4.bin", "rb");  // r for read, b for binary
-  
-  /*  Initialize serial communication port */
-  HANDLE hSerial = initSerialComm(comPort, BAUD_RATE);
+  uint8_t data[200] = {0x1, 0x2, 0x3, 0x4, 0x5, 0x6, 0x7, 0x8, 0x9, 0xA};
   
   switch(*state)  {
     case TLV_START :
-      fread(data, size - 1, 1, pFile); // read bytes to our buffer  
-      tlv = tlvCreatePacket(TLV_WRITE, size, data);
-      *state = TLV_SEND_TYPE;
+      //fread(data, size - 1, 1, pFile); // read bytes to our buffer  
+      tlv = tlvCreatePacket(TLV_WRITE, sizeof(data), data);
+      size = tlvPackPacketIntoBuffer(txBuffer, tlv);
+      *state = TLV_TRANSMIT_DATA;
       break;
       
-    case TLV_SEND_TYPE :
-      *txBuffer = tlv->type;
-      writeToSerialPort(hSerial, txBuffer, ONE_BYTE);
-      *state = TLV_SEND_LENGTH;
-      break;
-      
-    case TLV_SEND_LENGTH :
-      *txBuffer = tlv->length;
-      writeToSerialPort(hSerial, txBuffer, ONE_BYTE);
-      *state = TLV_SEND_VALUE;
-      break;
-      
-    case TLV_SEND_VALUE :
-      txBuffer = tlv->value;
-      writeToSerialPort(hSerial, txBuffer, sizeof(tlv->value));
+    case TLV_TRANSMIT_DATA :
+      writeToSerialPort(hSerial, txBuffer, size);
       *state = TLV_WAIT_REPLY;
       break;
       
     case TLV_WAIT_REPLY :
       /* wait reply here */
-      do  {
-        readFromSerialPort(hSerial, rxBuffer, ONE_BYTE);
-      } while(*rxBuffer != TLV_OK);
+      readFromSerialPort(hSerial, rxBuffer, ONE_BYTE);
+      //do  {
+        //readFromSerialPort(hSerial, rxBuffer, ONE_BYTE);
+      //} while(*rxBuffer != TLV_OK);
       *state = TLV_START;
       break;
   }

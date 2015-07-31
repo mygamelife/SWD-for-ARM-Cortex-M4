@@ -24,6 +24,7 @@ typedef enum
   TLV_SEND_TYPE,
   TLV_SEND_LENGTH,
   TLV_SEND_VALUE,
+  TLV_TRANSMIT_DATA,
   TLV_WAIT_REPLY
 } TlvState;
 
@@ -42,8 +43,8 @@ typedef enum  {
 
 int tlvCalculateCheckSum(uint8_t *buffer, int length);
 TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value);
-void tlvPackPacketIntoBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
+int tlvPackPacketIntoBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
 int tlvCheckProbeStatus(HANDLE hSerial, uint8_t size, uint8_t *rxBuffer);
-void tlvHost(TlvState *state);
+void tlvHost(TlvState *state, HANDLE hSerial);
 
 #endif // TLV_Protocol_H

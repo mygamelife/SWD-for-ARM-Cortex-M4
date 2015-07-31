@@ -45,14 +45,16 @@ void test_tlvCreatePacket_given_type_length_and_value()
 
 void test_tlvPackPacketIntoBuffer_should_store_packet_info_into_buffer()
 {
+  int size = 0;
   uint8_t txBuffer[1024];
   uint8_t data[10] = {0x22, 0x33, 0x44, 0x55, 0x66,
                       0x77, 0x88, 0x99, 0xAA, 0xBB};
                       
   TLV_TypeDef *tlv = tlvCreatePacket(TLV_WRITE, sizeof(data), data);
 
-  tlvPackPacketIntoBuffer(txBuffer, tlv);
+  size = tlvPackPacketIntoBuffer(txBuffer, tlv);
   
+  TEST_ASSERT_EQUAL(size, 13);
   TEST_ASSERT_EQUAL(txBuffer[0], TLV_WRITE);  //type
   TEST_ASSERT_EQUAL(txBuffer[1], 10); //length
   TEST_ASSERT_EQUAL(txBuffer[2], 0x22); 
@@ -68,15 +70,25 @@ void test_tlvPackPacketIntoBuffer_should_store_packet_info_into_buffer()
   TEST_ASSERT_EQUAL(txBuffer[12], 0xAF); //chksum
 }
 
-/*
 void test_tlvHost_given_TLV_START_should_create_packet_and_change_state_to_TLV_SEND_TYPE()
 {
+  const char *comPort = "COM7";
+  TlvState state = TLV_START;
   HANDLE hSerial;
   
-  TlvState state = TLV_START;
+  tlvHost(&state, hSerial);
+  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+}
+
+void test_tlvHost_given_TLV_WAIT_REPLY_should_wait_reply_from_probe()
+{
+  const char *comPort = "COM7";
+  TlvState state = TLV_WAIT_REPLY;
+  HANDLE hSerial;
   
-  initSerialComm_IgnoreAndReturn(hSerial);
+  uint8_t rxBuffer[1024] = {0x10};
+  readFromSerialPort_ExpectAndReturn(hSerial, rxBuffer, ONE_BYTE, sizeof(rxBuffer));
   
-  tlvHost(&state);
-  TEST_ASSERT_EQUAL(state, TLV_SEND_TYPE);
-}*/
+  tlvHost(&state, hSerial);
+  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+}
