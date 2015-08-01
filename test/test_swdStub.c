@@ -70,10 +70,6 @@ void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_bef
   
   emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_TARGET_STATUS);
   emulateSWDRegister_Read(DRW_REG,AP,OK,0,readDummy);
-  emulateSWDRegister_Read(DRW_REG,AP,OK,1,TARGET_BUSY);
-  
-  emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_TARGET_STATUS);
-  emulateSWDRegister_Read(DRW_REG,AP,OK,0,readDummy);
   emulateSWDRegister_Read(DRW_REG,AP,OK,0,TARGET_OK);
   
   /* Load start addres */

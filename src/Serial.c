@@ -57,7 +57,7 @@ HANDLE initSerialComm(LPCSTR portname, DWORD baudrate) {
   return hSerial;  
 }
 
-DWORD readFromSerialPort(HANDLE hSerial, uint8_t * buffer, int buffersize) {
+DWORD serialGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize) {
   DWORD dwBytesRead = 0;
   if(!ReadFile(hSerial, buffer, buffersize, &dwBytesRead, NULL)){
     //handle error
@@ -67,7 +67,7 @@ DWORD readFromSerialPort(HANDLE hSerial, uint8_t * buffer, int buffersize) {
   return dwBytesRead;
 }
 
-DWORD writeToSerialPort(HANDLE hSerial, uint8_t * data, int length) {
+DWORD serialWriteByte(HANDLE hSerial, uint8_t * data, int length) {
 	DWORD dwBytesRead = 0;
 	if(!WriteFile(hSerial, data, length, &dwBytesRead, NULL)){
     DWORD errId = GetLastError();

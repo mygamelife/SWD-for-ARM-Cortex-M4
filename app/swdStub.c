@@ -139,7 +139,8 @@ void targetMain() {
 
   while(1)
   {
-    swdInstruction = (__IO uint32_t)sramRead(SWD_INSTRUCTION);
+    //swdInstruction = (__IO uint32_t)sramRead(SWD_INSTRUCTION);
+	swdInstruction = INSTRUCTION_ERASE_SECTOR;
     swdStub(swdInstruction);
   }
 }
