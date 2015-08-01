@@ -3,18 +3,24 @@
 
 #include <stdint.h>
 #include "Flash.h"
+#include "SRAM.h"
+
+#if !defined(TEST)
+#include "SystemConfigure.h"
+#endif
 
 /** SWD Instruction address 
   */
-#define TWO_KBYTES                        2000 //2k byte
-#define FOUR_KBYTES                       40002 //4k byte
+#define TWO_KBYTES                        2048 //2k byte
+#define FOUR_KBYTES                       4096 //4k byte
 #define SWD_INSTRUCTION                   ((uint32_t)0x20000000)
 #define SWD_BANK_SELECT                   ((uint32_t)0x20000004)
 #define SWD_DATA_LENGTH                   ((uint32_t)0x20000008)
-#define SWD_START_ADDRESS                 ((uint32_t)0x2000000C)
-#define SWD_END_ADDRESS                   ((uint32_t)0x20000010)
-#define SWD_TARGET_STATUS                 ((uint32_t)0x20000014)
-#define SWD_DATA32                        ((uint32_t)0x20000800)
+#define SWD_FLASH_START_ADDRESS           ((uint32_t)0x2000000C)
+#define SWD_FLASH_END_ADDRESS             ((uint32_t)0x20000010)
+#define SWD_SRAM_START_ADDRESS            ((uint32_t)0x20000014)
+#define SWD_TARGET_STATUS                 ((uint32_t)0x20000018)
+#define SWD_SRAM_DATA32_ADDRESS           ((uint32_t)0x20000800)
 
 /** SWD Instruction 
   */
@@ -23,7 +29,7 @@
 #define MASS_ERASE_BANK_2                 ((uint32_t)0x00000002)
 #define MASS_ERASE_BOTH_BANK              ((uint32_t)0x00000003)
 #define INSTRUCTION_COPY                  ((uint32_t)0x00000010)
-#define INSTRUCTION_SECTOR_ERASE          ((uint32_t)0x00000011)
+#define INSTRUCTION_ERASE_SECTOR          ((uint32_t)0x00000011)
 #define INSTRUCTION_MASS_ERASE            ((uint32_t)0x00000012)
 
 /** SWD target response
@@ -32,7 +38,11 @@
 #define TARGET_BUSY                       ((uint32_t)0x00000001)
 
 void swdStub(uint32_t swdInstruction);
-void stubCopy(void);
-void stubSectorErase(void);
-void stubMassErase(void);
+void stubCopy();
+void stubEraseSector();
+void stubMassErase();
+void targetMain();
+void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress);
+void loadMassEraseInstruction(uint32_t bankSelect);
+void loadCopyInstruction(uint32_t sramStartAddr, uint32_t flashStartAddr, int length);
 #endif // swdStub_H

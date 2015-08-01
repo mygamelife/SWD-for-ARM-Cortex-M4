@@ -1,7 +1,5 @@
 #include "SystemConfigure.h"
 
-static void SystemClock_Config(void);
-
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow : 
@@ -22,7 +20,7 @@ static void SystemClock_Config(void);
   * @param  None
   * @retval None
   */
-static void SystemClock_Config(void)
+void SystemClock_Config(void)
 {
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_OscInitTypeDef RCC_OscInitStruct;
@@ -62,9 +60,6 @@ static void SystemClock_Config(void)
 /*
  * systemConfig is a function to configure all the neccessary component before using flash
  *
- * BSP_LED_Init(LED3) Configure LED13 to indicate program is succeed
- * BSP_LED_Init(LED4) Configure LED14 to indicate program is failed
- *
  * SystemClock_Config() is a function to configure System Clock
  * !* please refer to stm32f42xx data sheet under section Embedded Flash memory interface
  */
@@ -76,11 +71,7 @@ void FlashSystemConfig(void)  {
      - Global MSP (MCU Support Package) initialization
   */
   HAL_Init();
-
-  /* Configure LED3 and LED4 for debug purpose*/
-  BSP_LED_Init(LED3);
-  BSP_LED_Init(LED4);
-
+  configureLED();
   /* Configure the system clock to 180 MHz */
   SystemClock_Config();
 }

@@ -193,7 +193,7 @@ HAL_StatusTypeDef HAL_FLASHEx_Erase(FLASH_EraseInitTypeDef *pEraseInit, uint32_t
     /*Initialization of SectorError variable*/
     *SectorError = 0xFFFFFFFF;
     
-    if(pEraseInit->TypeErase == FLASH_TYPEERASE_MASSERASE)
+    if(pEraseInit->TypeErase == FLASH_TYPEERASE_ERASE)
     {
       /*Mass erase to be done*/
       FLASH_MassErase((uint8_t) pEraseInit->VoltageRange, pEraseInit->Banks);

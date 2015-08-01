@@ -128,14 +128,7 @@ void test_readAhbIDR_return_WAIT_RESPONSE_should_retries_DPABORT_and_resend()
   //Retries
   emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
 	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
-  //Retries
-  emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
-	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
-  //Retries
-  emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
-	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
   
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
   emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
 	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
   
