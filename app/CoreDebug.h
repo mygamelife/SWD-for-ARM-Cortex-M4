@@ -18,16 +18,19 @@
 int setCore(CoreControl coreControl,CoreStatus *coreStatus);
 int setCore_Exception(CoreControl coreControl,CoreStatus *coreStatus);
 
-void configure_DEMCR(DebugMonitorControl debugmonitorcontrol,VectorCatch *vectorCatch);
-
 int write_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t data);
 int read_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t *dataRead);
 
-void check_CoreStatus(CoreStatus *coreStatus);
-void check_DebugEvent(DebugEvent *debugEvent);
-void check_VectorCatch(VectorCatch *vectorCatch);
+int check_CoreStatus(CoreStatus *coreStatus);
+int check_DebugEvent(DebugEvent *debugEvent);
+int check_DebugTrapStatus(DebugTrap *debugTrap);
 
-void enable_VectorCatch(DebugMode debugMode,VectorCatch *vectorCatch);
+int clear_DebugEvent(DebugEvent *debugEvent);
+int clear_DebugTrap(DebugTrap *debugTrap);
+
+int configure_DebugTrap(DebugTrap *debugTrap);
+
+int configure_DebugExceptionMonitorControl(DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM);
 
 
 int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries);

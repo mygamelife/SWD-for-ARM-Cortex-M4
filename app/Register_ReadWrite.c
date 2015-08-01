@@ -80,12 +80,15 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 
 int memoryAccessRead(uint32_t Address, uint32_t *dataRead)
 {
-	int ACK = 0, Parity = 0 ;
 
-	swdWriteAP(TAR_REG, &ACK, Address);
+	int ACK = 0, Parity = 0 , status = 0;
+	
+	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
 	swdReadAP(DRW_REG,&ACK,&Parity,dataRead);
-
-	return 0;
+	
+	status = compare_ParityWithData(*dataRead,Parity);
+	
+	return status ;
 }
 
 int memoryAccessWrite(uint32_t Address, uint32_t WriteData)

@@ -2,12 +2,15 @@
 #define CoreDebug_Utilities_H
 
 #include <stdint.h>
+#include "Misc_Utilities.h"
 
-#define SET_CORE_DEBUG 			0xA05F0001
-#define SET_CORE_DEBUG_HALT 	0xA05F0003
-#define SET_CORE_STEP			0xA05F0007
-#define SET_CORE_MASKINT		0xA05F000B
-#define SET_CORE_SNAPSTALL		0xA05F0023
+#define SET_CORE_NORMAL				0xA05F0000
+#define SET_CORE_DEBUG 				0xA05F0001
+#define SET_CORE_DEBUG_HALT 		0xA05F0003
+#define SET_CORE_STEP_NOMASKINT		0xA05F0005
+#define SET_CORE_STEP_MASKINT		0xA05F000D
+#define SET_CORE_MASKINT			0xA05F000B
+#define SET_CORE_SNAPSTALL			0xA05F0023
 
 #define DHCSR_S_RESET_MASK		0x200000
 #define DHCSR_S_RETIRE_MASK		0x100000
@@ -39,27 +42,32 @@
 #define FALSE 0
 #define TRUE 1
 
+#define ENABLE_DWT_ITM	1
+#define DISABLE_DWT_ITM 0
+
 #define CoreRegister_Read 0
 #define CoreRegister_Write 1
 
 typedef struct DebugEvent DebugEvent ;
 typedef struct CoreStatus CoreStatus  ;
-typedef struct VectorCatch VectorCatch ;
+typedef struct DebugTrap DebugTrap ;
 typedef struct DebugMonitorStatus DebugMonitorStatus ;
 
 typedef enum 
 {
+	CORE_NORMAL_MODE,
 	CORE_DEBUG_MODE,
 	CORE_DEBUG_HALT,
-	CORE_SINGLE_STEP,
+	CORE_SINGLE_STEP_NOMASKINT,
+	CORE_SINGLE_STEP_MASKINT,
 	CORE_MASK_INTERRUPT,
 	CORE_SNAPSTALL
 }CoreControl ;
 
 typedef enum 
 {
-	DebugMonitor_DISABLED,
-	DebugMonitor_ENABLED,
+	DebugMonitor_DISABLE,
+	DebugMonitor_ENABLE,
 	DebugMonitor_STEP
 }DebugMonitorControl ;
 
@@ -150,7 +158,7 @@ struct DebugEvent
 	int HALTED ;
 };
 
-struct VectorCatch
+struct DebugTrap
 {
 	int VC_HARDERR;
 	int VC_INTERR;
@@ -174,16 +182,19 @@ int isCore(CoreControl coreControl,CoreStatus *coreStatus);
 
 void init_CoreStatus(CoreStatus *coreStatus);
 void init_DebugEvent(DebugEvent *debugEvent);
-void init_VectorCatch(VectorCatch *vectorCatch);
+void init_DebugTrap(DebugTrap *debugTrap);
 
 void update_CoreStatus(CoreStatus *coreStatus, uint32_t dataRead);
 void update_DebugEvent(DebugEvent *debugEvent, uint32_t dataRead);
-void update_VectorCatch(VectorCatch *vectorCatch, uint32_t dataRead);
+void update_DebugTrapStatus(DebugTrap *debugTrap, uint32_t dataRead);
+
+
+
 
 uint32_t get_Core_WriteValue(CoreControl coreControl);
-uint32_t get_DEMCR_WriteValue(DebugMonitorControl debugMonitorControl,VectorCatch *vectorCatch);
 uint32_t get_CoreRegisterAccess_WriteValue(Core_RegisterSelect coreRegister,int CoreRegister_ReadWrite);
-
-int checkIs_BitSet(uint32_t data,uint32_t dataMask);
+uint32_t get_DebugExceptionMonitorControl_WriteValue(DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM);
+uint32_t get_ClearDebugEvent_WriteValue(DebugEvent *debugEvent);
+uint32_t get_ClearDebugTrap_WriteValue(DebugTrap *debugTrap);
 
 #endif // CoreDebug_Utilities_H

@@ -141,6 +141,7 @@ uint32_t tlvGetWordAddress(uint8_t *buffer, int index) {
   return address;
 }
 
+#if defined (TEST)
 /** tlvPutBytesIntoBuffer is a function 
   *
   */
@@ -158,3 +159,4 @@ void tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf) {
   pElf->address = pElf->address + length;
   pElf->size = pElf->size - dataBuffer->length;
 }
+#endif

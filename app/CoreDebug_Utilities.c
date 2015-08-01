@@ -11,30 +11,42 @@
  */
 int isCore(CoreControl coreControl,CoreStatus *coreStatus)
 {
-	int response = FALSE ;
-	
+	int status = 0;
+
 	switch(coreControl)
 	{
-		case CORE_DEBUG_MODE 	:
-									response = coreStatus->C_DEBUGEN ;
-									break ;
-		case CORE_DEBUG_HALT :
-									response = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT) ;
-									break ;					
-		case CORE_SINGLE_STEP	:
-									response = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP);
-									break ;
-		case CORE_MASK_INTERRUPT:
-									response = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_MASKINTS) ;
-									break ;
-		case CORE_SNAPSTALL	:
-									response = (coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_SNAPSTALL);
-									break ;
+		case CORE_NORMAL_MODE			:
+											status = (coreStatus->S_HALT | coreStatus->C_DEBUGEN | coreStatus->C_HALT | coreStatus->C_STEP | coreStatus->C_MASKINTS | coreStatus->C_STEP );
+											status = !status ;
+											break ;
+		
+		case CORE_DEBUG_MODE 			:
+											status = coreStatus->C_DEBUGEN ;
+											break ;
+		case CORE_DEBUG_HALT 			:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT) ;
+											break ;					
+		case CORE_SINGLE_STEP_NOMASKINT	:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP);
+											break ;
+		case CORE_SINGLE_STEP_MASKINT	:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP & coreStatus->C_MASKINTS);
+											break ;									
+											
+		case CORE_MASK_INTERRUPT		:
+											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_MASKINTS) ;
+											break ;
+		case CORE_SNAPSTALL				:
+											status = (coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_SNAPSTALL);
+											break ;
 		
 		default : break ;
 	}
 	
-	return response ;
+	if(status)
+		return ERR_NOERROR ;
+	else
+		return ERR_CORECONTROL_FAILED ;
 }
 
 /**
@@ -49,7 +61,7 @@ void init_CoreStatus(CoreStatus *coreStatus)
 	coreStatus->S_RETIRE	= 0 ; 
 	coreStatus->S_LOCKUP	= 0 ; 
 	coreStatus->S_SLEEP 	= 0 ;
-	coreStatus->S_HALT	= 0 ; 
+	coreStatus->S_HALT		= 0 ; 
 	coreStatus->S_REGRDY	= 0 ; 
 	coreStatus->C_SNAPSTALL	= 0 ; 
 	coreStatus->C_MASKINTS	= 0 ; 
@@ -75,21 +87,21 @@ void init_DebugEvent(DebugEvent *debugEvent)
 }
 
 /**
- *	Use to initialise all members in VectorCatch structure to 0
+ *	Use to initialise all members in DebugTrap structure to 0
  *	
- *	Input : vectorCatch is a pointer to vectorCatch which all the members are going to be initialised to 0
+ *	Input : debugTrap is a pointer to DebugTrap which all the members are going to be initialised to 0
  *	
  */
-void init_VectorCatch(VectorCatch *vectorCatch)
+void init_DebugTrap(DebugTrap *debugTrap)
 {
-	vectorCatch->VC_HARDERR		= 0;
-	vectorCatch->VC_INTERR		= 0;
-	vectorCatch->VC_BUSERR		= 0;
-	vectorCatch->VC_STATERR		= 0;
-	vectorCatch->VC_CHKERR		= 0;
-	vectorCatch->VC_NOCPERR		= 0;
-	vectorCatch->VC_MMERR		= 0;
-	vectorCatch->VC_CORERESET	= 0;
+	debugTrap->VC_HARDERR		= 0;
+	debugTrap->VC_INTERR		= 0;
+	debugTrap->VC_BUSERR		= 0;
+	debugTrap->VC_STATERR		= 0;
+	debugTrap->VC_CHKERR		= 0;
+	debugTrap->VC_NOCPERR		= 0;
+	debugTrap->VC_MMERR			= 0;
+	debugTrap->VC_CORERESET		= 0;
 }
 
 /**
@@ -101,57 +113,57 @@ void init_VectorCatch(VectorCatch *vectorCatch)
  */
 void update_CoreStatus(CoreStatus *coreStatus, uint32_t dataRead)
 {	
-	if ( checkIs_BitSet(dataRead,DHCSR_C_DEBUGEN_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_C_DEBUGEN_MASK) == ERR_NOERROR )
 		coreStatus-> C_DEBUGEN = 1 ;
 	else
 		coreStatus-> C_DEBUGEN = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_C_HALT_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_C_HALT_MASK) == ERR_NOERROR  )
 		coreStatus-> C_HALT = 1 ;
 	else
 		coreStatus-> C_HALT = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_C_STEP_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_C_STEP_MASK) == ERR_NOERROR )
 		coreStatus-> C_STEP = 1 ;
 	else
 		coreStatus-> C_STEP = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_C_MASKINTS_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_C_MASKINTS_MASK) == ERR_NOERROR )
 		coreStatus-> C_MASKINTS  = 1 ;
 	else
 		coreStatus-> C_MASKINTS = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_C_SNAPSTALL_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_C_SNAPSTALL_MASK) == ERR_NOERROR )
 		coreStatus-> C_SNAPSTALL = 1 ;
 	else
 		coreStatus-> C_SNAPSTALL = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_S_REGRDY_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_S_REGRDY_MASK) == ERR_NOERROR )
 		coreStatus-> S_REGRDY = 1 ;
 	else
 		coreStatus-> S_REGRDY = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_S_HALT_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_S_HALT_MASK) == ERR_NOERROR )
 		coreStatus-> S_HALT = 1 ;
 	else
 		coreStatus-> S_HALT = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_S_SLEEP_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_S_SLEEP_MASK) == ERR_NOERROR )
 		coreStatus-> S_SLEEP = 1 ;
 	else
 		coreStatus-> S_SLEEP = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_S_LOCKUP_MASK) )
+	if ( check_BitSetWithMask(dataRead,DHCSR_S_LOCKUP_MASK) == ERR_NOERROR )
 		coreStatus-> S_LOCKUP = 1 ;
 	else
 		coreStatus-> S_LOCKUP = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_S_RETIRE_MASK))
+	if ( check_BitSetWithMask(dataRead,DHCSR_S_RETIRE_MASK) == ERR_NOERROR )
 		coreStatus-> S_RETIRE = 1 ;
 	else
 		coreStatus-> S_RETIRE = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DHCSR_S_RESET_MASK))
+	if ( check_BitSetWithMask(dataRead,DHCSR_S_RESET_MASK) == ERR_NOERROR )
 		coreStatus-> S_RESET = 1 ;
 	else
 		coreStatus-> S_RESET = 0 ;
@@ -167,27 +179,27 @@ void update_CoreStatus(CoreStatus *coreStatus, uint32_t dataRead)
  */
 void update_DebugEvent(DebugEvent *debugEvent, uint32_t dataRead)
 {
-	if ( checkIs_BitSet(dataRead,DFSR_EXTERNAL_MASK) )
+	if ( check_BitSetWithMask(dataRead,DFSR_EXTERNAL_MASK) == ERR_NOERROR)
 		debugEvent->EXTERNAL = 1; 
 	else
 		debugEvent->EXTERNAL = 0; 
 	
-	if ( checkIs_BitSet(dataRead,DFSR_VCATCH_MASK) )
+	if ( check_BitSetWithMask(dataRead,DFSR_VCATCH_MASK) == ERR_NOERROR)
 		debugEvent->VCATCH = 1; 
 	else
 		debugEvent->VCATCH = 0; 
 	
-	if ( checkIs_BitSet(dataRead,DFSR_DWTTRAP_MASK) )
+	if ( check_BitSetWithMask(dataRead,DFSR_DWTTRAP_MASK) == ERR_NOERROR)
 		debugEvent->DWTTRAP = 1; 
 	else
 		debugEvent->DWTTRAP = 0;
 	
-	if ( checkIs_BitSet(dataRead,DFSR_BKPT_MASK) )
+	if ( check_BitSetWithMask(dataRead,DFSR_BKPT_MASK) == ERR_NOERROR)
 		debugEvent->BKPT = 1;
 	else
 		debugEvent->BKPT = 0;
 	
-	if ( checkIs_BitSet(dataRead,DFSR_HALTED_MASK) )
+	if ( check_BitSetWithMask(dataRead,DFSR_HALTED_MASK) == ERR_NOERROR)
 		debugEvent->HALTED = 1;	
 	else
 		debugEvent->HALTED = 0;	
@@ -196,53 +208,53 @@ void update_DebugEvent(DebugEvent *debugEvent, uint32_t dataRead)
 }
 
 /**
- *	Use to update the VectorCatch structure with the data received
+ *	Use to update the DebugTrap structure with the data received
  *	
- *	Input : vectorCatch is a pointer to VectorCatch which store whether the debug trap is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
+ *	Input : debugTrap is a pointer to DebugTrap which store whether the debug trap is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
  *			dataRead contain the data read from Debug Exception and Monitor Control Register
  *	
  */
-void update_VectorCatch(VectorCatch *vectorCatch, uint32_t dataRead)
+void update_DebugTrapStatus(DebugTrap *debugTrap, uint32_t dataRead)
 {
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_HARDERR_MASK) )
-		vectorCatch-> VC_HARDERR = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_HARDERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_HARDERR = 1 ;
 	else
-		vectorCatch-> VC_HARDERR = 0 ;
+		debugTrap-> VC_HARDERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_INTERR_MASK) )
-		vectorCatch-> VC_INTERR = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_INTERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_INTERR = 1 ;
 	else
-		vectorCatch-> VC_INTERR = 0 ;
+		debugTrap-> VC_INTERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_BUSERR_MASK) )
-		vectorCatch-> VC_BUSERR = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_BUSERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_BUSERR = 1 ;
 	else
-		vectorCatch-> VC_BUSERR = 0 ;
+		debugTrap-> VC_BUSERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_STATERR_MASK) )
-		vectorCatch-> VC_STATERR  = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_STATERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_STATERR  = 1 ;
 	else
-		vectorCatch-> VC_STATERR = 0 ;
+		debugTrap-> VC_STATERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_CHKERR_MASK) )
-		vectorCatch-> VC_CHKERR = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_CHKERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_CHKERR = 1 ;
 	else
-		vectorCatch-> VC_CHKERR = 0 ;
+		debugTrap-> VC_CHKERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_NOCPERR_MASK) )
-		vectorCatch-> VC_NOCPERR = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_NOCPERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_NOCPERR = 1 ;
 	else
-		vectorCatch-> VC_NOCPERR = 0 ;
+		debugTrap-> VC_NOCPERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_MMERR_MASK) )
-		vectorCatch-> VC_MMERR = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_MMERR_MASK) == ERR_NOERROR)
+		debugTrap-> VC_MMERR = 1 ;
 	else
-		vectorCatch-> VC_MMERR = 0 ;
+		debugTrap-> VC_MMERR = 0 ;
 	
-	if ( checkIs_BitSet(dataRead,DEMCR_VC_CORERESET_MASK) )
-		vectorCatch-> VC_CORERESET = 1 ;
+	if ( check_BitSetWithMask(dataRead,DEMCR_VC_CORERESET_MASK) == ERR_NOERROR)
+		debugTrap-> VC_CORERESET = 1 ;
 	else
-		vectorCatch-> VC_CORERESET = 0 ;
+		debugTrap-> VC_CORERESET = 0 ;
 }
 
 /**
@@ -258,23 +270,31 @@ uint32_t get_Core_WriteValue(CoreControl corecontrol)
 	
 	switch(corecontrol)
 	{
-		case CORE_DEBUG_MODE 	:
-									data = SET_CORE_DEBUG ;
-									break ;
+		case CORE_NORMAL_MODE			:
+											data = SET_CORE_NORMAL;
+											break ;
+		case CORE_DEBUG_MODE 			:
+											data = SET_CORE_DEBUG ;
+											break ;
 		
-		case CORE_DEBUG_HALT	:
-									data = SET_CORE_DEBUG_HALT ;
-									break ;
+		case CORE_DEBUG_HALT			:
+											data = SET_CORE_DEBUG_HALT ;
+											break ;
 								
-		case CORE_SINGLE_STEP	:
-									data = SET_CORE_STEP ;
-									break ;
-		case CORE_MASK_INTERRUPT:
-									data = SET_CORE_MASKINT ;
-									break ;
-		case CORE_SNAPSTALL	:
-									data = SET_CORE_SNAPSTALL ;
-									break ;
+		case CORE_SINGLE_STEP_NOMASKINT	:
+											data = SET_CORE_STEP_NOMASKINT ;
+											break ;
+	
+		case CORE_SINGLE_STEP_MASKINT	:
+											data = SET_CORE_STEP_MASKINT ;
+											break ;
+									
+		case CORE_MASK_INTERRUPT		:
+											data = SET_CORE_MASKINT ;
+											break ;
+		case CORE_SNAPSTALL				:
+											data = SET_CORE_SNAPSTALL ;
+											break ;
 		
 		default : break ;
 	}
@@ -300,19 +320,93 @@ uint32_t get_CoreRegisterAccess_WriteValue(Core_RegisterSelect coreRegister,int 
 }
 
 /**
- *	Use to check if multiple bits is set in the data
+ *	Use to get the value of the data going to be written into Debug Exception and Monitor Control Register, DEMCR
  *	
- *	Input : data contains the data going to be compared with
- *			dataMask is used to to check for the specific masked bits
- *
- *	Output : return TRUE if all the bits specified is set
- *			 return FALSE if not all/non of the bits specified is set
+ *	Input : debugMonitorControl is used to control the behaviour of Debug Monitor in ARM
+ *				Possible input value :
+ *					DebugMonitor_DISABLED  	Disable debug monitor
+ *					DebugMonitor_ENABLED	Enable debug monitor	
+ *					DebugMonitor_STEP		Enable stepping in debug monitor
+ *			debugTrap is a point to DebugTrap which store whether the debug trap is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
  *	
+ *	Output : return the 32bits data to be written into Debug Exception and Monitor Control Register, DEMCR
  */
-int checkIs_BitSet(uint32_t data,uint32_t dataMask)
+uint32_t get_DebugExceptionMonitorControl_WriteValue(DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM)
 {
-	if ((data & dataMask) == dataMask)
-		return TRUE ;
-	else
-		return FALSE ;
+	uint32_t data = 0 ;
+	
+	switch(debugMonitorControl)
+	{
+		case DebugMonitor_DISABLE :
+									data = 0 ;
+									break ;
+										
+		case DebugMonitor_ENABLE :
+									data = 0x1000;
+									break;
+		case DebugMonitor_STEP :		
+									data = 0x5000;
+									break ;		
+		
+		default : break ;
+	}
+	
+	if (enable_DWT_ITM == ENABLE_DWT_ITM)
+		data += 0x1000000 ;
+	
+	data += debugTrap->VC_HARDERR	<< Bit_10 ;
+	data += debugTrap->VC_INTERR	<< Bit_9  ;
+	data += debugTrap->VC_BUSERR	<< Bit_8  ;
+	data += debugTrap->VC_STATERR	<< Bit_7  ;
+	data += debugTrap->VC_CHKERR	<< Bit_6  ;
+	data += debugTrap->VC_NOCPERR	<< Bit_5  ;
+	data += debugTrap->VC_MMERR		<< Bit_4  ;
+	data += debugTrap->VC_CORERESET 		  ;
+	
+	return data ;
+}
+
+/**
+ *	Use to get the value of the data going to be written into Debug Fault Status Register, DFSR to clear debug event
+ *	Set the member of DebugEvent to clear 
+ *	
+ *	Input : debugEvent contains the debug event which is going to be cleared
+ *	
+ *	Output : return the 32bits data to be written into Debug Fault Status Register, DFSR to clear debug event
+ */
+uint32_t get_ClearDebugEvent_WriteValue(DebugEvent *debugEvent)
+{
+	uint32_t data = 0 ;
+	
+	data += debugEvent->EXTERNAL	<< Bit_4 ;
+	data += debugEvent->VCATCH 		<< Bit_3 ;
+	data += debugEvent->DWTTRAP 	<< Bit_2 ;
+	data += debugEvent->BKPT 		<< Bit_1 ;
+	data += debugEvent->HALTED 				 ;
+	
+	return data ;
+}
+
+/**
+ *	Use to get the value of the data going to be written into Debug Exception Monitor Status Register, DEMCRto clear debug trap
+ *	Set the member of DebugEvent to clear 
+ *	
+ *	Input : debugTrap contains the debug trap which is going to be cleared
+ *	
+ *	Output : return the 32bits data to be written into Debug Exception Monitor Status Register, DEMCRto clear debug trap
+ */
+uint32_t get_ClearDebugTrap_WriteValue(DebugTrap *debugTrap)
+{
+	uint32_t data = 0 ;
+	
+	data += !(debugTrap->VC_HARDERR)	<< Bit_10 ;
+	data += !(debugTrap->VC_INTERR) 	<< Bit_9 ;
+	data += !(debugTrap->VC_BUSERR) 	<< Bit_8 ;
+	data += !(debugTrap->VC_STATERR) 	<< Bit_7 ;
+	data += !(debugTrap->VC_CHKERR) 	<< Bit_6 ;
+	data += !(debugTrap->VC_NOCPERR) 	<< Bit_5 ;
+	data += !(debugTrap->VC_MMERR) 		<< Bit_4 ;
+	data += !(debugTrap->VC_CORERESET) 			 ;
+	
+	return data ;
 }

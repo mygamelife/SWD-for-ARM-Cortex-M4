@@ -1,7 +1,8 @@
-#include "stdint.h"
+#include <stdint.h>
 #include "unity.h"
 #include "Clock.h"
 #include "Emulator.h"
+#include "Misc_Utilities.h"
 #include "swd_Utilities.h"
 #include "Bit_Operations.h"
 #include "Register_ReadWrite.h"
@@ -140,8 +141,44 @@ void test_getSWD_Request_given_Address0x04_DP_READ_should_return_0x8D()
 	TEST_ASSERT_EQUAL(0x8D,getSWD_Request(0x04,DP,READ));
 }
 
+void test_compare_ParityWithData_given_0xFFFFFFFF_parity_0_should_return_ERR_NO_ERR()
+{
+	ErrorCode error;
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,compare_ParityWithData(0xFFFFFFFF,0));
+}
+
+void test_compare_ParityWithData_given_0x0_parity_0_should_return_ERR_NO_ERR()
+{
+	TEST_ASSERT_EQUAL(ERR_NOERROR,compare_ParityWithData(0,0));
+}
+
+void test_compare_ParityWithData_given_0xFFFFFFFF_parity_1_should_return_ERR_INVALID_PARITY_RECEIVED()
+{
+	TEST_ASSERT_EQUAL(ERR_INVALID_PARITY_RECEIVED,compare_ParityWithData(0xFFFFFFFF,1));
+}
+
+void test_compare_ParityWithData_given_0x1_parity_0_should_return_ERR_INVALID_PARITY_RECEIVED()
+{
+	TEST_ASSERT_EQUAL(ERR_INVALID_PARITY_RECEIVED,compare_ParityWithData(0x1,0));
+}
+
+void xtest_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
+  int i = 0, data = 0;
+
+  emulateWrite(0x8D, 8); //SWD 8bit protocol
+  emulateTurnAroundRead();
+  emulateSwdInput();
+  emulateRead(0x4, 3); //Acknowledgement
+  emulateRead(0x1000000, 32); //Read DATA (LSB)
+  emulateRead(0x1, 1); //Parity
+  emulateTurnAroundWrite();
+  emulateSwdOutput();
+  emulateIdleClock(8);
+}
 void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
+
 
 	emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x80));
 

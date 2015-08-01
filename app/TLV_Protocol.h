@@ -3,8 +3,14 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "Yield.h"
+
+#if defined (TEST)
 #include "Serial.h"
+#include "GetHeaders.h"
+#endif
+
+/* TLV protocol type defination */
+typedef uint8_t TLV_Byte;
 
 /* Type-Length-Value prototype */
 typedef struct
@@ -13,6 +19,12 @@ typedef struct
   uint8_t length;
   uint8_t *value;
 } TLV_TypeDef;
+
+typedef struct
+{
+  uint8_t *data;
+  uint8_t length;
+} TLV_DataBuffer;
 
 typedef struct	{
 	uint32_t state;
@@ -43,8 +55,12 @@ typedef enum  {
 
 int tlvCalculateCheckSum(uint8_t *buffer, int length);
 TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value);
-int tlvPackPacketIntoBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
-int tlvCheckProbeStatus(HANDLE hSerial, uint8_t size, uint8_t *rxBuffer);
-void tlvHost(TlvState *state, HANDLE hSerial);
-
+TLV_Byte tlvGetByte(uint8_t *data, int index);
+TLV_DataBuffer *tlvCreateDataBuffer(uint8_t *buffer, int size);
+void tlvGetBytesAddress(uint32_t address, uint8_t *buffer);
+uint32_t tlvGetWordAddress(uint8_t *buffer, int index);
+void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
+#if defined (TEST)
+void tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf);
+#endif
 #endif // TLV_Protocol_H

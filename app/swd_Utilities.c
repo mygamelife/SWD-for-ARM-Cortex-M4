@@ -52,6 +52,27 @@ int calculateParity_32bitData(uint32_t data)
 }
 
 /**
+ * Compare whether the input parity is the same as the calculated parity of the data received
+ *
+ * Input : data contains the data to be calculated for parity 
+ *		   Parity contains the input parity to be compared
+ *
+ * Output : return ERR_NOERROR if both of the parity are match
+ *			return ERR_INVALID_PARITY_RECEIVED if both of the parity does not match
+ *			
+ */
+int compare_ParityWithData(uint32_t data,int Parity)
+{
+	int calculatedParity = 0 ;
+	
+	calculatedParity = calculateParity_32bitData(data);
+	if(calculatedParity != Parity)
+		return ERR_INVALID_PARITY_RECEIVED ;
+	else
+		return ERR_NOERROR ;
+}
+
+/**
  * Obtain the bit 3 and bit 2 of the address for AP/DP register
  *
  * Input : Address_bit3 is used to store the bit 3 of the address
