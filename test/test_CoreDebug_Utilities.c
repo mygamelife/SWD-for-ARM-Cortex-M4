@@ -919,6 +919,7 @@ void test_update_DebugExceptionMonitor_given_0xFFFFFFFF_should_assert_all_member
 	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_NOCPERR);
 	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_MMERR);
 	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_CORERESET);
+	
 }
   
  
