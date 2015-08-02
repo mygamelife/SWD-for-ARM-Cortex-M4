@@ -144,19 +144,31 @@ uint32_t tlvGetWordAddress(uint8_t *buffer, int index) {
 #if defined (TEST)
 /** tlvPutBytesIntoBuffer is a function 
   *
+  * input   :
+  *
+  * return  :   1 indicate data is successfull put into buffer
+  *             0 indicate data is fail to put into buffer due to no data in section
   */
-void tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf) {
-  int i = 0, length = dataBuffer->length;
+int tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf) {
+  int i = 0, length = dataBuffer->length - 4;
   
+  /* Put section address into first 4 bytes of the buffer */
   tlvGetBytesAddress(pElf->address, dataBuffer->data);
   
   for(i; i < length; i++) {
+    if(pElf->size == 0) {
+      //printf("No data in elf section\n");
+      return 0;
+    }
+    
     /* data start at position four due to the first 4 position is reserved for address */
     dataBuffer->data[i + 4] = tlvGetByte(pElf->machineCode, i);
+      
+    /* Updata elf section address and size */
+    pElf->address++;
+    pElf->size--;
   }
   
-  /* Updata elf section address and size */
-  pElf->address = pElf->address + length;
-  pElf->size = pElf->size - dataBuffer->length;
+  return 1;    
 }
 #endif

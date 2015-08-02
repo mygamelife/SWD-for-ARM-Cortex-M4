@@ -61,6 +61,6 @@ void tlvGetBytesAddress(uint32_t address, uint8_t *buffer);
 uint32_t tlvGetWordAddress(uint8_t *buffer, int index);
 void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
 #if defined (TEST)
-void tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf);
+int tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf);
 #endif
 #endif // TLV_Protocol_H

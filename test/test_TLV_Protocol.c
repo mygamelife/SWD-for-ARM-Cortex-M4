@@ -155,20 +155,95 @@ void test_tlvGetWordAddress_given_address_DE_AD_BE_EF_should_get_0xDEADBEEF_addr
   TEST_ASSERT_EQUAL_HEX32(address32, 0xDEADBEEF);
 }
 
-void test_tlvPutBytesIntoBuffer(void)
+void test_tlvPutBytesIntoBuffer_given_address_0x200001f0_and_data_0x80b594b0_should_get_exactly_the_same(void)
 {
-  int index = 0;
-  uint8_t buffer[204];
+  int result = 0;
+  uint8_t buffer[8], buffer2[8] = {0x20, 0x00, 0x01, 0xf0, 0x80, 0xb5, 0x94, 0xb0};
   uint16_t fileSize = 0;
   
   TLV_DataBuffer *tlvDataBuffer = tlvCreateDataBuffer(buffer, sizeof(buffer));
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
-  tlvPutDataIntoBuffer(tlvDataBuffer, pElf);
-  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[0], 0x20);
-  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[1], 0x00);
-  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[2], 0x01);
-  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[3], 0xf0);
+  result = tlvPutDataIntoBuffer(tlvDataBuffer, pElf);
+  
+  TEST_ASSERT_EQUAL(result, 1);
+  
+  /* Address */
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[0], buffer2[0]);
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[1], buffer2[1]);
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[2], buffer2[2]);
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[3], buffer2[3]);
+  
+  /* Data */
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[4], buffer2[4]);
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[5], buffer2[5]);
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[6], buffer2[6]);
+  TEST_ASSERT_EQUAL_HEX8(tlvDataBuffer->data[7], buffer2[7]);
+  
+  closeFileInTxt(dataFromElf->myFile);
+}
+
+void test_tlvPutBytesIntoBuffer_should_update_address_and_size_every_time_putIntoBuffer(void)
+{
+  int result = 0;
+  uint8_t buffer[8];
+  uint16_t fileSize = 0;
+  
+  TLV_DataBuffer *tlvDataBuffer = tlvCreateDataBuffer(buffer, sizeof(buffer));
+  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+
+  result = tlvPutDataIntoBuffer(tlvDataBuffer, pElfSection);
+  
+  TEST_ASSERT_EQUAL(result, 1);
+
+  TEST_ASSERT_EQUAL_HEX32(pElfSection->address, 0x200001f4);
+  TEST_ASSERT_EQUAL_HEX16(pElfSection->size, 0x48C4);
+  
+  TLV_DataBuffer *tlvDataBuffer2 = tlvCreateDataBuffer(buffer, sizeof(buffer));
+  tlvPutDataIntoBuffer(tlvDataBuffer2, pElfSection);
+  
+  TEST_ASSERT_EQUAL_HEX32(pElfSection->address, 0x200001f8);
+  TEST_ASSERT_EQUAL_HEX16(pElfSection->size, 0x48C0);
+  
+  closeFileInTxt(dataFromElf->myFile);
+}
+
+void test_tlvPutBytesIntoBuffer_should_return_0_when_all_data_is_transfer(void)
+{
+  int result = 0, i = 0;
+  uint8_t buffer[204];
+  uint16_t fileSize = 0;
+  TLV_DataBuffer *tlvDataBuffer;
+  
+  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+
+  for(i; i < 95; i ++)  {
+    tlvDataBuffer = tlvCreateDataBuffer(buffer, sizeof(buffer));
+    result = tlvPutDataIntoBuffer(tlvDataBuffer, pElfSection);
+  }
+  
+  TEST_ASSERT_EQUAL(result, 0);
+  TEST_ASSERT_EQUAL_HEX16(pElfSection->size, 0);
+  TEST_ASSERT_EQUAL_HEX32(pElfSection->address, 0x20004ab8);
+  
+  closeFileInTxt(dataFromElf->myFile);
+}
+
+void test_tlvPackPacketIntoTxBuffer_should_get_data_from_elf_file_then_pack_into_txBuffer(void)
+{
+  int result = 0;
+  uint8_t txBuffer[1024], data[204];
+  
+  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  
+  TLV_DataBuffer *tlvDataBuffer = tlvCreateDataBuffer(data, sizeof(data));
+  TEST_ASSERT_EQUAL(tlvDataBuffer->length, 204);
+  
+  result = tlvPutDataIntoBuffer(tlvDataBuffer, pElfSection);
+  TEST_ASSERT_EQUAL(result, 1);
+  
+  TLV_TypeDef *tlv = tlvCreatePacket(TLV_WRITE, sizeof(data), data);
+  tlvPackPacketIntoTxBuffer(txBuffer, tlv);
   
   closeFileInTxt(dataFromElf->myFile);
 }
