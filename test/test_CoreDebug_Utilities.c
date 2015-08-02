@@ -337,8 +337,43 @@ void test_init_DebugTrap_should_set_all_data_to_0()
 	TEST_ASSERT_EQUAL(0,debugTrap.VC_CORERESET);
 }
 
+void test_init_DebugMonitorStatus_should_set_all_data_to_0()
+{
+	DebugMonitorStatus debugMonitor;
+	
+	init_DebugMonitorStatus(&debugMonitor);
+	
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_EN);
+}
 
-/*--------------------------------update_CoreStatus------------------------------------------*/
+void test_init_DebugExceptionMonitor_should_set_all_data_to_0()
+{
+	DebugExceptionMonitor debugExceptionMonitor;
+	
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.DWT_ITM_Enable);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_HARDERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_INTERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_BUSERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_STATERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CHKERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_NOCPERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_MMERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CORERESET);
+}
+
+
+/*--------------------------------process_CoreStatusData------------------------------------------*/
 /********************************************************
 	Debug Halting and Control Status Register , DHCSR
  
@@ -359,13 +394,13 @@ void test_init_DebugTrap_should_set_all_data_to_0()
 	
  ************************************************************/
 //Testing Bit[0]
-void test_update_CoreStatus_should_assert_C_DEBUGEN_if_bit0_is_1()
+void test_process_CoreStatusData_should_assert_C_DEBUGEN_if_bit0_is_1()
 {
 	CoreStatus coreStatus ;
 	
 	init_CoreStatus(&coreStatus);
 	
-	update_CoreStatus(&coreStatus,0x1);
+	process_CoreStatusData(&coreStatus,0x1);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -380,7 +415,7 @@ void test_update_CoreStatus_should_assert_C_DEBUGEN_if_bit0_is_1()
 	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
 }
  
-void test_update_CoreStatus_should_deassert_C_DEBUGEN_if_bit0_is_0()
+void test_process_CoreStatusData_should_deassert_C_DEBUGEN_if_bit0_is_0()
 {
 	CoreStatus coreStatus ;
 	
@@ -389,7 +424,7 @@ void test_update_CoreStatus_should_deassert_C_DEBUGEN_if_bit0_is_0()
 	coreStatus.C_DEBUGEN = 1 ;
 	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
 	
-	update_CoreStatus(&coreStatus,0);
+	process_CoreStatusData(&coreStatus,0);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -405,13 +440,13 @@ void test_update_CoreStatus_should_deassert_C_DEBUGEN_if_bit0_is_0()
 }
   
 //Testing Bit[1] 
-void test_update_CoreStatus_should_assert_C_HALT_if_bit1_is_1()
+void test_process_CoreStatusData_should_assert_C_HALT_if_bit1_is_1()
 {
 	CoreStatus coreStatus ;
 	
 	init_CoreStatus(&coreStatus);
 	
-	update_CoreStatus(&coreStatus,0x2);
+	process_CoreStatusData(&coreStatus,0x2);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -426,7 +461,7 @@ void test_update_CoreStatus_should_assert_C_HALT_if_bit1_is_1()
 	TEST_ASSERT_EQUAL(0,coreStatus.C_DEBUGEN);
 } 
  
-void test_update_CoreStatus_should_deassert_C_HALT_if_bit1_is_0()
+void test_process_CoreStatusData_should_deassert_C_HALT_if_bit1_is_0()
 {
 	CoreStatus coreStatus ;
 	
@@ -435,7 +470,7 @@ void test_update_CoreStatus_should_deassert_C_HALT_if_bit1_is_0()
 	coreStatus.C_HALT = 1 ;
 	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
 	
-	update_CoreStatus(&coreStatus,0);
+	process_CoreStatusData(&coreStatus,0);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -451,13 +486,13 @@ void test_update_CoreStatus_should_deassert_C_HALT_if_bit1_is_0()
 }  
  
 //Testing Bit[17]
-void test_update_CoreStatus_should_assert_S_HALT_if_bit17_is_1()
+void test_process_CoreStatusData_should_assert_S_HALT_if_bit17_is_1()
 {
 	CoreStatus coreStatus ;
 	
 	init_CoreStatus(&coreStatus);
 	
-	update_CoreStatus(&coreStatus,0x20000);
+	process_CoreStatusData(&coreStatus,0x20000);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -473,7 +508,7 @@ void test_update_CoreStatus_should_assert_S_HALT_if_bit17_is_1()
 	
 }
  
-void test_update_CoreStatus_should_deassert_S_HALT_if_bit17_is_0()
+void test_process_CoreStatusData_should_deassert_S_HALT_if_bit17_is_0()
 {
 	CoreStatus coreStatus ;
 	
@@ -482,7 +517,7 @@ void test_update_CoreStatus_should_deassert_S_HALT_if_bit17_is_0()
 	coreStatus.S_HALT = 1 ;
 	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
 	
-	update_CoreStatus(&coreStatus,0);
+	process_CoreStatusData(&coreStatus,0);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -499,13 +534,13 @@ void test_update_CoreStatus_should_deassert_S_HALT_if_bit17_is_0()
 }
 
 //Testing Bits[1:0] and Bit[17] 
-void test_update_CoreStatus_given_0x20003_should_assert_C_DEBUGEN_C_HALT_S_HALT()
+void test_process_CoreStatusData_given_0x20003_should_assert_C_DEBUGEN_C_HALT_S_HALT()
  {
 	CoreStatus coreStatus ;
 	
 	init_CoreStatus(&coreStatus);
 	
-	update_CoreStatus(&coreStatus,0x20003);
+	process_CoreStatusData(&coreStatus,0x20003);
 	
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RESET);
 	TEST_ASSERT_EQUAL(0,coreStatus.S_RETIRE);
@@ -758,7 +793,7 @@ void test_update_DebugEventStatus_should_deassert_VC_CORERESET_if_bit0_is_0()
 	TEST_ASSERT_EQUAL(0,debugTrap.VC_CORERESET);
 }
   
-void test_update_DebugEventStatus_should_given_0xFFFFFFFF_should_assert_all_VC()
+void test_update_DebugEventStatus_given_0xFFFFFFFF_should_assert_all_VC()
 {
 	DebugTrap debugTrap;
 	
@@ -775,6 +810,117 @@ void test_update_DebugEventStatus_should_given_0xFFFFFFFF_should_assert_all_VC()
 	TEST_ASSERT_EQUAL(1,debugTrap.VC_MMERR);
 	TEST_ASSERT_EQUAL(1,debugTrap.VC_CORERESET);
 } 
+ 
+ /*-------------------------------update_DebugMonitorStatus-----------------------------------------*/
+ /******************************************************************************************************
+	Debug Exception and Monitor Control Register , DEMCR
+ 
+	Bits[19] 	--- MON_REQ
+	Bits[18] 	--- MON_STEP
+	Bits[17] 	--- MON_PEND
+	Bits[16] 	--- MON_EN
+	
+ ******************************************************************************************************/
+ void test_update_DebugMonitorStatus__given_0x80000_should_assert_MON_REQ()
+{
+	DebugMonitorStatus debugMonitor;
+	
+	init_DebugMonitorStatus(&debugMonitor);
+
+	update_DebugMonitorStatus(&debugMonitor,0x80000);
+	
+	TEST_ASSERT_EQUAL(1,debugMonitor.MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_EN);
+} 
+ 
+  void test_update_DebugMonitorStatus_given_0xC0000_should_assert_MON_REQ_and_MON_STEP()
+{
+	DebugMonitorStatus debugMonitor;
+	
+	init_DebugMonitorStatus(&debugMonitor);
+
+	update_DebugMonitorStatus(&debugMonitor,0xC0000);
+	
+	TEST_ASSERT_EQUAL(1,debugMonitor.MON_REQ);
+	TEST_ASSERT_EQUAL(1,debugMonitor.MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugMonitor.MON_EN);
+} 
+ 
+ /*-------------------------------update_DebugMonitorStatus-----------------------------------------*/
+ /******************************************************************************************************
+	Debug Exception and Monitor Control Register , DEMCR
+ 
+	Bits[24]	--- TRCENA
+ 
+	Bits[19] 	--- MON_REQ
+	Bits[18] 	--- MON_STEP
+	Bits[17] 	--- MON_PEND
+	Bits[16] 	--- MON_EN
+
+	Bits[10] 	--- VC_HARDERR
+	Bits[9] 	--- VC_INTERR
+	Bits[8] 	--- VC_BUSERR
+	Bits[7] 	--- VC_STATERR
+	Bits[6] 	--- VC_CHKERR
+	Bits[5] 	--- VC_NOCPERR
+	Bits[4] 	--- VC_MMERR
+	
+	Bits[0] 	--- VC_CORERESET
+
+ ******************************************************************************************************/
+void test_update_DebugExceptionMonitor_given_0x1000000_should_assert_DWT_ITM_Enable_aka_TRCENA_bit()
+{
+	DebugExceptionMonitor debugExceptionMonitor ;
+	 
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	
+	update_DebugExceptionMonitor(&debugExceptionMonitor,0x1000000);
+	
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.DWT_ITM_Enable);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_HARDERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_INTERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_BUSERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_STATERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CHKERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_NOCPERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_MMERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CORERESET);
+}
+ 
+void test_update_DebugExceptionMonitor_given_0xFFFFFFFF_should_assert_all_members()
+{
+	DebugExceptionMonitor debugExceptionMonitor ;
+	 
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	
+	update_DebugExceptionMonitor(&debugExceptionMonitor,0xFFFFFFFF);
+	
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.DWT_ITM_Enable);
+	
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugMonitor->MON_EN);
+	
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_HARDERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_INTERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_BUSERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_STATERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_CHKERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_NOCPERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_MMERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_CORERESET);
+}
+  
  
 /*-------------------------------get_Core_WriteValue-----------------------------------------*/
 

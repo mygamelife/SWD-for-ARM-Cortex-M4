@@ -66,7 +66,6 @@ struct ComparatorInfo
 
 void init_FPBInfo(FPBInfo *fpbInfo);
 void init_ComparatorInfo(ComparatorInfo *compInfo,int compNo,char *compType,uint32_t address,int EnableDisable,int matchingMode);
-void update_ComparatorInfo(ComparatorInfo *compInfo,uint32_t address,int EnableDisable,uint32_t matchingMode);
 
 void process_FPControlData(FPBInfo *fpbInfo,uint32_t dataRead);
 void process_FPComparatorData(ComparatorInfo *compInfo,uint32_t dataRead);

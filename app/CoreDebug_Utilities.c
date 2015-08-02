@@ -105,13 +105,47 @@ void init_DebugTrap(DebugTrap *debugTrap)
 }
 
 /**
+ *	Use to initialise all members in DebugMonitorStatus structure to 0
+ *	
+ *	Input : debugMonitor is a pointer to DebugMonitorStatus which all the members are going to be initialised to 0
+ *	
+ */
+void init_DebugMonitorStatus(DebugMonitorStatus *debugMonitor)
+{
+	debugMonitor->MON_REQ = 0;
+	debugMonitor->MON_STEP = 0;
+	debugMonitor->MON_PEND = 0;
+	debugMonitor->MON_EN = 0;
+}
+
+/**
+ *	Use to initialise all members in DebugExceptionAndMonitor structure to 0
+ *	
+ *	Input : debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which all the members are going to be initialised to 0
+ *	
+ */
+void init_DebugExceptionMonitor(DebugExceptionMonitor *debugExceptionMonitor)
+{
+	static DebugTrap debugTrap ;
+	static DebugMonitorStatus debugMonitor ;
+	
+	init_DebugTrap(&debugTrap);
+	init_DebugMonitorStatus(&debugMonitor);
+	
+	debugExceptionMonitor->DWT_ITM_Enable = DISABLE_DWT_ITM;
+	debugExceptionMonitor->debugTrap = &debugTrap ;
+	debugExceptionMonitor->debugMonitor = &debugMonitor ;
+}
+
+
+/**
  *	Use to update the CoreStatus structure with the data received
  *	
  *	Input : coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
  *			dataRead contain the data read from Debug Halting Control and Status Register
  *	
  */
-void update_CoreStatus(CoreStatus *coreStatus, uint32_t dataRead)
+void process_CoreStatusData(CoreStatus *coreStatus, uint32_t dataRead)
 {	
 	if ( check_BitSetWithMask(dataRead,DHCSR_C_DEBUGEN_MASK) == ERR_NOERROR )
 		coreStatus-> C_DEBUGEN = 1 ;
@@ -258,6 +292,54 @@ void update_DebugTrapStatus(DebugTrap *debugTrap, uint32_t dataRead)
 }
 
 /**
+ *	Use to update the DebugMonitorStatus structure with the data received
+ *	
+ *	Input : debugMonitor is a pointer to DebugMonitorStatus which store information about the debug monitor
+ *			dataRead contain the data read from Debug Exception and Monitor Control Register
+ *	
+ */
+void update_DebugMonitorStatus(DebugMonitorStatus *debugMonitor, uint32_t dataRead)
+{
+	if ( check_BitSetWithMask(dataRead,DEMCR_MON_REQ_MASK) == ERR_NOERROR)
+		debugMonitor->MON_REQ = 1 ;
+	else 
+		debugMonitor->MON_REQ = 0 ; 
+	
+	if ( check_BitSetWithMask(dataRead,DEMCR_MON_STEP_MASK) == ERR_NOERROR)
+		debugMonitor->MON_STEP = 1 ;
+	else 
+		debugMonitor->MON_STEP = 0 ;
+	
+	if ( check_BitSetWithMask(dataRead,DEMCR_MON_PEND_MASK) == ERR_NOERROR)
+		debugMonitor->MON_PEND = 1 ;
+	else 
+		debugMonitor->MON_PEND = 0 ;
+	
+	if ( check_BitSetWithMask(dataRead,DEMCR_MON_EN_MASK) == ERR_NOERROR)
+		debugMonitor->MON_EN = 1 ; 
+	else
+		debugMonitor->MON_EN = 0 ;
+}
+
+/**
+ *	Use to update the DebugExceptionAndMonitor structure with the data received
+ *	
+ *	Input : debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
+ *			dataRead contain the data read from Debug Exception and Monitor Control Register
+ *	
+ */
+void update_DebugExceptionMonitor(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead)
+{
+	if ( check_BitSetWithMask(dataRead,DEMCR_TRCENA_MASK) == ERR_NOERROR)
+		debugExceptionMonitor->DWT_ITM_Enable = ENABLE_DWT_ITM ;
+	else 
+		debugExceptionMonitor->DWT_ITM_Enable = DISABLE_DWT_ITM ;
+	
+	update_DebugTrapStatus(debugExceptionMonitor->debugTrap,dataRead);
+	update_DebugMonitorStatus(debugExceptionMonitor->debugMonitor,dataRead);
+}
+
+/**
  *	Use to get the value of the data going to be written into Debug Halting and Control Status Register based on CoreControl mode
  *	
  *	Input : coreControl is used to set the core to the desired mode
@@ -327,7 +409,8 @@ uint32_t get_CoreRegisterAccess_WriteValue(Core_RegisterSelect coreRegister,int 
  *					DebugMonitor_DISABLED  	Disable debug monitor
  *					DebugMonitor_ENABLED	Enable debug monitor	
  *					DebugMonitor_STEP		Enable stepping in debug monitor
- *			debugTrap is a point to DebugTrap which store whether the debug trap is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
+ *			debugTrap is a pointer to DebugTrap which will be written into DEMCR to enable/disable the corresponding debugTrap
+ *			enable_DWT_ITM is use to enable / disable DWT and ITM
  *	
  *	Output : return the 32bits data to be written into Debug Exception and Monitor Control Register, DEMCR
  */

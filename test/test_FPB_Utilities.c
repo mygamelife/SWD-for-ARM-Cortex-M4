@@ -99,19 +99,6 @@ void test_init_ComparatorInfo_given_compNo_100_Instruction_address_0xFFFFFFFF_Di
 	TEST_ASSERT_EQUAL(Match_REMAP,compInfo.matchingMode);
 }
 
-/*---------------------------------------update_ComparatorInfo-----------------------------------*/
-
-void test_update_ComparatorInfo_should_update_the_ComparatorInfo()
-{
-	ComparatorInfo compInfo ;
-	
-	update_ComparatorInfo(&compInfo,0xFFFFFFFF,Disable,Match_REMAP);
-	
-	TEST_ASSERT_EQUAL(0xFFFFFFFF,compInfo.address);
-	TEST_ASSERT_EQUAL(Disable,compInfo.EnableDisable);
-	TEST_ASSERT_EQUAL(Match_REMAP,compInfo.matchingMode);
-}
-
 /*---------------------------------------process_FPControlData-----------------------------------*/
 
 void test_process_FPControlData_given_0x341_should_set_FPBInfo_numLit_to_3_numInstruction_to_4_and_enable_to_Enable()
