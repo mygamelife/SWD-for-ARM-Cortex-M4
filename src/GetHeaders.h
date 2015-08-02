@@ -20,6 +20,7 @@ typedef struct {
 
 typedef struct {
   uint8_t *machineCode;
+  int codeIndex;
   uint32_t address;
   uint8_t index;
   uint16_t size;

@@ -8,7 +8,7 @@
   *
   * return  : chksum is the check sum of the data in buffer
   */
-int tlvCalculateCheckSum(uint8_t *buffer, int length, int index) {
+uint8_t tlvCalculateCheckSum(uint8_t *buffer, int length, int index) {
   int i;
   uint8_t sum = 0, chksum = 0, result = 0;
   
@@ -24,7 +24,40 @@ int tlvCalculateCheckSum(uint8_t *buffer, int length, int index) {
 }
 
 /**
+  * tlvVerifyCheckSum
+  *
+  * input   : buffer is a array pointer to store all the data
+  *           length is to determine the total length of data
+  *           index is value start position
+  *           chksum is actual check sum value
+  *
+  * return  : 1   correct
+  *           0   wrong
+  */
+uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index) {
+  int i = 0;
+  uint8_t sum = 0, result = 0, chksum = 0;
+  
+  for(i = index; i < length - 1; i++) {
+    sum += buffer[i];
+  }
+
+  chksum = buffer[length - 1];
+  result = sum + chksum;
+  
+  if(result == 0)
+    return 1;
+  
+  else 0;
+}
+
+/**
   * tlvCreatePacket create a packet contain all the information needed for tlv protocol
+  *
+  * packet :    type          length    Address     value    chksum
+  *          +--------------------------------------------------------+
+  *          |  1st byte  |  2nd byte  |       |  3rd byte  |   0    |           
+  *          +-------------------------------------------------------+
   *
   * input   : type is to determine the instruction send by pc/probe
   *           length is to determine the total length of data need to be send/receive
@@ -32,14 +65,15 @@ int tlvCalculateCheckSum(uint8_t *buffer, int length, int index) {
   *
   * return  : return a TLV type pointer address
   */
-TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value) {
-  uint8_t chksum = 0;
+TLV_TypeDef *tlvCreateNewPacket(uint8_t type) {
+  int index = 0;
   static TLV_TypeDef tlvPacket;
   
   tlvPacket.type = type;
-  tlvPacket.length = length;
-  tlvPacket.value = value;
-  tlvPacket.chksum = tlvCalculateCheckSum(value, length, 4);
+  tlvPacket.length = 0;
+  
+  for(index = 0; index < DATA_SIZE; index++)
+    tlvPacket.value[index] = 0;
   
   return &tlvPacket;
 }
@@ -65,17 +99,14 @@ void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
   buffer[index++] = tlvPacket->type;
 
   /** Second byte of the buffer is reserved for length
-    * Length need to reserve extra 3 spaces for TLV_Protocol type, length and checksum
-    * Therefore is the tlvPacket->length + type + length + checksum
+    * Length need to reserve extra 1 spaces for checksum
     */
-  buffer[index++] = tlvPacket->length + 3;
+  buffer[index++] = tlvPacket->length;
 
   for(i = 0; i < tlvPacket->length; i++) {
     buffer[index] = tlvPacket->value[i];
     index++;
   }
-  
-  buffer[index] = tlvPacket->chksum;
 }
 
 /** tlvGetByte get byte data from elf file
@@ -89,25 +120,8 @@ TLV_Byte tlvGetByte(uint8_t *data, int index) {
   uint8_t byteData = 0;
 
   byteData = data[index];
-  //printf("byteData %x\n", byteData);
   
   return byteData;
-}
-
-/** tlvCreateDataBuffer is a function to create dataBuffer to store information
-  *
-  * input     : buffer is the array use to store data information
-  *             size is the size of the buffer
-  *
-  * return    : tlvDataBuffer is a TLV_DataBuffer type structure contain data and length
-  */
-TLV_DataBuffer *tlvCreateDataBuffer(uint8_t *buffer, int size)  {
-  static TLV_DataBuffer tlvDataBuffer;
-  
-  tlvDataBuffer.data = buffer;
-  tlvDataBuffer.length = size;
-  
-  return &tlvDataBuffer;
 }
 
 /** tlvGetAddressInByte is a function get 32bt address and split it into bytes and store into buffer
@@ -149,25 +163,32 @@ uint32_t tlvGetWordAddress(uint8_t *buffer, int index) {
   * return  :   1 indicate data is successfull put into buffer
   *             0 indicate data is fail to put into buffer due to no data in section
   */
-int tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf) {
-  int i = 0, length = dataBuffer->length - 4;
+int tlvPutDataIntoBuffer(TLV_TypeDef *tlv, ElfSection *pElf)  {
+  int index = 0, length = 0;
   
   /* Put section address into first 4 bytes of the buffer */
-  tlvGetBytesAddress(pElf->address, dataBuffer->data);
-  
-  for(i; i < length; i++) {
+  tlvGetBytesAddress(pElf->address, tlv->value);
+  tlv->length += ADDRESS_LENGTH + CHECKSUM_LENGTH;
+
+  for(index += 4; index < DATA_SIZE - 1; index++) {
     if(pElf->size == 0) {
-      //printf("No data in elf section\n");
+      tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length, ADDRESS_START_POSITION);
+      printf("No data in elf section\n");
       return 0;
     }
     
     /* data start at position four due to the first 4 position is reserved for address */
-    dataBuffer->data[i + 4] = tlvGetByte(pElf->machineCode, i);
-      
+    tlv->value[index] = tlvGetByte(pElf->machineCode, pElf->codeIndex);
+    tlv->length++;
+    
     /* Updata elf section address and size */
+    pElf->codeIndex++;
     pElf->address++;
     pElf->size--;
   }
+  
+  /* Checksum locate at the last position */
+  tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length, ADDRESS_START_POSITION);
   
   return 1;    
 }
@@ -182,7 +203,12 @@ TLV_TypeDef *tlvDecodePacket(uint8_t *buffer) {
   
   tlv.type = buffer[index++];
   tlv.length = buffer[index++];
-  //tlv.address = tlvGetWordAddress(uint8_t *buffer, index);
+  
+  tlv.address = tlvGetWordAddress(buffer, index);
+  index += ADDRESS_LENGTH;
+  
+  // for(index; index < tlv.length - 1; index++)
+    // *tlv.value++ = buffer[index];
   
   return &tlv;
 }

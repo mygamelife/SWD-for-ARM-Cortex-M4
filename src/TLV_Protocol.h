@@ -12,21 +12,16 @@
 /* TLV protocol type defination */
 typedef uint8_t TLV_Byte;
 
+#define DATA_SIZE     253
+
 /* Type-Length-Value prototype */
 typedef struct
 {
   uint8_t type;
   uint8_t length;
   uint32_t address;
-  uint8_t *value;
-  uint8_t chksum;
+  uint8_t value[DATA_SIZE];
 } TLV_TypeDef;
-
-typedef struct
-{
-  uint8_t *data;
-  uint8_t length;
-} TLV_DataBuffer;
 
 typedef struct	{
 	uint32_t state;
@@ -48,6 +43,10 @@ typedef enum  {
 } ProbeStatus;
 
 #define ONE_BYTE                  256
+#define ADDRESS_LENGTH            4
+#define CHECKSUM_LENGTH           1
+#define ADDRESS_START_POSITION    4
+
 #define BAUD_RATE                 9600
 #define TLV_CLEAR_INSTRUCTION     (uint8_t)0x00
 #define TLV_WRITE                 (uint8_t)0x01
@@ -55,12 +54,11 @@ typedef enum  {
 #define TLV_BUSY_INSTRUCTION      (uint8_t)0x03
 #define TLV_OK                    (uint8_t)0x04
 
-int tlvCalculateCheckSum(uint8_t *buffer, int length, int index);
-//int tlvVerifyCheckSum(uint8_t *buffer, int length, int index);
+uint8_t tlvCalculateCheckSum(uint8_t *buffer, int length, int index);
+uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index);
 
-TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value);
+TLV_TypeDef *tlvCreateNewPacket(uint8_t type);
 TLV_Byte tlvGetByte(uint8_t *data, int index);
-TLV_DataBuffer *tlvCreateDataBuffer(uint8_t *buffer, int size);
 void tlvGetBytesAddress(uint32_t address, uint8_t *buffer);
 uint32_t tlvGetWordAddress(uint8_t *buffer, int index);
 void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
@@ -68,6 +66,6 @@ void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
 TLV_TypeDef *tlvDecodePacket(uint8_t *buffer);
 
 #if defined (TEST)
-int tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf);
+int tlvPutDataIntoBuffer(TLV_TypeDef *tlv, ElfSection *pElf);
 #endif
 #endif // TLV_Protocol_H

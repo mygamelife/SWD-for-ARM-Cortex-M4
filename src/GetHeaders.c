@@ -612,6 +612,7 @@ ElfSection *elfGetSectionInfoFromFile(char *fileName, char *sectionName) {
   pElfSection->size = dataFromElf->sh[pElfSection->index].sh_size;
   pElfSection->address = dataFromElf->sh[pElfSection->index].sh_addr;
   pElfSection->machineCode = dataFromElf->programElf[pElfSection->index].section;
-
+  pElfSection->codeIndex = 0;
+  
   return pElfSection;
 }
