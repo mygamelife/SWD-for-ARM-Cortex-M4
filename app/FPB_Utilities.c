@@ -295,5 +295,3 @@ int get_ComparatorInfoNumber(uint32_t COMP_no)
 	
 	return data ;
 }
-
-

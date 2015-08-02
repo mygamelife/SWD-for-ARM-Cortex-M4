@@ -83,8 +83,4 @@ uint32_t get_FP_COMP_WriteValue(uint32_t address,int matchingMode,int EnableDisa
 uint32_t get_FP_REMAP_WriteValue(uint32_t address);
 int get_ComparatorInfoNumber(uint32_t COMP_no);
 
-
-
-
-
 #endif // FPB_Utilities_H
