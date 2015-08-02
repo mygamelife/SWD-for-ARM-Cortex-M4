@@ -45,7 +45,7 @@
 #endif
                                               
 /* Includes ------------------------------------------------------------------*/
-#ifndef TEST
+#if !defined(TEST)
 #include "stm32f4xx_hal.h"
 #endif
    
