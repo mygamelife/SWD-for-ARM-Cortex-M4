@@ -17,7 +17,9 @@ typedef struct
 {
   uint8_t type;
   uint8_t length;
+  uint32_t address;
   uint8_t *value;
+  uint8_t chksum;
 } TLV_TypeDef;
 
 typedef struct
@@ -53,13 +55,18 @@ typedef enum  {
 #define TLV_BUSY_INSTRUCTION      (uint8_t)0x03
 #define TLV_OK                    (uint8_t)0x04
 
-int tlvCalculateCheckSum(uint8_t *buffer, int length);
+int tlvCalculateCheckSum(uint8_t *buffer, int length, int index);
+//int tlvVerifyCheckSum(uint8_t *buffer, int length, int index);
+
 TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value);
 TLV_Byte tlvGetByte(uint8_t *data, int index);
 TLV_DataBuffer *tlvCreateDataBuffer(uint8_t *buffer, int size);
 void tlvGetBytesAddress(uint32_t address, uint8_t *buffer);
 uint32_t tlvGetWordAddress(uint8_t *buffer, int index);
 void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
+
+TLV_TypeDef *tlvDecodePacket(uint8_t *buffer);
+
 #if defined (TEST)
 int tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf);
 #endif

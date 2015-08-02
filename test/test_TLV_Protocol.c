@@ -8,6 +8,7 @@
 #include "CException.h"
 #include "ErrorCode.h"
 #include "ProgramElf.h"
+#include "CustomAssertion.h"
 
 void setUp(void)
 {
@@ -26,7 +27,7 @@ void test_tlvCalculateCheckSum_given_data_and_length_should_calc_check_sum(void)
                       0x44, 0x20, 0x50, 0x52, 0x4F, 0x46, 0x49, 0x4C,
                       0x45, 0x00, 0x46, 0x4C};
   
-  chksum = tlvCalculateCheckSum(buffer, sizeof(buffer));
+  chksum = tlvCalculateCheckSum(buffer, sizeof(buffer), 0);
   
   TEST_ASSERT_EQUAL(chksum, 0x33);
 }
@@ -46,6 +47,7 @@ void test_tlvCreatePacket_given_type_length_and_value()
   TEST_ASSERT_EQUAL(tlv->value[2], 0x03);
   TEST_ASSERT_EQUAL(tlv->value[3], 0x04);
   TEST_ASSERT_EQUAL(tlv->value[4], 0x05);
+  TEST_ASSERT_EQUAL(tlv->chksum, 0xFB);
 }
 
 void test_tlvPackPacketIntoTxBuffer_should_store_packet_info_into_buffer()
@@ -71,7 +73,7 @@ void test_tlvPackPacketIntoTxBuffer_should_store_packet_info_into_buffer()
   TEST_ASSERT_EQUAL(txBuffer[9], 0x99);
   TEST_ASSERT_EQUAL(txBuffer[10], 0xAA);
   TEST_ASSERT_EQUAL(txBuffer[11], 0xBB);
-  TEST_ASSERT_EQUAL(txBuffer[12], 0xAF); //chksum
+  TEST_ASSERT_EQUAL_HEX8(txBuffer[12], 0x9D); //chksum
 }
 
 void test_tlvGetByteData_should_read_byte_data_from_elf_file(void)
@@ -232,7 +234,7 @@ void test_tlvPutBytesIntoBuffer_should_return_0_when_all_data_is_transfer(void)
 void test_tlvPackPacketIntoTxBuffer_should_get_data_from_elf_file_then_pack_into_txBuffer(void)
 {
   int result = 0;
-  uint8_t txBuffer[1024], data[204];
+  uint8_t txBuffer[1024], data[204], addr[4] = {0x20, 0x00, 0x01, 0xf0}, chksum = 0;
   
   pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
   
@@ -243,7 +245,50 @@ void test_tlvPackPacketIntoTxBuffer_should_get_data_from_elf_file_then_pack_into
   TEST_ASSERT_EQUAL(result, 1);
   
   TLV_TypeDef *tlv = tlvCreatePacket(TLV_WRITE, sizeof(data), data);
+  
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, sizeof(data), data, tlv);
+  
   tlvPackPacketIntoTxBuffer(txBuffer, tlv);
   
+  /* Type */
+  TEST_ASSERT_EQUAL(txBuffer[0], TLV_WRITE);
+  
+  /* Length */
+  TEST_ASSERT_EQUAL(txBuffer[1], 207);
+  
+  /* Address */
+  TEST_ASSERT_EQUAL(txBuffer[2], addr[0]);
+  TEST_ASSERT_EQUAL(txBuffer[3], addr[1]);
+  TEST_ASSERT_EQUAL(txBuffer[4], addr[2]);
+  TEST_ASSERT_EQUAL(txBuffer[5], addr[3]);
+  
+  TEST_ASSERT_EQUAL(txBuffer[206], tlv->chksum);
+  
   closeFileInTxt(dataFromElf->myFile);
+}
+
+void test_tlvDecodePacket_given_require_info_inside_txBuffer(void)
+{
+  int result = 0;
+  uint8_t rxBuffer[1024] = {TLV_WRITE,  //type
+                            0x13,       //length
+                            0xAA, 0xBB, 0xCC, 0xDD, //address
+                            0x1, 0x2, 0x3, 0x4, 0x5, 0x1, //data
+                            0xFE}; //chekcsum
+  
+  TLV_TypeDef *tlv = tlvDecodePacket(rxBuffer);
+  
+  /* Type */
+  TEST_ASSERT_EQUAL(tlv->type, TLV_WRITE);
+  
+  /* Length */
+  TEST_ASSERT_EQUAL(tlv->length, 0x13);
+  
+  /* Address */
+  // TEST_ASSERT_EQUAL(txBuffer[2], addr[0]);
+  // TEST_ASSERT_EQUAL(txBuffer[3], addr[1]);
+  // TEST_ASSERT_EQUAL(txBuffer[4], addr[2]);
+  // TEST_ASSERT_EQUAL(txBuffer[5], addr[3]);
+  
+  // TEST_ASSERT_EQUAL(txBuffer[206], tlv->chksum);
 }

@@ -8,11 +8,11 @@
   *
   * return  : chksum is the check sum of the data in buffer
   */
-int tlvCalculateCheckSum(uint8_t *buffer, int length) {
+int tlvCalculateCheckSum(uint8_t *buffer, int length, int index) {
   int i;
   uint8_t sum = 0, chksum = 0, result = 0;
   
-  for(i = 0; i < length; i++) {
+  for(i = index; i < length; i++) {
     sum += buffer[i];
   }
   
@@ -39,6 +39,7 @@ TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value) {
   tlvPacket.type = type;
   tlvPacket.length = length;
   tlvPacket.value = value;
+  tlvPacket.chksum = tlvCalculateCheckSum(value, length, 4);
   
   return &tlvPacket;
 }
@@ -47,10 +48,10 @@ TLV_TypeDef *tlvCreatePacket(uint8_t type, uint8_t length, uint8_t *value) {
   * tlvPackBtyeIntoBuffer is a function to pack the created TLV_TypeDef struct pointer
   * into the buffer
   *
-  * buffer :    type     length     value    checkSum
-  *          +--------------------------------------+
-  *          |1st byte| 2nd byte | 3rd byte|   0    |           
-  *          +--------------------------------------+
+  * buffer :    type     length    Address     value    checkSum7
+  *          +--------------------------------------------------+
+  *          |1st byte| 2nd byte |       |  3rd byte  |   0    |           
+  *          +-------------------------------------------------+
   *
   * input   : buffer is a array pointer to store data that need to be transmit
   *           tlvPacket is a TLV_TypeDef struct pointer
@@ -74,8 +75,7 @@ void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
     index++;
   }
   
-  /* check sum locate at the last byte after type, length and value */
-  buffer[index] = tlvCalculateCheckSum(tlvPacket->value, tlvPacket->length);
+  buffer[index] = tlvPacket->chksum;
 }
 
 /** tlvGetByte get byte data from elf file
@@ -172,3 +172,18 @@ int tlvPutDataIntoBuffer(TLV_DataBuffer *dataBuffer, ElfSection *pElf) {
   return 1;    
 }
 #endif
+
+/** Abort if size is 0
+  *
+  */
+TLV_TypeDef *tlvDecodePacket(uint8_t *buffer) {
+  int index = 0;
+  static TLV_TypeDef tlv;
+  
+  tlv.type = buffer[index++];
+  tlv.length = buffer[index++];
+  //tlv.address = tlvGetWordAddress(uint8_t *buffer, index);
+  
+  return &tlv;
+}
+
