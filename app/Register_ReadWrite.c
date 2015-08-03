@@ -93,7 +93,7 @@ int memoryAccessRead(uint32_t Address, uint32_t *dataRead)
 
 int memoryAccessWrite(uint32_t Address, uint32_t WriteData)
 {
-	int ACK = 0, Parity = 0 ;
+	int ACK = 0;
 
   swdWriteAP(TAR_REG, &ACK, Address);
   swdWriteAP(DRW_REG, &ACK, WriteData);
@@ -121,7 +121,6 @@ int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
  */
 void powerUpSystemAndDebug()  {
   int ack = 0;
-  uint32_t errorFlag = 0;
 
   swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
 }

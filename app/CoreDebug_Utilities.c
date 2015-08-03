@@ -211,7 +211,7 @@ void process_CoreStatusData(CoreStatus *coreStatus, uint32_t dataRead)
  *			dataRead contain the data read from Debug Fault Status Register
  *	
  */
-void update_DebugEvent(DebugEvent *debugEvent, uint32_t dataRead)
+void process_DebugEventData(DebugEvent *debugEvent, uint32_t dataRead)
 {
 	if ( check_BitSetWithMask(dataRead,DFSR_EXTERNAL_MASK) == ERR_NOERROR)
 		debugEvent->EXTERNAL = 1; 
@@ -248,7 +248,7 @@ void update_DebugEvent(DebugEvent *debugEvent, uint32_t dataRead)
  *			dataRead contain the data read from Debug Exception and Monitor Control Register
  *	
  */
-void update_DebugTrapStatus(DebugTrap *debugTrap, uint32_t dataRead)
+void process_DebugTrapData(DebugTrap *debugTrap, uint32_t dataRead)
 {
 	if ( check_BitSetWithMask(dataRead,DEMCR_VC_HARDERR_MASK) == ERR_NOERROR)
 		debugTrap-> VC_HARDERR = 1 ;
@@ -298,7 +298,7 @@ void update_DebugTrapStatus(DebugTrap *debugTrap, uint32_t dataRead)
  *			dataRead contain the data read from Debug Exception and Monitor Control Register
  *	
  */
-void update_DebugMonitorStatus(DebugMonitorStatus *debugMonitor, uint32_t dataRead)
+void process_DebugMonitorData(DebugMonitorStatus *debugMonitor, uint32_t dataRead)
 {
 	if ( check_BitSetWithMask(dataRead,DEMCR_MON_REQ_MASK) == ERR_NOERROR)
 		debugMonitor->MON_REQ = 1 ;
@@ -328,15 +328,15 @@ void update_DebugMonitorStatus(DebugMonitorStatus *debugMonitor, uint32_t dataRe
  *			dataRead contain the data read from Debug Exception and Monitor Control Register
  *	
  */
-void update_DebugExceptionMonitor(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead)
+void process_DebugExceptionMonitorData(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead)
 {
 	if ( check_BitSetWithMask(dataRead,DEMCR_TRCENA_MASK) == ERR_NOERROR)
 		debugExceptionMonitor->DWT_ITM_Enable = ENABLE_DWT_ITM ;
 	else 
 		debugExceptionMonitor->DWT_ITM_Enable = DISABLE_DWT_ITM ;
 	
-	update_DebugTrapStatus(debugExceptionMonitor->debugTrap,dataRead);
-	update_DebugMonitorStatus(debugExceptionMonitor->debugMonitor,dataRead);
+	process_DebugTrapData(debugExceptionMonitor->debugTrap,dataRead);
+	process_DebugMonitorData(debugExceptionMonitor->debugMonitor,dataRead);
 }
 
 /**

@@ -203,7 +203,7 @@ void process_CoreStatusData(CoreStatus *coreStatus, uint32_t dataRead);
 void process_DebugEventData(DebugEvent *debugEvent, uint32_t dataRead);
 void process_DebugTrapData(DebugTrap *debugTrap, uint32_t dataRead);
 void process_DebugMonitorData(DebugMonitorStatus *debugMonitor, uint32_t dataRead);
-void process_DDebugExceptionMonitorData(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead);
+void process_DebugExceptionMonitorData(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead);
 
 uint32_t get_Core_WriteValue(CoreControl coreControl);
 uint32_t get_CoreRegisterAccess_WriteValue(Core_RegisterSelect coreRegister,int CoreRegister_ReadWrite);

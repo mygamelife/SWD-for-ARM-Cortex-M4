@@ -102,7 +102,7 @@ int check_DebugEvent(DebugEvent *debugEvent)
 	init_DebugEvent(debugEvent);
 	
 	status = memoryAccessRead(DFSR_REG,&dataRead);
-	update_DebugEvent(debugEvent,dataRead);
+	process_DebugEventData(debugEvent,dataRead);
 	
 	return status ;
 }
@@ -145,7 +145,7 @@ int check_DebugTrapStatus(DebugTrap *debugTrap)
 	init_DebugTrap(debugTrap);
 	
 	status = memoryAccessRead(DEMCR_REG,&dataRead);
-	update_DebugTrapStatus(debugTrap,dataRead);
+	process_DebugTrapData(debugTrap,dataRead);
 	
 	return status ;
 }
@@ -185,7 +185,7 @@ int clear_DebugTrap(DebugTrap *debugTrap)
 int write_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t data)
 {
 	int status =  0 ; 
-	uint32_t coreSelectData = 0,dataRead = 0;
+	uint32_t coreSelectData = 0;
 	
 	coreSelectData =  get_CoreRegisterAccess_WriteValue(coreRegister,CoreRegister_Write);
 	
@@ -290,7 +290,7 @@ int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugException
 	memoryAccessWrite(DEMCR_REG,data);
 	status = memoryAccessRead(DEMCR_REG,&dataRead);
 	
-	update_DebugExceptionMonitor(debugExceptionMonitor,dataRead);
+	process_DebugExceptionMonitorData(debugExceptionMonitor,dataRead);
 	return status ;
 }
 

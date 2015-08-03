@@ -98,7 +98,9 @@ void process_FPComparatorData(ComparatorInfo *compInfo,uint32_t dataRead)
 	address = (dataRead & FP_COMP_ADDRESS_MASK) + data ;
 	EnableDisable = (dataRead & FP_COMP_ENABLE_MASK);	
 
-	update_ComparatorInfo(compInfo,address,EnableDisable,matchingMode);
+  compInfo->address = address ;
+  compInfo->EnableDisable = EnableDisable ;
+  compInfo->matchingMode = matchingMode ;
 }
 
 /* Process data read from FP_Comparator register and update SRAM_REMAP_Address in FPBInfo

@@ -287,7 +287,7 @@ int configure_DWTFunction(DWTInfo *dwtInfo,uint32_t DWT_FUNCno,int firstLinkComp
 int disable_DWTComparator(DWTInfo *dwtInfo,uint32_t DWT_COMPno)
 {
 	int status = 0 ,number = 0 ;
-	int firstLinkComp = 0, secondLinkComp = 0 ,EMITRANGE = 0 ; 
+	int firstLinkComp = 0, secondLinkComp = 0 ;
 	ComparisonMode mode = 0 ;
 	DATAVSIZE size  = 0;
 	
@@ -299,7 +299,6 @@ int disable_DWTComparator(DWTInfo *dwtInfo,uint32_t DWT_COMPno)
 	secondLinkComp =dwtInfo->dwtCompInfo[number]->dwtFunctionInfo->DATAVADDR1 ;
 	firstLinkComp = dwtInfo->dwtCompInfo[number]->dwtFunctionInfo->DATAVADDR0 ;
 	size = dwtInfo->dwtCompInfo[number]->dwtFunctionInfo->dataSize ;
-	EMITRANGE = dwtInfo->dwtCompInfo[number]->dwtFunctionInfo->EMITRANGE ;
 	
 	if (dwtInfo->dwtCompInfo[number]->dwtFunctionInfo->CYCMATCH == 1)
 		mode = CycleCount_Comparison ;

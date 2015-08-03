@@ -15,8 +15,8 @@
  */
 int control_FPB(FPBInfo *fpbInfo,int EnableDisable)
 {
-	uint32_t dataToWrite ,dataRead = 0;
-	int ACK = 0 , status = 0 ;
+	uint32_t dataToWrite ;
+	int status = 0 ;
 		
 	dataToWrite = get_FP_CTRL_WriteValue(EnableDisable);
 		
