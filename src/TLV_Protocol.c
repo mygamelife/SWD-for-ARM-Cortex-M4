@@ -99,7 +99,6 @@ void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
   buffer[index++] = tlvPacket->type;
 
   /** Second byte of the buffer is reserved for length
-    * Length need to reserve extra 1 spaces for checksum
     */
   buffer[index++] = tlvPacket->length;
 
@@ -158,7 +157,8 @@ uint32_t tlvGetWordAddress(uint8_t *buffer, int index) {
 #if defined (TEST)
 /** tlvPutBytesIntoBuffer is a function 
   *
-  * input   :
+  * input   :   tlv is a TLV_TypeDef structure pointer contain all the Tlv info
+  *             pElf is ElfSection structure pointer contain all the section info
   *
   * return  :   1 indicate data is successfull put into buffer
   *             0 indicate data is fail to put into buffer due to no data in section
@@ -168,6 +168,9 @@ int tlvPutDataIntoBuffer(TLV_TypeDef *tlv, ElfSection *pElf)  {
   
   /* Put section address into first 4 bytes of the buffer */
   tlvGetBytesAddress(pElf->address, tlv->value);
+  
+  /** Length included address and checksum
+    */
   tlv->length += ADDRESS_LENGTH + CHECKSUM_LENGTH;
 
   for(index += 4; index < DATA_SIZE - 1; index++) {
@@ -198,18 +201,27 @@ int tlvPutDataIntoBuffer(TLV_TypeDef *tlv, ElfSection *pElf)  {
   *
   */
 TLV_TypeDef *tlvDecodePacket(uint8_t *buffer) {
-  int index = 0;
+  int index = 0, i = 0;
   static TLV_TypeDef tlv;
-  
+    
+  /* Type */
   tlv.type = buffer[index++];
+
+  /* Length */
   tlv.length = buffer[index++];
+
+  /* Set error code if size is 0 */
+  if(tlv.length == 0)
+    tlv.errorCode = TLV_EMPTY_BUFFER;
   
-  tlv.address = tlvGetWordAddress(buffer, index);
+  /* Address */
+  tlv.decodeAddress = tlvGetWordAddress(buffer, index);
   index += ADDRESS_LENGTH;
   
-  // for(index; index < tlv.length - 1; index++)
-    // *tlv.value++ = buffer[index];
+  /* Data */
+  for(index; index < tlv.length + 2; index++)  {
+    tlv.value[i++] = buffer[index];
+  }
   
   return &tlv;
 }
-

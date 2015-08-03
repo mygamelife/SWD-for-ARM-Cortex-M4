@@ -15,12 +15,20 @@ typedef uint8_t TLV_Byte;
 #define DATA_SIZE     253
 
 /* Type-Length-Value prototype */
+typedef enum
+{
+  TLV_EMPTY_BUFFER = 0,
+  TLV_RECEIVE_TIMEOUT
+} TLV_ErrorCode;
+
 typedef struct
 {
   uint8_t type;
   uint8_t length;
-  uint32_t address;
+  uint32_t decodeAddress;
+  uint32_t decodeValue[DATA_SIZE];
   uint8_t value[DATA_SIZE];
+  TLV_ErrorCode errorCode;
 } TLV_TypeDef;
 
 typedef struct	{
@@ -35,7 +43,7 @@ typedef enum
   TLV_SEND_VALUE,
   TLV_TRANSMIT_DATA,
   TLV_WAIT_REPLY
-} TlvState;
+} TLV_State;
 
 typedef enum  {
   PROBE_OK = 0,

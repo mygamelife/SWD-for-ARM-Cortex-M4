@@ -5,7 +5,7 @@
 #include "GetHeaders.h"
 
 typedef struct {
-  TlvState *state;
+  TLV_State *state;
   HANDLE hSerial;
   ElfData *pElfData;
 } TLVSession;
