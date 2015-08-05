@@ -3,8 +3,13 @@
 
 #include <stdio.h>
 #include <stdint.h>
-
 #define HOST_TRANSMITTER
+
+#if defined (HOST_TRANSMITTER)
+#include "GetHeaders.h"
+#include "Serial.h"
+#endif
+
 #define DATA_SIZE     253
 
 typedef enum
@@ -38,9 +43,13 @@ typedef struct
   TLV_ErrorCode errorCode;
 } TLV;
 
-typedef struct	{
-	uint32_t state;
-} TaskBlock;
+#if defined (HOST_TRANSMITTER)
+typedef struct {
+  TLV_State state;
+  HANDLE hSerial;
+  ElfSection *pElf;
+} TLVSession;
+#endif
 
 #define ONE_BYTE                  256
 #define ADDRESS_LENGTH            4
@@ -55,18 +64,9 @@ typedef struct	{
 #define TLV_OK                    (uint8_t)0x04
 
 #if defined (HOST_TRANSMITTER)
-  #include "GetHeaders.h"
-  #include "Serial.h"
-
-  typedef struct {
-    TLV_State state;
-    HANDLE hSerial;
-    ElfSection *pElf;
-  } TLVSession;
-
-  void tlvHost(TLVSession *tlvSession);
-  uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf);
-  void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf);
+void tlvHost(TLVSession *tlvSession);
+uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf);
+void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf);
 #endif
 
 TLV *tlvCreateNewPacket(uint8_t type);

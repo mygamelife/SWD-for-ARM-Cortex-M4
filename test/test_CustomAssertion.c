@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "CustomAssertion.h"
 #include "TLV_Protocol.h"
+#include "mock_Serial.h"
 #include "GetHeaders.h"
 #include "Read_File.h"
 #include "CException.h"
@@ -19,12 +20,10 @@ void tearDown(void)
 
 void test_assertTLV_call_put_data_1_times(void)
 { 
-  int result = 0;
-  
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
   TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvPutDataIntoBuffer(tlv, pElf);
+  tlvGetDataFromElf(tlv, pElf);
   
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, tlv->length, pElf, tlv);
   
@@ -34,16 +33,15 @@ void test_assertTLV_call_put_data_1_times(void)
 
 void test_assertTLV_call_put_data_2_times(void)
 { 
-  int result = 0;
   TLV *tlv;
   
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
   tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvPutDataIntoBuffer(tlv, pElf);
+  tlvGetDataFromElf(tlv, pElf);
   
   tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvPutDataIntoBuffer(tlv, pElf);
+  tlvGetDataFromElf(tlv, pElf);
   
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, tlv->length, pElf, tlv);
   
