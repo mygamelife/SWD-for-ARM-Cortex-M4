@@ -2,11 +2,12 @@
 
 static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
 
-/**
-  * initUart is a function to configure the UART peripheral
+/**  initUart is a function to configure the UART peripheral
+  *
   */
 UART_HandleTypeDef *initUart(void) {
   static UART_HandleTypeDef UartHandle;
+
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
   /* UART1 configured as follow:
       - Word Length = 8 Bits

@@ -1,6 +1,7 @@
 #include "unity.h"
 #include "CustomAssertion.h"
-#include "TLV_Protocol.h"
+#include "TLV_Host.h"
+#include "TLV_State.h"
 #include "mock_Serial.h"
 #include "GetHeaders.h"
 #include "Read_File.h"

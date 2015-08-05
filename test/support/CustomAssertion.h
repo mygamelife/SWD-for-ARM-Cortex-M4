@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 #include "unity.h"
-#include "TLV_Protocol.h"
+#include "TLV_Host.h"
 #include "GetHeaders.h"
 
 #define TEST_ASSERT_EQUAL_TLV(type, length, elf, actual)		assertTLV( type,    \

@@ -1,2 +1,2 @@
-gcc TLV_Protocol.c TLV_Host.c Serial.c GetHeaders.c Read_File.c main.c -o main.exe
+gcc TLV_Protocol.c Serial.c GetHeaders.c Read_File.c main.c -o main.exe
 ./main.exe
