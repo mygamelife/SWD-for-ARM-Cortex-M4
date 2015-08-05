@@ -1,6 +1,6 @@
 #include "CustomAssertion.h"
 
-void assertTLV(uint8_t type, uint8_t length, ElfSection *elf, TLV_TypeDef *actual, int line) {
+void assertTLV(uint8_t type, uint8_t length, ElfSection *elf, TLV *actual, int line) {
   int index = 0, elfStart = 0;
   char msg[30];
   

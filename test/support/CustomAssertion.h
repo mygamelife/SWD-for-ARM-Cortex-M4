@@ -12,6 +12,6 @@
                                                                        actual,  \
                                                                        __LINE__);                                                                            
                                                                   
-void assertTLV(uint8_t type, uint8_t length, ElfSection *elf, TLV_TypeDef *actual, int line);
+void assertTLV(uint8_t type, uint8_t length, ElfSection *elf, TLV *actual, int line);
 
 #endif // CustomAssertion_H

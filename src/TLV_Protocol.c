@@ -14,9 +14,9 @@
   *
   * return  : return a TLV type pointer address
   */
-TLV_TypeDef *tlvCreateNewPacket(uint8_t type) {
+TLV *tlvCreateNewPacket(uint8_t type) {
   int index = 0;
-  static TLV_TypeDef tlvPacket;
+  static TLV tlvPacket;
   
   tlvPacket.type = type;
   tlvPacket.length = 0;
@@ -74,21 +74,6 @@ uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index) {
   else 0;
 }
 
-/** tlvGetByteDataFromElfFile is a function read the elf file and return a byte data
-  *
-  * input   : pElf is a ElfSection type pointer contain all the elf file information
-  *
-  * return  : data in bytes
-  */
-uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf)  {
-
-  /* Updata elf section address and size */
-  pElf->address++;
-  pElf->size--;
-  
-  return pElf->code[pElf->codeIndex++];
-}
-
 /** tlvPackBytesAddress is a function convert 32bit address to bytes and pack into buffer
   *
   * input     : address is the 32bit address need to be split
@@ -104,6 +89,52 @@ void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index)  {
   buffer[index + 3] = (address & 0x000000ff) >> 0;
 }
 
+/**
+  * tlvPackBtyeIntoBuffer is a function to pack the created TLV struct pointer
+  * into the buffer
+  *
+  * buffer :    type     length    Address       value        checkSum
+  *          +-------------------------------------------------------+
+  *          | 1 byte  | 1 byte | 4 byte  | Multiple bytes  | 1 byte |           
+  *          +-------------------------------------------------------+
+  *
+  * input   : buffer is a array pointer to store data that need to be transmit
+  *           tlvPacket is a TLV struct pointer
+  *
+  * return  : NONE
+  */
+void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV *tlvPacket) {
+  int i = 0, index = 0;
+  
+  /* First byte of the buffer is reserved for type */
+  buffer[index++] = tlvPacket->type;
+
+  /** Second byte of the buffer is reserved for length
+    */
+  buffer[index++] = tlvPacket->length;
+
+  for(i = 0; i < tlvPacket->length; i++) {
+    buffer[index] = tlvPacket->value[i];
+    index++;
+  }
+}
+
+#if defined (HOST_TRANSMITTER)
+/** tlvGetByteDataFromElfFile is a function read the elf file and return a byte data
+  *
+  * input   : pElf is a ElfSection type pointer contain all the elf file information
+  *
+  * return  : data in bytes
+  */
+uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf)  {
+
+  /* Updata elf section address and size */
+  pElf->address++;
+  pElf->size--;
+  
+  return pElf->code[pElf->codeIndex++];
+}
+
 /** tlvGetDataFromElf is a function to get all the needed data from elf file 
   *
   * DATA :     Address             value              checkSum
@@ -111,12 +142,12 @@ void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index)  {
   *          | 4 byte |        Multiple bytes        | 1 byte |           
   *          +------------------------------------------------+
   *
-  * input   :   tlv is a TLV_TypeDef structure pointer contain all the Tlv info
+  * input   :   tlv is a TLV structure pointer contain all the Tlv info
   *             pElf is ElfSection structure pointer contain all the section info
   *
   * return  :   when elf data is finish transfer over
   */
-void tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf)  {
+void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf)  {
   int index = 0, length;
   
   /* First 4 byte is reserved for elf address */
@@ -143,35 +174,48 @@ void tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf)  {
   tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length - CHECKSUM_LENGTH, ADDRESS_LENGTH);
 }
 
-/**
-  * tlvPackBtyeIntoBuffer is a function to pack the created TLV_TypeDef struct pointer
-  * into the buffer
-  *
-  * buffer :    type     length    Address       value        checkSum
-  *          +-------------------------------------------------------+
-  *          | 1 byte  | 1 byte | 4 byte  | Multiple bytes  | 1 byte |           
-  *          +-------------------------------------------------------+
-  *
-  * input   : buffer is a array pointer to store data that need to be transmit
-  *           tlvPacket is a TLV_TypeDef struct pointer
-  *
-  * return  : NONE
+/** tlvHost is state machine for tlv host transmitter
+  * 
   */
-void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket) {
-  int i = 0, index = 0;
+void tlvHost(TLVSession *tlvSession)  {
+  TLV *tlv;
+  uint8_t bufferState;
+  uint8_t txBuffer[1024], rxBuffer = 0;
   
-  /* First byte of the buffer is reserved for type */
-  buffer[index++] = tlvPacket->type;
-
-  /** Second byte of the buffer is reserved for length
-    */
-  buffer[index++] = tlvPacket->length;
-
-  for(i = 0; i < tlvPacket->length; i++) {
-    buffer[index] = tlvPacket->value[i];
-    index++;
+  switch(tlvSession->state)  {
+    case TLV_START :
+      /* Create new TLV packet */
+      tlv = tlvCreateNewPacket(TLV_WRITE);
+      
+      /* Get data from elf file */
+      tlvGetDataFromElf(tlv, tlvSession->pElf);
+  
+      /* Pack into TXBUFFER */
+      if(tlvSession->pElf->size != 0) {
+        tlvPackPacketIntoTxBuffer(txBuffer, tlv);
+      }
+      else  {
+        //something here
+      }
+      tlvSession->state = TLV_TRANSMIT_DATA;
+      break;
+      
+    case TLV_TRANSMIT_DATA :
+      /* Transmit all data inside txBuffer to probe */
+      serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
+      tlvSession->state = TLV_WAIT_REPLY;
+      break;
+      
+    case TLV_WAIT_REPLY :
+      while(rxBuffer != PROBE_OK) {
+        rxBuffer = serialGetByte(tlvSession->hSerial);
+      }
+      
+      tlvSession->state = TLV_START;
+      break;
   }
 }
+#endif
 
 /** tlvGetWordAddress is a function get 32bt address from bytes
   *
@@ -190,14 +234,12 @@ uint32_t tlvGetWordAddress(uint8_t *buffer, int index) {
   return address;
 }
 
-
-
 /** Abort if size is 0
   *
   */
-TLV_TypeDef *tlvDecodePacket(uint8_t *buffer) {
+TLV *tlvDecodePacket(uint8_t *buffer) {
   int index = 0, i = 0;
-  static TLV_TypeDef tlv;
+  static TLV tlv;
     
   /* Type */
   tlv.type = buffer[index++];

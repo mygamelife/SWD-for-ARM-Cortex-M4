@@ -4,7 +4,7 @@
   * tlvHost
   */
 void tlvHost(TLVSession *tlvSession)  {
-  TLV_TypeDef *tlv;
+  TLV *tlv;
   uint8_t bufferState;
   uint8_t txBuffer[1024], rxBuffer = 0;
   

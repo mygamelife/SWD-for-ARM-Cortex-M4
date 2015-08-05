@@ -3,31 +3,15 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "Serial.h"
-#include "GetHeaders.h"
 
+#define HOST_TRANSMITTER
 #define DATA_SIZE     253
 
-/* Type-Length-Value prototype */
 typedef enum
 {
   TLV_EMPTY_BUFFER = 0,
   TLV_RECEIVE_TIMEOUT
 } TLV_ErrorCode;
-
-typedef struct
-{
-  uint8_t type;
-  int length;
-  uint32_t decodeAddress;
-  uint32_t decodeValue[DATA_SIZE];
-  uint8_t value[DATA_SIZE];
-  TLV_ErrorCode errorCode;
-} TLV_TypeDef;
-
-typedef struct	{
-	uint32_t state;
-} TaskBlock;
 
 typedef enum
 {
@@ -44,26 +28,53 @@ typedef enum  {
   PROBE_OK
 } ProbeStatus;
 
+typedef struct
+{
+  uint8_t type;
+  int length;
+  uint32_t decodeAddress;
+  uint32_t decodeValue[DATA_SIZE];
+  uint8_t value[DATA_SIZE];
+  TLV_ErrorCode errorCode;
+} TLV;
+
+typedef struct	{
+	uint32_t state;
+} TaskBlock;
+
 #define ONE_BYTE                  256
 #define ADDRESS_LENGTH            4
 #define CHECKSUM_LENGTH           1
 
 #define BAUD_RATE                 9600
-#define TLV_CLEAR_INSTRUCTION     (uint8_t)0x00
-#define TLV_WRITE                 (uint8_t)0x01
-#define TLV_READ_INSTRUCTION      (uint8_t)0x02
-#define TLV_BUSY_INSTRUCTION      (uint8_t)0x03
+#define TLV_BUFFER_EMPTY          0
+#define TLV_CLEAR                 (uint8_t)0x10
+#define TLV_WRITE                 (uint8_t)0x20
+#define TLV_READ                  (uint8_t)0x30
+#define TLV_BUSY                  (uint8_t)0x40
 #define TLV_OK                    (uint8_t)0x04
 
-TLV_TypeDef *tlvCreateNewPacket(uint8_t type);
+#if defined (HOST_TRANSMITTER)
+  #include "GetHeaders.h"
+  #include "Serial.h"
+
+  typedef struct {
+    TLV_State state;
+    HANDLE hSerial;
+    ElfSection *pElf;
+  } TLVSession;
+
+  void tlvHost(TLVSession *tlvSession);
+  uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf);
+  void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf);
+#endif
+
+TLV *tlvCreateNewPacket(uint8_t type);
 uint8_t tlvCalculateCheckSum(uint8_t *buffer, int length, int index);
 uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index);
-uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf);
 void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index);
-void tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf);
-
 uint32_t tlvGetWordAddress(uint8_t *buffer, int index);
-void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
-TLV_TypeDef *tlvDecodePacket(uint8_t *buffer);
+void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV *tlvPacket);
+TLV *tlvDecodePacket(uint8_t *buffer);
 
 #endif // TLV_Protocol_H

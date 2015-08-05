@@ -23,7 +23,7 @@ void test_assertTLV_call_put_data_1_times(void)
   
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
-  TLV_TypeDef *tlv = tlvCreateNewPacket(TLV_WRITE);
+  TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
   result = tlvPutDataIntoBuffer(tlv, pElf);
   
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, tlv->length, pElf, tlv);
@@ -35,7 +35,7 @@ void test_assertTLV_call_put_data_1_times(void)
 void test_assertTLV_call_put_data_2_times(void)
 { 
   int result = 0;
-  TLV_TypeDef *tlv;
+  TLV *tlv;
   
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
@@ -57,7 +57,7 @@ void test_assertTLV_given_Wrong_value_should_give_some_feedback(void)
   uint8_t value[] = {0x1, 0x2, 0x3, 0x4, 0x5};
   uint8_t actualValue[] = {0x1, 0x2, 0x3, 0x4, 0x6};
   
-  TLV_TypeDef *tlv = tlvCreatePacket(TLV_WRITE, sizeof(actualValue), actualValue);
+  TLV *tlv = tlvCreatePacket(TLV_WRITE, sizeof(actualValue), actualValue);
   
 	TEST_ASSERT_EQUAL_TLV(TLV_WRITE, sizeof(value), value, tlv);
 }*/

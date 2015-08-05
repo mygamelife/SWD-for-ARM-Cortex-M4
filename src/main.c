@@ -10,7 +10,7 @@ int main(void) {
   // const char *comPort = "COM7";
   
   /* Create new TLV packet */
-  // TLV_TypeDef *tlv = tlvCreateNewPacket(TLV_WRITE);
+  // TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
 
   initElfData();
   
