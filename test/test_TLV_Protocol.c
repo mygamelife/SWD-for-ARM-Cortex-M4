@@ -154,14 +154,11 @@ void test_tlvPackBytesAddress_given_index_4_and_address_0xDEADBEEF_buffer_should
 
 void test_tlvGetDataFromElf_data_should_contain_address_data_and_checkSum(void)
 { 
-  int result = 0;
-  
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
   TLV_TypeDef *tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvGetDataFromElf(tlv, pElf);
+  tlvGetDataFromElf(tlv, pElf);
   
-  TEST_ASSERT_EQUAL(result, 1);
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
   
   TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
@@ -176,32 +173,49 @@ void test_tlvGetDataFromElf_data_should_contain_address_data_and_checkSum(void)
 
 void test_tlvGetDataFromElf_calling_tlvGetDataFromElf_3_times_should_get_data_and_update_information_correctly(void)
 {
-  int result = 0;
   TLV_TypeDef *tlv;
   
   ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
 
   tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvGetDataFromElf(tlv, pElf);
-  TEST_ASSERT_EQUAL(result, 1);
+  tlvGetDataFromElf(tlv, pElf);
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
   TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
   
   tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvGetDataFromElf(tlv, pElf);
-  TEST_ASSERT_EQUAL(result, 1);
+  tlvGetDataFromElf(tlv, pElf);
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
   TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
   
   tlv = tlvCreateNewPacket(TLV_WRITE);
-  result = tlvGetDataFromElf(tlv, pElf);
-  TEST_ASSERT_EQUAL(result, 1);
+  tlvGetDataFromElf(tlv, pElf);
   TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
   TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
   
   /* Elf section Address and Size*/
   TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x200004D8);
   TEST_ASSERT_EQUAL_HEX16(pElf->size, 0x45E0);
+  
+  closeFileInTxt(dataFromElf->myFile);
+  free(pElf);
+}
+
+void test_tlvGetDataFromElf_get_all_the_data_from_elf_file_until_size_is_0(void)
+{
+  TLV_TypeDef *tlv;
+  
+  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+
+  while(pElf->size != 0) {
+    tlv = tlvCreateNewPacket(TLV_WRITE);
+    tlvGetDataFromElf(tlv, pElf);
+    TEST_ASSERT_EQUAL_TLV(TLV_WRITE, tlv->length, pElf, tlv);
+    TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
+  }
+
+  /* Elf section Address and Size*/
+  TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x20004ab8);
+  TEST_ASSERT_EQUAL_HEX16(pElf->size, 0x00);
   
   closeFileInTxt(dataFromElf->myFile);
   free(pElf);

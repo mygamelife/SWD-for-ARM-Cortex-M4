@@ -114,10 +114,9 @@ void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index)  {
   * input   :   tlv is a TLV_TypeDef structure pointer contain all the Tlv info
   *             pElf is ElfSection structure pointer contain all the section info
   *
-  * return  :   1 indicate data is successfull put into buffer
-  *             0 indicate data is fail to put into buffer due to no data in section
+  * return  :   when elf data is finish transfer over
   */
-int tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf)  {
+void tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf)  {
   int index = 0, length;
   
   /* First 4 byte is reserved for elf address */
@@ -132,28 +131,26 @@ int tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf)  {
     if(pElf->size == 0) {
       tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length - CHECKSUM_LENGTH, ADDRESS_LENGTH);
       printf("No data in elf section\n");
-      return 0;
+      return;
     }
     
-    /* Acquire information from elf file */
+    /* Retrieve information from elf file */
     tlv->value[index] = tlvGetByteDataFromElfFile(pElf);
     tlv->length++;
   }
   
   /* Checksum locate at the last position */
   tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length - CHECKSUM_LENGTH, ADDRESS_LENGTH);
-  
-  return 1;    
 }
 
 /**
   * tlvPackBtyeIntoBuffer is a function to pack the created TLV_TypeDef struct pointer
   * into the buffer
   *
-  * buffer :    type     length    Address     value    checkSum7
-  *          +--------------------------------------------------+
-  *          |1st byte| 2nd byte |       |  3rd byte  |   0    |           
-  *          +-------------------------------------------------+
+  * buffer :    type     length    Address       value        checkSum
+  *          +-------------------------------------------------------+
+  *          | 1 byte  | 1 byte | 4 byte  | Multiple bytes  | 1 byte |           
+  *          +-------------------------------------------------------+
   *
   * input   : buffer is a array pointer to store data that need to be transmit
   *           tlvPacket is a TLV_TypeDef struct pointer

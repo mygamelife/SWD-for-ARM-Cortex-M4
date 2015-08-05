@@ -60,7 +60,7 @@ uint8_t tlvCalculateCheckSum(uint8_t *buffer, int length, int index);
 uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index);
 uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf);
 void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index);
-int tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf);
+void tlvGetDataFromElf(TLV_TypeDef *tlv, ElfSection *pElf);
 
 uint32_t tlvGetWordAddress(uint8_t *buffer, int index);
 void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV_TypeDef *tlvPacket);
