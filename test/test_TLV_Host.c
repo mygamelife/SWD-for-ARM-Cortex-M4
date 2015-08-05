@@ -349,3 +349,32 @@ void test_tlvHost_when_state_changed_to_TLV_WAIT_REPLY_should_transmit_all_txbuf
   free(pElfSection);
   free(dataFromElf);
 }
+
+void test_tlvHost_when_elf_section_size_is_0_should_change_state_to_TLV_END_and_send_message_inform_probe_to_stop()
+{
+  HANDLE hSerial;
+  TLVSession tlvSession;
+  
+  /* Open elf file */
+  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  
+  /* Initialize TlvSeesion structure */
+  tlvSession.state = TLV_START;
+  tlvSession.pElf = pElfSection;
+  tlvSession.hSerial = hSerial;
+  
+  tlvSession.pElf->size = 0x00;
+  tlvHost(&tlvSession);
+  
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_END);
+  
+  serialWriteByte_IgnoreAndReturn(255);
+  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_OK);
+  tlvHost(&tlvSession);
+  
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_COMPLETE);
+    
+  closeFileInTxt(dataFromElf->myFile);
+  free(pElfSection);
+  free(dataFromElf);
+}

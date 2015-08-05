@@ -185,22 +185,24 @@ void tlvHost(TLVSession *tlvSession)  {
     case TLV_START :
       /* Create new TLV packet */
       tlv = tlvCreateNewPacket(TLV_WRITE);
-      
-      /* Get data from elf file */
-      tlvGetDataFromElf(tlv, tlvSession->pElf);
-  
-      /* Pack into TXBUFFER */
-      if(tlvSession->pElf->size != 0) {
-        tlvPackPacketIntoTxBuffer(txBuffer, tlv);
+
+      if(tlvSession->pElf->size == 0) {
+        tlvSession->state = TLV_END;
+        break;
       }
       else  {
-        //something here
+        /* Get data from elf file */
+        tlvGetDataFromElf(tlv, tlvSession->pElf);
+        /* Pack into TXBUFFER */
+        tlvPackPacketIntoTxBuffer(txBuffer, tlv);
       }
+      
       tlvSession->state = TLV_TRANSMIT_DATA;
       break;
       
     case TLV_TRANSMIT_DATA :
       /* Transmit all data inside txBuffer to probe */
+      printf("Data Starting To Transfer\n");
       serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
       tlvSession->state = TLV_WAIT_REPLY;
       break;
@@ -209,8 +211,17 @@ void tlvHost(TLVSession *tlvSession)  {
       while(rxBuffer != PROBE_OK) {
         rxBuffer = serialGetByte(tlvSession->hSerial);
       }
-      
+      printf("Probe reply OK!\n");
       tlvSession->state = TLV_START;
+      break;
+    
+    case TLV_END  :
+      txBuffer[0] = TLV_TRANSFER_COMPLETE;
+      serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
+      while(rxBuffer != PROBE_OK) {
+        rxBuffer = serialGetByte(tlvSession->hSerial);
+      }
+      tlvSession->state = TLV_COMPLETE;
       break;
   }
 }

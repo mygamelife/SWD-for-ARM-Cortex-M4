@@ -1,4 +1,5 @@
 #include "UART.h"
+#include "TLV_Probe.h"
 #include "swdProtocol.h"
 #include "configurePort.h"
 #include "SystemConfigure.h"
@@ -7,7 +8,7 @@
 int main(void)
 {
 	uint8_t rxBuffer[1024] = {0}, received = 1;
-	uint8_t txBuffer[] = {"HELLO"};
+	uint8_t txBuffer[] = {PROBE_OK};
 
 	HAL_Init();
 	configureUartPorts();
@@ -26,7 +27,7 @@ int main(void)
 	    - Hardware flow control disabled (RTS and CTS signals) */
 	UartHandle.Instance          = USARTx;
 
-	UartHandle.Init.BaudRate     = 9600;
+	UartHandle.Init.BaudRate     = 115200;
 	UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
 	UartHandle.Init.StopBits     = UART_STOPBITS_1;
 	UartHandle.Init.Parity       = UART_PARITY_NONE;
@@ -39,11 +40,11 @@ int main(void)
 		  errorHandler();
 	}
 
-	//HAL_UART_Transmit(&UartHandle, txBuffer, sizeof(txBuffer), 5000);
-
-	while(received)	{
+	while(rxBuffer[0] != TLV_TRANSFER_COMPLETE)	{
 		if(HAL_UART_Receive(&UartHandle, rxBuffer, sizeof(rxBuffer), 5000) == HAL_OK)	{
-			received = 0;
+			if(HAL_UART_Transmit(&UartHandle, txBuffer, sizeof(txBuffer), 5000) != HAL_OK)	{
+				errorHandler();
+			}
 		}
 	}
 

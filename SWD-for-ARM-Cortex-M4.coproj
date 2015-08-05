@@ -100,19 +100,19 @@
     <File name="Code/swdProtocol.c" path="app/swdProtocol.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_dma.h" path="app/Hardware/stm32f4xx_hal_dma.h" type="1"/>
     <File name="Hardware" path="" type="2"/>
+    <File name="Code/TLV_Probe.c" path="app/TLV_Probe.c" type="1"/>
     <File name="Code/Register_ReadWrite.c" path="app/Register_ReadWrite.c" type="1"/>
-    <File name="Code/CoreDebug.h" path="app/CoreDebug.h" type="1"/>
     <File name="Code/Delay.h" path="app/Delay.h" type="1"/>
+    <File name="Code/CoreDebug.h" path="app/CoreDebug.h" type="1"/>
     <File name="Hardware/startup_stm32f429xx.s" path="app/Hardware/startup_stm32f429xx.s" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_pwr.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c" type="1"/>
-    <File name="Hardware/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
     <File name="Core/core_cmFunc.h" path="app/Hardware/core_cmFunc.h" type="1"/>
+    <File name="Hardware/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_pwr.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c" type="1"/>
     <File name="STM32F4/system_stm32f4xx.c" path="app/system_stm32f4xx.c" type="1"/>
-    <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
     <File name="Code/UART.c" path="app/UART.c" type="1"/>
+    <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h" type="1"/>
-    <File name="Code/TLV_Protocol.c" path="app/TLV_Protocol.c" type="1"/>
     <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
     <File name="Code/swdProtocol.h" path="app/swdProtocol.h" type="1"/>
     <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
@@ -129,23 +129,23 @@
     <File name="Hardware/stm32f4xx_hal_i2c.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h" type="1"/>
-    <File name="Code/TLV_Protocol.h" path="app/TLV_Protocol.h" type="1"/>
     <File name="Code/Reset.h" path="app/Reset.h" type="1"/>
     <File name="Code/SRAM.h" path="app/SRAM.h" type="1"/>
     <File name="Code/LED.h" path="app/LED.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h" type="1"/>
     <File name="Code/SystemConfigure.c" path="app/SystemConfigure.c" type="1"/>
-    <File name="Code/FPB_Unit.h" path="app/FPB_Unit.h" type="1"/>
     <File name="Code/Bit_Operations.c" path="app/Bit_Operations.c" type="1"/>
+    <File name="Code/FPB_Unit.h" path="app/FPB_Unit.h" type="1"/>
     <File name="Code/swdStub.h" path="app/swdStub.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_flash_ex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_i2c.h" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_flash_ex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c" type="1"/>
     <File name="Hardware/system_stm32f4xx.h" path="app/Hardware/system_stm32f4xx.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_conf.h" path="app/stm32f4xx_hal_conf.h" type="1"/>
     <File name="Code/Reset.c" path="app/Reset.c" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_conf.h" path="app/stm32f4xx_hal_conf.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_uart.h" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h" type="1"/>
     <File name="Code/UART.h" path="app/UART.h" type="1"/>
     <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
+    <File name="Code/TLV_Probe.h" path="app/TLV_Probe.h" type="1"/>
     <File name="Code/FPB_Unit.c" path="app/FPB_Unit.c" type="1"/>
     <File name="Core/core_cm4.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/CMSIS/Include/core_cm4.h" type="1"/>
     <File name="Code/IO_Operations.h" path="app/IO_Operations.h" type="1"/>
@@ -153,6 +153,7 @@
     <File name="Hardware/stm32f4xx_hal_pwr.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr.h" type="1"/>
     <File name="Code/configurePort.h" path="app/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c" type="1"/>
+    <File name="Code/TLV_State.h" path="app/TLV_State.h" type="1"/>
     <File name="Code/configurePort.c" path="app/configurePort.c" type="1"/>
     <File name="Code/swd_Utilities.c" path="app/swd_Utilities.c" type="1"/>
     <File name="Code/IO_Operations.c" path="app/IO_Operations.c" type="1"/>
@@ -166,8 +167,8 @@
     <File name="Hardware/stm32f4xx_hal.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Code/CoreDebug_Utilities.h" path="app/CoreDebug_Utilities.h" type="1"/>
-    <File name="Code/swd_Utilities.h" path="app/swd_Utilities.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
+    <File name="Code/swd_Utilities.h" path="app/swd_Utilities.h" type="1"/>
     <File name="Code/Flash.c" path="app/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_uart.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c" type="1"/>
     <File name="Core" path="" type="2"/>

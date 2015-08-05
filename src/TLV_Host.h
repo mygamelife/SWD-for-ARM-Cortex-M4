@@ -7,15 +7,6 @@
 #include "TLV_State.h"
 #include "Serial.h"
 
-#define DATA_SIZE     253
-
-typedef struct
-{
-  uint8_t type;
-  int length;
-  uint8_t value[DATA_SIZE];
-} TLV;
-
 typedef struct {
   TLV_State state;
   HANDLE hSerial;
