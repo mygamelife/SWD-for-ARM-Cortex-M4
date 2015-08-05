@@ -3,12 +3,15 @@
 
 #include "TLV_Protocol.h"
 #include "GetHeaders.h"
+#include "Serial.h"
 
 typedef struct {
-  TLV_State *state;
+  TLV_State state;
   HANDLE hSerial;
-  ElfData *pElfData;
+  ElfSection *pElf;
 } TLVSession;
+
+#define TLV_BUFFER_EMPTY        0
 
 void tlvHost(TLVSession *tlvSession);
 

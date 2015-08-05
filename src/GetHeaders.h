@@ -2,7 +2,7 @@
 #define Get_File_Header_H
 
 #include <stdio.h>
-#include "unity.h"
+//#include "unity.h"
 
 #include "Read_File.h"
 #include "elf.h"
@@ -19,11 +19,11 @@ typedef struct {
 } ElfData;
 
 typedef struct {
-  uint8_t *machineCode;
-  int codeIndex;
+  int  index;
+  uint8_t *code;
+  uint32_t codeIndex;
   uint32_t address;
-  uint8_t index;
-  uint16_t size;
+  uint32_t size;
 } ElfSection;
 
 extern ElfData *dataFromElf;

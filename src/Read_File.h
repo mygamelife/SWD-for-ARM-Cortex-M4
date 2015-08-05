@@ -2,7 +2,7 @@
 #define Read_File_H
 
 #include <stdio.h>
-#include "unity.h"
+//#include "unity.h"
 
 #include "elf.h"
 
@@ -32,7 +32,7 @@ uint32_t twoByte(InStream *getByte);
 uint32_t fourByte(InStream *getByte);
 uint32_t byteSelection(InStream *getByte, int inputByte);
 
-uint32_t inStreamMoveFilePtr(InStream *myFile, long int offset);
+//uint32_t inStreamMoveFilePtr(InStream *myFile, long int offset);
 uint32_t posPtr(InStream *myFile);
 
 #endif // Read_File_H
