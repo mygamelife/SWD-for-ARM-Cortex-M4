@@ -15,6 +15,8 @@
 #define DCRSR_REG	0xE000EDF4	  
 #define DCRDR_REG 	0xE000EDF8
 
+#define AIRCR_REG	0xE000ED0C
+
 int setCore(CoreControl coreControl,CoreStatus *coreStatus);
 int setCore_Exception(CoreControl coreControl,CoreStatus *coreStatus);
 
@@ -28,14 +30,9 @@ int check_DebugTrapStatus(DebugTrap *debugTrap);
 int clear_DebugEvent(DebugEvent *debugEvent);
 int clear_DebugTrap(DebugTrap *debugTrap);
 
-int configure_DebugTrap(DebugTrap *debugTrap);
-
-int configure_DebugExceptionMonitorControl(DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM);
-
-
 int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries);
 
+int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugExceptionMonitor,DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM);
 
-
-
+int perform_HaltOnReset(CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor);
 #endif // CoreDebug_H

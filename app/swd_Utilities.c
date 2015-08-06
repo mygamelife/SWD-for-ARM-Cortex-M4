@@ -257,7 +257,7 @@ void swdReadWriteApWithRetries(int readOrWrite, int address, int *ack, int *pari
  * Return : ack is the acknowledgement status
  */
 int retriesSwdOperation(int readOrWrite, int address, int APorDP, int *parity, uint32_t *data, int numOfRetires)  {
-  int ack = 0, count = 0;
+  int ack = 0;
   
   if(APorDP == DP)
     swdReadWriteDpWithRetries(readOrWrite, address, &ack, parity, data, numOfRetires);

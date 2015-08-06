@@ -106,7 +106,7 @@ void test_init_DWTCompratorInfo_should_initialise_DWTComparatorInfo_and_DWTFunct
 	
 	init_DWTComparatorInfo(&compInfo,&funcInfo);
 	
-	TEST_ASSERT_EQUAL(0,compInfo.address);
+	TEST_ASSERT_EQUAL(0,compInfo.data);
 	TEST_ASSERT_EQUAL(0,compInfo.ignoreMask);
 	TEST_ASSERT_EQUAL(Ignore_Non,compInfo.ignoreMask);
 	TEST_ASSERT_EQUAL(&funcInfo,compInfo.dwtFunctionInfo);
@@ -158,7 +158,7 @@ void test_init_DWTInfo_should_initialise_all_8bit_and_32bitcounters_DWTControl_a
 	TEST_ASSERT_EQUAL(0,dwtInfo.PCSample->previousValue);
 	TEST_ASSERT_EQUAL(0,dwtInfo.PCSample->currentValue);	
 	
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->address);
+	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->data);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->ignoreMask);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->MATCHED);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR1);
@@ -170,7 +170,7 @@ void test_init_DWTInfo_should_initialise_all_8bit_and_32bitcounters_DWTControl_a
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->EMITRANGE);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dwtFunction);
 	
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->address);
+	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->data);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->ignoreMask);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->MATCHED);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR1);
@@ -182,7 +182,7 @@ void test_init_DWTInfo_should_initialise_all_8bit_and_32bitcounters_DWTControl_a
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->EMITRANGE);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dwtFunction);
 	
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->address);
+	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->data);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->ignoreMask);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->MATCHED);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->DATAVADDR1);
@@ -194,7 +194,7 @@ void test_init_DWTInfo_should_initialise_all_8bit_and_32bitcounters_DWTControl_a
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->EMITRANGE);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->dwtFunction);
 	
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->address);
+	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->data);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->ignoreMask);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->MATCHED);
 	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVADDR1);
@@ -397,7 +397,7 @@ void test_process_DWTComparatorData_given_0x12345678_should_update_address_in_DW
 	
 	process_DWTComparatorData(&dwtCompInfo,0x12345678);
 	
-	TEST_ASSERT_EQUAL(0x12345678,dwtCompInfo.address);
+	TEST_ASSERT_EQUAL(0x12345678,dwtCompInfo.data);
 	
 }
 
@@ -407,7 +407,7 @@ void test_process_DWTComparatorData_given_0xFFFFFFFF_should_update_addressn_DWTC
 	
 	process_DWTComparatorData(&dwtCompInfo,0xFFFFFFFF);
 	
-	TEST_ASSERT_EQUAL(0xFFFFFFFF,dwtCompInfo.address);
+	TEST_ASSERT_EQUAL(0xFFFFFFFF,dwtCompInfo.data);
 }
 
 /*------------------process_DWTMaskData--------------*/
@@ -446,7 +446,7 @@ void test_process_DWTFunctionData_given_0xFFFFFFFF_should_update_DWTFunction()
 	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.DATAVMATCH);
 	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.CYCMATCH);
 	TEST_ASSERT_EQUAL(1,dwtFunctionInfo.EMITRANGE);
-	TEST_ASSERT_EQUAL(Sample_PC_Data_Write,dwtFunctionInfo.dwtFunction);
+	TEST_ASSERT_EQUAL(Sample_DataAddressOffset_Data_Write,dwtFunctionInfo.dwtFunction);
 }
 
 void test_process_DWTFunctionData_given_0xFEFAB8F0_should_update_DWTFunction()
@@ -486,14 +486,19 @@ void test_process_DWTFunctionData_given_0x11111111_should_update_DWTFunction()
 }
 
 /*------------------get_DWTFunction_WriteValue--------------*/
-void_test_get_DWTFunction_WriteValue_given_1stLink_0xF_2ndLink_0xA_CycleCountCompare_HalfWord_EMITRANGE1_DWTFunction_DISABLED_should_return0x000FA4A0()
+void_test_get_DWTFunction_WriteValue_given_1stLink_0xF_2ndLink_0xA_CycleCountCompare_HalfWord_DWTFunction_DISABLED_should_return0x000FA4A0()
 {
-	TEST_ASSERT_EQUAL(0x000FA4A0,get_DWTFunction_WriteValue(0xF,0xA,CycleCount_Comparaison,Halfword,1,DWTFunction_Disabled));
+	TEST_ASSERT_EQUAL(0x000FA4A0,get_DWTFunction_WriteValue(0xF,0xA,CycleCount_Comparison,Halfword,DWTFunction_Disabled));
 }
 
-void_test_get_DWTFunction_WriteValue_given_1stLink_0x3_2ndLink_0x5_DataValueCompare_Word_EMITRANGE1_DWTFunction_DISABLED_should_return0x000FA920()
+void_test_get_DWTFunction_WriteValue_given_1stLink_0x3_2ndLink_0x5_DataValueCompare_Word_DWTFunction_DISABLED_should_return0x000FA900()
 {
-	TEST_ASSERT_EQUAL(0x000FA920,get_DWTFunction_WriteValue(0x3,0x5,DataValue_Comparaison,Word,1,DWTFunction_Disabled));
+	TEST_ASSERT_EQUAL(0x000FA900,get_DWTFunction_WriteValue(0x3,0x5,DataValue_Comparison,Word,DWTFunction_Disabled));
+}
+
+void_test_get_DWTFunction_WriteValue_given_1stLink_0x3_2ndLink_0x5_DataValueCompare_Word_ITM_Emit_AddressOffset_should_return0x000FA921()
+{
+	TEST_ASSERT_EQUAL(0x000FA921,get_DWTFunction_WriteValue(0x3,0x5,DataValue_Comparison,Word,ITM_Emit_AddressOffset));
 }
 
 /*------------------get_DWTControl_WriteValue--------------*/

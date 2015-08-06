@@ -104,34 +104,34 @@ typedef enum
 {
 	DWTFunction_Disabled = 0 ,
 	ITM_SampleEmit_PC = 1 ,
-	ITM_Emit_AddressOffset = 1,
+	ITM_Emit_AddressOffset = 100,
 	ITM_Emit_DataRW = 2,
-	ITM_Emit_Data_AddressOffset_RW = 2 ,
+	ITM_Emit_Data_AddressOffset_RW = 200 ,
 	ITM_Sample_PC_DataValue_RW = 3,
-	ITM_Emit_AddressOffset_DataValue_RW = 3,
+	ITM_Emit_AddressOffset_DataValue_RW = 300,
 	Watchpoint_PCMatch  = 4,
-	Watchpoint_DataRead = 5,
-	Watchpoint_DataWrite = 6,
-	Watchpoint_DataReadWrite = 7,
+	Watchpoint_Read = 5,
+	Watchpoint_Write = 6,
+	Watchpoint_ReadWrite = 7,
 	ETM_Trigger_PCMatch = 8,
-	ETM_Trigger_DataRead = 9,
-	ETM_Trigger_DataWrite = 10,
-	ETM_TriggerDataReadWrite = 11,
+	ETM_Trigger_Read = 9,
+	ETM_Trigger_Write = 10,
+	ETM_Trigger_ReadWrite = 11,
 	Sample_DataRead =12,
-	Sample_DataAddressOffset_Read=12,
+	Sample_DataAddressOffset_Read=1200,
 	Sample_DataWrite =13,
-	Sample_DataAddressOffset_Write=13,
+	Sample_DataAddressOffset_Write=1300,
 	Sample_PC_Data_Read =14,
-	Sample_DataAddressOffset_Data_Read=14,
+	Sample_DataAddressOffset_Data_Read=1400,
 	Sample_PC_Data_Write =15,
-	Sample_DataAddressOffset_Data_Write=15,
+	Sample_DataAddressOffset_Data_Write=1500,
 }DWTFunction;
 
 typedef enum
 {
 	Address_Comparison = 0 ,
-	DataValue_Comparaison ,
-	CycleCount_Comparaison
+	DataValue_Comparison ,
+	CycleCount_Comparison
 }ComparisonMode;
 
 typedef enum
@@ -234,7 +234,7 @@ struct DWT_FunctionInfo
 
 struct DWT_ComparatorInfo
 {
-	uint32_t address ;
+	uint32_t data ;
 	IgnoreMask ignoreMask ;
 	DWT_FunctionInfo *dwtFunctionInfo ;
 };
@@ -257,9 +257,10 @@ void process_DWTComparatorData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead
 void process_DWTMaskData(DWT_ComparatorInfo *dwtCompInfo,uint32_t dataRead);
 void process_DWTFunctionData(DWT_FunctionInfo *dwtFunctionInfo,uint32_t dataRead);
 
-
-uint32_t get_DWTFunction_WriteValue(int firstLinkComp,int secondLinkComp,ComparisonMode mode,DATAVSIZE size,int EMITRANGE,DWTFunction function);
+uint32_t get_DWTFunction_WriteValue(int firstLinkComp,int secondLinkComp,ComparisonMode mode,DATAVSIZE size,DWTFunction function);
 uint32_t get_DWTControl_WriteValue(EventStatus *eventStatus,SyncTap syncTap,int cycTap,int posCnt,int postReset,int EnableDisable_CycleCountCounter);
 
 int get_DWTComparatorInfoNumber(uint32_t address);
+
+void equaliseLinkedComparator(uint32_t first_COMPno,uint32_t firstAddress,IgnoreMask firstMask,int numberCOMP1,uint32_t *second_COMPno,uint32_t *secondAddress,IgnoreMask *secondMask,int *numberCOMP2);
 #endif // DWT_Utilities_H

@@ -63,25 +63,6 @@ void init_ComparatorInfo(ComparatorInfo *compInfo,int compNo,char *compType,uint
 	compInfo->matchingMode = matchingMode ;
 }
 
-/* Updated certain member of ComparatorInfo with the passed in parameter
- *
- * Input : compInfo is a pointer to ComparatorInfo which store the information about the specific comparator
- *		   address is the address set in the comparator
- *		   EnableDisable is the enable bit for the comparator
- *		   matchingMode is the behaviour of the comparator when the address set is matched
- *				Possible value :
- *					Match_REMAP			remap to address specified in FlashPatch Remap Register, FP_REMAP
- *					Match_Lower16bits	Set breakpoint on lower halfword
- *					Match_Upper16bits	Set breakpoint on upper halfword
- *					Match_32bits		Set breakpoint on both upper and lower halfword
- */
-void update_ComparatorInfo(ComparatorInfo *compInfo,uint32_t address,int EnableDisable,uint32_t matchingMode)
-{
-	compInfo->address = address ;
-	compInfo->EnableDisable = EnableDisable ;
-	compInfo->matchingMode = matchingMode ;
-}
-
 /* Process data read from FP_CTRL register to extract information about number of literal & instruction comparator and the enable bit for PFB
  *
  * Input : fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
@@ -117,7 +98,9 @@ void process_FPComparatorData(ComparatorInfo *compInfo,uint32_t dataRead)
 	address = (dataRead & FP_COMP_ADDRESS_MASK) + data ;
 	EnableDisable = (dataRead & FP_COMP_ENABLE_MASK);	
 
-	update_ComparatorInfo(compInfo,address,EnableDisable,matchingMode);
+  compInfo->address = address ;
+  compInfo->EnableDisable = EnableDisable ;
+  compInfo->matchingMode = matchingMode ;
 }
 
 /* Process data read from FP_Comparator register and update SRAM_REMAP_Address in FPBInfo
@@ -295,5 +278,3 @@ int get_ComparatorInfoNumber(uint32_t COMP_no)
 	
 	return data ;
 }
-
-

@@ -208,7 +208,7 @@ void test_setCore_Exception_will_return_ERR_NOERROR_and_do_nothing_for_other_cor
 	
  ************************************************************/
 
-void test_check_CoreStatus_should_read_DHCSR_and_update_CoreStatus()
+void test_check_CoreStatus_should_read_DHCSR_and_process_CoreStatusData()
 {
 	CoreStatus coreStatus ;
 	init_CoreStatus(&coreStatus);
@@ -357,4 +357,198 @@ void test_clear_DebugTrap_should_write_to_DEMCR_to_clear_and_update_DebugTrap()
 	TEST_ASSERT_EQUAL(0,debugTrap.VC_MMERR);
 	TEST_ASSERT_EQUAL(0,debugTrap.VC_CORERESET);
 	
+}
+
+/***************************************write_CoreRegister***************************************************/
+void test_write_CoreRegister_given_ARM_R0_will_halt_CPU_write_data_to_DCRDR_and_select_R0_in_DCRSR()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus (&coreStatus);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DCRDR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,0x100);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DCRSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,get_CoreRegisterAccess_WriteValue(ARM_R0,CoreRegister_Write));
+
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x10000));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,write_CoreRegister(ARM_R0,&coreStatus,0x100));
+}
+
+/***************************************read_CoreRegister***************************************************/
+void test_read_CoreRegister_given_ARM_R1_will_halt_CPU_select_R1_in_DCRSR_and_read_data_from_DCRDR()
+{
+	uint32_t dataRead ;
+	CoreStatus coreStatus ;
+	init_CoreStatus (&coreStatus);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
+		
+	emulateSWDRegister_Write(TAR_REG,AP,4,DCRSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,get_CoreRegisterAccess_WriteValue(ARM_R1,CoreRegister_Read));
+
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x10000));
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DCRDR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x12345678));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,read_CoreRegister(ARM_R1,&coreStatus,&dataRead));
+	TEST_ASSERT_EQUAL(0x12345678,dataRead);
+}
+
+/***************************************wait_CoreRegisterTransaction*********************************/
+void test_wait_CoreRegisterTransaction_should_read_S_REGRDY_bit_and_return_ERR_NOERR_if_is_1()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus (&coreStatus);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,wait_CoreRegisterTransaction(&coreStatus,10));
+}
+
+void test_wait_CoreRegisterTransaction_should_read_S_REGRDY_bit_and_repeat_until_is_1()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus (&coreStatus);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x10000));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,wait_CoreRegisterTransaction(&coreStatus,10));
+}
+
+void test_wait_CoreRegisterTransaction_should_return_ERR_COREREGRW_FAILED_if_S_REGRDY_is_not_1_after_retry()
+{
+	CoreStatus coreStatus ;
+	init_CoreStatus (&coreStatus);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	
+	TEST_ASSERT_EQUAL(ERR_COREREGRW_FAILED,wait_CoreRegisterTransaction(&coreStatus,2));
+}
+
+/***************************************configure_DebugExceptionMonitorControl*********************************/
+void test_configure_DebugExceptionMonitorControl_should_write_to_DEMCR()
+{
+	DebugExceptionMonitor debugExceptionMonitor ;
+	DebugTrap debugTrap ;
+	
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	init_DebugTrap(&debugTrap);
+	uint32_t data = 0 ;
+	data = get_DebugExceptionMonitorControl_WriteValue(DebugMonitor_DISABLE,&debugTrap,DISABLE_DWT_ITM);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,data);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_DebugExceptionMonitorControl(&debugExceptionMonitor,DebugMonitor_DISABLE,&debugTrap,DISABLE_DWT_ITM));
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.DWT_ITM_Enable);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_HARDERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_INTERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_BUSERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_STATERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CHKERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_NOCPERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_MMERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CORERESET);
+}
+
+/***************************************perform_HaltOnReset*********************************/
+void test_perform_HaltOnReset_should_debug_halt_cpu_enable_CoreResetDebugTrap_and_write_to_AIRCR_REG()
+{
+	DebugExceptionMonitor debugExceptionMonitor ;
+	CoreStatus coreStatus ;	
+	DebugTrap debugTrap ;
+	
+	init_CoreStatus(&coreStatus);
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	init_DebugTrap(&debugTrap);
+	
+	debugTrap.VC_CORERESET = 1 ;
+	uint32_t data = 0 ;
+	data = get_DebugExceptionMonitorControl_WriteValue(DebugMonitor_DISABLE,&debugTrap,DISABLE_DWT_ITM);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,data);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,AIRCR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,0xFA050004);
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(data));
+	
+	TEST_ASSERT_EQUAL(ERR_NOERROR,perform_HaltOnReset(&coreStatus,&debugExceptionMonitor));
+	
+	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
+	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
+	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.DWT_ITM_Enable);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_HARDERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_INTERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_BUSERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_STATERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CHKERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_NOCPERR);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_MMERR);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_CORERESET);
 }

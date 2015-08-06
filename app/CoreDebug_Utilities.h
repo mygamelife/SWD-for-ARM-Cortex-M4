@@ -30,7 +30,12 @@
 #define DFSR_BKPT_MASK		0x00000002
 #define DFSR_HALTED_MASK	0x00000001
 
-#define DEMCR_VC_HARDERR_MASK	0x300
+#define DEMCR_TRCENA_MASK		0x1000000
+#define DEMCR_MON_REQ_MASK		0x80000
+#define DEMCR_MON_STEP_MASK		0x40000
+#define DEMCR_MON_PEND_MASK		0x20000
+#define DEMCR_MON_EN_MASK		0x10000
+#define DEMCR_VC_HARDERR_MASK	0x400
 #define DEMCR_VC_INTERR_MASK	0x200
 #define DEMCR_VC_BUSERR_MASK	0x100
 #define DEMCR_VC_STATERR_MASK	0x80
@@ -52,6 +57,7 @@ typedef struct DebugEvent DebugEvent ;
 typedef struct CoreStatus CoreStatus  ;
 typedef struct DebugTrap DebugTrap ;
 typedef struct DebugMonitorStatus DebugMonitorStatus ;
+typedef struct DebugExceptionMonitor DebugExceptionMonitor;
 
 typedef enum 
 {
@@ -178,18 +184,26 @@ struct DebugMonitorStatus
 	int MON_EN;
 };
 
+struct DebugExceptionMonitor
+{
+	int DWT_ITM_Enable ;
+	DebugMonitorStatus *debugMonitor;
+	DebugTrap *debugTrap ;
+};
+
 int isCore(CoreControl coreControl,CoreStatus *coreStatus);
 
 void init_CoreStatus(CoreStatus *coreStatus);
 void init_DebugEvent(DebugEvent *debugEvent);
 void init_DebugTrap(DebugTrap *debugTrap);
+void init_DebugMonitorStatus(DebugMonitorStatus *debugMonitor);
+void init_DebugExceptionMonitor(DebugExceptionMonitor *debugExceptionMonitor);
 
-void update_CoreStatus(CoreStatus *coreStatus, uint32_t dataRead);
-void update_DebugEvent(DebugEvent *debugEvent, uint32_t dataRead);
-void update_DebugTrapStatus(DebugTrap *debugTrap, uint32_t dataRead);
-
-
-
+void process_CoreStatusData(CoreStatus *coreStatus, uint32_t dataRead);
+void process_DebugEventData(DebugEvent *debugEvent, uint32_t dataRead);
+void process_DebugTrapData(DebugTrap *debugTrap, uint32_t dataRead);
+void process_DebugMonitorData(DebugMonitorStatus *debugMonitor, uint32_t dataRead);
+void process_DebugExceptionMonitorData(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead);
 
 uint32_t get_Core_WriteValue(CoreControl coreControl);
 uint32_t get_CoreRegisterAccess_WriteValue(Core_RegisterSelect coreRegister,int CoreRegister_ReadWrite);

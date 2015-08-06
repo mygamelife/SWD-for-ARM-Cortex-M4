@@ -15,7 +15,7 @@
 void SWD_Initialisation()
 {
 	int ack = 0, parity = 0;
-	uint32_t idcode = 0, errorFlag = 0;
+	uint32_t idcode = 0;
 
 	switchJTAGtoSWD();
 	SWDRegister_Read(IDCODE_REG, DP, &ack, &parity, &idcode);

@@ -20,6 +20,7 @@
 <attrib name="charEnd" value="-1"/>
 <attrib name="org.eclipse.debug.core.enabled" value="false"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">
@@ -38,8 +39,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\Shengli\CoIDE\workspace\SerialWireDebug\app\main.c"/>
-<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">
@@ -58,8 +59,8 @@
 <attrib name="registered" value="true"/>
 <attrib name="path" value="/SWD-for-ARM-Cortex-M4/Code/DWT_Unit.c"/>
 <attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\Shengli\CoIDE\workspace\SerialWireDebug\app\DWT_Unit.c"/>
-<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 </marker>
 </breakpoint>
 <breakpoint enabled="true" persistant="true" registered="true">

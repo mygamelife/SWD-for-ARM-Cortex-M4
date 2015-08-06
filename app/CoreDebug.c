@@ -80,7 +80,7 @@ int check_CoreStatus(CoreStatus *coreStatus)
 	init_CoreStatus(coreStatus);
 	
 	status = memoryAccessRead(DHCSR_REG,&dataRead);
-	update_CoreStatus(coreStatus,dataRead);
+	process_CoreStatusData(coreStatus,dataRead);
 	
 	return status ;
 }
@@ -102,7 +102,7 @@ int check_DebugEvent(DebugEvent *debugEvent)
 	init_DebugEvent(debugEvent);
 	
 	status = memoryAccessRead(DFSR_REG,&dataRead);
-	update_DebugEvent(debugEvent,dataRead);
+	process_DebugEventData(debugEvent,dataRead);
 	
 	return status ;
 }
@@ -145,7 +145,7 @@ int check_DebugTrapStatus(DebugTrap *debugTrap)
 	init_DebugTrap(debugTrap);
 	
 	status = memoryAccessRead(DEMCR_REG,&dataRead);
-	update_DebugTrapStatus(debugTrap,dataRead);
+	process_DebugTrapData(debugTrap,dataRead);
 	
 	return status ;
 }
@@ -185,7 +185,7 @@ int clear_DebugTrap(DebugTrap *debugTrap)
 int write_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t data)
 {
 	int status =  0 ; 
-	uint32_t coreSelectData = 0,dataRead;
+	uint32_t coreSelectData = 0;
 	
 	coreSelectData =  get_CoreRegisterAccess_WriteValue(coreRegister,CoreRegister_Write);
 	
@@ -223,8 +223,10 @@ int read_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,ui
 		memoryAccessWrite(DCRSR_REG,coreSelectData);
 	
 		status = wait_CoreRegisterTransaction(coreStatus,10);
+		if (status != ERR_NOERROR)
+			return status ;
 	
-		memoryAccessRead(DCRDR_REG,dataRead);
+		status = memoryAccessRead(DCRDR_REG,dataRead);
 	}
 	return status ;
 }
@@ -244,13 +246,14 @@ int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries)
 	int i = 0 ;
 	
 	if (numberOfTries <= 0 )
-		numberOfTries = 10 ;
+		numberOfTries = 3 ;
 	
 	do
 	{		
 		if(check_CoreStatus(coreStatus) == ERR_INVALID_PARITY_RECEIVED)
 			return ERR_INVALID_PARITY_RECEIVED;
 	
+		i ++ ;
 	}while(coreStatus->S_REGRDY != 1 && i != numberOfTries);
 	
 	if(coreStatus->S_REGRDY)
@@ -259,20 +262,65 @@ int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries)
 		return ERR_COREREGRW_FAILED ;
 }
 
-int configure_DebugExceptionMonitorControl(DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM)
+/**
+ *	Configure Debug Exception and Monitor Control Register, DEMCR and update DebugExceptionAndMonitor
+ *	
+ *	Input : debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
+ *			debugMonitorControl is used to control the behaviour of Debug Monitor in ARM
+ *				Possible input value :
+ *					DebugMonitor_DISABLED  	Disable debug monitor
+ *					DebugMonitor_ENABLED	Enable debug monitor	
+ *					DebugMonitor_STEP		Enable stepping in debug monitor
+ *			debugTrap is a pointer to DebugTrap which will be written into DEMCR to enable/disable the corresponding debugTrap
+ *			enable_DWT_ITM is use to enable / disable DWT and ITM
+ *				Possible value :
+ *					Enable 		enable DWT and ITM
+ *					Disable 	disable DWT and ITM
+ *
+ *	Output : return ERR_NOERROR if the operation completed successfully
+ *			 return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ */
+int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugExceptionMonitor,DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM)
 {
 	int status = 0 ;
-	uint32_t data = 0 ,dataRead = 0 ;
+	uint32_t data = 0, dataRead = 0 ;
 	
 	data = get_DebugExceptionMonitorControl_WriteValue(debugMonitorControl,debugTrap,enable_DWT_ITM);
 	
 	memoryAccessWrite(DEMCR_REG,data);
 	status = memoryAccessRead(DEMCR_REG,&dataRead);
 	
-	return status = 0 ;
+	process_DebugExceptionMonitorData(debugExceptionMonitor,dataRead);
+	return status ;
 }
 
-int configure_DebugTrap(DebugTrap *debugTrap)
+/**
+ *	Perform halt on reset function
+ *	
+ *	Input : coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
+ *			debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
+ *
+ *	Output : return ERR_NOERROR if the operation completed successfully
+ *			 return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ */
+int perform_HaltOnReset(CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor)
 {
-	return configure_DebugExceptionMonitorControl(DebugMonitor_DISABLE,debugTrap,DISABLE_DWT_ITM);
+	int status = 0 ;
+
+	DebugTrap debugTrap ;
+	
+	init_DebugTrap(&debugTrap);
+	debugTrap.VC_CORERESET = 1 ;
+	
+	status = setCore(CORE_DEBUG_HALT,coreStatus);
+	if(status != ERR_NOERROR)
+		return status ; 
+	
+	status = configure_DebugExceptionMonitorControl(debugExceptionMonitor,DebugMonitor_DISABLE,&debugTrap,DISABLE_DWT_ITM);
+	if(status != ERR_NOERROR)
+		return status ; 
+	
+	memoryAccessWrite(AIRCR_REG,0xFA050004);
+	
+	return status ;
 }
