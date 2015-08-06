@@ -7,7 +7,9 @@ typedef struct
 {
   uint8_t type;
   int length;
+  uint32_t sectionAddress;
   uint8_t value[DATA_SIZE];
+  uint8_t chksum;
 } TLV;
 
 typedef enum
@@ -28,20 +30,28 @@ typedef enum
 
 typedef enum  {
   PROBE_BUSY = 0,
-  PROBE_OK
+  PROBE_FAULT,
+  PROBE_OK,
+  PROBE_COMPLETE
 } ProbeStatus;
 
 #define ONE_BYTE                  256
 #define ADDRESS_LENGTH            4
 #define CHECKSUM_LENGTH           1
-
 #define BAUD_RATE                 9600
+
+#define TLV_TYPE_INDEX            0
+#define TLV_ADDRESS_INDEX         0
+#define TLV_LENGTH_INDEX          1
+
+/* TLV Instruction */
 #define TLV_BUFFER_EMPTY          0
 #define TLV_CLEAR                 (uint8_t)0x10
 #define TLV_WRITE                 (uint8_t)0x20
 #define TLV_READ                  (uint8_t)0x30
 #define TLV_BUSY                  (uint8_t)0x40
 #define TLV_TRANSFER_COMPLETE     (uint8_t)0x50
-#define TLV_OK                    (uint8_t)0x04
+#define TLV_ABORT                 (uint8_t)0x60
+#define TLV_DATA_CORRUPTED        (uint8_t)0x70
 
 #endif // TLV_State_H

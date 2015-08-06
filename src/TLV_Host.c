@@ -173,6 +173,43 @@ void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf)  {
   tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length - CHECKSUM_LENGTH, ADDRESS_LENGTH);
 }
 
+/** tlvCheckAcknowledge is function to change the acknowledge reply from probe
+  * and decise the next tlv state
+  *
+  * input     : acknowledge is the response from probe
+  *
+  * return    : TLV State 
+  */
+TLV_State tlvCheckAcknowledge(uint8_t acknowledge)  {
+  static count = 0;
+  
+  if(acknowledge == PROBE_OK)  {
+    // printf("Probe reply OK!\n");
+    return TLV_START;
+  }
+      
+  else if(acknowledge == PROBE_FAULT)  {
+    /** Retries 3 times if probe still reply fault acknowledgement it may due to 
+      * 1.  Wire connection problem
+      * 2.  Power supply problem
+      * And many other possible season can cause this problem
+      */
+      if(count++ == 3)  {
+        count = 0; //clear count
+        return TLV_ABORT;
+      }
+      else  {
+        return TLV_TRANSMIT_DATA;
+      }
+  }
+  
+  else if(acknowledge == PROBE_COMPLETE)
+    return TLV_COMPLETE;
+  
+  else
+    printf("Invalid response from PROBE\n");
+}
+
 /** tlvHost is state machine for tlv host transmitter
   * 
   */
@@ -196,32 +233,28 @@ void tlvHost(TLVSession *tlvSession)  {
         /* Pack into TXBUFFER */
         tlvPackPacketIntoTxBuffer(txBuffer, tlv);
       }
-      
       tlvSession->state = TLV_TRANSMIT_DATA;
       break;
       
     case TLV_TRANSMIT_DATA :
       /* Transmit all data inside txBuffer to probe */
-      printf("Data Starting To Transfer\n");
+      // printf("Data Starting To Transfer\n");
       serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
       tlvSession->state = TLV_WAIT_REPLY;
       break;
       
     case TLV_WAIT_REPLY :
-      while(rxBuffer != PROBE_OK) {
-        rxBuffer = serialGetByte(tlvSession->hSerial);
-      }
-      printf("Probe reply OK!\n");
-      tlvSession->state = TLV_START;
+      /* Waiting reply from probe */
+      rxBuffer = serialGetByte(tlvSession->hSerial);
+      tlvSession->state = tlvCheckAcknowledge(rxBuffer);
       break;
     
     case TLV_END  :
       txBuffer[0] = TLV_TRANSFER_COMPLETE;
       serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
-      while(rxBuffer != PROBE_OK) {
-        rxBuffer = serialGetByte(tlvSession->hSerial);
-      }
-      tlvSession->state = TLV_COMPLETE;
+      /* Waiting reply from probe */
+      rxBuffer = serialGetByte(tlvSession->hSerial);
+      tlvSession->state = tlvCheckAcknowledge(rxBuffer);
       break;
   }
 }

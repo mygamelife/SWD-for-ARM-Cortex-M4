@@ -369,7 +369,7 @@ void test_tlvHost_when_elf_section_size_is_0_should_change_state_to_TLV_END_and_
   TEST_ASSERT_EQUAL(tlvSession.state, TLV_END);
   
   serialWriteByte_IgnoreAndReturn(255);
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_OK);
+  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_COMPLETE);
   tlvHost(&tlvSession);
   
   TEST_ASSERT_EQUAL(tlvSession.state, TLV_COMPLETE);
@@ -377,4 +377,97 @@ void test_tlvHost_when_elf_section_size_is_0_should_change_state_to_TLV_END_and_
   closeFileInTxt(dataFromElf->myFile);
   free(pElfSection);
   free(dataFromElf);
+}
+
+void test_tlvHost_when_receive_PROBE_FAULT_response_should_retry_3_times_and_ABORT()
+{
+  HANDLE hSerial;
+  TLVSession tlvSession;
+  
+  /* Open elf file */
+  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  
+  /* Initialize TlvSeesion structure */
+  tlvSession.state = TLV_START;
+  tlvSession.pElf = pElfSection;
+  tlvSession.hSerial = hSerial;
+
+  /* START */
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  
+  /* TRANSMIT */
+  serialWriteByte_IgnoreAndReturn(255);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  
+  /* WAIT REPLY x1*/
+  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+
+  /* TRANSMIT */
+  serialWriteByte_IgnoreAndReturn(255);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  
+  /* WAIT REPLY x2*/
+  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  
+  /* TRANSMIT */
+  serialWriteByte_IgnoreAndReturn(255);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  
+  /* WAIT REPLY x3*/
+  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  
+  /* TRANSMIT */
+  serialWriteByte_IgnoreAndReturn(255);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  
+  /* WAIT REPLY x4*/
+  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  tlvHost(&tlvSession);
+  TEST_ASSERT_EQUAL(tlvSession.state, TLV_ABORT);
+    
+  closeFileInTxt(dataFromElf->myFile);
+  free(pElfSection);
+  free(dataFromElf);
+}
+
+void test_tlvCheckAcknowledge_given_PROBE_OK_should_change_state_to_TLV_START()
+{
+  uint8_t state;
+  
+  state = tlvCheckAcknowledge(PROBE_OK);
+  
+  TEST_ASSERT_EQUAL(state, TLV_START);
+}
+
+void test_tlvCheckAcknowledge_received_3_times_PROBE_FAULT_should_change_state_to_TLV_ABORT()
+{
+  uint8_t state;
+  
+  state = tlvCheckAcknowledge(PROBE_FAULT);
+  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+  state = tlvCheckAcknowledge(PROBE_FAULT);
+  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+  state = tlvCheckAcknowledge(PROBE_FAULT);
+  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+  state = tlvCheckAcknowledge(PROBE_FAULT);
+  TEST_ASSERT_EQUAL(state, TLV_ABORT);
+}
+
+void test_tlvCheckAcknowledge_when_received_PROBE_COMPLETE_should_change_state_to_TLV_COMPLETE()
+{
+  uint8_t state;
+  
+  state = tlvCheckAcknowledge(PROBE_COMPLETE);
+  TEST_ASSERT_EQUAL(state, TLV_COMPLETE);
 }
