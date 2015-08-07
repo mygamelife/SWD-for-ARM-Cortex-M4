@@ -1,12 +1,11 @@
 #ifndef FPB_Unit_H
 #define FPB_Unit_H
 
-#include "Reset.h"
 #include "swd_Utilities.h"
-#include "configurePort.h"
-#include "Bit_Operations.h"
 #include "Register_ReadWrite.h"
 #include "FPB_Utilities.h"
+#include "CoreDebug.h"
+#include "CoreDebug_Utilities.h"
 
 #define InstructionCOMP_0	FP_COMP0
 #define InstructionCOMP_1	FP_COMP1
@@ -30,5 +29,7 @@ int set_LiteralREMAP(FPBInfo *fpbInfo,uint32_t LiteralCOMP_no,uint32_t address);
 
 int disable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no);
 int reenable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no);
+
+int prepare_FPBOperations(FPBInfo *fpbInfo,CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor,DebugTrap *debugTrap,DebugMonitorControl debugMonitorControl);
 
 #endif // FPB_Unit_H

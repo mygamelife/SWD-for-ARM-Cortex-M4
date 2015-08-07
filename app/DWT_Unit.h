@@ -3,33 +3,30 @@
 
 #include <stdint.h>
 #include "DWT_Utilities.h"
-#include "swd_Utilities.h"
-#include "configurePort.h"
-#include "Bit_Operations.h"
-#include "Register_ReadWrite.h"
+
 
 typedef enum 
 {
-	Comparator_Disable = 0,
-	Read = 5 ,
-	Write ,
-	ReadWrite 
-}RWmode ;
-
-int configure_DWTControl(DWTInfo *dwtInfo);
-
-int read_DWTControl(DWTInfo *dwtInfo);
-int read_DWTComparator(DWTInfo *dwtInfo,uint32_t DWT_COMPno);
-int read_DWTMask(DWTInfo *dwtInfo,uint32_t DWT_MASKno);
-int read_DWTFunction(DWTInfo *dwtInfo,uint32_t DWT_FUNCno);
+	WATCHPOINT_READ = 5 ,
+	WATCHPOINT_WRITE = 6 ,
+	WATCHPOINT_READWRITE 
+}Watchpoint_AccessMode ;
 
 
-int disable_DWTComparator(DWTInfo *dwtInfo,uint32_t DWT_COMPno);
-int reenable_DWTComparator(DWTInfo *dwtInfo,uint32_t DWT_COMPno,DWTFunction function);
+int setWatchpoint(int comparatorNumber,uint32_t address,IgnoreMask addressMask,Watchpoint_AccessMode accessMode);
+int setWatchpoint_MatchingOneComparator(int comparatorNumber,uint32_t address,IgnoreMask addressMask,uint32_t matchedData,Watchpoint_AccessMode accessMode);
+int setWatchpoint_MatchingTwoComparator(int comparatorNumber_1,uint32_t address_1,IgnoreMask addressMask_1,
+										int comparatorNumber_2,uint32_t address_2,IgnoreMask addressMask_2,
+										uint32_t matchedData,Watchpoint_AccessMode accessMode);
 
-int configure_DWTComparator(DWTInfo *dwtInfo,uint32_t DWT_COMPno,uint32_t address);
-int configure_DWTMask(DWTInfo *dwtInfo,uint32_t DWT_MASKno,IgnoreMask ignoreMask);
-int configure_DWTFunction(DWTInfo *dwtInfo,uint32_t DWT_FUNCno,int firstLinkComp,int secondLinkComp,ComparisonMode mode,DATAVSIZE size,DWTFunction function);
+int disable_WatchpointComparator(int comparatorNumber);
+int disable_AllWatchpoint();
+
+
+
+
+
+
 
 int setWatchpoint_PC(DWTInfo *dwtInfo,uint32_t DWT_COMPno,uint32_t address,IgnoreMask ignoreMask);
 int setWatchpoint_DataAddr(DWTInfo *dwtInfo,uint32_t DWT_COMPno,uint32_t address,IgnoreMask ignoreMask,RWmode mode);

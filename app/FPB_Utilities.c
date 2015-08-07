@@ -98,9 +98,9 @@ void process_FPComparatorData(ComparatorInfo *compInfo,uint32_t dataRead)
 	address = (dataRead & FP_COMP_ADDRESS_MASK) + data ;
 	EnableDisable = (dataRead & FP_COMP_ENABLE_MASK);	
 
-  compInfo->address = address ;
-  compInfo->EnableDisable = EnableDisable ;
-  compInfo->matchingMode = matchingMode ;
+	compInfo->address = address ;
+	compInfo->EnableDisable = EnableDisable ;
+	compInfo->matchingMode = matchingMode ;
 }
 
 /* Process data read from FP_Comparator register and update SRAM_REMAP_Address in FPBInfo
@@ -113,12 +113,18 @@ void process_FPRemapData(FPBInfo *fpbInfo,uint32_t dataRead)
 	fpbInfo->SRAM_REMAP_address = (dataRead & FP_REMAP_ReadAddress_MASK);
 }
 
-/* Check if the FlashPatch Breakpoint Unit is enabled/disabled
+/**
+ * Check if the FlashPatch Breakpoint Unit is enabled/disabled
  *
  * Input : 	fpbInfo is a pointer to FPBInfo which store the enable status of FlashPatch Breakpoint Unit
+ *			EnableDisable is used to determine whether the FlashPatch Breakpoint Unit is in the selected mode
+ *				Possible value :
+ *					Enable		check if FlashPatch Breakpoint Unit is enabled
+ *					Disable		check if FlashPatch Breakpoint Unit is disable
  *
  * Output :	return ERR_NOERROR if FlashPatch Breakpoint Unit is enabled
  *			return ERR_FPB_NOTENABLED if FlashPatch Breakpoint Unit is not enabled
+ *			return ERR_FPB_NOTDISABLED if FlashPatch Breakpoint Unit is not disabled
  *
  */
 int isFPB_EnabledDisabled(FPBInfo *fpbInfo,int EnableDisable)

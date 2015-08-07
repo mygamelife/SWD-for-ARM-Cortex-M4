@@ -5,11 +5,11 @@
 #include "Misc_Utilities.h"
 
 #define SET_CORE_NORMAL				0xA05F0000
+#define SET_CORE_NORMAL_MASKINT		0xA05F0008
 #define SET_CORE_DEBUG 				0xA05F0001
 #define SET_CORE_DEBUG_HALT 		0xA05F0003
-#define SET_CORE_STEP_NOMASKINT		0xA05F0005
+#define SET_CORE_STEP				0xA05F0005
 #define SET_CORE_STEP_MASKINT		0xA05F000D
-#define SET_CORE_MASKINT			0xA05F000B
 #define SET_CORE_SNAPSTALL			0xA05F0023
 
 #define DHCSR_S_RESET_MASK		0x200000
@@ -62,19 +62,19 @@ typedef struct DebugExceptionMonitor DebugExceptionMonitor;
 typedef enum 
 {
 	CORE_NORMAL_MODE,
+	CORE_NORMAL_MASKINT,
 	CORE_DEBUG_MODE,
 	CORE_DEBUG_HALT,
-	CORE_SINGLE_STEP_NOMASKINT,
+	CORE_SINGLE_STEP,
 	CORE_SINGLE_STEP_MASKINT,
-	CORE_MASK_INTERRUPT,
 	CORE_SNAPSTALL
 }CoreControl ;
 
 typedef enum 
 {
-	DebugMonitor_DISABLE,
-	DebugMonitor_ENABLE,
-	DebugMonitor_STEP
+	DEBUGMONITOR_DISABLE,
+	DEBUGMONITOR_ENABLE,
+	DEBUGMONITOR_STEP
 }DebugMonitorControl ;
 
 typedef enum
@@ -186,7 +186,7 @@ struct DebugMonitorStatus
 
 struct DebugExceptionMonitor
 {
-	int DWT_ITM_Enable ;
+	int enableDWT_ITM ;
 	DebugMonitorStatus *debugMonitor;
 	DebugTrap *debugTrap ;
 };

@@ -1,13 +1,9 @@
 #ifndef CoreDebug_H
 #define CoreDebug_H
 
-#include "Clock.h"
-#include "Reset.h"
-#include "swd_Utilities.h"
-#include "configurePort.h"
-#include "Bit_Operations.h"
-#include "Register_ReadWrite.h"
 #include "CoreDebug_Utilities.h"
+#include "swd_Utilities.h"
+#include "Register_ReadWrite.h"
 
 #define DHCSR_REG	0xE000EDF0
 #define DFSR_REG	0xE000ED30

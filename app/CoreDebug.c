@@ -5,11 +5,13 @@
  *	
  *	Input : coreControl is the mode to be applied to the core
  *				Possible value :
- *					CORE_DEBUG_MODE 		Enable debug mode
- *					CORE_DEBUG_HALT			Enable halting debug mode
- *					CORE_SINGLE_STEP_NOMASKINT_NOMASK		Enable processor single stepping
- *					CORE_MASK_INTERRUPT		Enable masking of PendSV,SysTick and external configurable interrupts
- *					CORE_SNAPSTALL			Force to enter imprecise debug mode (Used when processor is stalled )
+ *					CORE_NORMAL_MODE				Normal operation mode without masking of PendSV,SysTick and external configurable interrupts
+ *					CORE_NORMAL_MASKINT				Normal operation mode with masking of PendSV,SysTick and external configurable interrupts
+ *					CORE_DEBUG_MODE 				Enable debug mode
+ *					CORE_DEBUG_HALT					Enable halting debug mode
+ *					CORE_SINGLE_STEP				Enable processor single stepping without masking of PendSV,SysTick and external configurable interrupts
+ *					CORE_SINGLE_STEP_MASKINT		Enable processor single stepping with masking of PendSV,SysTick and external configurable interrupts
+ *					CORE_SNAPSTALL					Force to enter imprecise debug mode (Used when processor is stalled )
  *
  *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
  *
@@ -44,7 +46,7 @@ int setCore(CoreControl coreControl,CoreStatus *coreStatus)
 }
 
 /**
- *	Manages exception when setting CORE_SINGLE_STEP_NOMASKINT_NOMASK and CORE_MASK_INTERRUPT mode as the core must be already in CORE_DEBUG_HALT mode
+ *	Manages exception when setting CORE_NORMAL_MASKINT,CORE_SINGLE_STEP and CORE_SINGLE_STEP_MASKINT mode as the core must be already in CORE_DEBUG_HALT mode
  *	
  *	Input : coreControl is the mode to be applied to the core
  *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
@@ -55,7 +57,7 @@ int setCore(CoreControl coreControl,CoreStatus *coreStatus)
  */
 int setCore_Exception(CoreControl coreControl,CoreStatus *coreStatus)
 {	
-	if (coreControl == CORE_SINGLE_STEP_NOMASKINT || coreControl == CORE_SINGLE_STEP_MASKINT || coreControl == CORE_MASK_INTERRUPT)
+	if (coreControl == CORE_NORMAL_MASKINT || coreControl == CORE_SINGLE_STEP || coreControl == CORE_SINGLE_STEP_MASKINT)
 	{
 		return(setCore(CORE_DEBUG_HALT,coreStatus));
 	}
@@ -268,11 +270,11 @@ int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries)
  *	Input : debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
  *			debugMonitorControl is used to control the behaviour of Debug Monitor in ARM
  *				Possible input value :
- *					DebugMonitor_DISABLED  	Disable debug monitor
- *					DebugMonitor_ENABLED	Enable debug monitor	
- *					DebugMonitor_STEP		Enable stepping in debug monitor
+ *					DEBUGMONITOR_DISABLE  	Disable debug monitor
+ *					DEBUGMONITOR_ENABLE		Enable debug monitor	
+ *					DEBUGMONITOR_STEP		Enable stepping in debug monitor
  *			debugTrap is a pointer to DebugTrap which will be written into DEMCR to enable/disable the corresponding debugTrap
- *			enable_DWT_ITM is use to enable / disable DWT and ITM
+ *			enableDWT_ITM is use to enable / disable DWT and ITM
  *				Possible value :
  *					Enable 		enable DWT and ITM
  *					Disable 	disable DWT and ITM
@@ -280,16 +282,16 @@ int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries)
  *	Output : return ERR_NOERROR if the operation completed successfully
  *			 return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
  */
-int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugExceptionMonitor,DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM)
+int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugExceptionMonitor,DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enableDWT_ITM)
 {
 	int status = 0 ;
 	uint32_t data = 0, dataRead = 0 ;
 	
-	data = get_DebugExceptionMonitorControl_WriteValue(debugMonitorControl,debugTrap,enable_DWT_ITM);
+	data = get_DebugExceptionMonitorControl_WriteValue(debugMonitorControl,debugTrap,enableDWT_ITM);
 	
 	memoryAccessWrite(DEMCR_REG,data);
 	status = memoryAccessRead(DEMCR_REG,&dataRead);
-	
+
 	process_DebugExceptionMonitorData(debugExceptionMonitor,dataRead);
 	return status ;
 }
@@ -316,7 +318,7 @@ int perform_HaltOnReset(CoreStatus *coreStatus,DebugExceptionMonitor *debugExcep
 	if(status != ERR_NOERROR)
 		return status ; 
 	
-	status = configure_DebugExceptionMonitorControl(debugExceptionMonitor,DebugMonitor_DISABLE,&debugTrap,DISABLE_DWT_ITM);
+	status = configure_DebugExceptionMonitorControl(debugExceptionMonitor,DEBUGMONITOR_DISABLE,&debugTrap,DISABLE_DWT_ITM);
 	if(status != ERR_NOERROR)
 		return status ; 
 	

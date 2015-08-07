@@ -16,26 +16,24 @@ int isCore(CoreControl coreControl,CoreStatus *coreStatus)
 	switch(coreControl)
 	{
 		case CORE_NORMAL_MODE			:
-											status = (coreStatus->S_HALT | coreStatus->C_DEBUGEN | coreStatus->C_HALT | coreStatus->C_STEP | coreStatus->C_MASKINTS | coreStatus->C_STEP );
-											status = !status ;
+											status = (!coreStatus->S_HALT & !coreStatus->C_DEBUGEN & !coreStatus->C_HALT & !coreStatus->C_STEP & !coreStatus->C_MASKINTS & !coreStatus->C_STEP) ;
 											break ;
-		
+		case CORE_NORMAL_MASKINT	:
+											status = (!coreStatus->S_HALT & !coreStatus->C_DEBUGEN & !coreStatus->C_HALT & !coreStatus->C_STEP & coreStatus->C_MASKINTS & !coreStatus->C_STEP);
+											break ;
 		case CORE_DEBUG_MODE 			:
-											status = coreStatus->C_DEBUGEN ;
+											status = coreStatus->C_DEBUGEN & !coreStatus-> C_HALT & !coreStatus->S_HALT;
 											break ;
 		case CORE_DEBUG_HALT 			:
 											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT) ;
 											break ;					
-		case CORE_SINGLE_STEP_NOMASKINT	:
+		case CORE_SINGLE_STEP	:
 											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP);
 											break ;
 		case CORE_SINGLE_STEP_MASKINT	:
 											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_STEP & coreStatus->C_MASKINTS);
 											break ;									
 											
-		case CORE_MASK_INTERRUPT		:
-											status = (coreStatus->S_HALT & coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_MASKINTS) ;
-											break ;
 		case CORE_SNAPSTALL				:
 											status = (coreStatus->C_DEBUGEN & coreStatus->C_HALT & coreStatus->C_SNAPSTALL);
 											break ;
@@ -132,7 +130,7 @@ void init_DebugExceptionMonitor(DebugExceptionMonitor *debugExceptionMonitor)
 	init_DebugTrap(&debugTrap);
 	init_DebugMonitorStatus(&debugMonitor);
 	
-	debugExceptionMonitor->DWT_ITM_Enable = DISABLE_DWT_ITM;
+	debugExceptionMonitor->enableDWT_ITM = DISABLE_DWT_ITM;
 	debugExceptionMonitor->debugTrap = &debugTrap ;
 	debugExceptionMonitor->debugMonitor = &debugMonitor ;
 }
@@ -331,9 +329,9 @@ void process_DebugMonitorData(DebugMonitorStatus *debugMonitor, uint32_t dataRea
 void process_DebugExceptionMonitorData(DebugExceptionMonitor *debugExceptionMonitor,uint32_t dataRead)
 {
 	if ( check_BitSetWithMask(dataRead,DEMCR_TRCENA_MASK) == ERR_NOERROR)
-		debugExceptionMonitor->DWT_ITM_Enable = ENABLE_DWT_ITM ;
+		debugExceptionMonitor->enableDWT_ITM = ENABLE_DWT_ITM ;
 	else 
-		debugExceptionMonitor->DWT_ITM_Enable = DISABLE_DWT_ITM ;
+		debugExceptionMonitor->enableDWT_ITM = DISABLE_DWT_ITM ;
 	
 	process_DebugTrapData(debugExceptionMonitor->debugTrap,dataRead);
 	process_DebugMonitorData(debugExceptionMonitor->debugMonitor,dataRead);
@@ -355,6 +353,10 @@ uint32_t get_Core_WriteValue(CoreControl corecontrol)
 		case CORE_NORMAL_MODE			:
 											data = SET_CORE_NORMAL;
 											break ;
+		case CORE_NORMAL_MASKINT		:
+											data = SET_CORE_NORMAL_MASKINT ;
+											break ;
+											
 		case CORE_DEBUG_MODE 			:
 											data = SET_CORE_DEBUG ;
 											break ;
@@ -363,17 +365,14 @@ uint32_t get_Core_WriteValue(CoreControl corecontrol)
 											data = SET_CORE_DEBUG_HALT ;
 											break ;
 								
-		case CORE_SINGLE_STEP_NOMASKINT	:
-											data = SET_CORE_STEP_NOMASKINT ;
+		case CORE_SINGLE_STEP	:
+											data = SET_CORE_STEP ;
 											break ;
 	
 		case CORE_SINGLE_STEP_MASKINT	:
 											data = SET_CORE_STEP_MASKINT ;
 											break ;
 									
-		case CORE_MASK_INTERRUPT		:
-											data = SET_CORE_MASKINT ;
-											break ;
 		case CORE_SNAPSTALL				:
 											data = SET_CORE_SNAPSTALL ;
 											break ;
@@ -406,9 +405,9 @@ uint32_t get_CoreRegisterAccess_WriteValue(Core_RegisterSelect coreRegister,int 
  *	
  *	Input : debugMonitorControl is used to control the behaviour of Debug Monitor in ARM
  *				Possible input value :
- *					DebugMonitor_DISABLED  	Disable debug monitor
- *					DebugMonitor_ENABLED	Enable debug monitor	
- *					DebugMonitor_STEP		Enable stepping in debug monitor
+ *					DEBUGMONITOR_DISABLED  	Disable debug monitor
+ *					DEBUGMONITOR_ENABLED	Enable debug monitor	
+ *					DEBUGMONITOR_STEP		Enable stepping in debug monitor
  *			debugTrap is a pointer to DebugTrap which will be written into DEMCR to enable/disable the corresponding debugTrap
  *			enable_DWT_ITM is use to enable / disable DWT and ITM
  *	
@@ -420,15 +419,15 @@ uint32_t get_DebugExceptionMonitorControl_WriteValue(DebugMonitorControl debugMo
 	
 	switch(debugMonitorControl)
 	{
-		case DebugMonitor_DISABLE :
+		case DEBUGMONITOR_DISABLE :
 									data = 0 ;
 									break ;
 										
-		case DebugMonitor_ENABLE :
-									data = 0x1000;
+		case DEBUGMONITOR_ENABLE :
+									data = 0x10000;
 									break;
-		case DebugMonitor_STEP :		
-									data = 0x5000;
+		case DEBUGMONITOR_STEP :		
+									data = 0x50000;
 									break ;		
 		
 		default : break ;

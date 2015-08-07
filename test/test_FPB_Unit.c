@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include "FPB_Unit.h"
 #include "FPB_Utilities.h"
+#include "CoreDebug.h"
+#include "CoreDebug_Utilities.h"
 #include "Misc_Utilities.h"
 #include "Clock.h"
 #include "Emulator.h"
@@ -40,7 +42,7 @@ void test_control_FPB_should_write_and_read_FP_CTRL_given_0x0_should_return_ERR_
 {
 	FPBInfo fpbInfo ;
 	
-		emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
+	emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
 	emulateSWDRegister_Write(DRW_REG,AP,4,ENABLE_FPB);
 	
 	emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
@@ -182,4 +184,97 @@ void test_configure_FP_REMAP_should_write_and_read_FP_REMAP_and_return_ERR_NOERR
 	
 	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_FP_REMAP(&fpbInfo,0x34567890));
 	TEST_ASSERT_EQUAL((data & FP_REMAP_ReadAddress_MASK),fpbInfo.SRAM_REMAP_address);
+}
+
+/*--------------------------------------------prepare_FPBOperations-----------------------------------------*/
+//DEBUGMONITOR_DISABLE
+void test_prepare_FPBOperations_will_enable_FPB_if_it_is_disable_and_will_setCore_to_CORE_DEBUG_MODE_if_not_in_that_mode_and_return_ERR_NOERROR_if_successful()
+{
+	FPBInfo fpbInfo ;
+	CoreStatus coreStatus ;
+	DebugExceptionMonitor debugExceptionMonitor;
+	DebugTrap debugTrap;
+	init_FPBInfo(&fpbInfo);
+	init_CoreStatus(&coreStatus);
+	init_DebugTrap(&debugTrap);
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	
+	//Enable FPB Unit
+	emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
+	emulateSWDRegister_Write(DRW_REG,AP,4,ENABLE_FPB);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x12345677));
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x00000001));
+	
+	//Set Core to CORE_DEBUG_MODE
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,0xA05F0001);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x1));
+		
+	TEST_ASSERT_EQUAL(ERR_NOERROR,prepare_FPBOperations(&fpbInfo,&coreStatus,&debugExceptionMonitor,&debugTrap,DEBUGMONITOR_DISABLE));
+	
+	TEST_ASSERT_EQUAL(Enable,fpbInfo.EnableDisable);
+	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
+	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
+	TEST_ASSERT_EQUAL(0,coreStatus.S_HALT);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.enableDWT_ITM);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
+}
+
+//DEBUGMONITOR_ENABLED
+void test_prepare_FPBOperations_will_enable_FPB_if_it_is_disable_and_will_enable_debugMonitor_return_ERR_NOERROR_if_successful()
+{
+	uint32_t dataToWrite = 0 ;
+	
+	FPBInfo fpbInfo ;
+	CoreStatus coreStatus ;
+	DebugExceptionMonitor debugExceptionMonitor;
+	DebugTrap debugTrap;
+	init_FPBInfo(&fpbInfo);
+	init_CoreStatus(&coreStatus);
+	init_DebugTrap(&debugTrap);
+	init_DebugExceptionMonitor(&debugExceptionMonitor);
+	
+	dataToWrite = get_DebugExceptionMonitorControl_WriteValue(DEBUGMONITOR_ENABLE,&debugTrap,ENABLE_DWT_ITM);
+	
+	
+	//Enable FPB Unit
+	emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
+	emulateSWDRegister_Write(DRW_REG,AP,4,ENABLE_FPB);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,FP_CTRL);
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x12345677));
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x00000001));
+	
+	//Enable debugMonitor
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Write(DRW_REG,AP,4,dataToWrite);
+	
+	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
+	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
+	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(dataToWrite));
+		
+	TEST_ASSERT_EQUAL(ERR_NOERROR,prepare_FPBOperations(&fpbInfo,&coreStatus,&debugExceptionMonitor,&debugTrap,DEBUGMONITOR_ENABLE));
+	
+	TEST_ASSERT_EQUAL(Enable,fpbInfo.EnableDisable);
+	
+	TEST_ASSERT_EQUAL(0,coreStatus.C_DEBUGEN);
+	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
+	TEST_ASSERT_EQUAL(0,coreStatus.S_HALT);
+	
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.enableDWT_ITM);
+	
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
+	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
+	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugMonitor->MON_EN);
 }
