@@ -4,7 +4,7 @@
 #include "elf.h"
 #include <stdio.h>
 #include <malloc.h>
-#include "CException.h"
+//#include "CException.h"
 #include "ErrorCode.h"
 
 ElfData *dataFromElf;
@@ -611,7 +611,8 @@ ElfSection *elfGetSectionInfoFromFile(char *fileName, char *sectionName) {
   pElfSection->index = getIndexOfSectionByName(dataFromElf, sectionName);
   pElfSection->size = dataFromElf->sh[pElfSection->index].sh_size;
   pElfSection->address = dataFromElf->sh[pElfSection->index].sh_addr;
-  pElfSection->machineCode = dataFromElf->programElf[pElfSection->index].section;
-
+  pElfSection->code = dataFromElf->programElf[pElfSection->index].section;
+  pElfSection->codeIndex = 0;
+  
   return pElfSection;
 }
