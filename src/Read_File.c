@@ -1,7 +1,7 @@
 #include "Read_File.h"
 #include <stdio.h>
 #include <malloc.h>
-#include "CException.h"
+//#include "CException.h"
 #include "ErrorCode.h"
 
 /******************************************************************************
@@ -24,7 +24,8 @@ InStream *openFile(char *fileDirectory, char *mode){
   myFile->file = fopen(fileDirectory, mode);
   
   if(myFile->file == NULL){
-    Throw(ERR_FILE_NOT_EXIST);
+    printf("EMPTY\n");
+    //Throw(ERR_FILE_NOT_EXIST);
   }
   
   myFile->filename = fileDirectory;
@@ -73,7 +74,8 @@ uint32_t inStreamMoveFilePtr(InStream *myFile, long int offset){
   startPos = fseek(myFile->file, offset, SEEK_SET);
   
   if(startPos == 1){
-    Throw(ERR_RANGE_OFFSET);
+    printf("INVALID RANGE OFFSET\n");
+    //Throw(ERR_RANGE_OFFSET);
   }else{
     return startPos;
   }

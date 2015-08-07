@@ -80,3 +80,15 @@ DWORD serialWriteByte(HANDLE hSerial, uint8_t * data, int length) {
 void closeSerialPort(HANDLE hSerial) {
 	CloseHandle(hSerial);
 }
+
+uint8_t serialGetByte(HANDLE hSerial)  {
+  DWORD dwBytesRead = 0;
+  uint8_t rxBuffer[1];
+  
+  if(!ReadFile(hSerial, rxBuffer, sizeof(rxBuffer), &dwBytesRead, NULL)){
+    //handle error
+    DWORD errId = GetLastError();
+    printf("ReadFile Error: %d\n", errId);
+  }
+  return rxBuffer[0];  
+}
