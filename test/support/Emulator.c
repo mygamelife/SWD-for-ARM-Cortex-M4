@@ -2,7 +2,7 @@
 #include "Emulator.h"
 
 
-uint32_t MSB_LSB_Conversion(uint32_t input)
+uint32_t convertMSB_LSB(uint32_t input)
 {
 	// swap odd and even bits
     input = (((input & 0xaaaaaaaa) >> 1) | ((input & 0x55555555) << 1));
@@ -104,7 +104,7 @@ void emulateResetTarget()
 	ResetPin_High_Expect();
 }
 
-void emulateSWDRegister_Write(int Address,int APnDP,int emulateACK, uint32_t data)
+void emulateswdRegisterWrite(int Address,int APnDP,int emulateACK, uint32_t data)
 {
 	int SWD_Request = 0 , parity = 0;
 	SWD_Request = getSWD_Request(Address,APnDP,WRITE);
@@ -125,7 +125,7 @@ void emulateSWDRegister_Write(int Address,int APnDP,int emulateACK, uint32_t dat
 	emulateIdleClock(8);
 }
 
-void emulateSWDRegister_Read(int Address,int APnDP,int emulateACK,int emulateParity, uint32_t emulateData)
+void emulateswdRegisterRead(int Address,int APnDP,int emulateACK,int emulateParity, uint32_t emulateData)
 {
 	int SWD_Request = 0 ;
 	SWD_Request = getSWD_Request(Address,APnDP,READ);

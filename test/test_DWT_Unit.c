@@ -21,475 +21,257 @@ void tearDown(void)
 {
 }
 
-/*------------------setWatchpoint_PC--------------*/
-void test_setWatchpoint_PC_should_disable_comparator_first_program_then_setPCwatchpoint_and_update_COMPinfo()
+/*------------------setAddressWatchpoint--------------*/
+void test_setAddressWatchpoint_given_DWT_COMP0_address_0x12345677_mask_WATCHPOINTMASK_BIT0_WATCHPOINT_READ()
 {
-	DWTInfo dwtInfo;
-	init_DWTInfo(&dwtInfo);
-	
-	uint32_t dataToWrite = 0 ;
-	
-	dataToWrite = get_DWTFunction_WriteValue(0,0,Address_Comparison,0,Watchpoint_PCMatch);
-	
-	// Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	
-	// Program comparator 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x12345677);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x12345677),MSB_LSB_Conversion(0x12345677));
-	
-	// Program mask 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,WATCHPOINTMASK_BIT0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(WATCHPOINTMASK_BIT0),MSB_LSB_Conversion(WATCHPOINTMASK_BIT0));
-	
-	// Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,dataToWrite);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(dataToWrite),MSB_LSB_Conversion(dataToWrite));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setWatchpoint_PC(&dwtInfo,DWT_COMP0,0x12345677,WATCHPOINTMASK_BIT0));
-	
-	TEST_ASSERT_EQUAL(0x12345677,dwtInfo.dwtCompInfo[0]->data);
-	TEST_ASSERT_EQUAL(WATCHPOINTMASK_BIT0,dwtInfo.dwtCompInfo[0]->Watchpoint_AddressMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Watchpoint_PCMatch,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dwtFunction);
+
+  //Faking CSW to Byte Size
+  cswDataSize = CSW_BYTE_SIZE ;
+
+  //Enable Global enable for DWT
+  emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0);
+
+  //Set CSW to Word Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Set CORE_DEBUG_MODE
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG);
+  
+  //Disable comparator first
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC0);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program comparator 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_COMP0);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x12345677);
+ 
+  //Program mask 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_MASK0);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_BIT0);
+  
+  //Program function
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC0);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_READ);
+  
+  TEST_ASSERT_EQUAL(0,setAddressWatchpoint(DWT_COMP0,0x12345677,WATCHPOINT_MASK_BIT0,WATCHPOINT_READ));
 }
 
-/*------------------setWatchpoint_DataAddr--------------*/
-//Read
-void test_setWatchpoint_DataAddr_Read_should_disable_comparator_first_program_then_setWatchpoint_Read_and_update_COMPinfo()
+/*------------------setDataWatchpoint_MatchingOneComparator--------------*/
+
+void test_setDataWatchpoint_MatchingOneComparator()
 {
-	DWTInfo dwtInfo;
-	init_DWTInfo(&dwtInfo);
-	
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	
-	//Program comparator 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x12345677);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x12345677),MSB_LSB_Conversion(0x12345677));
-	
-	//Program mask 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING,WATCHPOINT_MASK_NOTHING);
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,5);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(5),MSB_LSB_Conversion(5));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setWatchpoint_DataAddr(&dwtInfo,DWT_COMP0,0x12345677,WATCHPOINT_MASK_NOTHING,Read));
-	
-	TEST_ASSERT_EQUAL(0x12345677,dwtInfo.dwtCompInfo[0]->data);
-	TEST_ASSERT_EQUAL(WATCHPOINT_MASK_NOTHING,dwtInfo.dwtCompInfo[0]->Watchpoint_AddressMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Watchpoint_Read,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dwtFunction);
+  uint32_t configData = 0 ;
+  configData = (2 << 16) + (2 << 12) + (WATCHPOINT_WORD << 10) + (DATA_COMPARISON << 8) + WATCHPOINT_WRITE ;
+  
+  //Faking CSW to Byte Size
+  cswDataSize = CSW_BYTE_SIZE ;
+
+  //Enable Global enable for DWT
+  emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0);
+
+  //Set CSW to Word Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Set CORE_DEBUG_MODE
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG);
+  
+  //Disable matching comparator
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program matching comparator 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_COMP2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xFFFFFFFF);
+  
+  //Program matching mask 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_MASK2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_BIT14_BIT0);
+  
+  //Program comparator 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_COMP1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xABCDEF12);
+  
+  //Program mask 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_MASK1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING);
+  
+  //Program function
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,configData);
+  
+  TEST_ASSERT_EQUAL(0,setDataWatchpoint_MatchingOneComparator(DWT_COMP2,0xFFFFFFFF,WATCHPOINT_MASK_BIT14_BIT0,
+                                                              0xABCDEF12,WATCHPOINT_WORD,WATCHPOINT_WRITE));
 }
 
-//ReadWrite
-void test_setWatchpoint_DataAddr_ReadWrite_should_disable_comparator_first_program_then_setWatchpoint_ReadWrite_and_update_COMPinfo()
+/*------------------setDataWatchpoint_MatchingTwoComparator--------------*/
+void test_setDataWatchpoint_MatchingTwoComparator()
 {
-	DWTInfo dwtInfo;
-	init_DWTInfo(&dwtInfo);
-	
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program comparator 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x100);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x100),MSB_LSB_Conversion(0x100));
-	
-	//Program mask 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(WATCHPOINT_MASK_NOTHING),MSB_LSB_Conversion(WATCHPOINT_MASK_NOTHING));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,5);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(5),MSB_LSB_Conversion(5));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setWatchpoint_DataAddr(&dwtInfo,DWT_COMP3,0x100,WATCHPOINT_MASK_NOTHING,ReadWrite));
-	
-	TEST_ASSERT_EQUAL(0x100,dwtInfo.dwtCompInfo[3]->data);
-	TEST_ASSERT_EQUAL(WATCHPOINT_MASK_NOTHING,dwtInfo.dwtCompInfo[3]->Watchpoint_AddressMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Watchpoint_ReadWrite,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->dwtFunction);
+  uint32_t configData = 0 ;
+  configData = (3 << 16) + (2 << 12) + (WATCHPOINT_BYTE << 10) + (DATA_COMPARISON << 8) + WATCHPOINT_READWRITE ;
+  
+  //Faking CSW to Byte Size
+  cswDataSize = CSW_BYTE_SIZE ;
+
+  //Enable Global enable for DWT
+  emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0);
+
+  //Set CSW to Word Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Set CORE_DEBUG_MODE
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG);
+  
+  //Disable 1st matching comparator
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program 1st matching comparator 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_COMP2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xBEEEEEEF);
+  
+  //Program 1st matching mask 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_MASK2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_BIT0);
+  
+  //Disable 2nd matching comparator
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC3);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program 2nd matching comparator 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_COMP3);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xA55AA55A);
+  
+  //Program 2nd matching mask 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_MASK3);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING);
+  
+  //Program comparator 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_COMP1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xABCDEF12);
+  
+  //Program mask 
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_MASK1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING);
+  
+  //Program function
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,configData);
+  
+  TEST_ASSERT_EQUAL(0,setDataWatchpoint_MatchingTwoComparator(DWT_COMP2,0xBEEEEEEF,WATCHPOINT_MASK_BIT0,
+                                                              DWT_COMP3,0xA55AA55A, WATCHPOINT_MASK_NOTHING,
+                                                              0xABCDEF12,WATCHPOINT_BYTE,WATCHPOINT_READWRITE));
 }
 
-/*------------------setWatchpoint_DataValue--------------*/
-//Write
-void test_setWatchpoint_DataValue_Read_should_disable_DWTCOMP1_first_program_then_setWatchpoint_Write_and_update_COMPinfo()
+/*------------------isDataWatchpointOccurred--------------*/
+void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_MATCHED_should_return_1()
 {
-	DWTInfo dwtInfo;
-	init_DWTInfo(&dwtInfo);
-	uint32_t dataToWrite = 0 ;
-	
-	dataToWrite = get_DWTFunction_WriteValue(0,0,DataValue_Comparison,Word,Watchpoint_Write);
-	
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program comparator
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x34567890);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x34567890),MSB_LSB_Conversion(0x34567890));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,dataToWrite);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(dataToWrite),MSB_LSB_Conversion(dataToWrite));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setWatchpoint_DataValue(&dwtInfo,0x34567890,Word,Write));
-	
-	TEST_ASSERT_EQUAL(0x34567890,dwtInfo.dwtCompInfo[1]->data);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(Word,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(1,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Watchpoint_Write,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dwtFunction);
+  //Faking CSW to Byte Size
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  //DWTTRAP_DEBUGEVENT = 1
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x4));
+  
+  //read DWT_FUNC1 and MATCHED bit set
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC1);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x1000000));
+  
+  TEST_ASSERT_EQUAL(1,isDataWatchpointOccurred());
 }
 
-/*------------------setWatchpoint_LinkedComparison--------------*/
-//Single Linked ReadWrite
-void test_setWatchpoint_LinkedComparison_singleLinkedReadWrite_should_first_disable_DWTCOMP1_program_DWTCMOP1_and_linkedComparator_setWatchpointRW_and_update_compInfo()
+void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_NOT_MATCHED_should_return_0()
 {
-	DWTInfo dwtInfo;
-	init_DWTInfo(&dwtInfo);
-	uint32_t dataToWrite = 0 ;
-	
-	dataToWrite = get_DWTFunction_WriteValue(0,0,DataValue_Comparison,Byte,Watchpoint_ReadWrite);
-	
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//First linked comparator
-	//Disable linked comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program linked comparator 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x12345670);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x12345670),MSB_LSB_Conversion(0x12345670));
-	
-	//Program mask 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,WATCHPOINTMASK_BIT1_BIT0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(WATCHPOINTMASK_BIT1_BIT0),MSB_LSB_Conversion(WATCHPOINTMASK_BIT1_BIT0));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC0);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Main comparator
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program comparator
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0xABCDEF);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0xABCDEF),MSB_LSB_Conversion(0xABCDEF));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,dataToWrite);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(dataToWrite+ 1<<9),MSB_LSB_Conversion(dataToWrite+1<<9));
+  //DWTTRAP_DEBUGEVENT = 1
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x4));
+  
+  //read DWT_FUNC1 and MATCHED bit not set
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC1);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,0,convertMSB_LSB(0xA));
+  
+  TEST_ASSERT_EQUAL(0,isDataWatchpointOccurred());
+}
 
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setWatchpoint_LinkedComparison(&dwtInfo,0xABCDEF,Byte,DWT_COMP0,0x12345670,WATCHPOINTMASK_BIT1_BIT0,0,0,0,ReadWrite));
-	
-	TEST_ASSERT_EQUAL(0xABCDEF,dwtInfo.dwtCompInfo[1]->data);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(Byte,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(1,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(1,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Watchpoint_ReadWrite,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dwtFunction);
-	
-	TEST_ASSERT_EQUAL(0x12345670,dwtInfo.dwtCompInfo[0]->data);
-	TEST_ASSERT_EQUAL(WATCHPOINTMASK_BIT1_BIT0,dwtInfo.dwtCompInfo[0]->Watchpoint_AddressMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(DWTComparator_Disabled,dwtInfo.dwtCompInfo[0]->dwtFunctionInfo->dwtFunction);
+void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_0_should_return_0()
+{
+  //DWTTRAP_DEBUGEVENT = 0
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x0));
+  
+  TEST_ASSERT_EQUAL(0,isDataWatchpointOccurred());
+}
+
+/*------------------isAddressWatchpointOccurred--------------*/
+void test_isAddressWatchpointOccurred_given_DWT_COMP3__DWTTRAP_DEBUGEVENT_1_MATCHED_should_return_1()
+{
+  //DWTTRAP_DEBUGEVENT = 1
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x4));
+  
+  //read DWT_FUNC3 and MATCHED bit set
+  emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC3);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x1000000));
+  
+  TEST_ASSERT_EQUAL(1,isAddressWatchpointOccurred(DWT_COMP3));
 }
 
 
-//Double Linked Read
-void test_setWatchpoint_LinkedComparison_doubleLinkedRead_should_first_disable_DWTCOMP1_program_DWTCMOP1_and_linkedComparator_setWatchpointR_and_update_compInfo()
+/*------------------disableDWTComparator--------------*/
+void test_disableDWTComparator_given_DWT_COMP1_should_write_0_to_DWT_FUNC1()
 {
-	DWTInfo dwtInfo;
-	init_DWTInfo(&dwtInfo);
-	uint32_t dataToWrite = 0 ;
-	
-	dataToWrite = get_DWTFunction_WriteValue(2,3,DataValue_Comparison,Halfword,Watchpoint_Read);
-	
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//First linked comparator
-	//Disable linked comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC2);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC2);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program linked comparator 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP2);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x12345670);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP2);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x12345670),MSB_LSB_Conversion(0x12345670));
-	
-	//Program mask 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK2);
-	emulateSWDRegister_Write(DRW_REG,AP,4,WATCHPOINTMASK_BIT1_BIT0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK2);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(WATCHPOINTMASK_BIT1_BIT0),MSB_LSB_Conversion(WATCHPOINTMASK_BIT1_BIT0));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC2);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC2);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Second linked comparator
-	//Disable linked comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program linked comparator 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x34567890);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0x34567890),MSB_LSB_Conversion(0x34567890));
-	
-	//Program mask 
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,WATCHPOINT_MASK_NOTHING);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_MASK3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(WATCHPOINT_MASK_NOTHING),MSB_LSB_Conversion(WATCHPOINT_MASK_NOTHING));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC3);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Main comparator
-	//Disable comparator first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0),MSB_LSB_Conversion(0));
-	
-	//Program comparator
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0xABCDEF);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_COMP1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(0xABCDEF),MSB_LSB_Conversion(0xABCDEF));
-	
-	//Program function
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Write(DRW_REG,AP,4,dataToWrite);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DWT_FUNC1);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,calculateParity_32bitData(dataToWrite+1<<9),MSB_LSB_Conversion(dataToWrite + 1 << 9));
-
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setWatchpoint_LinkedComparison(&dwtInfo,0xABCDEF,Halfword,DWT_COMP2,0x12345670,WATCHPOINTMASK_BIT1_BIT0,DWT_COMP3,0x34567890,WATCHPOINT_MASK_NOTHING,Read));
-
-
-	TEST_ASSERT_EQUAL(0xABCDEF,dwtInfo.dwtCompInfo[1]->data);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(3,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(2,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(Halfword,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(1,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(1,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(Watchpoint_Read,dwtInfo.dwtCompInfo[1]->dwtFunctionInfo->dwtFunction);
-	
-	TEST_ASSERT_EQUAL(0x12345670,dwtInfo.dwtCompInfo[2]->data);
-	TEST_ASSERT_EQUAL(WATCHPOINTMASK_BIT1_BIT0,dwtInfo.dwtCompInfo[2]->Watchpoint_AddressMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(DWTComparator_Disabled,dwtInfo.dwtCompInfo[2]->dwtFunctionInfo->dwtFunction);
-	
-	TEST_ASSERT_EQUAL(0x34567890,dwtInfo.dwtCompInfo[3]->data);
-	TEST_ASSERT_EQUAL(WATCHPOINT_MASK_NOTHING,dwtInfo.dwtCompInfo[3]->Watchpoint_AddressMask);
-	
-	TEST_ASSERT_EQUAL(NOT_MATCH,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->MATCHED);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVADDR1);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVADDR0);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->dataSize);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->LNK1ENA);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->DATAVMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->CYCMATCH);
-	TEST_ASSERT_EQUAL(0,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->EMITRANGE);
-	TEST_ASSERT_EQUAL(DWTComparator_Disabled,dwtInfo.dwtCompInfo[3]->dwtFunctionInfo->dwtFunction);
-	
+  //Faking CSW to Word Size
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  //Program function
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  TEST_ASSERT_EQUAL(0,disableDWTComparator(DWT_COMP1));
 }
 
+void test_disableDWTComparator_given_DWT_COMP3_should_write_0_to_DWT_FUNC3()
+{ 
+  //Program function
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC3);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  TEST_ASSERT_EQUAL(0,disableDWTComparator(DWT_COMP3));
+}
+
+/*------------------disableAllDWTComparators--------------*/
+void test_disableAllDWTComparators_should_write_0_to_DWT_FUNC0_FUNC1_FUNC2_FUNC3()
+{
+  //Program DWT_FUNC0
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC0);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program DWT_FUNC1
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC1);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program DWT_FUNC2
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC2);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  //Program DWT_FUNC3
+	emulateswdRegisterWrite(TAR_REG,AP,4,DWT_FUNC3);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  disableAllDWTComparators();
+}

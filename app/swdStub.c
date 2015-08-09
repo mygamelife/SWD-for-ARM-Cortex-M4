@@ -158,15 +158,15 @@ void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress)  {
   uint32_t targetStatus = 0;
   /* Continues wait for target to release */
   do  {
-    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+    memoryReadWord(SWD_TARGET_STATUS, &targetStatus);
   } while(targetStatus != TARGET_OK);
   
   /* load flash start and end address to sram */
-  memoryAccessWrite(SWD_FLASH_START_ADDRESS, startAddress);
-  memoryAccessWrite(SWD_FLASH_END_ADDRESS, endAddress);
+  memoryWriteWord(SWD_FLASH_START_ADDRESS, startAddress);
+  memoryWriteWord(SWD_FLASH_END_ADDRESS, endAddress);
   
   /* load instruction to sram */
-  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
+  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
 }
 
 /**
@@ -184,14 +184,14 @@ void loadMassEraseInstruction(uint32_t bankSelect)  {
   uint32_t targetStatus = 0;
   /* Continues wait for target to release */
   do  {
-    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+    memoryReadWord(SWD_TARGET_STATUS, &targetStatus);
   } while(targetStatus != TARGET_OK);
   
   /* load bank select to sram */
-  memoryAccessWrite(SWD_BANK_SELECT, bankSelect);
+  memoryWriteWord(SWD_BANK_SELECT, bankSelect);
   
   /* load instruction to sram */
-  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
+  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
 }
 
 /**
@@ -207,18 +207,18 @@ void loadCopyInstruction(uint32_t src, uint32_t dest, int length) {
   uint32_t targetStatus = 0;
   /* Continues wait for target to release */
   do  {
-    memoryAccessRead(SWD_TARGET_STATUS, &targetStatus);
+    memoryReadWord(SWD_TARGET_STATUS, &targetStatus);
   } while(targetStatus != TARGET_OK);
 
   /* load SRAM start address into sram */
-  memoryAccessWrite(SWD_SRAM_START_ADDRESS, src);
+  memoryWriteWord(SWD_SRAM_START_ADDRESS, src);
   
   /* load Flash start address into sram */
-  memoryAccessWrite(SWD_FLASH_START_ADDRESS, dest);
+  memoryWriteWord(SWD_FLASH_START_ADDRESS, dest);
   
   /* load length into sram */
-  memoryAccessWrite(SWD_DATA_LENGTH, length);
+  memoryWriteWord(SWD_DATA_LENGTH, length);
 
 	/* load copy instructoin into sram */
-  memoryAccessWrite(SWD_INSTRUCTION, INSTRUCTION_COPY);
+  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
 }

@@ -15,7 +15,7 @@ void tearDown(void){}
  ------------------------------------------------------------------------------------------------------
  |      1       |    1      |    0     |     1      |     0     |     0       |    0      |     1     |
  ******************************************************************************************************/
-void test_SWDRegister_Write_given_Address_0x4_AP_Write_data_0xFFFFFFFF()
+void test_swdRegisterWrite_given_Address_0x4_AP_Write_data_0xFFFFFFFF()
 {
 	int i = 0 , ACK = 0;
 	uint32_t dataToSend = 0xFFFFFFFF ;
@@ -47,7 +47,7 @@ void test_SWDRegister_Write_given_Address_0x4_AP_Write_data_0xFFFFFFFF()
 	//-----------extraIdleClock-------------
 	emulateIdleClock(8);
 
-	SWDRegister_Write(0x4,AP,&ACK,0xFFFFFFFF);
+	swdRegisterWrite(0x4,AP,&ACK,0xFFFFFFFF);
 	TEST_ASSERT_EQUAL(1,ACK);
 }
 
@@ -71,36 +71,36 @@ void test_SWDRegisterRead_given_Address_0x4_AP_READ() {
 	emulateSwdOutput();
 	emulateIdleClock(8);
   
-	SWDRegister_Read(0x4,AP,&ACK,&parity, &dataRead);
+	swdRegisterRead(0x4,AP,&ACK,&parity, &dataRead);
 
 	TEST_ASSERT_EQUAL(1,ACK);
 	TEST_ASSERT_EQUAL(1,parity);  
 	TEST_ASSERT_EQUAL(0x1000000,dataRead);
 }
 
-void test_swdReadAP_should_call_SWDRegister_Read_2times()
+void test_swdReadAP_should_call_swdRegisterRead_2times()
 {
 	int ACK = 0 , Parity = 0 ;
 	uint32_t dataRead = 0 ;
 	
-	emulateSWDRegister_Read(TAR_REG,AP,4,1,0x10);
-	emulateSWDRegister_Read(TAR_REG,AP,4,1,0x88112233);
+	emulateswdRegisterRead(TAR_REG,AP,4,1,0x10);
+	emulateswdRegisterRead(TAR_REG,AP,4,1,0x88112233);
 	
 	swdReadAP(TAR_REG,&ACK,&Parity,&dataRead);
 	
   TEST_ASSERT_EQUAL(1,ACK);
 	TEST_ASSERT_EQUAL(1,Parity);  
-	TEST_ASSERT_EQUAL(MSB_LSB_Conversion(0x88112233),dataRead);
+	TEST_ASSERT_EQUAL(convertMSB_LSB(0x88112233),dataRead);
 }
 
 void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_and_check_error_flag() {
-  emulateSWDRegister_Write(CTRLSTAT_REG, DP, 1, POWERUP_SYSTEM);
+  emulateswdRegisterWrite(CTRLSTAT_REG, DP, 1, POWERUP_SYSTEM);
 
   powerUpSystemAndDebug();
 }
 
 void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_then_check_error_flag_and_send_0x8_to_ABORT() {
-  emulateSWDRegister_Write(CTRLSTAT_REG, DP, 1, POWERUP_SYSTEM);
+  emulateswdRegisterWrite(CTRLSTAT_REG, DP, 1, POWERUP_SYSTEM);
 
   powerUpSystemAndDebug();
 }
@@ -108,10 +108,10 @@ void test_powerUpSystemAndDebug_should_send_0x50000000_to_CTRL_STATUS_register_t
 void test_readAhbIDR_should_clear_flags_after_readSelect_and_readAP()
 {
   uint32_t data_IDR = 0;
-	emulateSWDRegister_Write(CTRLSTAT_REG, DP, OK, POWERUP_SYSTEM);
-	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_F);
-	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
-	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
+	emulateswdRegisterWrite(CTRLSTAT_REG, DP, OK, POWERUP_SYSTEM);
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_F);
+	emulateswdRegisterRead(IDR_REG, AP, OK, 1, convertMSB_LSB(0x24770011));
+	emulateswdRegisterRead(IDR_REG, AP, OK, 1, convertMSB_LSB(0x24770011));
   
   readAhbIDR(&data_IDR);
   TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
@@ -120,50 +120,147 @@ void test_readAhbIDR_should_clear_flags_after_readSelect_and_readAP()
 void test_readAhbIDR_return_WAIT_RESPONSE_should_retries_DPABORT_and_resend()
 {
   uint32_t data_IDR = 0;
-	emulateSWDRegister_Write(CTRLSTAT_REG, DP, OK, POWERUP_SYSTEM);
-	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_F);
-	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
-	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+	emulateswdRegisterWrite(CTRLSTAT_REG, DP, OK, POWERUP_SYSTEM);
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_F);
+	emulateswdRegisterRead(IDR_REG, AP, WAIT, 1, convertMSB_LSB(0x24770011));
+	emulateswdRegisterRead(IDR_REG, AP, WAIT, 1, convertMSB_LSB(0x24770011));
   
   //Retries
-  emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
-	emulateSWDRegister_Read(IDR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x24770011));
+  emulateswdRegisterRead(IDR_REG, AP, WAIT, 1, convertMSB_LSB(0x24770011));
+	emulateswdRegisterRead(IDR_REG, AP, WAIT, 1, convertMSB_LSB(0x24770011));
   
-  emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
-	emulateSWDRegister_Read(IDR_REG, AP, OK, 1, MSB_LSB_Conversion(0x24770011));
+  emulateswdRegisterRead(IDR_REG, AP, OK, 1, convertMSB_LSB(0x24770011));
+	emulateswdRegisterRead(IDR_REG, AP, OK, 1, convertMSB_LSB(0x24770011));
   
   readAhbIDR(&data_IDR);
   TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
 }
 
-void test_memoryAccessRead_given_Address_0x12345678_should_write_address_to_TAR_and_read_data_from_DRW()
+void test_memoryReadWord_given_Address_0x12345678_should_write_address_to_TAR_and_read_data_from_DRW()
 {
 	uint32_t dataRead = 0 ;
 	
 	//Write memory address to TAR
-	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 
 	//Read and Discard dummy data
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0xAABBCCDD);
+	emulateswdRegisterRead(DRW_REG,AP,4,1,0xAABBCCDD);
 	
 	//Read actual data from DRW
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x10);
+	emulateswdRegisterRead(DRW_REG,AP,4,1,0x10);
 	
-	memoryAccessRead(0x12345678,&dataRead);
+	memoryReadWord(0x12345678,&dataRead);
 	
-	TEST_ASSERT_EQUAL(MSB_LSB_Conversion(0x10),dataRead);
+	TEST_ASSERT_EQUAL(convertMSB_LSB(0x10),dataRead);
 }
 
-void test_memoryAccessWrite_given_Address_0x12345678_Data_0x87654321_should_Write_Address_to_TAR_and_data_to_DRW()
+//cswDataSize = CSW_WORD_SIZE
+void test_memoryWriteByte_should_set_CSW_REG_to_byte_and_write_address_to_TAR_and_data_to_DRW()
 {
-	//Write memory address to TAR
-	emulateSWDRegister_Write(TAR_REG,AP,4,0x12345678);
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  //Write BANK_0 to select register
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	
+	//Write CSW_BYTE_SIZE to csw register
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
+  
+  //Write memory address to TAR
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 	
 	//Write data to DRW
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x87654321);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
 	
 	//Write data to DRW
-	memoryAccessWrite(0x12345678,0x87654321);
+	memoryWriteByte(0x12345678,0x87654321);
+  
+}
+
+//cswDataSize = CSW_BYTE_SIZE
+void test_memoryWriteByte_should_write_address_to_TAR_and_data_to_DRW()
+{
+  cswDataSize = CSW_BYTE_SIZE ;
+  
+  //Write memory address to TAR
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	memoryWriteByte(0x12345678,0x87654321);
+}
+
+//cswDataSize = CSW_BYTE_SIZE
+void test_memoryWriteHalfword_should_set_CSW_REG_to_haflword_and_write_address_to_TAR_and_data_to_DRW()
+{
+  cswDataSize = CSW_BYTE_SIZE ;
+  
+  //Write BANK_0 to select register
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	
+	//Write CSW_HALFWORD_SIZE_SIZE to csw register
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+  
+  //Write memory address to TAR
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	memoryWriteHalfword(0x12345678,0x87654321);
+}
+
+//cswDataSize = CSW_HALFWORD_SIZE
+void test_memoryWriteHalfword_should_write_address_to_TAR_and_data_to_DRW()
+{
+  cswDataSize = CSW_HALFWORD_SIZE ;
+  
+  //Write memory address to TAR
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	memoryWriteHalfword(0x12345678,0x87654321);
+}
+
+//cswDataSize = CSW_BYTE_SIZE
+void test_memoryWriteWord_should_set_CSW_REG_to_word_and_write_address_to_TAR_and_data_to_DRW()
+{
+  cswDataSize = CSW_BYTE_SIZE ;
+  
+	//Write BANK_0 to select register
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	
+	//Write CSW_WORD_SIZE to csw register
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Write memory address to TAR
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	memoryWriteWord(0x12345678,0x87654321);
+}
+
+//cswDataSize = CSW_WORD_SIZE
+void test_memoryWriteWord_should_write_address_to_TAR_and_data_to_DRW()
+{
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  //Write memory address to TAR
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	
+	//Write data to DRW
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	
+	//Write data to DRW
+	memoryWriteWord(0x12345678,0x87654321);
 }
 
 void test_swdWriteCSW_given_CSW_WORD_SIZE_should_select_BANK_0_and_set_CSW_register()
@@ -174,10 +271,10 @@ void test_swdWriteCSW_given_CSW_WORD_SIZE_should_select_BANK_0_and_set_CSW_regis
   CSW_BIT_SET = CSW_DEFAULT_MASK | CSW_WORD_SIZE;
   
 	//Write BANK_0 to select register
-	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
 	
 	//Write CSW_WORD_SIZE to csw register
-	emulateSWDRegister_Write(CSW_REG, AP, OK, CSW_BIT_SET);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, CSW_BIT_SET);
 	
 	swdWriteCSW(&ack, CSW_BIT_SET);
   
@@ -192,10 +289,10 @@ void test_swdWriteCSW_given_CSW_WORD_SIZE_and_Enable_ADDR_INC()
   CSW_BIT_SET = CSW_DEFAULT_MASK | CSW_WORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED;
   
 	//Write BANK_0 to select register
-	emulateSWDRegister_Write(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
 	
 	//Write CSW_WORD_SIZE to csw register
-	emulateSWDRegister_Write(CSW_REG, AP, OK, CSW_BIT_SET);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, CSW_BIT_SET);
 	
 	swdWriteCSW(&ack, CSW_BIT_SET);
   

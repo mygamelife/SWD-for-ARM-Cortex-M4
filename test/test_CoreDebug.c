@@ -12,6 +12,7 @@
 #include "mock_IO_Operations.h"
 
 
+
 void setUp(void)
 {
 }
@@ -20,573 +21,330 @@ void tearDown(void)
 {
 }
 
-/*--------------------------------setCore---------------------------------------*/
+/*--------------------------------setCoreMode---------------------------------------*/
 //CORE_NORMAL_MODE
-void test_setCore_CORE_NORMAL_MODE_should_write_0xA05F0000_to_DHCSR_and_return_ERR_NOERROR_if_successful()
+void test_setCoreMode_CORE_NORMAL_MODE_should_write_SET_CORE_NORMAL_to_DHCSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
+  cswDataSize = CSW_WORD_SIZE ;
+  
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_NORMAL);
 	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_NORMAL);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore(CORE_NORMAL_MODE,&coreStatus));
-	
-	TEST_ASSERT_EQUAL(0,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(0,coreStatus.S_HALT);
-	
+	setCoreMode(CORE_NORMAL_MODE);
 }
 
-//CORE_DEBUG_MODE
-void test_setCore_CORE_DEBUG_MODE_should_write_0xA05F0001_to_DHCSR_and_return_ERR_NOERROR_if_successful()
+//CORE_NORMAL_MASKINT
+void test_setCoreMode_CORE_NORMAL_MASKINT_will_setCoreMode_to_CORE_DEBUG_HALT_first_and_write_SET_CORE_NORMAL_MASKINT_to_DHCSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0xA05F0001);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x1));
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore(CORE_DEBUG_MODE,&coreStatus));
-	
-	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(0,coreStatus.S_HALT);
+	//Set to CORE_DEBUG_HALT first
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
+	//Then only set to CORE_NORMAL_MASKINT
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_NORMAL_MASKINT);
+  
+  setCoreMode(CORE_NORMAL_MASKINT);
+}
+
+
+//CORE_DEBUG_MODE
+void test_setCoreMode_CORE_DEBUG_MODE_should_write_SET_CORE_DEBUG_to_DHCSR()
+{
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG);
+
+	setCoreMode(CORE_DEBUG_MODE);
 }
 
 //CORE_DEBUG_HALT
-void test_setCore_CORE_DEBUG_HALT_should_write_0xA05F0003_to_DHCSR_and_return_ERR_NOERROR_if_successful()
+void test_setCore_CORE_DEBUG_HALT_should_write_SET_CORE_DEBUG_HALT_to_DHCSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
 	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore(CORE_DEBUG_HALT,&coreStatus));
-	
-	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
-	
+  setCoreMode(CORE_DEBUG_HALT);
 }
 
-void test_setCore_CORE_DEBUG_HALT_should_write_0xA05F0003_to_DHCSR_and_return_false_if_fail()
-{
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030000));
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_DEBUG_HALT,&coreStatus));
-	
-	TEST_ASSERT_EQUAL(0,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);	
-}
 
 //CORE_SINGLE_STEP
-void test_setCore_CORE_SINGLE_STEPwill_setCore_to_CORE_DEBUG_HALT_first_and_write_SET_CORE_STEP_to_DHCSR_and_return_ERR_NOERROR_if_successful()
+void test_setCoreMode_CORE_SINGLE_STEP_will_setCoreMode_to_CORE_DEBUG_HALT_first_and_write_SET_CORE_STEP_to_DHCSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
 	//Set to CORE_DEBUG_HALT first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
 	//Then only set to CORE_SINGLE_STEP
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_STEP);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x03030007));
-	TEST_ASSERT_EQUAL(TRUE,setCore(CORE_SINGLE_STEP,&coreStatus));
-	
-	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(1,coreStatus.C_STEP);
-	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_STEP);
+  
+  setCoreMode(CORE_SINGLE_STEP);
 }
 
-void test_setCore_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_first_and_write_SET_CORE_STEP_to_DHCSR_and_return_ERR_CORECONTROL_FAILED_if_fail()
+//CORE_SINGLE_STEP_MASKINT
+void test_setCoreMode_SET_CORE_STEP_MASKINT_will_setCoreMode_to_CORE_DEBUG_HALT_first_and_write_SET_CORE_STEP_MASKINT_to_DHCSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
 	//Set to CORE_DEBUG_HALT first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
 	//Then only set to CORE_SINGLE_STEP
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_STEP);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030000));
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_SINGLE_STEP,&coreStatus));
-	
-	TEST_ASSERT_EQUAL(0,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(0,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(0,coreStatus.C_STEP);
-	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_STEP_MASKINT);
+  
+  setCoreMode(CORE_SINGLE_STEP_MASKINT);
 }
 
-void test_setCore_CORE_SINGLE_STEP_but_setCore_to_CORE_DEBUG_HALT_failed_will_not_setCore_to_CORE_SINGLE_STEP_NOMASK()
+/*--------------------------------getCoreMode---------------------------------------*/
+void test_getCoreMode_given_0x0_should_return_CORE_NORMAL_MODE()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	//Set to CORE_DEBUG_HALT first
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030000));
-	
-	TEST_ASSERT_EQUAL(ERR_CORECONTROL_FAILED,setCore(CORE_SINGLE_STEP,&coreStatus));
-	
-	
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,0,0);
+  
+  TEST_ASSERT_EQUAL(CORE_NORMAL_MODE,getCoreMode());
 }
 
-/*--------------------------------setCore_Exception-----------------------------------------*/
-
-void test_setCore_Exception_given_CORE_SINGLE_STEP_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
+void test_getCoreMode_given_0x8_should_return_CORE_NORMAL_MASKINT()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_SINGLE_STEP,&coreStatus));
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x8));
+  
+  TEST_ASSERT_EQUAL(CORE_NORMAL_MASKINT,getCoreMode());
 }
 
-void test_setCore_Exception_given_CORE_SINGLE_STEP_MASKINT_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
+void test_getCoreMode_given_0x1_should_return_CORE_DEBUG_MODE()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_SINGLE_STEP_MASKINT,&coreStatus));
+   emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x1));
+  
+  TEST_ASSERT_EQUAL(CORE_DEBUG_MODE,getCoreMode());
 }
 
-void test_setCore_Exception_given_CORE_NORMAL_MASKINT_will_setCore_to_CORE_DEBUG_HALT_and_return_ERR_NOERROR_if_successful()
+void test_getCoreMode_given_0x20003_should_return_CORE_DEBUG_HALT_MODE()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_NORMAL_MASKINT,&coreStatus));
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x20003));
+  
+  TEST_ASSERT_EQUAL(CORE_DEBUG_HALT,getCoreMode());
 }
 
-void test_setCore_Exception_will_return_ERR_NOERROR_and_do_nothing_for_other_coreControl_mode()
+/*--------------------------------writeCoreRegister---------------------------------------*/
+void test_writeCoreRegister_given_0x52_CORE_REG_R1_should_write_0x52_to_DCRDR_and_0x10001_to_DCRSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,setCore_Exception(CORE_DEBUG_HALT,&coreStatus));
+  //SET_CORE_DEBUG_HALT
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+  
+  //Write data to DCRDR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,DCRDR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x52);
+  
+  //Select CORE_REG_R1 and write mode in DCRSR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,DCRSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x10001);
+  
+  //wait for transaction to complete
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x10000));
+  
+  writeCoreRegister(CORE_REG_R1,0x52);
 }
 
-/***************************************check_CoreStatus***************************************************/
-/********************************************************
-	Debug Halting and Control Status Register , DHCSR
- 
-	Bit[26]		--- S_RESET_ST
-	Bit[25]		--- S_RETIRE_ST
-	
-	Bit[19]		--- S_LOCKUP
-	Bit[18]		--- S_SLEEP
-	Bit[17]		--- S_HALT
-	Bit[16]		--- S_REGRDY
-	
-	Bit[5]		--- C_SNAPSTALL
-	
-	Bit[3]		--- C_MASKINTS
-	Bit[2]		--- C_STEP
-	Bit[1]		--- C_HALT
-	Bit[0]		--- C_DEBUGEN
-	
- ************************************************************/
-
-void test_check_CoreStatus_should_read_DHCSR_and_process_CoreStatusData()
+void test_writeCoreRegister_given_0xFFFFFFFF_CORE_REG_FPREGS31_should_write_0xFFFFFFFF_to_DCRDR_and_0x1005F_to_DCRSR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus(&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	check_CoreStatus(&coreStatus);
-	
-	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
+  //SET_CORE_DEBUG_HALT
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+  
+  //Write data to DCRDR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,DCRDR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xFFFFFFFF);
+  
+  //Select CORE_REG_FPREGS31 and write mode in DCRSR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,DCRSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x1005F);
+  
+  //wait for transaction to complete
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x10000));
+  
+  writeCoreRegister(CORE_REG_FPREGS31,0xFFFFFFFF);
 }
 
-/***************************************check_DebugEvent***************************************************/
-/******************************************************************************************************
-	Debug Fault Status Register , DFSR
- 
-	Bits[31:5] --- RESERVED
-
-	Bit[4]		--- EXTERNAL
-	Bit[3]		--- VCATCH
-	Bit[2]		--- DWTTRAP
-	Bit[1]		--- BKPT
-	Bit[0]		--- HALTED
-	
- ******************************************************************************************************/
-
-void test_check_DebugEvent_should_read_DFSR_and_update_DebugEvent()
+/*--------------------------------readCoreRegister---------------------------------------*/
+void test_readCoreRegister_given_CORE_REG_PC_should_write_0xF_to_DCRSR_and_read_data_from_DCRDR()
 {
-	DebugEvent debugEvent ;
-	init_DebugEvent(&debugEvent);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DFSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x2345671F));
-	
-	check_DebugEvent(&debugEvent);
-	
-	TEST_ASSERT_EQUAL(1,debugEvent.EXTERNAL);
-	TEST_ASSERT_EQUAL(1,debugEvent.VCATCH);
-	TEST_ASSERT_EQUAL(1,debugEvent.DWTTRAP);
-	TEST_ASSERT_EQUAL(1,debugEvent.BKPT);
-	TEST_ASSERT_EQUAL(1,debugEvent.HALTED);
+  uint32_t dataRead = 0 ;
+  
+  //SET_CORE_DEBUG_HALT
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+  
+  //Select CORE_REG_PC and read mode in DCRSR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,DCRSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0xF);
+  
+  //wait for transaction to complete
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x10000));
+  
+  //Read data from DCRDR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,DCRDR_REG);
+	emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x1234567));
+  
+  readCoreRegister(CORE_REG_PC,&dataRead);
+  
+  TEST_ASSERT_EQUAL(0x1234567,dataRead);
 }
 
-/***************************************clear_DebugEvent***************************************************/
-
-void test_clear_DebugEvent_should_write_to_DFSR_to_clear_and_update_DebugEvent()
+/*------------------------------waitForCoreRegisterTransactionToComplete------------------------------------*/
+//S_REGRDY @ bit 16
+void test_waitForCoreRegisterTransactionToComplete_should_read_DHCSR_until_S_REGRDY_bit_is_1()
 {
-	DebugEvent debugEvent ;
-	init_DebugEvent(&debugEvent);
-	
-	debugEvent.EXTERNAL = 1 ;
-	debugEvent.VCATCH = 1 ;
-	debugEvent.DWTTRAP = 1 ;
-	debugEvent.BKPT = 1 ;
-	debugEvent.HALTED = 1 ;
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DFSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0X1F);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DFSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x0));
-	
-	clear_DebugEvent(&debugEvent);
-	
-	TEST_ASSERT_EQUAL(0,debugEvent.EXTERNAL);
-	TEST_ASSERT_EQUAL(0,debugEvent.VCATCH);
-	TEST_ASSERT_EQUAL(0,debugEvent.DWTTRAP);
-	TEST_ASSERT_EQUAL(0,debugEvent.BKPT);
-	TEST_ASSERT_EQUAL(0,debugEvent.HALTED);
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,0,0);
+  
+  emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x10000));
+  waitForCoreRegisterTransactionToComplete();
 }
 
-/***************************************check_DebugTrapStatus***************************************************/
-/******************************************************************************************************
-	Debug Exception and Monitor Control Register, DEMCR
- 
-	Bit[10]	--- VC_HARDERR
-	Bit[9]	--- VC_INTERR
-	Bit[8]	--- VC_BUSERR
-	Bit[7]	--- VC_STATERR
-	Bit[6]	--- VC_CHKERR
-	Bit[5]	--- VC_NOCPERR
-	Bit[4]	--- VC_MMERR
-
-	Bit[0]	--- VC_CORERESET
-	
- ******************************************************************************************************/
- 
-void test_check_DebugTrapStatus_should_read_DEMCR_and_update_DebugTrap()
+/*------------------------------isSelectedDebugEventOccured------------------------------------*/
+void test_isSelectedDebugEventOccured_given_HALTED_DEBUGEVENT_should_read_DFSR_dataRead0x1_should_return_1()
 {
-	DebugTrap debugTrap ;
-	init_DebugTrap(&debugTrap);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x7A1));
-	
-	check_DebugTrapStatus(&debugTrap);
-	
-	TEST_ASSERT_EQUAL(1,debugTrap.VC_HARDERR);
-	TEST_ASSERT_EQUAL(1,debugTrap.VC_INTERR);
-	TEST_ASSERT_EQUAL(1,debugTrap.VC_BUSERR);
-	TEST_ASSERT_EQUAL(1,debugTrap.VC_STATERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_CHKERR);
-	TEST_ASSERT_EQUAL(1,debugTrap.VC_NOCPERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_MMERR);
-	TEST_ASSERT_EQUAL(1,debugTrap.VC_CORERESET);
-
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(1));
+  
+  TEST_ASSERT_EQUAL(1,isSelectedDebugEventOccured(HALTED_DEBUGEVENT));
 }
 
-/***************************************clear_DebugTrap***************************************************/
-void test_clear_DebugTrap_should_write_to_DEMCR_to_clear_and_update_DebugTrap()
+void test_isSelectedDebugEventOccured_given_HALTED_DEBUGEVENT_should_read_DFSR_dataRead0x_should_return_0()
 {
-	DebugTrap debugTrap ;
-	init_DebugTrap(&debugTrap);
-	
-	debugTrap.VC_HARDERR = 1; 
-	debugTrap.VC_INTERR = 1; 
-	debugTrap.VC_BUSERR = 1; 
-	debugTrap.VC_STATERR = 1; 
-	debugTrap.VC_CHKERR = 1; 
-	debugTrap.VC_NOCPERR = 1; 
-	debugTrap.VC_MMERR = 1; 
-	debugTrap.VC_CORERESET = 1; 
-	
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0));
-	
-	clear_DebugTrap(&debugTrap);
-	
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_HARDERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_INTERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_BUSERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_STATERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_CHKERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_NOCPERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_MMERR);
-	TEST_ASSERT_EQUAL(0,debugTrap.VC_CORERESET);
-	
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0));
+  
+  TEST_ASSERT_EQUAL(0,isSelectedDebugEventOccured(HALTED_DEBUGEVENT));
 }
 
-/***************************************write_CoreRegister***************************************************/
-void test_write_CoreRegister_given_ARM_R0_will_halt_CPU_write_data_to_DCRDR_and_select_R0_in_DCRSR()
+void test_isSelectedDebugEventOccured_given_VCATCH_DEBUGEVENT_should_read_DFSR_dataRead0x8_should_return_1()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus (&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DCRDR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0x100);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DCRSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,get_CoreRegisterAccess_WriteValue(ARM_R0,CoreRegister_Write));
-
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x10000));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,write_CoreRegister(ARM_R0,&coreStatus,0x100));
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,convertMSB_LSB(0x8));
+  
+  TEST_ASSERT_EQUAL(1,isSelectedDebugEventOccured(VCATCH_DEBUGEVENT));
 }
 
-/***************************************read_CoreRegister***************************************************/
-void test_read_CoreRegister_given_ARM_R1_will_halt_CPU_select_R1_in_DCRSR_and_read_data_from_DCRDR()
+void test_isSelectedDebugEventOccured_given_VCATCH_DEBUGEVENT_should_read_DFSR_dataRead0xC_should_return_1()
 {
-	uint32_t dataRead ;
-	CoreStatus coreStatus ;
-	init_CoreStatus (&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-		
-	emulateSWDRegister_Write(TAR_REG,AP,4,DCRSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,get_CoreRegisterAccess_WriteValue(ARM_R1,CoreRegister_Read));
-
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x10000));
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DCRDR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x12345678));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,read_CoreRegister(ARM_R1,&coreStatus,&dataRead));
-	TEST_ASSERT_EQUAL(0x12345678,dataRead);
+  emulateswdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
+  emulateswdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateswdRegisterRead(DRW_REG,AP,4,0,convertMSB_LSB(0xC));
+  
+  TEST_ASSERT_EQUAL(1,isSelectedDebugEventOccured(VCATCH_DEBUGEVENT));
 }
 
-/***************************************wait_CoreRegisterTransaction*********************************/
-void test_wait_CoreRegisterTransaction_should_read_S_REGRDY_bit_and_return_ERR_NOERR_if_is_1()
+/*------------------------------enableSelectedVectorCatch------------------------------------*/
+void test_enableSelectedVectorCatch_given_VC_HARDERR_should_writeHalfWord_0x400_to_DEMCR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus (&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,wait_CoreRegisterTransaction(&coreStatus,10));
+  
+  //Write BANK_0 to select register
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	//Write CSW_HALFWORD_SIZE to csw register
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+  
+  emulateswdRegisterWrite(TAR_REG,AP,4,DEMCR_REG);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0x400);
+
+  enableSelectedVectorCatch(VC_HARDERR);
 }
 
-void test_wait_CoreRegisterTransaction_should_read_S_REGRDY_bit_and_repeat_until_is_1()
+void test_enableSelectedVectorCatch_given_VC_CORERESET_should_writeHalfWord_0x1_to_DEMCR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus (&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,MSB_LSB_Conversion(0x10000));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,wait_CoreRegisterTransaction(&coreStatus,10));
+  cswDataSize = CSW_BYTE_SIZE ;
+  //Write BANK_0 to select register
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	//Write CSW_HALFWORD_SIZE to csw register
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+  
+  emulateswdRegisterWrite(TAR_REG,AP,4,DEMCR_REG);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0x1);
+
+  enableSelectedVectorCatch(VC_CORERESET);
 }
 
-void test_wait_CoreRegisterTransaction_should_return_ERR_COREREGRW_FAILED_if_S_REGRDY_is_not_1_after_retry()
+void test_enableSelectedVectorCatch_given_VC_DISABLEALL_should_writeHalfWord_0_to_DEMCR()
 {
-	CoreStatus coreStatus ;
-	init_CoreStatus (&coreStatus);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	
-	TEST_ASSERT_EQUAL(ERR_COREREGRW_FAILED,wait_CoreRegisterTransaction(&coreStatus,2));
+  /*cswDataSize was previously CSW_HALFWORD_SIZE do not require to set it again */
+
+  emulateswdRegisterWrite(TAR_REG,AP,4,DEMCR_REG);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0);
+
+  enableSelectedVectorCatch(VC_DISABLEALL);
 }
 
-/***************************************configure_DebugExceptionMonitorControl*********************************/
-void test_configure_DebugExceptionMonitorControl_should_write_to_DEMCR()
+/*------------------------------performHaltOnReset------------------------------------*/
+void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERESET_and_write_REQUEST_SYTEM_RESET_to_ARICR_REG()
 {
-	DebugExceptionMonitor debugExceptionMonitor ;
-	DebugTrap debugTrap ;
-	
-	init_DebugExceptionMonitor(&debugExceptionMonitor);
-	init_DebugTrap(&debugTrap);
-	uint32_t data = 0 ;
-	data = get_DebugExceptionMonitorControl_WriteValue(DEBUGMONITOR_DISABLE,&debugTrap,DISABLE_DWT_ITM);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,data);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,configure_DebugExceptionMonitorControl(&debugExceptionMonitor,DEBUGMONITOR_DISABLE,&debugTrap,DISABLE_DWT_ITM));
-	
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.enableDWT_ITM);
-	
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
-	
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_HARDERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_INTERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_BUSERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_STATERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CHKERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_NOCPERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_MMERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CORERESET);
+  //Set CSW to Word Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Set to CORE_DEBUG_HALT 
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+  
+  
+  //Set CSW to Halfword Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+  
+  //Enable VC_CORERESET
+  emulateswdRegisterWrite(TAR_REG,AP,4,DEMCR_REG);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0x1);
+  
+  //Set CSW to Word Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Write REQUEST_SYSTEM_RESET to AIRCR_REG
+  emulateswdRegisterWrite(TAR_REG,AP,4,AIRCR_REG);
+  emulateswdRegisterWrite(DRW_REG,AP,4,REQUEST_SYSTEM_RESET);
+  
+  performHaltOnReset();
 }
 
-/***************************************perform_HaltOnReset*********************************/
-void test_perform_HaltOnReset_should_debug_halt_cpu_enable_CoreResetDebugTrap_and_write_to_AIRCR_REG()
+
+/*------------------------------enableDWTandITM------------------------------------*/
+void test_enableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_1_to_DRW()
 {
-	DebugExceptionMonitor debugExceptionMonitor ;
-	CoreStatus coreStatus ;	
-	DebugTrap debugTrap ;
-	
-	init_CoreStatus(&coreStatus);
-	init_DebugExceptionMonitor(&debugExceptionMonitor);
-	init_DebugTrap(&debugTrap);
-	
-	debugTrap.VC_CORERESET = 1 ;
-	uint32_t data = 0 ;
-	data = get_DebugExceptionMonitorControl_WriteValue(DEBUGMONITOR_DISABLE,&debugTrap,DISABLE_DWT_ITM);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DHCSR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,1,0x1234) ;
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x03030003));
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,data);
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,DEMCR_REG);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	
-	emulateSWDRegister_Write(TAR_REG,AP,4,AIRCR_REG);
-	emulateSWDRegister_Write(DRW_REG,AP,4,0xFA050004);
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(0x0));
-	emulateSWDRegister_Read(DRW_REG,AP,4,0,MSB_LSB_Conversion(data));
-	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,perform_HaltOnReset(&coreStatus,&debugExceptionMonitor));
-	
-	TEST_ASSERT_EQUAL(1,coreStatus.C_DEBUGEN);
-	TEST_ASSERT_EQUAL(1,coreStatus.C_HALT);
-	TEST_ASSERT_EQUAL(1,coreStatus.S_HALT);
-	
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.enableDWT_ITM);
-	
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_REQ);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_STEP);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_PEND);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugMonitor->MON_EN);
-	
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_HARDERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_INTERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_BUSERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_STATERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_CHKERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_NOCPERR);
-	TEST_ASSERT_EQUAL(0,debugExceptionMonitor.debugTrap->VC_MMERR);
-	TEST_ASSERT_EQUAL(1,debugExceptionMonitor.debugTrap->VC_CORERESET);
+  //Set CSW to Byte Size
+	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
+  
+  emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
+  emulateswdRegisterWrite(DRW_REG,AP,4,1);
+  
+  enableDWTandITM();
+}
+
+/*------------------------------disableDWTandITM------------------------------------*/
+void test_disableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_0_to_DRW()
+{
+  emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0);
+  
+  disableDWTandITM();
 }

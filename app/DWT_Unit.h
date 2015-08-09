@@ -5,33 +5,18 @@
 #include "DWT_Utilities.h"
 
 
-typedef enum 
-{
-	WATCHPOINT_READ = 5 ,
-	WATCHPOINT_WRITE = 6 ,
-	WATCHPOINT_READWRITE 
-}Watchpoint_AccessMode ;
+int setAddressWatchpoint(uint32_t dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,Watchpoint_AccessMode accessMode);
+int setDataWatchpoint_MatchingOneComparator(uint32_t dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,
+                                            uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
 
+int setDataWatchpoint_MatchingTwoComparator(uint32_t dwtCompNumber1,uint32_t address1,Watchpoint_AddressMask addressMask1,
+                                            uint32_t dwtCompNumber2,uint32_t address2,Watchpoint_AddressMask addressMask2,
+                                            uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
 
-int setWatchpoint(int comparatorNumber,uint32_t address,IgnoreMask addressMask,Watchpoint_AccessMode accessMode);
-int setWatchpoint_MatchingOneComparator(int comparatorNumber,uint32_t address,IgnoreMask addressMask,uint32_t matchedData,Watchpoint_AccessMode accessMode);
-int setWatchpoint_MatchingTwoComparator(int comparatorNumber_1,uint32_t address_1,IgnoreMask addressMask_1,
-										int comparatorNumber_2,uint32_t address_2,IgnoreMask addressMask_2,
-										uint32_t matchedData,Watchpoint_AccessMode accessMode);
-
-int disable_WatchpointComparator(int comparatorNumber);
-int disable_AllWatchpoint();
-
-
-
-
-
-
-
-int setWatchpoint_PC(DWTInfo *dwtInfo,uint32_t DWT_COMPno,uint32_t address,IgnoreMask ignoreMask);
-int setWatchpoint_DataAddr(DWTInfo *dwtInfo,uint32_t DWT_COMPno,uint32_t address,IgnoreMask ignoreMask,RWmode mode);
-int setWatchpoint_DataValue(DWTInfo *dwtInfo,uint32_t value,DATAVSIZE size,RWmode mode);
-
-int setWatchpoint_LinkedComparison(DWTInfo *dwtInfo,uint32_t value,DATAVSIZE size,uint32_t first_COMPno,uint32_t firstAddress,IgnoreMask firstMask,uint32_t second_COMPno,uint32_t secondAddress,IgnoreMask secondMask,RWmode mode);
+int isDataWatchpointOccurred();
+int isAddressWatchpointOccurred(uint32_t dwtCompNumber);
+                             
+int disableDWTComparator(uint32_t dwtCompNumber);
+void disableAllDWTComparators();
 
 #endif // DWT_Unit_H

@@ -20,7 +20,7 @@ int control_FPB(FPBInfo *fpbInfo,int EnableDisable)
 		
 	dataToWrite = get_FP_CTRL_WriteValue(EnableDisable);
 		
-	memoryAccessWrite(FP_CTRL,dataToWrite);
+	memoryWriteWord(FP_CTRL,dataToWrite);
 	status = read_FPBControl(fpbInfo);
 
 	if (status != ERR_NOERROR)
@@ -44,7 +44,7 @@ int read_FPBControl(FPBInfo *fpbInfo)
 	uint32_t dataRead = 0;
 	uint32_t status = 0 ;
 	
-	status = memoryAccessRead(FP_CTRL,&dataRead);
+	status = memoryReadWord(FP_CTRL,&dataRead);
 	if (status != ERR_NOERROR)
 		return status;
 	
@@ -97,8 +97,8 @@ int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int mat
 	
 	dataToWrite = get_FP_COMP_WriteValue(address,matchingMode,EnableDisable);
 	
-	memoryAccessWrite(COMP_no,dataToWrite);
-	status = memoryAccessRead(COMP_no,&dataRead);
+	memoryWriteWord(COMP_no,dataToWrite);
+	status = memoryReadWord(COMP_no,&dataRead);
 	if (status != ERR_NOERROR)
 		return status;
 	
@@ -126,8 +126,8 @@ int configure_FP_REMAP(FPBInfo *fpbInfo,uint32_t SRAM_REMAP_address)
 	
 	dataToWrite = get_FP_REMAP_WriteValue(SRAM_REMAP_address);
 	
-	memoryAccessWrite(FP_REMAP,dataToWrite);
-	status = memoryAccessRead(FP_REMAP,&dataRead);
+	memoryWriteWord(FP_REMAP,dataToWrite);
+	status = memoryReadWord(FP_REMAP,&dataRead);
 	
 	if (status != ERR_NOERROR)
 		return status;
@@ -286,43 +286,4 @@ int reenable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no)
 	status = configure_FP_COMP(fpbInfo,COMP_no,address,matchingMode,Enable);
 	
 	return status ;
-}
-
-/**
- * Prepare FPB operations by enabling the Global Enable for FPB Unit and setting the processor to CORE_DEBUG_MODE or using DebugMonitor
- * If debug monitor is not used, the processor will be automatically set to CORE_DEBUG_MODE
- * 
- * Input : 	fpbInfo is a pointer to FPBInfo which contain information about the selected Comparator
- *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *			debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
- *			debugTrap is a pointer to DebugTrap which store whether the vector catch is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
- *			debugMonitorControl is used to control the behaviour of Debug Monitor in ARM
- *				Possible input value :
- *					DEBUGMONITOR_DISABLE  	Disable debug monitor
- *					DEBUGMONITOR_ENABLE		Enable debug monitor
- * Output : return ERR_NOERROR if the prepartions has been completed successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- *			return ERR_CORE_CONTROL_FAILED if the core does not switch to CORE_DEBUG_MODE
- *			return ERR_FPB_NOTENABLED if FlashPatch Breakpoint Unit is not enabled
- */
-int prepare_FPBOperations(FPBInfo *fpbInfo,CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor,DebugTrap *debugTrap,DebugMonitorControl debugMonitorControl)
-{
-	int status = 0;
-	
-	if (fpbInfo->EnableDisable == Disable)
-		status = control_FPB(fpbInfo,Enable);
-	
-	if (status != ERR_NOERROR)
-		return status ;
-	
-	if (debugMonitorControl == DEBUGMONITOR_DISABLE)
-	{
-		if(isCore(CORE_DEBUG_MODE,coreStatus) == ERR_CORECONTROL_FAILED)
-			status = setCore(CORE_DEBUG_MODE,coreStatus);
-	}
-	else
-		status  = configure_DebugExceptionMonitorControl(debugExceptionMonitor,debugMonitorControl,debugTrap,ENABLE_DWT_ITM);
-	
-	return status;
-
 }

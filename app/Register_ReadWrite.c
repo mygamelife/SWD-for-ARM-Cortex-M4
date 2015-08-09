@@ -1,5 +1,7 @@
- #include "Register_ReadWrite.h"
+#include "Register_ReadWrite.h"
 
+int cswDataSize = CSW_WORD_SIZE; 
+ 
 /***************************************************************
  **                   SWD-DP Register                         **
  ***************************************************************/
@@ -31,11 +33,11 @@
  *  PARK          Always  1
  */
 
-void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
+void swdRegisterWrite(int address,int APnDP,int *ack, uint32_t data)
 {
 	int SWD_Request = 0 , parity = 0;
 
-	SWD_Request = getSWD_Request(Address,APnDP,WRITE);
+	SWD_Request = getSWD_Request(address,APnDP,WRITE);
 	parity = calculateParity_32bitData(data); //calculate parity before initiating transfer
 
 	send8bit(SWD_Request);
@@ -43,7 +45,7 @@ void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
 	turnAround_ToRead();
 	SWDIO_InputMode();
 
-	read3bit(ACK);
+	read3bit(ack);
 
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
@@ -54,22 +56,22 @@ void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data)
 	extraIdleClock(8);
 }
 
-void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data)
+void swdRegisterRead(int address,int APnDP,int *ack,int *parity, uint32_t *data)
 {
 	int SWD_Request = 0  ;
 
-	SWD_Request = getSWD_Request(Address,APnDP,READ);
+	SWD_Request = getSWD_Request(address,APnDP,READ);
 
 	send8bit(SWD_Request);
 
 	turnAround_ToRead();
 	SWDIO_InputMode();
 
-	read3bit(ACK);
+	read3bit(ack);
 
 	read32bit(data);
 
-	*Parity = readBit();
+	*parity = readBit();
 
 	turnAround_ToWrite();
 	SWDIO_OutputMode();
@@ -78,34 +80,67 @@ void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data
 
 }
 
-int memoryAccessRead(uint32_t Address, uint32_t *dataRead)
+int memoryReadWord(uint32_t address, uint32_t *dataRead)
 {
 
-	int ACK = 0, Parity = 0 , status = 0;
+	int ACK = 0, parity = 0 , status = 0;
 	
-	SWDRegister_Write(TAR_REG,AP,&ACK,Address);
-	swdReadAP(DRW_REG,&ACK,&Parity,dataRead);
+	swdRegisterWrite(TAR_REG,AP,&ACK,address);
+	swdReadAP(DRW_REG,&ACK,&parity,dataRead);
 	
-	status = compare_ParityWithData(*dataRead,Parity);
+	status = compare_ParityWithData(*dataRead,parity);
 	
 	return status ;
 }
 
-int memoryAccessWrite(uint32_t Address, uint32_t WriteData)
+void memoryWriteByte(uint32_t address, uint32_t writeData)
 {
-	int ACK = 0;
-
-  swdWriteAP(TAR_REG, &ACK, Address);
-  swdWriteAP(DRW_REG, &ACK, WriteData);
-
-	return 0;
+  int ack = 0;
+  
+  if(cswDataSize != CSW_BYTE_SIZE) // used to prevent setting same size again and again
+  {  
+    swdWriteCSW(&ack, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
+    cswDataSize = CSW_BYTE_SIZE;
+  }
+  
+  swdWriteAP(TAR_REG, &ack, address);
+  swdWriteAP(DRW_REG, &ack, writeData);
 }
 
-int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data)
+void memoryWriteHalfword(uint32_t address, uint32_t writeData)
+{
+  int ack = 0;
+  
+  if(cswDataSize != CSW_HALFWORD_SIZE) // used to prevent setting same size again and again
+  {  
+    swdWriteCSW(&ack, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+    cswDataSize = CSW_HALFWORD_SIZE;
+  }
+  
+  swdWriteAP(TAR_REG, &ack, address);
+  swdWriteAP(DRW_REG, &ack, writeData);
+}
+
+
+void memoryWriteWord(uint32_t address, uint32_t writeData)
+{
+	int ack = 0;
+  
+  if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
+  {  
+    swdWriteCSW(&ack, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+    cswDataSize = CSW_WORD_SIZE;
+  }
+ 
+  swdWriteAP(TAR_REG, &ack, address);
+  swdWriteAP(DRW_REG, &ack, writeData);
+}
+
+int swdReadAP(int address,int *ack,int *parity, uint32_t *data)
 {
 	uint32_t discardPreviousRead = 0;
-	SWDRegister_Read(Address,AP,ACK,Parity,&discardPreviousRead);
-	SWDRegister_Read(Address,AP,ACK,Parity,data);
+	swdRegisterRead(address,AP,ack,parity,&discardPreviousRead);
+	swdRegisterRead(address,AP,ack,parity,data);
 
 	return 0 ;
 }

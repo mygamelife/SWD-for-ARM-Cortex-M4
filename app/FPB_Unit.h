@@ -30,6 +30,4 @@ int set_LiteralREMAP(FPBInfo *fpbInfo,uint32_t LiteralCOMP_no,uint32_t address);
 int disable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no);
 int reenable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no);
 
-int prepare_FPBOperations(FPBInfo *fpbInfo,CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor,DebugTrap *debugTrap,DebugMonitorControl debugMonitorControl);
-
 #endif // FPB_Unit_H
