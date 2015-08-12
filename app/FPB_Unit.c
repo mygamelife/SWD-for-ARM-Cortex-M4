@@ -1,289 +1,150 @@
 #include "FPB_Unit.h"
 
-/**
- * Enable/Disable Flash Patch Breakpoint unit for the usage of flash patching/remapping and instruction breakpoint
- *
- * Input : fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
- *		   EnableDisable is use to enable/disable the Flash Patch Breakpoint unit
- *				Possible values :
- *					Enable			enable FPB unit
- *					Disable			disable FPB unit
- *
- * Output :	return ERR_NOERROR if FlashPatch Breakpoint Unit is enabled
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- *			return ERR_FPB_NOTENABLED if FlashPatch Breakpoint Unit is not enabled
- */
-int control_FPB(FPBInfo *fpbInfo,int EnableDisable)
-{
-	uint32_t dataToWrite ;
-	int status = 0 ;
-		
-	dataToWrite = get_FP_CTRL_WriteValue(EnableDisable);
-		
-	memoryWriteWord(FP_CTRL,dataToWrite);
-	status = read_FPBControl(fpbInfo);
 
-	if (status != ERR_NOERROR)
-		return status;
-	
-	status = isFPB_EnabledDisabled(fpbInfo,EnableDisable);
-	
-	return status;
+#define MATCH_REMAP					  0x00000000
+#define MATCH_LOWERHALFWORD	 	0x40000000
+#define MATCH_UPPERHALFWORD		0x80000000
+#define MATCH_WORD				    0xC0000000
+
+/**
+ *  Use to set for instruction address breakpoint
+ *
+ *  Input : instructionCOMPno is the instruction comparator going to be used
+ *				  Possible values : 
+ *					  INSTRUCTION_COMP0			Instruction comparator number 0	
+ *					  INSTRUCTION_COMP1			Instruction comparator number 1	
+ *					  INSTRUCTION_COMP2     Instruction comparator number 2
+ *					  INSTRUCTION_COMP3     Instruction comparator number 3
+ *					  INSTRUCTION_COMP4     Instruction comparator number 4
+ *					  INSTRUCTION_COMP5     Instruction comparator number 5
+ *
+ *          instructionAddress is the address that will be breakpointed
+ *          matchingMode defines the behaviour when the comparator is matched
+ *          Possible value :
+ *					  MATCH_LOWERHALFWORD	    Set breakpoint on lower halfword (Bits[1:0] are 0b00)			
+ *					  MATCH_UPPERHALFWORD	    Set breakpoint on upper halfword (Bits[1:0] are 0b10)			
+ *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword						
+ *
+ *  Output :  return 0 if instruction breakpoint is set
+ *            retunr -1 if invalid comparator is chosen
+ */
+int setInstructionBreakpoint(uint32_t instructionCOMPno,uint32_t instructionAddress,int matchingMode)
+{
+  uint32_t configData = 0 ;
+  
+  if(checkForValidInstructionComparator(instructionCOMPno) == -1)
+    return -1 ;
+  
+  configData = (instructionAddress & FP_COMP_ADDRESS_MASK) +matchingMode + FP_COMP_ENABLE ;
+  
+  disableFPBUnit();
+  
+  memoryWriteWord(instructionCOMPno,configData);
+  
+  setCoreMode(CORE_DEBUG_MODE);
+  enableFPBUnit();
+  
+  return 0 ;
 }
 
 /**
- * Read FP_CTRL register and store the information into FPBInfo
+ *  Use to set for instruction address remapping
  *
- * Input : fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
+ *  Input : instructionCOMPno is the instruction comparator going to be used
+ *				  Possible values : 
+ *					  INSTRUCTION_COMP0			Instruction comparator number 0	
+ *					  INSTRUCTION_COMP1			Instruction comparator number 1	
+ *					  INSTRUCTION_COMP2     Instruction comparator number 2
+ *					  INSTRUCTION_COMP3     Instruction comparator number 3
+ *					  INSTRUCTION_COMP4     Instruction comparator number 4
+ *					  INSTRUCTION_COMP5     Instruction comparator number 5
  *
- * Output :	return ERR_NOERROR if the read of FP_CTRL is successful
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ *          instructionAddress is the address that will be remapped to the remap addresss + 4n (where n = 0,1,2,3,4,5 of INSTRUCTION_COMPn)
+ *          remap address is the base address for remapping
+ *
+ *  Output :  return 0 if instruction remapping is set
+ *            retunr -1 if invalid comparator is chosen
  */
-int read_FPBControl(FPBInfo *fpbInfo)
+int setInstructionRemapping(uint32_t instructionCOMPno,uint32_t instructionAddress, uint32_t remapAddress)
 {
-	uint32_t dataRead = 0;
-	uint32_t status = 0 ;
-	
-	status = memoryReadWord(FP_CTRL,&dataRead);
-	if (status != ERR_NOERROR)
-		return status;
-	
-	process_FPControlData(fpbInfo,dataRead);
-	
-	return ERR_NOERROR;
+  uint32_t configData = 0 ;
+  
+  if(checkForValidInstructionComparator(instructionCOMPno) == -1)
+    return -1 ;
+  
+  configData = (instructionAddress & FP_COMP_ADDRESS_MASK) + FP_COMP_ENABLE ;
+  
+  disableFPBUnit();
+  
+  memoryWriteWord(FP_REMAP,(remapAddress & FP_REMAP_ADDRESS_MASK));
+  memoryWriteWord(instructionCOMPno,configData);
+  
+  setCoreMode(CORE_DEBUG_MODE);
+  enableFPBUnit();
+  
+  return 0 ;
+}
+
+/**
+ *  Use to set for literal address remapping
+ *
+ *  Input : literalCOMPno is the literal comparator going to be used
+ *				  Possible values : 
+ *					  LITERAL_COMP0			Literal comparator number 0	
+ *					  LITERAL_COMP1			Litreal comparator number 1	
+ *
+ *          literalAddress is the address that will be remapped to the remap addresss + 0x24 + 4n (where n = 0,1 of LITERAL_COMPn)
+ *          remap address is the base address for remapping
+ *
+ *  Output :  return 0 if literal remapping is set
+ *            retunr -1 if invalid comparator is chosen
+ */
+int setLiteralRemapping(uint32_t literalCOMPno,uint32_t literalAddress, uint32_t remapAddress)
+{
+  uint32_t configData = 0 ;
+  
+  if(checkForValidLiteralComparator(literalCOMPno) == -1)
+    return -1 ;
+  
+  configData = (literalAddress & FP_COMP_ADDRESS_MASK) + FP_COMP_ENABLE ;
+  
+  disableFPBUnit();
+  
+  memoryWriteWord(FP_REMAP,(remapAddress & FP_REMAP_ADDRESS_MASK));
+  memoryWriteWord(literalCOMPno,configData);
+  
+  setCoreMode(CORE_DEBUG_MODE);
+  enableFPBUnit();
+  
+  return 0 ;
 }
 
 
 /**
- * Configure the selected FP Comparator as defined by the pass in parameter
+ *  Disable the selected FP Comparator 
  * 
- * Input : 	fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
- *			COMP_no is the comparator number being configured
- *				Possible values : 
- *					InstructionCOMP_0				LiteralCOMP_0
- *					InstructionCOMP_1				LiteralCOMP_1
- *					InstructionCOMP_2
- *					InstructionCOMP_4
- *					InstructionCOMP_5
+ *  Input : fpCOMPno is the comparator number going to be disabled		
+ *				  Possible values : 
+ *					  INSTRUCTION_COMP0			Instruction comparator number 0	
+ *					  INSTRUCTION_COMP1			Instruction comparator number 1	
+ *					  INSTRUCTION_COMP2     Instruction comparator number 2
+ *					  INSTRUCTION_COMP3     Instruction comparator number 3
+ *					  INSTRUCTION_COMP4     Instruction comparator number 4
+ *					  INSTRUCTION_COMP5     Instruction comparator number 5
  *
- *   	   	address is the instruction/literal address in CODE region going to be compared (0x00000000 - 0x1FFFFFFF)
+ *					  LITERAL_COMP0			Literal comparator number 0	
+ *					  LITERAL_COMP1			Litreal comparator number 1	
  *
- *		   	Matching mode is the operation mode of the comparator 
- *				Possible values : 
- *					Match_REMAP			remap to address specified in FlashPatch Remap Register, FP_REMAP 	(please use set_InstructionREMAP() for this mode)
- *					Match_Lower16bits	Set breakpoint on lower halfword (Bits[1:0] are 0b00)				(Setting this mode for LiteralCOMPn will be ignored by hardware)
- *					Match_Upper16bits	Set breakpoint on upper halfword (Bits[1:0] are 0b10)				(Setting this mode for LiteralCOMPn will be ignored by hardware)
- *					Match_32bits		Set breakpoint on both upper and lower halfword						(Setting this mode for LiteralCOMPn will be ignored by hardware)
- *
- *			EnableDisable is use to enable / disable the comparator
- *				Possible value :
- *					Enable 				enable the comparator
- *					Disable				disable the comparator
- *
- * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- *			return ERR_INVALID_COMPARATOR if the selected comparator is not valid/found in the device
+ *  Output :  return 0 if comparator is disabled
+ *            retunr -1 if invalid comparator is chosen
  */
-int configure_FP_COMP(FPBInfo *fpbInfo,uint32_t COMP_no,uint32_t address,int matchingMode,int EnableDisable)
+int disableFPComparator(uint32_t compNo)
 {
-	uint32_t dataToWrite = 0, dataRead = 0 ;
-	int status = 0, number = 0 ;
-	
-	number = get_ComparatorInfoNumber(COMP_no);
-	
-	if(number == ERR_INVALID_COMPARATOR)
-		return number ;
-	
-	dataToWrite = get_FP_COMP_WriteValue(address,matchingMode,EnableDisable);
-	
-	memoryWriteWord(COMP_no,dataToWrite);
-	status = memoryReadWord(COMP_no,&dataRead);
-	if (status != ERR_NOERROR)
-		return status;
-	
-	status = isFP_COMP_Updated(dataToWrite,dataRead);
-	if (status == ERR_NOERROR)
-		process_FPComparatorData(fpbInfo->compInfo[number],dataRead);
-	
-	return status ;
+  if(checkForValidFPComparator(compNo) == -1)
+    return -1 ;
+  
+  memoryWriteWord(compNo,FP_COMP_DISABLE);
+  
+  return 0 ;
 }
 
-/**
- * Configure FP REMAP register to set the base address for remapping
- *
- * Input :	fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
- *			SRMAP_REMAP_address is the base address for remapping which is located in the SRAM region (0x20000000 - 0x3FFFFFFF)
- *
- * Output : return ERR_NOERROR if the FP REMAP has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- */
-int configure_FP_REMAP(FPBInfo *fpbInfo,uint32_t SRAM_REMAP_address)
-{
-	uint32_t dataToWrite = 0, dataRead = 0 ;
-	int status = 0 ;
-	
-	dataToWrite = get_FP_REMAP_WriteValue(SRAM_REMAP_address);
-	
-	memoryWriteWord(FP_REMAP,dataToWrite);
-	status = memoryReadWord(FP_REMAP,&dataRead);
-	
-	if (status != ERR_NOERROR)
-		return status;
-	
-	status = isFP_REMAP_Updated(dataToWrite,dataRead);
-	
-	if (status == ERR_NOERROR)
-		process_FPRemapData(fpbInfo,dataRead);
-	
-	return status ;
-}
-
-/** 
- * Set instruction breakpoint using the user defined comparator at at the user defined address 
- *
- * Input :	fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
- *			InstructionCOMP_no is the number of the selected instruction comparator to perform comparison
- *				Possible values : 
- *					InstructionCOMP_0				
- *					InstructionCOMP_1				
- *					InstructionCOMP_2
- *					InstructionCOMP_4
- *					InstructionCOMP_5
- *
- *	   		address is the instruction/literal address in CODE region going to be compared (0x00000000 - 0x1FFFFFFF)
- *
- *		   	Matching mode is the operation mode of the comparator 
- *				Possible values : 
- *					Match_REMAP			remap to address specified in FlashPatch Remap Register, FP_REMAP 	(please use set_InstructionREMAP() for this mode)
- *					Match_Lower16bits	Set breakpoint on lower halfword (Bits[1:0] are 0b00)				(Setting this mode for LiteralCOMPn will be ignored by hardware)
- *					Match_Upper16bits	Set breakpoint on upper halfword (Bits[1:0] are 0b10)				(Setting this mode for LiteralCOMPn will be ignored by hardware)
- *					Match_32bits		Set breakpoint on both upper and lower halfword						(Setting this mode for LiteralCOMPn will be ignored by hardware)
- *
- * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- */
-int set_InstructionBKPT(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t address,int matchingMode)
-{	
-	int status = 0 ;
-
-	status = configure_FP_COMP(fpbInfo,InstructionCOMP_no,address,matchingMode,Enable);
-	return status ;
-}
-
-/** 
- * Set instruction remapping using the user defined comparator at at the user defined address 
- * 
- * Input :	fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
- *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *			InstructionCOMP_no is the number of the selected instruction comparator to perform comparison
- *				Possible values : 
- *					InstructionCOMP_0				
- *					InstructionCOMP_1				
- *					InstructionCOMP_2
- *					InstructionCOMP_4
- *					InstructionCOMP_5
- *
- *	   		address is the instruction/literal address in CODE region going to be compared (0x00000000 - 0x1FFFFFFF)
- *
- * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- */
-int set_InstructionREMAP(FPBInfo *fpbInfo,uint32_t InstructionCOMP_no,uint32_t address)
-{
-	int status = 0 ;
-	
-	status = configure_FP_COMP(fpbInfo,InstructionCOMP_no,address,Match_REMAP,Enable);
-	return status ;
-}
-
-/** 
- * Set literal remapping using the user defined comparator at at the user defined address 
- *
- * Input :	fpbInfo is a pointer to FPBInfo which store information about the status of FlashPatch Breakpoint Unit
- *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *			LiteralCOMP_no is the number of the selected litreal comparator to perform comparison
- *				Possible values : 
- *					LiteralCOMP_0	
- *					LiteralCOMP_1
- *
- *	   		address is the instruction/literal address in CODE region going to be compared (0x00000000 - 0x1FFFFFFF)
- *
- * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- */
-int set_LiteralREMAP(FPBInfo *fpbInfo,uint32_t LiteralCOMP_no,uint32_t address)
-{
-	int status = 0 ;
-	
-	status = configure_FP_COMP(fpbInfo,LiteralCOMP_no,address,Match_REMAP,Enable);
-	return status ;
-}
-
-
-
-/**
- * Disable the selected FP Comparator and preserve the address and matching mode set inside
- * 
- * Input : 	fpbInfo is a pointer to FPBInfo which contain information about the selected Comparator
- *			COMP_no is the comparator number being configured
- *				Possible values : 
- *					InstructionCOMP_0				LiteralCOMP_0
- *					InstructionCOMP_1				LiteralCOMP_1
- *					InstructionCOMP_2
- *					InstructionCOMP_4
- *					InstructionCOMP_5
- *
- * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- *			return ERR_INVALID_COMPARATOR if the selected comparator is not valid/found in the device
- */
-int disable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no)
-{
-	int status = 0 , number = 0  ;
-	uint32_t address = 0 , matchingMode = 0 ;
-	
-	number = get_ComparatorInfoNumber(COMP_no);
-	address = fpbInfo->compInfo[number]->address ;
-	matchingMode = fpbInfo->compInfo[number]->matchingMode ;
-	
-	status = configure_FP_COMP(fpbInfo,COMP_no,address,matchingMode,Disable);
-	
-	return status ;
-}
-
-/**
- * Re-enable the selected previously disabled comparator
- * 
- * Input : 	fpbInfo is a pointer to FPBInfo which contain information about the selected Comparator
- *			COMP_no is the comparator number being configured
- *				Possible values : 
- *					InstructionCOMP_0				LiteralCOMP_0
- *					InstructionCOMP_1				LiteralCOMP_1
- *					InstructionCOMP_2
- *					InstructionCOMP_4
- *					InstructionCOMP_5
- *
- * Output : return ERR_NOERROR if the FP Comparator has been updated successfully
- *			return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- * 			return ERR_DATARW_NOT_MATCH if data read is the different as the data written
- *			return ERR_INVALID_COMPARATOR if the selected comparator is not valid/found in the device
- */
-int reenable_FPComp(FPBInfo *fpbInfo,uint32_t COMP_no)
-{
-	int status = 0 , number = 0  ;
-	uint32_t address = 0 , matchingMode = 0 ;
-	
-	number = get_ComparatorInfoNumber(COMP_no);
-	address = fpbInfo->compInfo[number]->address ;
-	matchingMode = fpbInfo->compInfo[number]->matchingMode ;
-	
-	status = configure_FP_COMP(fpbInfo,COMP_no,address,matchingMode,Enable);
-	
-	return status ;
-}
