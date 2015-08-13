@@ -50,6 +50,20 @@ CoreMode getCoreMode()
 }
 
 /**
+ *  Step  n numbers of instruction as defined by the pass in paramenter
+ *
+ *  Input : nInstructions is the number of instructions going to be stepped
+ */
+void stepOnly(int nInstructions)
+{
+  int i = 0 ;
+  
+  for(i = 0 ; i < nInstructions ; i ++)
+    setCoreMode(CORE_SINGLE_STEP);
+  
+}
+
+/**
  *	Use to write data into the selected ARM Core Register
  *  Note : Will automatically set the processor to CORE_DEBUG_HALT 
  *	

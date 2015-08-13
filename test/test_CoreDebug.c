@@ -132,6 +132,50 @@ void test_getCoreMode_given_0x20003_should_return_CORE_DEBUG_HALT_MODE()
   TEST_ASSERT_EQUAL(CORE_DEBUG_HALT,getCoreMode());
 }
 
+
+/*--------------------------------stepOnly---------------------------------------*/
+void test_stepOnly_given_1_should_step_1_times()
+{
+  //Set to CORE_DEBUG_HALT first
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
+	//Then only set to CORE_SINGLE_STEP
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_STEP);
+  
+  stepOnly(1);
+}
+
+void test_stepOnly_given_3_should_step_3_times()
+{
+  //Set to CORE_DEBUG_HALT first
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
+	//Then only set to CORE_SINGLE_STEP
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_STEP);
+  
+  //Set to CORE_DEBUG_HALT first
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
+	//Then only set to CORE_SINGLE_STEP
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_STEP);
+  
+  //Set to CORE_DEBUG_HALT first
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_DEBUG_HALT);
+
+	//Then only set to CORE_SINGLE_STEP
+	emulateswdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateswdRegisterWrite(DRW_REG,AP,4,SET_CORE_STEP);
+  
+  stepOnly(3);
+}
+
 /*--------------------------------writeCoreRegister---------------------------------------*/
 void test_writeCoreRegister_given_0x52_CORE_REG_R1_should_write_0x52_to_DCRDR_and_0x10001_to_DCRSR()
 {

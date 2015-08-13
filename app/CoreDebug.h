@@ -26,6 +26,8 @@
 void setCoreMode(CoreMode mode);
 CoreMode getCoreMode();
 
+void stepOnly(int nInstructions);
+
 void writeCoreRegister(CoreRegister coreRegister,uint32_t data);
 void readCoreRegister(CoreRegister coreRegister,uint32_t *dataRead);
 
