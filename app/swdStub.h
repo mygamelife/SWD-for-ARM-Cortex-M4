@@ -15,7 +15,7 @@
 #define FOUR_KBYTES                       4096 //4k byte
 #define SWD_INSTRUCTION                   ((uint32_t)0x20000000)
 #define SWD_BANK_SELECT                   ((uint32_t)0x20000004)
-#define SWD_DATA_LENGTH                   ((uint32_t)0x20000008)
+#define SWD_DATA_SIZE                   ((uint32_t)0x20000008)
 #define SWD_FLASH_START_ADDRESS           ((uint32_t)0x2000000C)
 #define SWD_FLASH_END_ADDRESS             ((uint32_t)0x20000010)
 #define SWD_SRAM_START_ADDRESS            ((uint32_t)0x20000014)
@@ -38,11 +38,11 @@
 #define TARGET_BUSY                       ((uint32_t)0x00000001)
 
 void swdStub(uint32_t swdInstruction);
-void stubCopy();
-void stubEraseSector();
-void stubMassErase();
-void targetMain();
-void loadEraseSectorInstruction(uint32_t startAddress, uint32_t endAddress);
+void stubCopyFromSRAMToFlash(void);
+void stubEraseSector(void);
+void stubMassErase(void);
+void targetMain(void);
+void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector);
 void loadMassEraseInstruction(uint32_t bankSelect);
-void loadCopyInstruction(uint32_t sramStartAddr, uint32_t flashStartAddr, int length);
+void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAddress, int size);
 #endif // swdStub_H

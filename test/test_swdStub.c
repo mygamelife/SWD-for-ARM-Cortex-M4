@@ -51,14 +51,14 @@ void test_stubCopy_should_get_flash_sram_start_address_length_and_call_Flash_Cop
   
   sramRead_ExpectAndReturn(SWD_SRAM_START_ADDRESS, SWD_SRAM_DATA32_ADDRESS);
   sramRead_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_22);
-  sramRead_ExpectAndReturn(SWD_DATA_LENGTH, 2048);
+  sramRead_ExpectAndReturn(SWD_DATA_SIZE, 2048);
   
-  flashCopyFromSramToFlash_Expect(SWD_SRAM_DATA32_ADDRESS, ADDR_FLASH_SECTOR_22, 2048);
+  flashCopyFromSRAMToFlash_Ignore();
   
   sramWrite_Expect(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
   sramWrite_Expect(SWD_TARGET_STATUS, TARGET_OK);
   
-  stubCopy();
+  stubCopyFromSRAMToFlash();
 }
 
 void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_before_load_instruction(void)
@@ -84,7 +84,7 @@ void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_bef
   emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_INSTRUCTION);
   emulateSWDRegister_Write(DRW_REG,AP,OK,INSTRUCTION_ERASE_SECTOR);
   
-  loadEraseSectorInstruction(ADDR_FLASH_SECTOR_20, ADDR_FLASH_SECTOR_22);
+  loadEraseSectorInstruction((uint32_t *)ADDR_FLASH_SECTOR_20, (uint32_t *)ADDR_FLASH_SECTOR_22);
 }
 
 void test_loadMassEraseInstruction_should_wait_untill_target_response_OK_before_load_instruction(void)
@@ -121,12 +121,12 @@ void test_loadCopyInstruction_should_load_src_address_dest_address_and_length_in
   emulateSWDRegister_Write(DRW_REG,AP,OK,ADDR_FLASH_SECTOR_18);
   
   /* Load length */
-  emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_DATA_LENGTH);
+  emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_DATA_SIZE);
   emulateSWDRegister_Write(DRW_REG,AP,OK,2000);
   
   /* Load Instruction */
   emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_INSTRUCTION);
   emulateSWDRegister_Write(DRW_REG,AP,OK,INSTRUCTION_COPY);
   
-  loadCopyInstruction(SWD_SRAM_DATA32_ADDRESS, ADDR_FLASH_SECTOR_18, 2000);
+  loadCopyFromSRAMToFlashInstruction((uint32_t *)SWD_SRAM_DATA32_ADDRESS, (uint32_t *)ADDR_FLASH_SECTOR_18, 2000);
 }

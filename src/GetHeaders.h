@@ -2,7 +2,6 @@
 #define Get_File_Header_H
 
 #include <stdio.h>
-//#include "unity.h"
 
 #include "Read_File.h"
 #include "elf.h"
@@ -16,19 +15,11 @@ typedef struct {
   _Elf32_Shdr *programElf;
   Elf32_Sym *st;
   Elf32_Rel *rel;
+  uint32_t *sectionAddress;
+  uint32_t *targetAddr;
 } ElfData;
 
-typedef struct {
-  int  index;
-  uint8_t *code;
-  uint32_t codeIndex;
-  uint32_t address;
-  uint32_t size;
-} ElfSection;
-
-extern ElfData *dataFromElf;
-extern ElfSection *pElfSection;
-void initElfData();
+ElfData *openElfFile(char *fileName);
 
 // File Header
 Elf32_Ehdr *getElfHeader(ElfData *dataFromElf);
@@ -65,12 +56,5 @@ int isSectionReadable(ElfData *dataFromElf, int index);
 uint32_t getSymbolTableSizeUsingName(ElfData *dataFromElf, char *name);
 uint32_t getSymbolTableAddressUsingName(ElfData *dataFromElf, char *name);
 
-//  Relocation
-Elf32_Rel *getRelocation(ElfData *dataFromElf);
-char *getRelSymbolName(ElfData *dataFromElf, int index);
-uint32_t getRelType(ElfData *dataFromElf, int index);
-
-//For TLV Protocol
-ElfSection *elfGetSectionInfoFromFile(char *fileName, char *sectionName);
 #endif // Get_File_Header_H
 

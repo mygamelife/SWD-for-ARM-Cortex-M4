@@ -350,29 +350,29 @@ void flashErrorHandler(void)
   *
   * output :   NONE
   */
-void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int length) {
+void flashCopyFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length) {
   int i;
   __IO uint32_t data32 = 0;
-  uint32_t FLASH_Addr = 0, SRAM_Addr = 0;
+  uint32_t startSector, endSector, sramAddress, flashAddress;
 
   /* Assign src and dest to a template variable */
-  SRAM_Addr	 = src;
-  FLASH_Addr = dest;
-  
+  sramAddress = src;
+  startSector = flashAddress = dest;
+  endSector = dest + length;
+
+  /* Flash Erase Sector at specified address */
+  flashEraseSector(startSector, endSector);
+
   /* Unlock the Flash to enable the flash control register access */
   HAL_FLASH_Unlock();
 
   /* Copy data to flash */
-  for(i = 0; i < length; i += 4)	{
-	  data32 = *(__IO uint32_t *)SRAM_Addr;
+  for(i = 0; i < length; i += (1 << FLASH_TYPEPROGRAM_WORD))	{
+	  data32 = *(__IO uint32_t *)sramAddress;
+	  flashWriteWord(flashAddress, data32);
 
-	  if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, FLASH_Addr, data32) != HAL_OK)	{
-		 flashErrorHandler();
-		 break;
-	  }
-    
-	  FLASH_Addr = FLASH_Addr + 4;
-	  SRAM_Addr	 = SRAM_Addr + 4;
+	  flashAddress += (1 << FLASH_TYPEPROGRAM_WORD);
+	  sramAddress += (1 << FLASH_TYPEPROGRAM_WORD);
   }
 
   /* Lock the Flash to disable the flash control register access (recommended
@@ -380,7 +380,7 @@ void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int length) {
   HAL_FLASH_Lock();
 
   #if !defined(TEST)
-    flashVerifyDataFromSramToFlash(src, dest, length);
+    flashVerifyDataFromSRAMToFlash(src, dest, length);
   #endif
 }
 
@@ -397,32 +397,32 @@ void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int length) {
   *
   * output :   NONE
   */
-void flashVerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
+void flashVerifyDataFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length)	{
   int i = 0;
   __IO uint32_t dataFlash = 0, dataSRAM = 0, memoryProgramStatus = 0;
-  uint32_t SRAM_Addr = 0, FLASH_Addr = 0, tickstart = 0;
+  uint32_t sramAddress, flashAddress;
 
   /* Check if the programmed data is OK
       MemoryProgramStatus = 0: data programmed correctly
       MemoryProgramStatus != 0: number of words not programmed correctly ******/
   memoryProgramStatus = 0x0;
 
-  SRAM_Addr	 = src;
-  FLASH_Addr = dest;
+  sramAddress = src;
+  flashAddress = dest;
 
   /* Compare data in flash with sram  */
-  for(i; i < length; i += 4)	{
+  for(i; i < length; i += (1 << FLASH_TYPEPROGRAM_WORD))	{
     
     /* get data from Flash & SRAM  */
-	  dataFlash = *(__IO uint32_t *)FLASH_Addr;
-	  dataSRAM 	= *(__IO uint32_t *)SRAM_Addr;
+	  dataFlash = *(__IO uint32_t *)sramAddress;
+	  dataSRAM 	= *(__IO uint32_t *)flashAddress;
 
 	  if (dataFlash != dataSRAM)	{
 		  memoryProgramStatus++;
 	  }
     
-	  FLASH_Addr = FLASH_Addr + 4;
-	  SRAM_Addr  = SRAM_Addr + 4;
+	  flashAddress += (1 << FLASH_TYPEPROGRAM_WORD);
+	  sramAddress  += (1 << FLASH_TYPEPROGRAM_WORD);
   }
 
   /* Check if there is an issue to program data */
@@ -438,6 +438,58 @@ void flashVerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length)  {
   else
   {
     /* Error detected. Switch on LED4 */
+    flashErrorHandler();
+  }
+}
+
+/** flashWriteByte is a function to write data to flash in byte
+  *
+  * input   : address is the flash address want to write to 
+  *           data is the data need to write to flash
+  *
+  * return :   NONE
+  */
+void flashWriteByte(uint32_t address, uint8_t data) {
+  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, address, data) != HAL_OK)  {
+    flashErrorHandler();
+  }
+}
+
+/** flashWriteByte is a function to write data to flash in halfword
+  *
+  * input   : address is the flash address want to write to 
+  *           data is the data need to write to flash
+  *
+  * return :   NONE
+  */
+void flashWriteHalfWord(uint32_t address, uint16_t data) {
+  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, address, data) != HAL_OK)  {
+    flashErrorHandler();
+  }
+}
+
+/** flashWriteByte is a function to write data to flash in word
+  *
+  * input   : address is the flash address want to write to 
+  *           data is the data need to write to flash
+  *
+  * return :   NONE
+  */
+void flashWriteWord(uint32_t address, uint32_t data) {
+  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, data) != HAL_OK)  {
+    flashErrorHandler();
+  }
+}
+
+/** flashWriteByte is a function to write data to flash in doubleword
+  *
+  * input   : address is the flash address want to write to 
+  *           data is the data need to write to flash
+  *
+  * return :   NONE
+  */
+void flashWriteDoubleWord(uint32_t address, uint64_t data) {
+  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address, data) != HAL_OK)  {
     flashErrorHandler();
   }
 }

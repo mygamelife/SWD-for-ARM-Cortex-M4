@@ -19,9 +19,9 @@ TLV *tlvCreateNewPacket(uint8_t type) {
   static TLV tlvPacket;
   
   tlvPacket.type = type;
-  tlvPacket.length = 0;
+  tlvPacket.length = 1; //chksum
   
-  for(index = 0; index < DATA_SIZE; index++)
+  for(index = 0; index < TLV_DATA_SIZE; index++)
     tlvPacket.value[index] = 0;
   
   return &tlvPacket;
@@ -74,19 +74,20 @@ uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index) {
   else 0;
 }
 
-/** tlvPackBytesAddress is a function convert 32bit address to bytes and pack into buffer
+/** tlvPack4ByteAddress is a function convert 32bit address to bytes and pack into buffer
   *
   * input     : address is the 32bit address need to be split
-  *             buffer is the place to store bytes address
-  *             index is the start position to pack
+  *             tlv is the pointer pointing to TLV structure
   * 
   * return    : NONE
   */
-void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index)  {
-  buffer[index]     = (address & 0xff000000) >> 24;
-  buffer[index + 1] = (address & 0x00ff0000) >> 16;
-  buffer[index + 2] = (address & 0x0000ff00) >> 8;
-  buffer[index + 3] = (address & 0x000000ff) >> 0;
+void tlvPack4ByteAddress(uint32_t address, TLV *tlv)  {
+  tlv->value[0] = (address & 0xff000000) >> 24;
+  tlv->value[1] = (address & 0x00ff0000) >> 16;
+  tlv->value[2] = (address & 0x0000ff00) >> 8;
+  tlv->value[3] = (address & 0x000000ff) >> 0;
+  
+  tlv->length += 4;
 }
 
 /**
@@ -103,7 +104,7 @@ void tlvPackBytesAddress(uint32_t address, uint8_t *buffer, int index)  {
   *
   * return  : NONE
   */
-void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV *tlvPacket) {
+void tlvPackPacketIntoBuffer(uint8_t *buffer, TLV *tlvPacket) {
   int i = 0, index = 0;
   
   /* First byte of the buffer is reserved for type */
@@ -119,58 +120,124 @@ void tlvPackPacketIntoTxBuffer(uint8_t *buffer, TLV *tlvPacket) {
   }
 }
 
-/** tlvGetByteDataFromElfFile is a function read the elf file and return a byte data
-  *
-  * input   : pElf is a ElfSection type pointer contain all the elf file information
-  *
-  * return  : data in bytes
-  */
-uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf)  {
-
-  /* Updata elf section address and size */
-  pElf->address++;
-  pElf->size--;
-  
-  return pElf->code[pElf->codeIndex++];
-}
-
-/** tlvGetDataFromElf is a function to get all the needed data from elf file 
+/** tlvGetBytesData is a function to get bytes data from elf file 
   *
   * DATA :     Address             value              checkSum
   *          +------------------------------------------------+
   *          | 4 byte |        Multiple bytes        | 1 byte |           
   *          +------------------------------------------------+
   *
-  * input   :   tlv is a TLV structure pointer contain all the Tlv info
-  *             pElf is ElfSection structure pointer contain all the section info
+  * input   :   dataAddress is the address where is data retrieve from
+  *             tlv is a TLV structure pointer contain all the Tlv info
+  *             size is the size of data want to retrieve
   *
-  * return  :   when elf data is finish transfer over
+  * return  :   NONE
   */
-void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf)  {
-  int index = 0, length;
-  
-  /* First 4 byte is reserved for elf address */
-  tlvPackBytesAddress(pElf->address, tlv->value, 0);
-  
-  /** Length included address and checksum
-    */
-  tlv->length += ADDRESS_LENGTH + CHECKSUM_LENGTH;
-  
-  for(index += ADDRESS_LENGTH; index < DATA_SIZE - 1; index++) {
-    
-    if(pElf->size == 0) {
-      tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length - CHECKSUM_LENGTH, ADDRESS_LENGTH);
-      printf("No data in elf section\n");
-      return;
-    }
-    
-    /* Retrieve information from elf file */
-    tlv->value[index] = tlvGetByteDataFromElfFile(pElf);
+void tlvGetBytesData(uint8_t *dataAddress, TLV *tlv, int size) {
+  int i;  uint8_t sum = 0;
+
+  for(i = 0; i < size; i++) {
+    tlv->value[i + ADDRESS_LENGTH] = dataAddress[i];
+    sum += dataAddress[i];
     tlv->length++;
   }
   
-  /* Checksum locate at the last position */
-  tlv->value[tlv->length - 1] = tlvCalculateCheckSum(tlv->value, tlv->length - CHECKSUM_LENGTH, ADDRESS_LENGTH);
+  /** Insert cheksum  at last position */
+  tlv->value[tlv->length - 1] = ~sum + 1;
+}
+
+/** <! For Internal User Only !>
+  * tlvWriteDataChunk is a function to get number of data arccoding to the size and send
+  * data using UART
+  *
+  * input   : dataAddress is the address of data 
+  *           destAddress is the destination address of the data
+  *           size is the size of data to transfer (TLV_DATA_SIZE   248)
+  *           hSerial is used by initSerialPort() to initialize the USB-Serial port
+  *
+  * return  : NONE
+  */
+void tlvWriteDataChunk(uint8_t *dataAddress, uint32_t *destAddress, int size, HANDLE hSerial)  {
+  uint8_t txBuffer[1024] = {0};
+  
+  TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
+  
+  /* Pack destAddress into tlv->value */
+  tlvPack4ByteAddress((uint32_t)destAddress, tlv);
+  /* Get bytes data from elf file */
+  tlvGetBytesData(dataAddress, tlv, size);
+  /* pack tlv packet into txBuffer */
+  tlvPackPacketIntoBuffer(txBuffer, tlv);
+  
+  uartSendBytes(hSerial, txBuffer, sizeof(txBuffer));
+}
+
+/** tlvCheckDataSize is to determine the current data file size
+  * and adjust the data size to retrieve
+  *
+  * input     : size is the size of data can be any value
+  *
+  * return    : size is the remaining data size
+  *             TLV_DATA_SIZE is the default data retrieve size
+  */
+int tlvCheckDataSize(int size)  {
+  if(size < TLV_DATA_SIZE){
+    return size;
+  }
+  
+  return TLV_DATA_SIZE;
+}
+
+
+/** tlvWaitProbeReply is a function to receive probe reply
+  *
+  * input     : size is the size of data can be any value
+  *
+  * return    : size is the remaining data size
+  *             TLV_DATA_SIZE is the default data retrieve size
+  */
+uint8_t tlvProbeReply() {
+  
+}
+
+/** tlvWriteRam is a function to write data from elf to sram
+  *
+  * input     : dataAddress is the address where the data is located
+  *             destAddress is the destination address of the data where should it be located
+  *             size is the size of data to transfer, and can be any value
+  *
+  * return    : NONE
+  */
+void tlvWriteRam(uint8_t *dataAddress, uint32_t *destAddress, int size)  {
+  uint8_t txBuffer[] = {TLV_START}, ack = 0;
+  static int retries = 0;
+  int dataSize = 0;
+  
+  HANDLE hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
+  
+  /* Start transmit between host and probe */
+  uartSendBytes(hSerial, txBuffer, sizeof(txBuffer));
+  
+  while(size > 0)  {
+    dataSize = tlvCheckDataSize(size);
+    
+    while(uartGetByte(hSerial) != PROBE_OK)  {
+      if(retries++ == 3)  {
+        retries = 0;
+        printf("Data transmit timeout!\n");
+        closeSerialPort(hSerial);
+        return;
+      }
+      tlvWriteDataChunk(dataAddress, destAddress, dataSize, hSerial);
+    }
+
+    retries = 0;
+    /* Updata data address and size */
+    size = size - TLV_DATA_SIZE;
+    dataAddress = dataAddress + dataSize;
+  }
+  
+  closeSerialPort(hSerial);
 }
 
 /** tlvCheckAcknowledge is function to change the acknowledge reply from probe
@@ -213,48 +280,48 @@ TLV_State tlvCheckAcknowledge(uint8_t acknowledge)  {
 /** tlvHost is state machine for tlv host transmitter
   * 
   */
-void tlvHost(TLVSession *tlvSession)  {
-  TLV *tlv;
-  uint8_t bufferState;
-  uint8_t txBuffer[1024], rxBuffer = 0;
+// void tlvHost(TLVSession *tlvSession)  {
+  // TLV *tlv;
+  // uint8_t bufferState;
+  // uint8_t txBuffer[1024], rxBuffer = 0;
   
-  switch(tlvSession->state)  {
-    case TLV_START :
-      /* Create new TLV packet */
-      tlv = tlvCreateNewPacket(TLV_WRITE);
+  // switch(tlvSession->state)  {
+    // case TLV_START :
+      // /* Create new TLV packet */
+      // tlv = tlvCreateNewPacket(TLV_WRITE);
 
-      if(tlvSession->pElf->size == 0) {
-        tlvSession->state = TLV_END;
-        break;
-      }
-      else  {
-        /* Get data from elf file */
-        tlvGetDataFromElf(tlv, tlvSession->pElf);
-        /* Pack into TXBUFFER */
-        tlvPackPacketIntoTxBuffer(txBuffer, tlv);
-      }
-      tlvSession->state = TLV_TRANSMIT_DATA;
-      break;
+      // if(tlvSession->pElf->size == 0) {
+        // tlvSession->state = TLV_END;
+        // break;
+      // }
+      // else  {
+        // /* Get data from elf file */
+        // tlvGetDataFromElf(tlv, tlvSession->pElf);
+        // /* Pack into TXBUFFER */
+        // tlvPackPacketIntoBuffer(txBuffer, tlv);
+      // }
+      // tlvSession->state = TLV_TRANSMIT_DATA;
+      // break;
       
-    case TLV_TRANSMIT_DATA :
-      /* Transmit all data inside txBuffer to probe */
+    // case TLV_TRANSMIT_DATA :
+      // /* Transmit all data inside txBuffer to probe */
       // printf("Data Starting To Transfer\n");
-      serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
-      tlvSession->state = TLV_WAIT_REPLY;
-      break;
+      // uartSendBytes(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
+      // tlvSession->state = TLV_WAIT_REPLY;
+      // break;
       
-    case TLV_WAIT_REPLY :
-      /* Waiting reply from probe */
-      rxBuffer = serialGetByte(tlvSession->hSerial);
-      tlvSession->state = tlvCheckAcknowledge(rxBuffer);
-      break;
+    // case TLV_WAIT_REPLY :
+      // /* Waiting reply from probe */
+      // rxBuffer = uartGetByte(tlvSession->hSerial);
+      // tlvSession->state = tlvCheckAcknowledge(rxBuffer);
+      // break;
     
-    case TLV_END  :
-      txBuffer[0] = TLV_TRANSFER_COMPLETE;
-      serialWriteByte(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
-      /* Waiting reply from probe */
-      rxBuffer = serialGetByte(tlvSession->hSerial);
-      tlvSession->state = tlvCheckAcknowledge(rxBuffer);
-      break;
-  }
-}
+    // case TLV_END  :
+      // txBuffer[0] = TLV_TRANSFER_COMPLETE;
+      // uartSendBytes(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
+      // /* Waiting reply from probe */
+      // rxBuffer = uartGetByte(tlvSession->hSerial);
+      // tlvSession->state = tlvCheckAcknowledge(rxBuffer);
+      // break;
+  // }
+// }

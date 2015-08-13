@@ -1,54 +1,38 @@
-#include "UART.h"
-#include "TLV_Probe.h"
-#include "swdProtocol.h"
-#include "configurePort.h"
-#include "SystemConfigure.h"
-#include "Register_ReadWrite.h"
-#include "stm32f4xx_it.h"
+#include "main.h"
+
+#define VECT_TAB_OFFSET 0x0000001C
 
 int main(void)
 {
-	uint8_t rxBuffer[1024] = {0}, received = 1;
-	uint8_t txBuffer[] = {PROBE_OK};
+	uint32_t ahbIDR = 0, ack = 0, cswBit = 0, readDataValue = 0;
+	uint32_t *dataAddress = 0x20000000;
+	uint32_t *data = 0xABCDABCD, start = 0, end = 0, status = 0;
 
-	//HAL_Init();
-	//configureUartPorts();
-	//configureLED();
-
-	//SystemClock_Config();
-
-	//static UART_HandleTypeDef UartHandle;
-
-	/* Put the USART peripheral in the Asynchronous mode (UART Mode) */
-	/* UART1 configured as follow:
-	    - Word Length = 8 Bits
-	    - Stop Bit = One Stop bit
-	    - Parity = None
-	    - BaudRate = 9600 baud
-	    - Hardware flow control disabled (RTS and CTS signals) */
-	//UartHandle.Instance          = USARTx;
-
-	//UartHandle.Init.BaudRate     = 115200;
-	//UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
-	//UartHandle.Init.StopBits     = UART_STOPBITS_1;
-	//UartHandle.Init.Parity       = UART_PARITY_NONE;
-	//UartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-	//UartHandle.Init.Mode         = UART_MODE_TX_RX;
-	//UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
-
-	//if(HAL_UART_Init(&UartHandle) != HAL_OK)
-	//{
-		//  errorHandler();
-	//}
+	//configure_IOPorts();
+	//resetTarget();
+	//SWD_Initialisation();
+	//readAhbIDR(&ahbIDR);
 
 	/*
-	while(rxBuffer[0] != TLV_TRANSFER_COMPLETE)	{
-		if(HAL_UART_Receive(&UartHandle, rxBuffer, sizeof(rxBuffer), 5000) == HAL_OK)	{
-			if(HAL_UART_Transmit(&UartHandle, txBuffer, sizeof(txBuffer), 5000) != HAL_OK)	{
-				errorHandler();
-			}
-		}
-	}*/
+	cswBit = CSW_DEFAULT_MASK | CSW_WORD_SIZE;
+	swdWriteCSW(&ack, cswBit);
+
+	memoryAccessWrite((uint32_t)0x20000100, 0xDEADBEEF);
+	memoryAccessWrite((uint32_t)0x20000104, 0xBEEFCAFE);
+	loadCopyFromSRAMToFlashInstruction(0x20000100, 0x081C0000, 0x08);
+
+	do  {
+	    memoryAccessRead(SWD_TARGET_STATUS, &status);
+	} while(status != TARGET_OK);
+	memoryAccessRead((uint32_t)0x081C0000, &readDataValue);
+	memoryAccessRead((uint32_t)0x081C0004, &readDataValue);
+
+	loadEraseSectorInstruction(ADDR_FLASH_SECTOR_22, ADDR_FLASH_SECTOR_23);
+
+	memoryAccessRead(0x20000018, &readDataValue);
+	memoryAccessRead((uint32_t)0x081C0004, &readDataValue);*/
+	SCB->VTOR = SRAM_BASE | VECT_TAB_OFFSET;
+	targetMain();
 
 	while(1)
 	{

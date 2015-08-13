@@ -12,14 +12,11 @@
 #include "mock_Serial.h"
 #include "CustomAssertion.h"
 
-void setUp(void)
-{
-  initElfData();
-}
+void setUp(void)  {}
 
 void tearDown(void) {}
 
-void test_tlvCreateNewPacket_given_type_length_and_value()
+void test_tlvCreateNewPacket_given_type_length_and_value(void)
 {
   int i = 0;
   uint8_t chksum = 0;
@@ -27,10 +24,10 @@ void test_tlvCreateNewPacket_given_type_length_and_value()
   TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
   
   TEST_ASSERT_EQUAL(tlv->type, TLV_WRITE);
-  TEST_ASSERT_EQUAL(tlv->length, 0);
+  TEST_ASSERT_EQUAL(tlv->length, 1);
   
-  for(i; i < DATA_SIZE; i++)
-    TEST_ASSERT_EQUAL_HEX8(tlv->value[i], 0x00);
+  for(i; i < TLV_DATA_SIZE; i++)
+    TEST_ASSERT_EQUAL_HEX8(0x00, tlv->value[i]);
 }
 
 void test_tlvCalculateCheckSum_given_data_and_length_should_calc_check_sum(void)
@@ -48,7 +45,7 @@ void test_tlvCalculateCheckSum_given_data_and_length_should_calc_check_sum(void)
   
   chksum = tlvCalculateCheckSum(tlv->value, sizeof(buffer), 0);
   
-  TEST_ASSERT_EQUAL_HEX8(chksum, 0x33);
+  TEST_ASSERT_EQUAL_HEX8(0x33, chksum);
 }
 
 void test_tlvCalculateCheckSum_given_index_4_and_length_should_calculate_checksum_start_at_index_4(void)
@@ -60,7 +57,7 @@ void test_tlvCalculateCheckSum_given_index_4_and_length_should_calculate_checksu
   
   chksum = tlvCalculateCheckSum(buffer, sizeof(buffer), 4);
   
-  TEST_ASSERT_EQUAL_HEX8(chksum, 0xA9);
+  TEST_ASSERT_EQUAL_HEX8(0xA9, chksum);
 }
 
 void test_tlvVerifyCheckSum_given_data_with_actual_chksum_should_verify_it_with_add_up_all_the_data(void)
@@ -77,397 +74,360 @@ void test_tlvVerifyCheckSum_given_data_with_actual_chksum_should_verify_it_with_
                       
   result = tlvVerifyCheckSum(buffer, sizeof(buffer), 4);
   
-  TEST_ASSERT_EQUAL(result, 1);
+  TEST_ASSERT_EQUAL(1, result);
 }
 
-void test_tlvGetByteData_should_read_byte_data_from_elf_file_and_updata_the_size_address_and_index(void)
-{
-  int i = 0;
-	uint8_t buffer[1024];
-  
-  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
-  
-  buffer[0] = tlvGetByteDataFromElfFile(pElf);
-  
-  TEST_ASSERT_EQUAL(pElf->codeIndex, 1);
-  TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x200001f1);
-  TEST_ASSERT_EQUAL_HEX32(pElf->size, 0x000048c7);
-  TEST_ASSERT_EQUAL_HEX8(buffer[0], 0x80);
-  
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElf);
-  free(dataFromElf);
-}
-
-void test_tlvGetByteData_should_update_all_the_information_according_to_how_many_times_it_read(void)
-{
-  int i = 0;
-	uint8_t buffer[1024];
-  
-  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
-  
-  buffer[0] = tlvGetByteDataFromElfFile(pElf);
-  buffer[1] = tlvGetByteDataFromElfFile(pElf);
-  buffer[2] = tlvGetByteDataFromElfFile(pElf);
-  buffer[3] = tlvGetByteDataFromElfFile(pElf);
-  
-  TEST_ASSERT_EQUAL(pElf->codeIndex, 4);
-  TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x200001f4);
-  TEST_ASSERT_EQUAL_HEX32(pElf->size, 0x000048c4);
-  
-  TEST_ASSERT_EQUAL_HEX8(buffer[0], 0x80);
-  TEST_ASSERT_EQUAL_HEX8(buffer[1], 0xb5);
-  TEST_ASSERT_EQUAL_HEX8(buffer[2], 0x94);
-  TEST_ASSERT_EQUAL_HEX8(buffer[3], 0xb0);
-  
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElf);
-  free(dataFromElf);
-}
-
-void test_tlvPackBytesAddress_given_index_0_and_address_0x12345678_buffer_should_contain_the_address_in_bytes(void ) {
-  uint8_t buffer[10];
-  
-  tlvPackBytesAddress(0x12345678, buffer, 0);
-  
-  TEST_ASSERT_EQUAL_HEX8(buffer[0], 0x12);
-  TEST_ASSERT_EQUAL_HEX8(buffer[1], 0x34);
-  TEST_ASSERT_EQUAL_HEX8(buffer[2], 0x56);
-  TEST_ASSERT_EQUAL_HEX8(buffer[3], 0x78);
-}
-
-void test_tlvPackBytesAddress_given_index_4_and_address_0xDEADBEEF_buffer_should_contain_the_address_start_at_position_4(void ) {
-  uint8_t buffer[10] = {0};
-  
-  tlvPackBytesAddress(0xDEADBEEF, buffer, 4);
-  
-  TEST_ASSERT_EQUAL_HEX8(buffer[0], 0x00);
-  TEST_ASSERT_EQUAL_HEX8(buffer[1], 0x00);
-  TEST_ASSERT_EQUAL_HEX8(buffer[2], 0x00);
-  TEST_ASSERT_EQUAL_HEX8(buffer[3], 0x00);
-  
-  TEST_ASSERT_EQUAL_HEX8(buffer[4], 0xDE);
-  TEST_ASSERT_EQUAL_HEX8(buffer[5], 0xAD);
-  TEST_ASSERT_EQUAL_HEX8(buffer[6], 0xBE);
-  TEST_ASSERT_EQUAL_HEX8(buffer[7], 0xEF);
-  
-  TEST_ASSERT_EQUAL_HEX8(buffer[8], 0x00);
-  TEST_ASSERT_EQUAL_HEX8(buffer[9], 0x00);
-}
-
-void test_tlvGetDataFromElf_data_should_contain_address_data_and_checkSum(void)
-{ 
-  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
-
+void test_tlvPack4ByteAddress_given_index_0_and_address_0x12345678_buffer_should_contain_the_address_in_bytes(void) {
   TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
-  tlvGetDataFromElf(tlv, pElf);
+  tlvPack4ByteAddress(0x12345678, tlv);
   
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
+  TEST_ASSERT_EQUAL_HEX8(0x12, tlv->value[0]);
+  TEST_ASSERT_EQUAL_HEX8(0x34, tlv->value[1]);
+  TEST_ASSERT_EQUAL_HEX8(0x56, tlv->value[2]);
+  TEST_ASSERT_EQUAL_HEX8(0x78, tlv->value[3]);
   
-  TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
-  
-  /* Elf section Address and Size*/
-  TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x200002E8);
-  TEST_ASSERT_EQUAL_HEX16(pElf->size, 0x47D0);
-  
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElf);
-  free(dataFromElf);
+  TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&tlv->value[0]));
 }
 
-void test_tlvGetDataFromElf_calling_tlvGetDataFromElf_3_times_should_get_data_and_update_information_correctly(void)
-{
+void test_tlvGetBytesData_should_read_248_bytes_from_dataAddress(void) {
   TLV *tlv;
   
-  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
-
-  tlv = tlvCreateNewPacket(TLV_WRITE);
-  tlvGetDataFromElf(tlv, pElf);
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
-  TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
   
   tlv = tlvCreateNewPacket(TLV_WRITE);
-  tlvGetDataFromElf(tlv, pElf);
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
-  TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
+  tlvGetBytesData(dataAddress, tlv, TLV_DATA_SIZE);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 249, 0, dataAddress, tlv);
   
-  tlv = tlvCreateNewPacket(TLV_WRITE);
-  tlvGetDataFromElf(tlv, pElf);
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
-  TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
-  
-  /* Elf section Address and Size*/
-  TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x200004D8);
-  TEST_ASSERT_EQUAL_HEX16(pElf->size, 0x45E0);
-  
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElf);
-  free(dataFromElf);
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
 }
 
-void test_tlvGetDataFromElf_get_all_the_data_from_elf_file_until_size_is_0(void)
-{
+void test_tlvGetBytesData_call_multiple_times_should_data_should_match(void) {
   TLV *tlv;
   
-  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
-
-  while(pElf->size != 0) {
-    tlv = tlvCreateNewPacket(TLV_WRITE);
-    tlvGetDataFromElf(tlv, pElf);
-    TEST_ASSERT_EQUAL_TLV(TLV_WRITE, tlv->length, pElf, tlv);
-    TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
-  }
-
-  /* Elf section Address and Size*/
-  TEST_ASSERT_EQUAL_HEX32(pElf->address, 0x20004ab8);
-  TEST_ASSERT_EQUAL_HEX16(pElf->size, 0x00);
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
   
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElf);
-  free(dataFromElf);
+  tlv = tlvCreateNewPacket(TLV_WRITE);
+  tlvGetBytesData(dataAddress, tlv, TLV_DATA_SIZE);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 249, 0, dataAddress, tlv);
+  
+  dataAddress += TLV_DATA_SIZE;
+  tlv = tlvCreateNewPacket(TLV_WRITE);
+  tlvGetBytesData(dataAddress, tlv, TLV_DATA_SIZE);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 249, 0, dataAddress, tlv);
+  
+  dataAddress += TLV_DATA_SIZE;
+  tlv = tlvCreateNewPacket(TLV_WRITE);
+  tlvGetBytesData(dataAddress, tlv, TLV_DATA_SIZE);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 249, 0, dataAddress, tlv);
+  
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
 }
 
-void test_tlvPackPacketIntoTxBuffer_should_get_data_from_elf_file_then_pack_into_txBuffer(void)
+void test_tlvGetBytesData_given_size_8_should_only_get_8_bytes_data(void) {
+  TLV *tlv;
+  
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t *destAddress = (uint32_t *)getSectionVirtualAddress(elfData, 0);
+  
+  tlv = tlvCreateNewPacket(TLV_WRITE);
+  tlv->length += ADDRESS_LENGTH;
+  tlvGetBytesData(dataAddress, tlv, 8);
+  
+  TEST_ASSERT_EQUAL(tlv->type, TLV_WRITE);
+  TEST_ASSERT_EQUAL(tlv->length, 13);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[4], 0x80);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[5], 0xB5);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[6], 0x86);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[7], 0xB0);
+  
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[8], 0x00);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[9], 0xaf);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[10], 0x00);
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[11], 0x23);
+  
+  //chksum
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[12], 0xC3);
+  
+  TEST_ASSERT_EQUAL_HEX8(tlv->value[13], 0x00);
+  
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}
+
+void test_tlvPackPacketIntoBuffer_should_get_data_from_elf_file_then_pack_into_txBuffer(void)
 {
-  int i = 0;
-  uint8_t txBuffer[1024], chksum = 0;
+  uint8_t txBuffer[1024] = {0};
+  uint32_t index32 = 0;
+  TLV *tlv;
   
-  ElfSection *pElf = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t *destAddress = (uint32_t *)getSectionVirtualAddress(elfData, 0);
   
-  TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
-  tlvGetDataFromElf(tlv, pElfSection);  
+  tlv = tlvCreateNewPacket(TLV_WRITE);
+  tlvPack4ByteAddress((uint32_t)destAddress, tlv);
+  tlvGetBytesData(dataAddress, tlv, TLV_DATA_SIZE);
+  tlvPackPacketIntoBuffer(txBuffer, tlv);
   
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, DATA_SIZE, pElf, tlv);
-  TEST_ASSERT_EQUAL(tlvVerifyCheckSum(tlv->value, tlv->length, 4), 1);
-  
-  tlvPackPacketIntoTxBuffer(txBuffer, tlv);
-  
-  /* Type */
-  TEST_ASSERT_EQUAL(txBuffer[0], TLV_WRITE);
-  
-  /* Length */
-  TEST_ASSERT_EQUAL(txBuffer[1], tlv->length);
-  
-  /* Address */
-  TEST_ASSERT_EQUAL(txBuffer[2], 0x20);
-  TEST_ASSERT_EQUAL(txBuffer[3], 0x00);
-  TEST_ASSERT_EQUAL(txBuffer[4], 0x01);
-  TEST_ASSERT_EQUAL(txBuffer[5], 0xf0);
-  
-  /* Data */
-  for(i += 4; i < tlv->length - 1; i++)
-    TEST_ASSERT_EQUAL(txBuffer[i + 2], tlv->value[i]);
-  
-  TEST_ASSERT_EQUAL_HEX8(txBuffer[254], tlv->value[DATA_SIZE - 1]);
-  
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 253, get4Byte(&txBuffer[2]), &txBuffer[6], tlv);
+
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
 }
 
-/**********************************************
+void test_tlvWriteDataChunk_should_send_chunk_of_data_using_UART(void)
+{
+  HANDLE hSerial;
+  int i = 0, index = 0, size = 0;
+	uint8_t buffer[TLV_DATA_SIZE];
+  
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  
+  index = getIndexOfSectionByName(elfData, ".text");
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t *destAddress = (uint32_t *)getSectionVirtualAddress(elfData, 0);
+  
+  uartSendBytes_IgnoreAndReturn(1024);
+  tlvWriteDataChunk(dataAddress, destAddress, TLV_DATA_SIZE, hSerial);
+  
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}
+
+  /********************************************
   *                 TLV-HOST                  *
   *                                           *
   *********************************************/
-void test_tlvHost_given_TLV_START_should_create_packet_and_pack_into_Tx_Buffer_and_change_state_to_TLV_TRANSMIT_DATA()
+void test_tlvWriteRam_should_transmit_chunk_data_in_size_of_248_bytes()
 {
   HANDLE hSerial;
-  TLVSession tlvSession;
   
-  /* Open elf file */
-  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
   
-  /* Initialize TlvSeesion structure */
-  tlvSession.state = TLV_START;
-  tlvSession.pElf = pElfSection;
-  tlvSession.hSerial = hSerial;
+  int index = getIndexOfSectionByName(elfData, ".text");
+  int size = getSectionSize(elfData, index);
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t *destAddress = (uint32_t *)getSectionVirtualAddress(elfData, 0);
   
-  /* Function call */
-  tlvHost(&tlvSession);
+  /* Init uart */
+  initSerialComm_IgnoreAndReturn(hSerial);
+  uartSendBytes_IgnoreAndReturn(1024);
+  uartGetByte_IgnoreAndReturn(PROBE_OK);
+  closeSerialPort_Ignore();
   
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  tlvWriteRam(dataAddress, destAddress, size);
   
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
-}
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}  
+// void test_tlvHost_given_TLV_START_should_create_packet_and_pack_into_Tx_Buffer_and_change_state_to_TLV_TRANSMIT_DATA()
+// {
+  // HANDLE hSerial;
+  // TLVSession tlvSession;
+  
+  // /* Open elf file */
+  // pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  
+  // /* Initialize TlvSeesion structure */
+  // tlvSession.state = TLV_START;
+  // tlvSession.pElf = pElfSection;
+  // tlvSession.hSerial = hSerial;
+  
+  // /* Function call */
+  // tlvHost(&tlvSession);
+  
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  
+  // closeFileInTxt(dataFromElf->myFile);
+  // free(pElfSection);
+  // free(dataFromElf);
+// }
 
-void test_tlvHost_when_state_changed_to_TLV_TRANSMIT_DATA_should_transmit_all_the_data_inside_txBUFFER_to_probe()
-{
-  HANDLE hSerial;
-  TLVSession tlvSession;
+// void test_tlvHost_when_state_changed_to_TLV_TRANSMIT_DATA_should_transmit_all_the_data_inside_txBUFFER_to_probe()
+// {
+  // HANDLE hSerial;
+  // TLVSession tlvSession;
   
-  /* Open elf file */
-  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  // /* Open elf file */
+  // pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
   
-  /* Initialize TlvSeesion structure */
-  tlvSession.state = TLV_START;
-  tlvSession.pElf = pElfSection;
-  tlvSession.hSerial = hSerial;
+  // /* Initialize TlvSeesion structure */
+  // tlvSession.state = TLV_START;
+  // tlvSession.pElf = pElfSection;
+  // tlvSession.hSerial = hSerial;
   
-  /* Mock */
-  serialWriteByte_IgnoreAndReturn(255);
+  // /* Mock */
+  // uartSendBytes_IgnoreAndReturn(255);
   
-  /* Function call */
-  tlvHost(&tlvSession);
-  tlvHost(&tlvSession);
+  // /* Function call */
+  // tlvHost(&tlvSession);
+  // tlvHost(&tlvSession);
   
-  /* Test */
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  // /* Test */
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
   
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
-}
+  // closeFileInTxt(dataFromElf->myFile);
+  // free(pElfSection);
+  // free(dataFromElf);
+// }
 
-void test_tlvHost_when_state_changed_to_TLV_WAIT_REPLY_should_transmit_all_txbuffer_data_and_wait_probe_reply()
-{
-  HANDLE hSerial;
-  TLVSession tlvSession;
+// void test_tlvHost_when_state_changed_to_TLV_WAIT_REPLY_should_transmit_all_txbuffer_data_and_wait_probe_reply()
+// {
+  // HANDLE hSerial;
+  // TLVSession tlvSession;
   
-  /* Open elf file */
-  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  // /* Open elf file */
+  // pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
   
-  /* Initialize TlvSeesion structure */
-  tlvSession.state = TLV_START;
-  tlvSession.pElf = pElfSection;
-  tlvSession.hSerial = hSerial;
+  // /* Initialize TlvSeesion structure */
+  // tlvSession.state = TLV_START;
+  // tlvSession.pElf = pElfSection;
+  // tlvSession.hSerial = hSerial;
   
-  /* Mock */
-  serialWriteByte_IgnoreAndReturn(255);
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_OK);
+  // /* Mock */
+  // uartSendBytes_IgnoreAndReturn(255);
+  // uartGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_OK);
   
-  /* Function call */
-  tlvHost(&tlvSession);
-  tlvHost(&tlvSession);
-  tlvHost(&tlvSession);
+  // /* Function call */
+  // tlvHost(&tlvSession);
+  // tlvHost(&tlvSession);
+  // tlvHost(&tlvSession);
   
-  /* Test */
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_START);
+  // /* Test */
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_START);
   
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
-}
+  // closeFileInTxt(dataFromElf->myFile);
+  // free(pElfSection);
+  // free(dataFromElf);
+// }
 
-void test_tlvHost_when_elf_section_size_is_0_should_change_state_to_TLV_END_and_send_message_inform_probe_to_stop()
-{
-  HANDLE hSerial;
-  TLVSession tlvSession;
+// void test_tlvHost_when_elf_section_size_is_0_should_change_state_to_TLV_END_and_send_message_inform_probe_to_stop()
+// {
+  // HANDLE hSerial;
+  // TLVSession tlvSession;
   
-  /* Open elf file */
-  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  // /* Open elf file */
+  // pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
   
-  /* Initialize TlvSeesion structure */
-  tlvSession.state = TLV_START;
-  tlvSession.pElf = pElfSection;
-  tlvSession.hSerial = hSerial;
+  // /* Initialize TlvSeesion structure */
+  // tlvSession.state = TLV_START;
+  // tlvSession.pElf = pElfSection;
+  // tlvSession.hSerial = hSerial;
   
-  tlvSession.pElf->size = 0x00;
-  tlvHost(&tlvSession);
+  // tlvSession.pElf->size = 0x00;
+  // tlvHost(&tlvSession);
   
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_END);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_END);
   
-  serialWriteByte_IgnoreAndReturn(255);
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_COMPLETE);
-  tlvHost(&tlvSession);
+  // uartSendBytes_IgnoreAndReturn(255);
+  // uartGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_COMPLETE);
+  // tlvHost(&tlvSession);
   
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_COMPLETE);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_COMPLETE);
     
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
-}
+  // closeFileInTxt(dataFromElf->myFile);
+  // free(pElfSection);
+  // free(dataFromElf);
+// }
 
-void test_tlvHost_when_receive_PROBE_FAULT_response_should_retry_3_times_and_ABORT()
-{
-  HANDLE hSerial;
-  TLVSession tlvSession;
+// void test_tlvHost_when_receive_PROBE_FAULT_response_should_retry_3_times_and_ABORT()
+// {
+  // HANDLE hSerial;
+  // TLVSession tlvSession;
   
-  /* Open elf file */
-  pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
+  // /* Open elf file */
+  // pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
   
-  /* Initialize TlvSeesion structure */
-  tlvSession.state = TLV_START;
-  tlvSession.pElf = pElfSection;
-  tlvSession.hSerial = hSerial;
+  // /* Initialize TlvSeesion structure */
+  // tlvSession.state = TLV_START;
+  // tlvSession.pElf = pElfSection;
+  // tlvSession.hSerial = hSerial;
 
-  /* START */
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  // /* START */
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
   
-  /* TRANSMIT */
-  serialWriteByte_IgnoreAndReturn(255);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  // /* TRANSMIT */
+  // uartSendBytes_IgnoreAndReturn(255);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
   
-  /* WAIT REPLY x1*/
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  // /* WAIT REPLY x1*/
+  // uartGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
 
-  /* TRANSMIT */
-  serialWriteByte_IgnoreAndReturn(255);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  // /* TRANSMIT */
+  // uartSendBytes_IgnoreAndReturn(255);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
   
-  /* WAIT REPLY x2*/
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  // /* WAIT REPLY x2*/
+  // uartGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
   
-  /* TRANSMIT */
-  serialWriteByte_IgnoreAndReturn(255);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  // /* TRANSMIT */
+  // uartSendBytes_IgnoreAndReturn(255);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
   
-  /* WAIT REPLY x3*/
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
+  // /* WAIT REPLY x3*/
+  // uartGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_TRANSMIT_DATA);
   
-  /* TRANSMIT */
-  serialWriteByte_IgnoreAndReturn(255);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
+  // /* TRANSMIT */
+  // uartSendBytes_IgnoreAndReturn(255);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_WAIT_REPLY);
   
-  /* WAIT REPLY x4*/
-  serialGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
-  tlvHost(&tlvSession);
-  TEST_ASSERT_EQUAL(tlvSession.state, TLV_ABORT);
+  // /* WAIT REPLY x4*/
+  // uartGetByte_ExpectAndReturn(tlvSession.hSerial, PROBE_FAULT);
+  // tlvHost(&tlvSession);
+  // TEST_ASSERT_EQUAL(tlvSession.state, TLV_ABORT);
     
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
-}
+  // closeFileInTxt(dataFromElf->myFile);
+  // free(pElfSection);
+  // free(dataFromElf);
+// }
 
-void test_tlvCheckAcknowledge_given_PROBE_OK_should_change_state_to_TLV_START()
-{
-  uint8_t state;
+// void test_tlvCheckAcknowledge_given_PROBE_OK_should_change_state_to_TLV_START()
+// {
+  // uint8_t state;
   
-  state = tlvCheckAcknowledge(PROBE_OK);
+  // state = tlvCheckAcknowledge(PROBE_OK);
   
-  TEST_ASSERT_EQUAL(state, TLV_START);
-}
+  // TEST_ASSERT_EQUAL(state, TLV_START);
+// }
 
-void test_tlvCheckAcknowledge_received_3_times_PROBE_FAULT_should_change_state_to_TLV_ABORT()
-{
-  uint8_t state;
+// void test_tlvCheckAcknowledge_received_3_times_PROBE_FAULT_should_change_state_to_TLV_ABORT()
+// {
+  // uint8_t state;
   
-  state = tlvCheckAcknowledge(PROBE_FAULT);
-  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
-  state = tlvCheckAcknowledge(PROBE_FAULT);
-  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
-  state = tlvCheckAcknowledge(PROBE_FAULT);
-  TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
-  state = tlvCheckAcknowledge(PROBE_FAULT);
-  TEST_ASSERT_EQUAL(state, TLV_ABORT);
-}
+  // state = tlvCheckAcknowledge(PROBE_FAULT);
+  // TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+  // state = tlvCheckAcknowledge(PROBE_FAULT);
+  // TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+  // state = tlvCheckAcknowledge(PROBE_FAULT);
+  // TEST_ASSERT_EQUAL(state, TLV_TRANSMIT_DATA);
+  // state = tlvCheckAcknowledge(PROBE_FAULT);
+  // TEST_ASSERT_EQUAL(state, TLV_ABORT);
+// }
 
-void test_tlvCheckAcknowledge_when_received_PROBE_COMPLETE_should_change_state_to_TLV_COMPLETE()
-{
-  uint8_t state;
+// void test_tlvCheckAcknowledge_when_received_PROBE_COMPLETE_should_change_state_to_TLV_COMPLETE()
+// {
+  // uint8_t state;
   
-  state = tlvCheckAcknowledge(PROBE_COMPLETE);
-  TEST_ASSERT_EQUAL(state, TLV_COMPLETE);
-}
+  // state = tlvCheckAcknowledge(PROBE_COMPLETE);
+  // TEST_ASSERT_EQUAL(state, TLV_COMPLETE);
+// }

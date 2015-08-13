@@ -48,7 +48,6 @@ typedef uint32_t FLASH_ErrorTypeDef;
 #define ADDR_FLASH_SECTOR_21     ((uint32_t)0x081A0000) /* Base @ of Sector 9, 128 Kbytes  */
 #define ADDR_FLASH_SECTOR_22     ((uint32_t)0x081C0000) /* Base @ of Sector 10, 128 Kbytes */
 #define ADDR_FLASH_SECTOR_23     ((uint32_t)0x081E0000) /* Base @ of Sector 11, 128 Kbytes */
-//#define ADDR_FLASH_SECTOR_24     ((uint32_t)0x081FFFFF) /*address within sector 23 use to terminate address not withint sector*/
 
 uint32_t flashGetSector(uint32_t Address);
 uint32_t flashRead(uint32_t startAddress);
@@ -58,6 +57,12 @@ void flashMassErase(uint32_t banks);
 void flashEraseSector(uint32_t startSector, uint32_t endSector);
 void flashWrite(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
 void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
-void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int length);
-void flashVerifyDataFromSramToFlash(uint32_t src, uint32_t dest, int length);
+void flashCopyFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length);
+void flashVerifyDataFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length);
+
+void flashWriteByte(uint32_t address, uint8_t data);
+void flashWriteHalfWord(uint32_t address, uint16_t data);
+void flashWriteWord(uint32_t address, uint32_t data);
+void flashWriteDoubleWord(uint32_t address, uint64_t data);
+  
 #endif // Flash_H

@@ -3,20 +3,14 @@
 
 #define DATA_SIZE     253
 
-typedef struct
-{
-  uint8_t type;
-  int length;
-  uint32_t sectionAddress;
-  uint8_t value[DATA_SIZE];
-  uint8_t chksum;
-} TLV;
-
 typedef enum
 {
   TLV_CLEAR_ERROR = 0,
   TLV_EMPTY_BUFFER,
-  TLV_RECEIVE_TIMEOUT
+  TLV_RECEIVE_TIMEOUT,
+  TLV_INVALID_TYPE,
+  TLV_INVALID_LENGTH,
+  TLV_INVALID_VALUE
 } TLV_ErrorCode;
 
 typedef enum
@@ -34,6 +28,17 @@ typedef enum  {
   PROBE_OK,
   PROBE_COMPLETE
 } ProbeStatus;
+
+typedef struct
+{
+  uint8_t type;
+  int length;
+  uint32_t sectionAddress;
+  uint8_t value[DATA_SIZE];
+  uint32_t value32[DATA_SIZE];
+  uint8_t chksum;
+  TLV_ErrorCode errorCode;
+} TLV;
 
 #define ONE_BYTE                  256
 #define ADDRESS_LENGTH            4
