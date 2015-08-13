@@ -83,7 +83,7 @@ void closeSerialPort(HANDLE hSerial) {
 
 uint8_t uartGetByte(HANDLE hSerial)  {
   DWORD dwBytesRead = 0;
-  uint8_t buffer;
+  uint8_t buffer = 0;
   
   if(!ReadFile(hSerial, &buffer, 1, &dwBytesRead, NULL)){
     //handle error

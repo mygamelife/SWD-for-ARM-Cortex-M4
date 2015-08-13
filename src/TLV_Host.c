@@ -209,14 +209,19 @@ uint8_t tlvProbeReply() {
   * return    : NONE
   */
 void tlvWriteRam(uint8_t *dataAddress, uint32_t *destAddress, int size)  {
-  uint8_t txBuffer[] = {TLV_START}, ack = 0;
+  //uint8_t *start = &TLV_START_TRANSMIT, *end = TLV_END_TRANSMIT,
+  uint8_t start[] = {TLV_START_TRANSMIT};
+  uint8_t end[]   = {TLV_END_TRANSMIT};
+  uint8_t ack = 0;
   static int retries = 0;
   int dataSize = 0;
   
   HANDLE hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
-  
+  // printf("Opening UART Port!\n");
+
   /* Start transmit between host and probe */
-  uartSendBytes(hSerial, txBuffer, sizeof(txBuffer));
+  uartSendBytes(hSerial, start, sizeof(start));
+  // printf("Start Transmission!\n");
   
   while(size > 0)  {
     dataSize = tlvCheckDataSize(size);
@@ -224,19 +229,26 @@ void tlvWriteRam(uint8_t *dataAddress, uint32_t *destAddress, int size)  {
     while(uartGetByte(hSerial) != PROBE_OK)  {
       if(retries++ == 3)  {
         retries = 0;
-        printf("Data transmit timeout!\n");
+        // printf("Data transmit timeout!\n");
         closeSerialPort(hSerial);
         return;
       }
       tlvWriteDataChunk(dataAddress, destAddress, dataSize, hSerial);
     }
 
+    // printf("Probe reply OK!\n");
     retries = 0;
     /* Updata data address and size */
     size = size - TLV_DATA_SIZE;
     dataAddress = dataAddress + dataSize;
+    destAddress = destAddress + dataSize;
   }
   
+  /* End transmit between host and probe */
+  uartSendBytes(hSerial, end, sizeof(end));
+  // printf("End Transmission!\n");
+  
+  // printf("Closing UART Port!\n");
   closeSerialPort(hSerial);
 }
 
@@ -276,52 +288,3 @@ TLV_State tlvCheckAcknowledge(uint8_t acknowledge)  {
   else
     printf("Invalid response from PROBE\n");
 }
-
-/** tlvHost is state machine for tlv host transmitter
-  * 
-  */
-// void tlvHost(TLVSession *tlvSession)  {
-  // TLV *tlv;
-  // uint8_t bufferState;
-  // uint8_t txBuffer[1024], rxBuffer = 0;
-  
-  // switch(tlvSession->state)  {
-    // case TLV_START :
-      // /* Create new TLV packet */
-      // tlv = tlvCreateNewPacket(TLV_WRITE);
-
-      // if(tlvSession->pElf->size == 0) {
-        // tlvSession->state = TLV_END;
-        // break;
-      // }
-      // else  {
-        // /* Get data from elf file */
-        // tlvGetDataFromElf(tlv, tlvSession->pElf);
-        // /* Pack into TXBUFFER */
-        // tlvPackPacketIntoBuffer(txBuffer, tlv);
-      // }
-      // tlvSession->state = TLV_TRANSMIT_DATA;
-      // break;
-      
-    // case TLV_TRANSMIT_DATA :
-      // /* Transmit all data inside txBuffer to probe */
-      // printf("Data Starting To Transfer\n");
-      // uartSendBytes(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
-      // tlvSession->state = TLV_WAIT_REPLY;
-      // break;
-      
-    // case TLV_WAIT_REPLY :
-      // /* Waiting reply from probe */
-      // rxBuffer = uartGetByte(tlvSession->hSerial);
-      // tlvSession->state = tlvCheckAcknowledge(rxBuffer);
-      // break;
-    
-    // case TLV_END  :
-      // txBuffer[0] = TLV_TRANSFER_COMPLETE;
-      // uartSendBytes(tlvSession->hSerial, txBuffer, sizeof(txBuffer));
-      // /* Waiting reply from probe */
-      // rxBuffer = uartGetByte(tlvSession->hSerial);
-      // tlvSession->state = tlvCheckAcknowledge(rxBuffer);
-      // break;
-  // }
-// }

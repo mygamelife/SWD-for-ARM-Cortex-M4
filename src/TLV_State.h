@@ -10,7 +10,7 @@
 typedef struct
 {
   uint8_t type;
-  int length;
+  uint8_t length;
   uint8_t value[255];
 } TLV;
 

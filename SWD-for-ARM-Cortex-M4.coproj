@@ -113,13 +113,12 @@
     <File name="Code/UART.c" path="app/UART.c" type="1"/>
     <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h" type="1"/>
-    <File name="Code/TLV_Protocol.c" path="app/TLV_Protocol.c" type="1"/>
     <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
     <File name="Code/swdProtocol.h" path="app/swdProtocol.h" type="1"/>
     <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
+    <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Projects/STM32F429I-Discovery/Templates/Src/stm32f4xx_it.c" type="1"/>
     <File name="Code/Read_File.h" path="app/Read_File.h" type="1"/>
-    <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
     <File name="Code/swdStub.c" path="app/swdStub.c" type="1"/>
     <File name="Code/Bit_Operations.h" path="app/Bit_Operations.h" type="1"/>
     <File name="Code/Misc_Utilities.c" path="app/Misc_Utilities.c" type="1"/>
@@ -127,9 +126,8 @@
     <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc_ex.h" type="1"/>
     <File name="Code/Bit_ReadSend.h" path="app/Bit_ReadSend.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_i2c.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_gpio.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_cortex.h" type="1"/>
-    <File name="Code/TLV_Protocol.h" path="app/TLV_Protocol.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_gpio.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Code/Reset.h" path="app/Reset.h" type="1"/>
     <File name="Code/SRAM.h" path="app/SRAM.h" type="1"/>
     <File name="Code/LED.h" path="app/LED.h" type="1"/>

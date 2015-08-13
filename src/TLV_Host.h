@@ -7,16 +7,6 @@
 #include "TLV_State.h"
 #include "Serial.h"
 
-typedef struct {
-  TLV_State state;
-  HANDLE hSerial;
-  //ElfSection *pElf;
-} TLVSession;
-
-void tlvHost(TLVSession *tlvSession);
-//uint8_t tlvGetByteDataFromElfFile(ElfSection *pElf);
-//void tlvGetDataFromElf(TLV *tlv, ElfSection *pElf);
-
 TLV *tlvCreateNewPacket(uint8_t type);
 uint8_t tlvCalculateCheckSum(uint8_t *buffer, int length, int index);
 uint8_t tlvVerifyCheckSum(uint8_t *buffer, int length, int index);

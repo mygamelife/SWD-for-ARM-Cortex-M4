@@ -24,6 +24,7 @@ InStream *openFile(char *fileDirectory, char *mode){
   myFile->file = fopen(fileDirectory, mode);
   
   if(myFile->file == NULL){
+    printf("File doesn't exists!\n");
     // Throw(ERR_FILE_NOT_EXIST);
   }
   
