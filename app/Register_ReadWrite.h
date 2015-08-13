@@ -77,25 +77,30 @@
 #define CSW_ENABLE_ADDR_INC_SINGLE    ((uint32_t)0x00000010)
 #define CSW_ENABLE_ADDR_INC_PACKED    ((uint32_t)0x00000020)
 
+extern int cswDataSize ;
+
 /**-------------------------------- SWD-DP Register Function-----------------------------------
   */
-#define swdWriteDP(address, ack, data)              SWDRegister_Write(address, DP, ack, data);
-#define swdWriteSelect(ack, writeData)              SWDRegister_Write(SELECT_REG, DP, ack, writeData);
-#define swdWriteAbort(ack, writeData)               SWDRegister_Write(ABORT_REG, DP, ack, writeData);
-#define swdWriteCtrlStatus(ack, writeData)          SWDRegister_Write(CTRLSTAT_REG, DP, ack, writeData);
-#define swdReadDP(address, ack, parity, data)       SWDRegister_Read(address, DP, ack, parity, data);
-#define swdReadCtrlStatus(ack, parity, readData)    SWDRegister_Read(CTRLSTAT_REG, DP, ack, parity, readData);
+#define swdWriteDP(address, ack, data)              swdRegisterWrite(address, DP, ack, data);
+#define swdWriteSelect(ack, writeData)              swdRegisterWrite(SELECT_REG, DP, ack, writeData);
+#define swdWriteAbort(ack, writeData)               swdRegisterWrite(ABORT_REG, DP, ack, writeData);
+#define swdWriteCtrlStatus(ack, writeData)          swdRegisterWrite(CTRLSTAT_REG, DP, ack, writeData);
+#define swdReadDP(address, ack, parity, data)       swdRegisterRead(address, DP, ack, parity, data);
+#define swdReadCtrlStatus(ack, parity, readData)    swdRegisterRead(CTRLSTAT_REG, DP, ack, parity, readData);
 
 void powerUpSystemAndDebug();
-void SWDRegister_Read(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
-void SWDRegister_Write(int Address,int APnDP,int *ACK, uint32_t data);
+void swdRegisterRead(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
+void swdRegisterWrite(int Address,int APnDP,int *ACK, uint32_t data);
 
 /**-------------------------------- AHB-AP Register Function-----------------------------------
   */
-#define swdWriteAP(address, ack, data)              SWDRegister_Write(address, AP, ack, data);
+#define swdWriteAP(address, ack, data)              swdRegisterWrite(address, AP, ack, data);
 
-int memoryAccessRead(uint32_t Address,uint32_t *dataRead);
-int memoryAccessWrite(uint32_t Address,uint32_t WriteData);
+int memoryReadWord(uint32_t Address,uint32_t *dataRead);
+void memoryWriteByte(uint32_t address, uint32_t writeData);
+void memoryWriteHalfword(uint32_t address, uint32_t writeData);
+void memoryWriteWord(uint32_t Address,uint32_t WriteData);
+
 int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
 void readAhbIDR(uint32_t *data_IDR);
 void swdWriteCSW(int *ack, uint32_t cswBitSet);

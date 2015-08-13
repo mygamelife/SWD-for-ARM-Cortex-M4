@@ -22,14 +22,14 @@ void tearDown(void)
 {
 }
 
-void test_MSB_LSB_Conversion_given_0xEE2805D4_should_return_0x2BA01477()
+void test_convertMSB_LSB_given_0xEE2805D4_should_return_0x2BA01477()
 {
-	TEST_ASSERT_EQUAL(0x2BA01477,MSB_LSB_Conversion(0xEE2805D4));
+	TEST_ASSERT_EQUAL(0x2BA01477,convertMSB_LSB(0xEE2805D4));
 }
 
-void test_MSB_LSB_Conversion_given_0x2BA01477_should_return_0xEE2805D4()
+void test_convertMSB_LSB_given_0x2BA01477_should_return_0xEE2805D4()
 {
-	TEST_ASSERT_EQUAL(0xEE2805D4,MSB_LSB_Conversion(0x2BA01477));
+	TEST_ASSERT_EQUAL(0xEE2805D4,convertMSB_LSB(0x2BA01477));
 }
 
 
@@ -123,23 +123,23 @@ void test_emulateResetTarget_should_call_ResetPinLow_ResetPin_High()
 	resetTarget();
 }
 
-void test_emulateSWDRegister_Write_should_send_SWD_Request_readACK_and_Write_data()
+void test_emulateswdRegisterWrite_should_send_SWD_Request_readACK_and_Write_data()
 {
 	int ACK = 0 ;
 	
-	emulateSWDRegister_Write(TAR_REG,AP,4,0x2BA01477);
-	SWDRegister_Write(TAR_REG,AP,&ACK,0x2BA01477);
+	emulateswdRegisterWrite(TAR_REG,AP,4,0x2BA01477);
+	swdRegisterWrite(TAR_REG,AP,&ACK,0x2BA01477);
 	
 	TEST_ASSERT_EQUAL(1,ACK);
 }
 
-void test_emulateSWDRegister_Read_should_send_SWD_Request_readACK_and_readData_readParity()
+void test_emulateswdRegisterRead_should_send_SWD_Request_readACK_and_readData_readParity()
 {
 	int ACK = 0 , Parity = 0;
 	uint32_t dataRead ;
 	
-	emulateSWDRegister_Read(TAR_REG,AP,4,1,0xEE2805D4);
-	SWDRegister_Read(TAR_REG,AP,&ACK,&Parity,&dataRead);
+	emulateswdRegisterRead(TAR_REG,AP,4,1,0xEE2805D4);
+	swdRegisterRead(TAR_REG,AP,&ACK,&Parity,&dataRead);
 	
 	TEST_ASSERT_EQUAL(0x2BA01477,dataRead);
 	TEST_ASSERT_EQUAL(1,ACK);

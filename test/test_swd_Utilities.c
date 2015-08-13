@@ -180,7 +180,7 @@ void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_re
   uint32_t flag = 0;
 
 
-	emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x80));
+	emulateswdRegisterRead(CTRLSTAT_REG, DP, OK, 1, convertMSB_LSB(0x80));
 
   flag = swdCheckErrorFlag();
   TEST_ASSERT_EQUAL(SWD_WDATA_ERROR_FLAG, flag);
@@ -189,7 +189,7 @@ void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_re
 void test_swdCheckErrorFlag_should_return_SWD_STICKYERR_FLAG_when_bit_5_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x20));
+  emulateswdRegisterRead(CTRLSTAT_REG, DP, OK, 1, convertMSB_LSB(0x20));
 
   flag = swdCheckErrorFlag();
 
@@ -199,7 +199,7 @@ void test_swdCheckErrorFlag_should_return_SWD_STICKYERR_FLAG_when_bit_5_of_the_r
 void test_swdCheckErrorFlag_should_return_SWD_STICKYCMP_FLAG_when_bit_4_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x10));
+  emulateswdRegisterRead(CTRLSTAT_REG, DP, OK, 1, convertMSB_LSB(0x10));
 
   flag = swdCheckErrorFlag();
 
@@ -209,7 +209,7 @@ void test_swdCheckErrorFlag_should_return_SWD_STICKYCMP_FLAG_when_bit_4_of_the_r
 void test_swdCheckErrorFlag_should_return_SWD_STICKYORUN_FLAG_when_bit_1_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x02));
+  emulateswdRegisterRead(CTRLSTAT_REG, DP, OK, 1, convertMSB_LSB(0x02));
 
   flag = swdCheckErrorFlag();
 
@@ -220,9 +220,9 @@ void test_swdReadDpWithRetries_should_repeat_readDP_transfer_3_times()  {
   int ack = 0, parity = 0;
   uint32_t readData = 0;
   
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xABC));
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xABC));
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xABC));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xABC));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xABC));
   
   swdReadWriteDpWithRetries(READ, SELECT_REG, &ack, &parity, &readData, 3);
   TEST_ASSERT_EQUAL(WAIT_RESPONSE, ack);
@@ -234,8 +234,8 @@ void test_swdReadDpWithRetries_should_repeat_writeDP_transfer_4_times()  {
   int ack = 0, parity = 0;
   uint32_t writeData = 0xBEEFABC;
   
-  emulateSWDRegister_Write(ABORT_REG, DP, WAIT, writeData);
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, writeData);
+  emulateswdRegisterWrite(ABORT_REG, DP, WAIT, writeData);
+  emulateswdRegisterWrite(ABORT_REG, DP, OK, writeData);
   
   swdReadWriteDpWithRetries(WRITE, ABORT_REG, &ack, &parity, &writeData, 4);
   TEST_ASSERT_EQUAL(OK_RESPONSE, ack);
@@ -247,12 +247,12 @@ void test_swdReadApWithRetries_should_repeat_writeAP_transfer_6_times()  {
   int ack = 0, parity = 0;
   uint32_t writeData = 0xD3ADB33F;
   
-  emulateSWDRegister_Write(CSW_REG, AP, WAIT, writeData);
-  emulateSWDRegister_Write(CSW_REG, AP, WAIT, writeData);
-  emulateSWDRegister_Write(CSW_REG, AP, WAIT, writeData);
-  emulateSWDRegister_Write(CSW_REG, AP, WAIT, writeData);
-  emulateSWDRegister_Write(CSW_REG, AP, WAIT, writeData);
-  emulateSWDRegister_Write(CSW_REG, AP, OK, writeData);
+  emulateswdRegisterWrite(CSW_REG, AP, WAIT, writeData);
+  emulateswdRegisterWrite(CSW_REG, AP, WAIT, writeData);
+  emulateswdRegisterWrite(CSW_REG, AP, WAIT, writeData);
+  emulateswdRegisterWrite(CSW_REG, AP, WAIT, writeData);
+  emulateswdRegisterWrite(CSW_REG, AP, WAIT, writeData);
+  emulateswdRegisterWrite(CSW_REG, AP, OK, writeData);
   
   swdReadWriteApWithRetries(WRITE, CSW_REG, &ack, &parity, &writeData, 6);
   TEST_ASSERT_EQUAL(OK_RESPONSE, ack);
@@ -264,10 +264,10 @@ void test_swdReadApWithRetries_should_repeat_readAP_transfer_2_times()  {
   int ack = 0, parity = 0;
   uint32_t readData = 0;
   
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1234ABCD));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1234ABCD));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1234ABCD));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1234ABCD));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0x1234ABCD));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0x1234ABCD));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0x1234ABCD));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0x1234ABCD));
   
   swdReadWriteApWithRetries(READ, TAR_REG, &ack, &parity, &readData, 2);
   TEST_ASSERT_EQUAL(WAIT_RESPONSE, ack);
@@ -279,8 +279,8 @@ void test_retriesSwdOperation_given_write_operation_should_write_AP_3_times_and_
   int parity = 0, result = 0;
   uint32_t readData = 0, dummyData = 0xDEADBEEF;
   
-  emulateSWDRegister_Write(CSW_REG, AP, WAIT, dummyData);
-  emulateSWDRegister_Write(CSW_REG, AP, OK, dummyData);
+  emulateswdRegisterWrite(CSW_REG, AP, WAIT, dummyData);
+  emulateswdRegisterWrite(CSW_REG, AP, OK, dummyData);
   
   result = retriesSwdOperation(WRITE, CSW_REG, AP, &parity, &dummyData, 3);
   TEST_ASSERT_EQUAL(OK_RESPONSE, result);
@@ -292,17 +292,17 @@ void test_retriesSwdOperation_given_read_operation_should_read_AP_4_times_and_re
   int parity = 0, result = 0;
   uint32_t readData = 0;
   
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
   
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
   
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
   
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
-  emulateSWDRegister_Read(DRW_REG, AP, WAIT, 1, MSB_LSB_Conversion(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
+  emulateswdRegisterRead(DRW_REG, AP, WAIT, 1, convertMSB_LSB(0x1EEA));
   
   result = retriesSwdOperation(READ, DRW_REG, AP, &parity, &readData, 4);
   TEST_ASSERT_EQUAL(WAIT_RESPONSE, result);
@@ -314,10 +314,10 @@ void test_retriesSwdOperation_given_read_operation_should_read_DP_6_times_and_re
   int parity = 0, result = 0;
   uint32_t readData = 0;
   
-  emulateSWDRegister_Read(ABORT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xA123A));
-  emulateSWDRegister_Read(ABORT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xA123A));
-  emulateSWDRegister_Read(ABORT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xA123A));
-  emulateSWDRegister_Read(ABORT_REG, DP, OK, 1, MSB_LSB_Conversion(0xA123A));
+  emulateswdRegisterRead(ABORT_REG, DP, WAIT, 1, convertMSB_LSB(0xA123A));
+  emulateswdRegisterRead(ABORT_REG, DP, WAIT, 1, convertMSB_LSB(0xA123A));
+  emulateswdRegisterRead(ABORT_REG, DP, WAIT, 1, convertMSB_LSB(0xA123A));
+  emulateswdRegisterRead(ABORT_REG, DP, OK, 1, convertMSB_LSB(0xA123A));
   
   result = retriesSwdOperation(READ, ABORT_REG, DP, &parity, &readData, 6);
   TEST_ASSERT_EQUAL(OK_RESPONSE, result);
@@ -328,8 +328,8 @@ void test_retriesSwdOperation_given_read_operation_should_read_DP_6_times_and_re
 void test_swdClearFlags_given_WDERR_FLAG_bit_set_to_1_should_write_SWD_WDERR_CLEAR_FLAG_to_AP_ABORT_register() {
   int i = 0, data = 0;
 
-  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x80));
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_WDERR_CLEAR_FLAG);
+  emulateswdRegisterRead(CTRLSTAT_REG, DP, OK, 1, convertMSB_LSB(0x80));
+  emulateswdRegisterWrite(ABORT_REG, DP, OK, SWD_WDERR_CLEAR_FLAG);
   
   swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
 }
@@ -337,8 +337,8 @@ void test_swdClearFlags_given_WDERR_FLAG_bit_set_to_1_should_write_SWD_WDERR_CLE
 void test_swdClearFlags_given_STICKYCMP_FLAG_bit_set_to_1_should_write_SWD_STKCMP_CLEAR_FLAG_to_AP_ABORT_register() {
   int i = 0, data = 0;
 
-  emulateSWDRegister_Read(CTRLSTAT_REG, DP, OK, 1, MSB_LSB_Conversion(0x10));
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_STKCMP_CLEAR_FLAG);
+  emulateswdRegisterRead(CTRLSTAT_REG, DP, OK, 1, convertMSB_LSB(0x10));
+  emulateswdRegisterWrite(ABORT_REG, DP, OK, SWD_STKCMP_CLEAR_FLAG);
   
   swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
 }
@@ -348,18 +348,18 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_retries_3_times_and_abort() {
   uint32_t readData = 0;
   
   //First AP read
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
   //Second AP read
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
   //Third AP read
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
   
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
-  emulateSWDRegister_Read(TAR_REG, AP, WAIT, 1, MSB_LSB_Conversion(0xABC));
+  emulateswdRegisterWrite(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
+  emulateswdRegisterRead(TAR_REG, AP, WAIT, 1, convertMSB_LSB(0xABC));
   
   swdClearFlags(WAIT_RESPONSE, READ, TAR_REG, AP, parity, readData);
 }
@@ -368,9 +368,9 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_AP_write_retries_3_times_if_su
   int parity = 0;
   uint32_t readData = 0;
   
-  emulateSWDRegister_Write(DRW_REG, AP, WAIT, 0xDEADBEEF);
-  emulateSWDRegister_Write(DRW_REG, AP, WAIT, 0xDEADBEEF);
-  emulateSWDRegister_Write(DRW_REG, AP, OK, 0xDEADBEEF);
+  emulateswdRegisterWrite(DRW_REG, AP, WAIT, 0xDEADBEEF);
+  emulateswdRegisterWrite(DRW_REG, AP, WAIT, 0xDEADBEEF);
+  emulateswdRegisterWrite(DRW_REG, AP, OK, 0xDEADBEEF);
   
   swdClearFlags(WAIT_RESPONSE, WRITE, DRW_REG, AP, parity, 0xDEADBEEF);
 }
@@ -379,13 +379,13 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_DP_read_retries_3_times_abort_
   int parity = 0;
   uint32_t readData = 0;
   
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xCBA987));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xCBA987));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xCBA987));
   
-  emulateSWDRegister_Write(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
+  emulateswdRegisterWrite(ABORT_REG, DP, OK, SWD_DAPABORT_CLEAR_FLAG);
   
-  emulateSWDRegister_Read(SELECT_REG, DP, WAIT, 1, MSB_LSB_Conversion(0xCBA987));
+  emulateswdRegisterRead(SELECT_REG, DP, WAIT, 1, convertMSB_LSB(0xCBA987));
   
   swdClearFlags(WAIT_RESPONSE, READ, SELECT_REG, DP, parity, 0xCBA987);
 }

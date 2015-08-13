@@ -1,38 +1,45 @@
 #ifndef CoreDebug_H
 #define CoreDebug_H
 
-#include "Clock.h"
-#include "Reset.h"
-#include "swd_Utilities.h"
-#include "configurePort.h"
-#include "Bit_Operations.h"
-#include "Register_ReadWrite.h"
 #include "CoreDebug_Utilities.h"
+#include "Register_ReadWrite.h"
 
-#define DHCSR_REG	0xE000EDF0
-#define DFSR_REG	0xE000ED30
-#define DEMCR_REG	0xE000EDFC	
-#define DCRSR_REG	0xE000EDF4	  
-#define DCRDR_REG 	0xE000EDF8
+#define enableDWTandITM()   {memoryWriteByte(DEMCR_REG+3,ENABLE_DWT_ITM);}
+#define disableDWTandITM()  {memoryWriteByte(DEMCR_REG+3,DISABLE_DWT_ITM);}
 
-#define AIRCR_REG	0xE000ED0C
+#define enableVectorCatchCoreReset()  {enableSelectedVectorCatch(VC_CORERESET);}
+#define enableVectorCatchMMERR()      {enableSelectedVectorCatch(VC_MMERR);}
+#define enableVectorCatchNOCPERR()    {enableSelectedVectorCatch(VC_NOCPERR);}
+#define enableVVectorCatchCHKERR()    {enableSelectedVectorCatch(VC_CHKERR);}
+#define enableVectorCatchSTATERR()    {enableSelectedVectorCatch(VC_STATERR);}
+#define enableVectorCatchBUSERR()     {enableSelectedVectorCatch(VC_BUSERR);}
+#define enableVectorCatchINTERR()     {enableSelectedVectorCatch(VC_INTERR);}
+#define enableVectorCatchHARDERR()    {enableSelectedVectorCatch(VC_HARDERR);}
+#define disableAllVectorCatch()       {enableSelectedVectorCatch(VC_DISABLEALL);}
 
-int setCore(CoreControl coreControl,CoreStatus *coreStatus);
-int setCore_Exception(CoreControl coreControl,CoreStatus *coreStatus);
+#define isExternalDebugEventOccured()     ((isSelectedDebugEventOccured(EXTERNAL_DEBUGEVENT)) ? 1 : 0)
+#define isVectorCatchDebugEventOccured()  ((isSelectedDebugEventOccured(VCATCH_DEBUGEVENT)) ? 1 : 0)
+#define isDWTTrapDebugEventOccured()      ((isSelectedDebugEventOccured(DWTTRAP_DEBUGEVENT)) ? 1 : 0)
+#define isBreakpointDebugEventOccured()   ((isSelectedDebugEventOccured(BKPT_DEBUGEVENT)) ? 1 : 0)
+#define isHaltedDebugEventOccured()       ((isSelectedDebugEventOccured(HALTED_DEBUGEVENT)) ? 1 : 0)
 
-int write_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t data);
-int read_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t *dataRead);
+void setCoreMode(CoreMode mode);
+CoreMode getCoreMode();
 
-int check_CoreStatus(CoreStatus *coreStatus);
-int check_DebugEvent(DebugEvent *debugEvent);
-int check_DebugTrapStatus(DebugTrap *debugTrap);
+void stepOnly(int nInstructions);
 
-int clear_DebugEvent(DebugEvent *debugEvent);
-int clear_DebugTrap(DebugTrap *debugTrap);
+void writeCoreRegister(CoreRegister coreRegister,uint32_t data);
+void readCoreRegister(CoreRegister coreRegister,uint32_t *dataRead);
 
-int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries);
+void waitForCoreRegisterTransactionToComplete();
 
-int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugExceptionMonitor,DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM);
+int isSelectedDebugEventOccured(DebugEvent debugEvent);
 
-int perform_HaltOnReset(CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor);
+void enableSelectedVectorCatch(VectorCatch vectorCatch);
+
+void enableSelectedVectorCatch(VectorCatch vectorCatch);
+
+void performHaltOnReset();
+
+
 #endif // CoreDebug_H

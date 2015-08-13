@@ -1,326 +1,260 @@
 #include "CoreDebug.h"
 
 /**
- *	Set the Core to the User Defined Mode
+ *	Set the core to operate on different mode based on the passed in CoreMode
  *	
- *	Input : coreControl is the mode to be applied to the core
- *				Possible value :
- *					CORE_DEBUG_MODE 		Enable debug mode
- *					CORE_DEBUG_HALT			Enable halting debug mode
- *					CORE_SINGLE_STEP_NOMASKINT_NOMASK		Enable processor single stepping
- *					CORE_MASK_INTERRUPT		Enable masking of PendSV,SysTick and external configurable interrupts
- *					CORE_SNAPSTALL			Force to enter imprecise debug mode (Used when processor is stalled )
+ *  Input : mode is the CoreMode to be applied to the core
+ *				  Possible value :
+ *					  CORE_NORMAL_MODE				    Normal operation mode without masking of PendSV,SysTick and external configurable interrupts
+ *					  CORE_NORMAL_MASKINT				  Normal operation mode with masking of PendSV,SysTick and external configurable interrupts
+ *					  CORE_DEBUG_MODE 				    Enable debug mode
+ *					  CORE_DEBUG_HALT					    Enable halting debug mode
+ *					  CORE_SINGLE_STEP				    Enable processor single stepping without masking of PendSV,SysTick and external configurable interrupts
+ *					  CORE_SINGLE_STEP_MASKINT		Enable processor single stepping with masking of PendSV,SysTick and external configurable interrupts
+ *				  	CORE_SNAPSTALL					    Force to enter imprecise debug mode (Used when processor is stalled )
  *
- *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- *			 return ERR_CORE_CONTROL_FAILED if the core does not switch to the specified mode
  */
-int setCore(CoreControl coreControl,CoreStatus *coreStatus)
+void setCoreMode(CoreMode mode)
 {
-	int status =  0 ;
-	uint32_t data = 0;
-	
-	init_CoreStatus(coreStatus);
-
-	data = get_Core_WriteValue(coreControl);
-	
-	status = setCore_Exception(coreControl,coreStatus);
-	
-	if (status != ERR_NOERROR) //Force quit if error occurs
-		return status; 
-			
-	memoryAccessWrite(DHCSR_REG,data) ;
-
-	status = check_CoreStatus(coreStatus);
-	
-	if (status != ERR_NOERROR)
-		return status;
-
-	status = isCore(coreControl,coreStatus);
-	
-	return status ;
+  uint32_t configData = 0 ;
+  
+  configData = getCoreModeConfiguration(mode);
+  
+  if(isCoreModeRequiresHaltedAndDebug(mode))
+    setCoreMode(CORE_DEBUG_HALT);
+  
+  memoryWriteWord(DHCSR_REG,configData);
+    
 }
 
 /**
- *	Manages exception when setting CORE_SINGLE_STEP_NOMASKINT_NOMASK and CORE_MASK_INTERRUPT mode as the core must be already in CORE_DEBUG_HALT mode
+ *	Get the current operating CoreMode of the processor 
  *	
- *	Input : coreControl is the mode to be applied to the core
- *			coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- *			 return ERR_CORE_CONTROL_FAILED if the core does not switch to the specified mode
+ *  Output :  return the current operating CoreMode of the processor
+ *            Possible return value :
+ *              CORE_NORMAL_MODE            Currently in normal operation mode without masking of PendSV,SysTick and external configurable interrupts
+ *              Core_NORMAL_MASKINT         Currently in normal operation mode with masking of PendSV,SysTick and external configurable interrupts
+ *              CORE_DEBUG_MODE             Currently in debug mode
+ *              CODE_DEBUG_HALT             Currently in halting debug mode
+ *              CORE_SINGLE_STEP            
+ *              CORE_SINGLE_STEP_MASKINT    
+ *              CORE_SNAPSTALL              
+ *              -1                          unknown/undefined CoreMode
  */
-int setCore_Exception(CoreControl coreControl,CoreStatus *coreStatus)
-{	
-	if (coreControl == CORE_SINGLE_STEP_NOMASKINT || coreControl == CORE_SINGLE_STEP_MASKINT || coreControl == CORE_MASK_INTERRUPT)
-	{
-		return(setCore(CORE_DEBUG_HALT,coreStatus));
-	}
-	else 
-		return ERR_NOERROR ;
-}
-
-/**
- *	Check for the core status by reading DHCSR_REG and update the CoreStatus structure
- *	
- *	Input : coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- */
-int check_CoreStatus(CoreStatus *coreStatus)
+CoreMode getCoreMode()
 {
-	int status =  0 ;
-	
-	uint32_t dataRead = 0 ;
-	
-	init_CoreStatus(coreStatus);
-	
-	status = memoryAccessRead(DHCSR_REG,&dataRead);
-	process_CoreStatusData(coreStatus,dataRead);
-	
-	return status ;
+  uint32_t dataRead = 0 ;
+  
+  memoryReadWord(DHCSR_REG,&dataRead); 
+  return (determineCoreModeFromDataRead(dataRead));
 }
 
 /**
- *	Check for the debug event occurred by reading DFSR_REG and update the DebugEvent structure
- *	
- *	Input :  debugEvent is a pointer to DebugEvent which store the event of the core occurred for example debug event generation of breakpoint BKPT
+ *  Step  n numbers of instruction as defined by the pass in paramenter
  *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ *  Input : nInstructions is the number of instructions going to be stepped
  */
-int check_DebugEvent(DebugEvent *debugEvent)
+void stepOnly(int nInstructions)
 {
-	int status =  0 ;
-	
-	uint32_t dataRead = 0 ;
-
-	init_DebugEvent(debugEvent);
-	
-	status = memoryAccessRead(DFSR_REG,&dataRead);
-	process_DebugEventData(debugEvent,dataRead);
-	
-	return status ;
+  int i = 0 ;
+  
+  for(i = 0 ; i < nInstructions ; i ++)
+    setCoreMode(CORE_SINGLE_STEP);
+  
 }
 
 /**
- *	Clear the debug event set in the debugEvent structure
- *	
- *	Input :  debugEvent is a pointer to DebugEvent which store the event going to be cleared (1 = going to be clear)
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- */
-int clear_DebugEvent(DebugEvent *debugEvent)
-{
-	int status =  0 ;
-	uint32_t data = 0 ;
-	
-	data = get_ClearDebugEvent_WriteValue(debugEvent);
-	
-	memoryAccessWrite(DFSR_REG,data);
-	status = check_DebugEvent(debugEvent);
-	
-	return status ;
-}
-
-/**
- *	Check for enabled/activated vector catch by reading DEMCR_REG and update the debugTrap structure
- *	
- *	Input : debugTrap is a pointer to DebugTrap which store whether the vector catch is enabled/disabled for example debug trap on HARDFAULT VC_HARDERR
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- */
-int check_DebugTrapStatus(DebugTrap *debugTrap)
-{
-	int status =  0 ;
-	
-	uint32_t dataRead = 0 ;
-	
-	init_DebugTrap(debugTrap);
-	
-	status = memoryAccessRead(DEMCR_REG,&dataRead);
-	process_DebugTrapData(debugTrap,dataRead);
-	
-	return status ;
-}
-
-/**
- *	Check for enabled/activated vector catch by reading DEMCR_REG and update the debugTrap structure
- *	
- *	Input : debugTrap is a pointer to DebugTrap which store which vector catch is going to be disabled(1 = going to be disabled)
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- */
-int clear_DebugTrap(DebugTrap *debugTrap)
-{
-	int status =  0 ;
-	uint32_t data = 0 ;
-	
-	data = get_ClearDebugTrap_WriteValue(debugTrap);
-	
-	memoryAccessWrite(DEMCR_REG,data);
-	status = check_DebugTrapStatus(debugTrap);
-
-	return status ;
-}
-
-/**
- *	Perform write on the selected ARM Core Register
- *  Automatic set core to CORE_DEBUG_HALT before writing
+ *	Use to write data into the selected ARM Core Register
+ *  Note : Will automatically set the processor to CORE_DEBUG_HALT 
  *	
  *	Input : coreRegister is the selected ARM Core register to be written
- *			coreStatus is a pointer to CoreStatus which store S_REGRDY to check for the transaction status
+ *          Possible value :
+ *          	CORE_REG_R0           ARM Core Register R0
+ *            CORE_REG_R1           ARM Core Register R1       
+ *            CORE_REG_R2           ARM Core Register R2
+ *            CORE_REG_R3           ARM Core Register R3
+ *                          ""
+ *            CORE_REG_R9           ARM Core Register R9
+ *            CORE_REG_R10          ARM Core Register R10
+ *            CORE_REG_R11          ARM Core Register R11
+ *            CORE_REG_R12          ARM Core Register R12
+ *            CORE_REG_SP           Stack Pointer
+ *            CORE_REG_LR           Link Register
+ *            CORE_REG_PC           Program Counter
+ *            CORE_REG_xPSR         xPSR
+ *            CORE_REG_MSP          Main Stack Pointer
+ *            CORE_REG_PSP          Process Stack Pointer
+ *            CORE_REG_SR           Special Register
+ *            CORE_REG_FPSCR        Floating Point Status and Control Register
+ *            CORE_REG_FPREGS0      Floating Point Register 0
+ *            CORE_REG_FPREGS1      Floating Point Register 1
+ *            CORE_REG_FPREGS2      Floating Point Register 2
+ *            CORE_REG_FPREGS3      Floating Point Register 3
+ *            	             ""
+ *            CORE_REG_FPREGS28     Floating Point Register 28
+ *            CORE_REG_FPREGS29     Floating Point Register 29
+ *            CORE_REG_FPREGS30     Floating Point Register 30
+ *            CORE_REG_FPREGS31     Floating Point Register 31
  *			data is the data that going to be written into the selected ARM Core Register
  *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
  */
-int write_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t data)
+void writeCoreRegister(CoreRegister coreRegister,uint32_t data)
 {
-	int status =  0 ; 
-	uint32_t coreSelectData = 0;
+	uint32_t configData = 0;
+	configData = coreRegister + CORE_REG_WRITE ;
+  
+  setCoreMode(CORE_DEBUG_HALT);
+  
+	memoryWriteWord(DCRDR_REG,data);
+	memoryWriteWord(DCRSR_REG,configData);
 	
-	coreSelectData =  get_CoreRegisterAccess_WriteValue(coreRegister,CoreRegister_Write);
-	
-	if(setCore(CORE_DEBUG_HALT,coreStatus)) 
-	{
-		memoryAccessWrite(DCRDR_REG,data);
-		memoryAccessWrite(DCRSR_REG,coreSelectData);
-	
-		status = wait_CoreRegisterTransaction(coreStatus,10);
-	}
-	return status ;
+	waitForCoreRegisterTransactionToComplete();
 }
 
 /**
- *	Perform read on the selected ARM Core Register
- *  Automatic set core to CORE_DEBUG_HALT before reading
+ *	Use to Read data from the selected ARM Core Register
+ *  Note : Will automatically set the processor to CORE_DEBUG_HALT
  *	
- *	Input : coreRegister is the selected ARM Core register to be read
- *			coreStatus is a pointer to CoreStatus which store S_REGRDY to check for the transaction status
- *			dataRead is a pointer to where the data read is stored
- *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *           return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- *			 return ERR_COREREGISTERRW_FAILED if transaction is not completed
+ *	Input : coreRegister is the selected ARM Core register to be written
+ *          Possible value :
+ *          	CORE_REG_R0           ARM Core Register R0
+ *            CORE_REG_R1           ARM Core Register R1       
+ *            CORE_REG_R2           ARM Core Register R2
+ *            CORE_REG_R3           ARM Core Register R3
+ *                          ""
+ *            CORE_REG_R9           ARM Core Register R9
+ *            CORE_REG_R10          ARM Core Register R10
+ *            CORE_REG_R11          ARM Core Register R11
+ *            CORE_REG_R12          ARM Core Register R12
+ *            CORE_REG_SP           Stack Pointer
+ *            CORE_REG_LR           Link Register
+ *            CORE_REG_PC           Program Counter
+ *            CORE_REG_xPSR         xPSR
+ *            CORE_REG_MSP          Main Stack Pointer
+ *            CORE_REG_PSP          Process Stack Pointer
+ *            CORE_REG_SR           Special Register
+ *            CORE_REG_FPSCR        Floating Point Status and Control Register
+ *            CORE_REG_FPREGS0      Floating Point Register 0
+ *            CORE_REG_FPREGS1      Floating Point Register 1
+ *            CORE_REG_FPREGS2      Floating Point Register 2
+ *            CORE_REG_FPREGS3      Floating Point Register 3
+ *            	             ""
+ *            CORE_REG_FPREGS28     Floating Point Register 28
+ *            CORE_REG_FPREGS29     Floating Point Register 29
+ *            CORE_REG_FPREGS30     Floating Point Register 30
+ *            CORE_REG_FPREGS31     Floating Point Register 31
+ *			dataRead is the pointer to where the data read from the core register is going to be stored
  */
-int read_CoreRegister(Core_RegisterSelect coreRegister,CoreStatus *coreStatus,uint32_t *dataRead)
+void readCoreRegister(CoreRegister coreRegister,uint32_t *dataRead)
 {
-	int status =  0 ; 
-	uint32_t coreSelectData = 0;
+	uint32_t configData = 0;
 	
-	coreSelectData =  get_CoreRegisterAccess_WriteValue(coreRegister,CoreRegister_Read);
-	
-	if(setCore(CORE_DEBUG_HALT,coreStatus)) 
-	{
-		memoryAccessWrite(DCRSR_REG,coreSelectData);
-	
-		status = wait_CoreRegisterTransaction(coreStatus,10);
-		if (status != ERR_NOERROR)
-			return status ;
-	
-		status = memoryAccessRead(DCRDR_REG,dataRead);
-	}
-	return status ;
+	configData = coreRegister + CORE_REG_READ ;
+  
+  setCoreMode(CORE_DEBUG_HALT);
+		
+  memoryWriteWord(DCRSR_REG,configData);
+	waitForCoreRegisterTransactionToComplete();
+	memoryReadWord(DCRDR_REG,dataRead);
+
 }
 
 /**
- *	Loop for a certain amount of cycles and check for the ARM Core Register Read/Write transaction status
+ *	Wait for the transaction of reading/writing the core register to complete
  *	
- *	Input : coreStatus is a pointer to CoreStatus which store S_REGRDY to check for the transaction status
- *			numberOfTries is the maximum number of tries to wait for the S_REGRDY to set 
- *
- *	Output : return ERR_NOERROR if transaction is complete
- *			 return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
- *			 return ERR_COREREGRW_FAILED if transaction is not completed
  */
-int wait_CoreRegisterTransaction(CoreStatus *coreStatus, int numberOfTries)
+void waitForCoreRegisterTransactionToComplete()
 {
-	int i = 0 ;
+  uint32_t dataRead = 0 ;
+  int completed = 0 ;
 	
-	if (numberOfTries <= 0 )
-		numberOfTries = 3 ;
-	
-	do
+  do
 	{		
-		if(check_CoreStatus(coreStatus) == ERR_INVALID_PARITY_RECEIVED)
-			return ERR_INVALID_PARITY_RECEIVED;
-	
-		i ++ ;
-	}while(coreStatus->S_REGRDY != 1 && i != numberOfTries);
-	
-	if(coreStatus->S_REGRDY)
-		return ERR_NOERROR;
-	else
-		return ERR_COREREGRW_FAILED ;
+		memoryReadWord(DHCSR,&dataRead) ;
+    completed = (dataRead & DHCSR_S_REGRDY_MASK) >> 16;
+  }while(completed != 1);
+
 }
 
 /**
- *	Configure Debug Exception and Monitor Control Register, DEMCR and update DebugExceptionAndMonitor
+ *	Use to check whether is the selected debug event occured 
  *	
- *	Input : debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
- *			debugMonitorControl is used to control the behaviour of Debug Monitor in ARM
- *				Possible input value :
- *					DebugMonitor_DISABLED  	Disable debug monitor
- *					DebugMonitor_ENABLED	Enable debug monitor	
- *					DebugMonitor_STEP		Enable stepping in debug monitor
- *			debugTrap is a pointer to DebugTrap which will be written into DEMCR to enable/disable the corresponding debugTrap
- *			enable_DWT_ITM is use to enable / disable DWT and ITM
- *				Possible value :
- *					Enable 		enable DWT and ITM
- *					Disable 	disable DWT and ITM
+ *  Input :   debugEvent is the debug event going to be checked
+ *				    Possible value :
+ *					    EXTERNAL_DEBUGEVENT       Check for external debug request debug event				    
+ *					    VCATCH_DEBUGEVENT				  Check for vector catch triggered debug event
+ *					    DWTTRAP_DEBUGEVENT 				Check for data watchpoint & trace unit debug event
+ *					    BKPT_DEBUGEVENT					  Check for breakpoint debug event
+ *					    HALTED_DEBUGEVENT				  Check for halt request debug event
  *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *			 return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ *  Output :  return 1 if the selected debug event occured 
+ *            return 0 if the selected debug event not occured 
  */
-int configure_DebugExceptionMonitorControl(DebugExceptionMonitor *debugExceptionMonitor,DebugMonitorControl debugMonitorControl,DebugTrap *debugTrap,int enable_DWT_ITM)
+int isSelectedDebugEventOccured(DebugEvent debugEvent)
 {
-	int status = 0 ;
-	uint32_t data = 0, dataRead = 0 ;
-	
-	data = get_DebugExceptionMonitorControl_WriteValue(debugMonitorControl,debugTrap,enable_DWT_ITM);
-	
-	memoryAccessWrite(DEMCR_REG,data);
-	status = memoryAccessRead(DEMCR_REG,&dataRead);
-	
-	process_DebugExceptionMonitorData(debugExceptionMonitor,dataRead);
-	return status ;
+  int result = 0 ;
+  uint32_t dataRead = 0 ; 
+  
+  memoryReadWord(DFSR_REG,&dataRead);
+  
+  switch(debugEvent)
+  {
+    case EXTERNAL_DEBUGEVENT  : 
+                                if ((dataRead & DFSR_EXTERNAL_MASK) > 0)
+                                  result = 1 ;                               
+                                break ;
+    case VCATCH_DEBUGEVENT    :
+                                if ((dataRead & DFSR_VCATCH_MASK) > 0)
+                                  result = 1 ;                             
+                                break ;
+    case DWTTRAP_DEBUGEVENT   :
+                                if ((dataRead & DFSR_DWTTRAP_MASK) > 0)
+                                  result = 1 ;                              
+                                break ;
+    case BKPT_DEBUGEVENT      :
+                                if ((dataRead & DFSR_BKPT_MASK) > 0)
+                                  result = 1 ;       
+                                break ;
+    case HALTED_DEBUGEVENT    :
+                                if ((dataRead & DFSR_HALTED_MASK) > 0)
+                                  result = 1 ;
+                                break ; 
+    default :
+                                break ;
+  }
+  return result ;
 }
 
 /**
- *	Perform halt on reset function
- *	
- *	Input : coreStatus is a pointer to CoreStatus which store the information of the core for example processor HALT status S_HALT
- *			debugExceptionMonitor is a pointer to DebugExceptionAndMonitor which store information about Debug Exception and Monitor Control Register, DEMCR
+ *  Enable the selected vector catch 
+ *  Note : Enabling the selected vector catch will override any other enabled vector catch
  *
- *	Output : return ERR_NOERROR if the operation completed successfully
- *			 return ERR_INVALID_PARITY_RECEIVED if SWD received wrong data/parity
+ *  Input : vectorCatch is the vector catch going to be enabled
+ *          Possible value :
+ *            VC_DISABLEALL     Disable all vector catch
+ *            VC_CORERESET      Enable reset vector catch
+ *            VC_MMERR          Enable memory management exception vector catch
+ *            VC_NOCPERR        Enable usage fault caused by access to Coprocessor vector catch
+ *            VC_CHKERR         Enable usage fault exception casued by checking error vector catch
+ *            VC_STATERR        Enable usage fault exception casued by state information error vector catch
+ *            VC_BUSERR         Enable bus fault exception vector catch
+ *            VC_INTERR         Enable interrupt/exception entry & return vector catch
+ *            VC_HARDERR        Enable hard fault exception vector catch
  */
-int perform_HaltOnReset(CoreStatus *coreStatus,DebugExceptionMonitor *debugExceptionMonitor)
+void enableSelectedVectorCatch(VectorCatch vectorCatch)
 {
-	int status = 0 ;
-
-	DebugTrap debugTrap ;
-	
-	init_DebugTrap(&debugTrap);
-	debugTrap.VC_CORERESET = 1 ;
-	
-	status = setCore(CORE_DEBUG_HALT,coreStatus);
-	if(status != ERR_NOERROR)
-		return status ; 
-	
-	status = configure_DebugExceptionMonitorControl(debugExceptionMonitor,DebugMonitor_DISABLE,&debugTrap,DISABLE_DWT_ITM);
-	if(status != ERR_NOERROR)
-		return status ; 
-	
-	memoryAccessWrite(AIRCR_REG,0xFA050004);
-	
-	return status ;
+  memoryWriteHalfword(DEMCR_REG,vectorCatch);
 }
+
+/**
+ *	Perform halt on reset which the system will be reset and halted on the first instruction
+ *	
+ */
+void performHaltOnReset()
+{
+	setCoreMode(CORE_DEBUG_HALT);
+
+	enableVectorCatchCoreReset();
+  memoryWriteWord(AIRCR_REG,REQUEST_SYSTEM_RESET);
+}
+
