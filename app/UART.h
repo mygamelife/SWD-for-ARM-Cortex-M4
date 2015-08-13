@@ -13,15 +13,15 @@
 #include "stm32f4xx_hal_dma.h"
 #include "stm32f429i_discovery.h"
 
-/* Size of Transmission buffer */
-//#define TXBUFFERSIZE                     (COUNTOF(aTxBuffer))//(COUNTOF(aTxBuffer) - 1)
-/* Size of Reception buffer */
-//#define RXBUFFERSIZE                     TXBUFFERSIZE
-
-/* Exported macro ------------------------------------------------------------*/
-#define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__) / sizeof(*(__BUFFER__)))
-
 UART_HandleTypeDef *initUart(void);
-void errorHandler(void);
+void uartErrorHandler(void);
+
+/* Uart Transmit Function */
+void stm32UartSendByte(UART_HandleTypeDef *uartHandle, uint8_t data);
+void stm32UartSendBytes(UART_HandleTypeDef *uartHandle, uint8_t *data);
+
+/* Uart Receive Function */
+uint8_t stm32UartGetByte(UART_HandleTypeDef *uartHandle);
+#define stm32UartGetBytes(uartHandle, buffer)   HAL_UART_Receive(uartHandle, buffer, sizeof(buffer), 5000)
 
 #endif // UART_H

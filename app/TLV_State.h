@@ -29,6 +29,7 @@ typedef enum
   TLV_RECEIVE_PACKET,
   TLV_TRANSMIT_DATA,
   TLV_WAIT_REPLY,
+  TLV_WRITE_TO_RAM,
   TLV_END,
   TLV_COMPLETE
 } TLV_State;
@@ -51,13 +52,13 @@ typedef enum  {
 
 /* TLV Instruction */
 #define TLV_BUFFER_EMPTY          0
-#define TLV_CLEAR                 (uint8_t)0x1
-#define TLV_WRITE                 (uint8_t)0x2
-#define TLV_READ                  (uint8_t)0x3
-#define TLV_BUSY                  (uint8_t)0x4
-#define TLV_ABORT                 (uint8_t)0x5
-#define TLV_DATA_CORRUPTED        (uint8_t)0x6
-#define TLV_START_TRANSMIT        (uint8_t)0x7
-#define TLV_END_TRANSMIT          (uint8_t)0x8
+#define TLV_CLEAR                 (uint8_t)0x11
+#define TLV_WRITE                 (uint8_t)0x12
+#define TLV_READ                  (uint8_t)0x13
+#define TLV_BUSY                  (uint8_t)0x14
+#define TLV_ABORT                 (uint8_t)0x15
+#define TLV_DATA_CORRUPTED        (uint8_t)0x16
+#define TLV_START_TRANSMISSION    (uint8_t)0x17
+#define TLV_END_TRANSMISSION      (uint8_t)0x18
 
 #endif // TLV_State_H

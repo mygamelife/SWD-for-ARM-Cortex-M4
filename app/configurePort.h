@@ -39,6 +39,9 @@
 #define USARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
 #define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
 
+/* USARTx Baud Rate */
+#define USART_BAUD_RATE                  115200
+
 /* Definition for USARTx Pins */
 #define USARTx_TX_PIN                    GPIO_PIN_9
 #define USARTx_TX_GPIO_PORT              GPIOA

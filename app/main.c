@@ -2,7 +2,7 @@
 
 int main(void)
 {
-	TLV_Session tlvSession;
+	TLVProbe_TypeDef tlvProbe;
 
     /* Configure Hardware */
     HAL_Init();
@@ -11,11 +11,18 @@ int main(void)
     /* UART port and setting */
     configureLED();
     configureUartPorts();
-    tlvSession.state = TLV_INITIATE;
-    tlvSession.UartHandle = initUart();
+    tlvProbe.state = TLV_INITIATE;
+    tlvProbe.uartHandle = initUart();
+
+	//UART_HandleTypeDef *uartHandle = initUart();
+	//stm32UartSendByte(uartHandle, PROBE_OK);
+
+	while(tlvProbe.state != TLV_END)	{
+		tlvWriteToTargetRam(&tlvProbe);
+	}
 
 	while(1)
 	{
-		tlvWriteToTargetRam(&tlvSession);
+
 	}
 }

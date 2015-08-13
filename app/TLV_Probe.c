@@ -1,7 +1,5 @@
 #include "TLV_Probe.h"
 
-UART_HandleTypeDef UartHandle;
-
 /** <!For internal use only!>
   * tlvReceiveInstructionFromHost is a function to receive instruction sent by host
   *
@@ -9,18 +7,34 @@ UART_HandleTypeDef UartHandle;
   *
   * return    : NONE
   */
-void tlvWaitInstructionFromHost(UART_HandleTypeDef *UartHandle) {
-  uint8_t rxBuffer = 0;
+void tlvWaitInstructionFromHost(UART_HandleTypeDef *uartHandle) {
   int received = 0;
   
   while(!received) {
-    if(HAL_UART_Receive(UartHandle, &rxBuffer, 1, 5000) == HAL_OK)
-    {
-      if(rxBuffer == TLV_START_TRANSMIT)
-        received = 1;
+    if(stm32UartGetByte(uartHandle) == TLV_START_TRANSMISSION) {
+      received = 1;
     }
   }
 }
+
+/** tlvDecodePacket is a function the decode the tlv packet and extract all information outp
+  *
+  * input   :   buffer is a pointer poiniting to an array that contain tlvPacket
+  *
+  * return  :   tlv is a TLV type structure address
+  */
+// TLV *tlvDecodePacket(uint8_t *buffer) {
+  // static TLV tlv;
+  // tlv.errorCode = TLV_CLEAR_ERROR;
+  
+  // tlv.type  = buffer[0];
+  
+  // tlv.length  = buffer[1];
+  
+  // tlvGetValue(buffer, tlv.value, 6, tlv.length - ADDRESS_LENGTH);
+  
+  // return &tlv;
+// }
 
 /** tlvWriteToTargetRam
   *
@@ -28,37 +42,28 @@ void tlvWaitInstructionFromHost(UART_HandleTypeDef *UartHandle) {
   *
   * return    : NONE
   */
-void tlvWriteToTargetRam(TLV_Session *tlvSession)  {
-	uint8_t txBuffer[1] = {PROBE_OK};
-	uint8_t rxBuffer[1024] = {0};
-	int received = 0;
+void tlvWriteToTargetRam(TLVProbe_TypeDef *tlvProbe)  {
+  uint8_t transmissionState = 0;
 
-  switch(tlvSession->state) {
+  switch(tlvProbe->state) {
     case TLV_INITIATE :
-    	tlvWaitInstructionFromHost(tlvSession->UartHandle);
-    	// Testing
-    	if(HAL_UART_Transmit(tlvSession->UartHandle, txBuffer, sizeof(txBuffer), 5000)!= HAL_OK)
-    	{
-    		errorHandler();
-    	}
-    	//
-    	tlvSession->state = TLV_RECEIVE_PACKET;
+    	tlvWaitInstructionFromHost(tlvProbe->uartHandle);
+    	tlvProbe->state = TLV_RECEIVE_PACKET;
       break;
       
     case TLV_RECEIVE_PACKET :
-    	while(rxBuffer[0] != TLV_END_TRANSMIT) {
-    		if(HAL_UART_Receive(tlvSession->UartHandle, rxBuffer, sizeof(rxBuffer), 5000) == HAL_OK)
-    		{
-    			//write to ram here
-
-    			/* Reply */
-    	    	if(HAL_UART_Transmit(tlvSession->UartHandle, txBuffer, sizeof(txBuffer), 5000)!= HAL_OK)
-    	    	{
-    	    		errorHandler();
-    	    	}
-    		}
-    	  }
-    	tlvSession->state = TLV_END;
+      // stm32UartSendByte(UART_HandleTypeDef *uartHandle, uint8_t data);
+    	while(transmissionState != TLV_END_TRANSMISSION) {
+        if(stm32UartGetBytes(tlvProbe->uartHandle, tlvProbe->rxBuffer) == HAL_OK)  {
+          //write to ram here
+          //
+          
+          /* Reply to host probe is ready for next packet */
+          stm32UartSendByte(tlvProbe->uartHandle, PROBE_OK);
+        }
+        transmissionState = tlvProbe->rxBuffer[0];
+      }
+    	tlvProbe->state = TLV_END;
       break;
 
     case TLV_END :
@@ -134,39 +139,6 @@ void tlvWriteToTargetRam(TLV_Session *tlvSession)  {
     // return 1;
   
   // return 0;
-// }
-
-/** tlvDecodePacket is a function the decode the tlv packet and extract all information outp
-  *
-  * input   :   buffer is a pointer poiniting to an array that contain tlvPacket
-  *
-  * return  :   tlv is a TLV type structure address
-  */
-// TLV *tlvDecodePacket(uint8_t *buffer) {
-  // static TLV tlv;
-  // tlv.errorCode = TLV_CLEAR_ERROR;
-  
-  // tlv.type  = buffer[0];
-  // if(!tlvVerifyType(tlv.type)) {
-    // tlv.errorCode  =  TLV_INVALID_TYPE;
-    // return &tlv;
-  // } 
-  
-  // tlv.length  = buffer[1];
-  // if(!tlvVerifyLength(tlv.length)) {
-    // tlv.errorCode  =  TLV_INVALID_LENGTH;
-    // return &tlv;
-  // }
-  
-  // tlv.sectionAddress  = tlvConvertFromByteToWord(buffer, 2);
-  
-  // tlvGetValue(buffer, tlv.value, 6, tlv.length - ADDRESS_LENGTH);
-  // if(!tlvVerifyValue(&tlv)) {
-    // tlv.errorCode  =  TLV_INVALID_VALUE;
-    // return &tlv;
-  // }
-  
-  // return &tlv;
 // }
 
 /** tlvConvertDataFromByteToWord is a function convert the data from bytes to word

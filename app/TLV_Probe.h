@@ -9,13 +9,14 @@
 
 typedef struct {
   TLV_State state;
-  UART_HandleTypeDef *UartHandle;
-} TLV_Session;
+  UART_HandleTypeDef *uartHandle;
+  uint8_t rxBuffer[1024];
+} TLVProbe_TypeDef;
 
 // void tlvGetValue(uint8_t *buffer, uint8_t *tlvBuffer, int index, int length);
 // uint32_t tlvConvertFromByteToWord(uint8_t *buffer, int index);
-void tlvWaitInstructionFromHost(UART_HandleTypeDef *UartHandle);
-void tlvWriteToTargetRam(TLV_Session *tlvSession);
+void tlvWaitInstructionFromHost(UART_HandleTypeDef *uartHandle);
+void tlvWriteToTargetRam(TLVProbe_TypeDef *tlvProbe);
 // TLV *tlvDecodePacket(uint8_t *buffer);
 // int tlvVerifyType(uint8_t type);
 // int tlvVerifyLength(int length);

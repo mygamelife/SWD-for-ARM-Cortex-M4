@@ -209,34 +209,35 @@ uint8_t tlvProbeReply() {
   * return    : NONE
   */
 void tlvWriteRam(uint8_t *dataAddress, uint32_t *destAddress, int size)  {
-  //uint8_t *start = &TLV_START_TRANSMIT, *end = TLV_END_TRANSMIT,
-  uint8_t start[] = {TLV_START_TRANSMIT};
-  uint8_t end[]   = {TLV_END_TRANSMIT};
+  uint8_t start[] = {TLV_START_TRANSMISSION}, end[] = {TLV_END_TRANSMISSION};
   uint8_t ack = 0;
   static int retries = 0;
   int dataSize = 0;
-  
+  // int delay = 30;
   HANDLE hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
-  // printf("Opening UART Port!\n");
+  printf("Opening UART Port!\n");
 
   /* Start transmit between host and probe */
   uartSendBytes(hSerial, start, sizeof(start));
-  // printf("Start Transmission!\n");
+  printf("Start Transmission!\n");
   
   while(size > 0)  {
     dataSize = tlvCheckDataSize(size);
     
+    tlvWriteDataChunk(dataAddress, destAddress, dataSize, hSerial);
+    // while(delay--);
+    
     while(uartGetByte(hSerial) != PROBE_OK)  {
       if(retries++ == 3)  {
         retries = 0;
-        // printf("Data transmit timeout!\n");
+        printf("Data transmit timeout!\n");
         closeSerialPort(hSerial);
         return;
       }
       tlvWriteDataChunk(dataAddress, destAddress, dataSize, hSerial);
     }
-
-    // printf("Probe reply OK!\n");
+    
+    printf("Probe reply OK!\n");
     retries = 0;
     /* Updata data address and size */
     size = size - TLV_DATA_SIZE;
@@ -246,9 +247,9 @@ void tlvWriteRam(uint8_t *dataAddress, uint32_t *destAddress, int size)  {
   
   /* End transmit between host and probe */
   uartSendBytes(hSerial, end, sizeof(end));
-  // printf("End Transmission!\n");
+  printf("End Transmission!\n");
   
-  // printf("Closing UART Port!\n");
+  printf("Closing UART Port!\n");
   closeSerialPort(hSerial);
 }
 
