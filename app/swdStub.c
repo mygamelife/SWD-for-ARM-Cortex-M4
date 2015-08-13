@@ -158,8 +158,8 @@ void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector)  {
   } while(targetStatus != TARGET_OK);
   
   /* load flash start and end address to sram */
-  memoryWriteWord(SWD_FLASH_START_ADDRESS, startAddress);
-  memoryWriteWord(SWD_FLASH_END_ADDRESS, endAddress);
+  memoryWriteWord(SWD_FLASH_START_ADDRESS, startSector);
+  memoryWriteWord(SWD_FLASH_END_ADDRESS, endSector);
   
   /* load instruction to sram */
   memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
@@ -205,13 +205,13 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
   } while(targetStatus != TARGET_OK);
 
   /* load SRAM start address into sram */
-  memoryWriteWord(SWD_SRAM_START_ADDRESS, src);
+  memoryWriteWord(SWD_SRAM_START_ADDRESS, dataAddress);
   
   /* load Flash start address into sram */
-  memoryWriteWord(SWD_FLASH_START_ADDRESS, dest);
+  memoryWriteWord(SWD_FLASH_START_ADDRESS, destAddress);
   
   /* load length into sram */
-  memoryWriteWord(SWD_DATA_LENGTH, length);
+  memoryWriteWord(SWD_DATA_SIZE, size);
 
 	/* load copy instructoin into sram */
   memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
