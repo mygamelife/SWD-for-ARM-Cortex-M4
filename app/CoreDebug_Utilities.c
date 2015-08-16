@@ -124,3 +124,43 @@ uint32_t getCoreModeConfiguration(CoreMode mode)
 	return data ;
 }
 
+/**
+ *	Use to get the configuration data going to be written into Debug Fault Status Register to clear the selected debug event
+ *
+ *  Input :   debugEvent is the debug event going to be checked
+ *				    Possible value :
+ *					    EXTERNAL_DEBUGEVENT       Clear external debug request debug event				    
+ *					    VCATCH_DEBUGEVENT				  Clear vector catch triggered debug event
+ *					    DWTTRAP_DEBUGEVENT 				Clear data watchpoint & trace unit debug event
+ *					    BKPT_DEBUGEVENT					  Clear breakpoint debug event
+ *					    HALTED_DEBUGEVENT				  Clear halt request debug event
+ *
+ *	Output : return the 32bits of configuration data to be written into Debug Fault Status Register 
+ */
+uint32_t getClearDebugEventConfiguration(DebugEvent debugEvent)
+{
+  uint32_t data = 0 ;
+  
+  switch(debugEvent)
+  {
+    case EXTERNAL_DEBUGEVENT  : 
+                                data = CLEAR_EXTERNAL_EVENT ;                            
+                                break ;
+    case VCATCH_DEBUGEVENT    :
+                                data = CLEAR_VCATCH_EVENT ;                              
+                                break ;
+    case DWTTRAP_DEBUGEVENT   :
+                                data = CLEAR_DWTTRAP_EVENT ;                               
+                                break ;
+    case BKPT_DEBUGEVENT      :
+                                data = CLEAR_BKPT_EVENT ;        
+                                break ;
+    case HALTED_DEBUGEVENT    :
+                                data = CLEAR_HALTED_EVENT ; 
+                                break ; 
+    default :             
+                                break ;
+  }
+  
+  return data ;
+}

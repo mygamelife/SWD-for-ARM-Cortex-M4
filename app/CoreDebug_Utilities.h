@@ -38,6 +38,12 @@
 #define DFSR_BKPT_MASK		  0x00000002
 #define DFSR_HALTED_MASK	  0x00000001
 
+#define CLEAR_EXTERNAL_EVENT  0x10     
+#define CLEAR_VCATCH_EVENT    0x8
+#define CLEAR_DWTTRAP_EVENT   0x4
+#define CLEAR_BKPT_EVENT      0x2
+#define CLEAR_HALTED_EVENT    0x1
+
 #define DEMCR_TRCENA_MASK		      0x1000000
 #define DEMCR_MON_REQ_MASK		    0x80000
 #define DEMCR_MON_STEP_MASK		    0x40000
@@ -149,5 +155,5 @@ typedef enum
 CoreMode determineCoreModeFromDataRead(uint32_t dataRead);
 int isCoreModeRequiresHaltedAndDebug(CoreMode mode);
 uint32_t getCoreModeConfiguration(CoreMode mode);
-
+uint32_t getClearDebugEventConfiguration(DebugEvent debugEvent);
 #endif // CoreDebug_Utilities_H

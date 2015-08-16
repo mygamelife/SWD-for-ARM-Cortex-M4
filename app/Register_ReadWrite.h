@@ -96,12 +96,14 @@ void swdRegisterWrite(int Address,int APnDP,int *ACK, uint32_t data);
   */
 #define swdWriteAP(address, ack, data)              swdRegisterWrite(address, AP, ack, data);
 
-int memoryReadWord(uint32_t Address,uint32_t *dataRead);
-void memoryWriteByte(uint32_t address, uint32_t writeData);
-void memoryWriteHalfword(uint32_t address, uint32_t writeData);
-void memoryWriteWord(uint32_t Address,uint32_t WriteData);
+int memoryReadWord(uint32_t address,uint32_t *dataRead);
+void memoryWriteByte(uint32_t address, uint8_t writeData);
+void memoryWriteHalfword(uint32_t address, uint16_t writeData);
+void memoryWriteWord(uint32_t address,uint32_t writeData);
 
 int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
 void readAhbIDR(uint32_t *data_IDR);
 void swdWriteCSW(int *ack, uint32_t cswBitSet);
+
+uint32_t memoryWriteDataAlignment(uint32_t address,uint16_t writeData);
 #endif // Register_ReadWrite_H

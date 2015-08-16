@@ -17,7 +17,7 @@ void setUp(void)  {}
 void tearDown(void) {}
 
 void test_stubEraseSector_should_get_start_and_end_flash_address_and_call_flashEraseSector_func()  {
-  
+  cswDataSize = CSW_WORD_SIZE ;
   sramWrite_Expect(SWD_TARGET_STATUS, TARGET_BUSY);
   
   sramRead_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_12);

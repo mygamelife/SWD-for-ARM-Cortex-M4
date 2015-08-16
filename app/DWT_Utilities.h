@@ -5,23 +5,17 @@
 #include "CoreDebug.h"
 #include "CoreDebug_Utilities.h"
 #include "Register_ReadWrite.h"
+#include "core_cm4.h"
 
-#define DWT_COMP0 	  0xE0001020
-#define DWT_MASK0 	  0xE0001024
-#define DWT_FUNC0 	  0xE0001028
-
-#define DWT_COMP1 	  0xE0001030
-#define DWT_MASK1 	  0xE0001034
-#define DWT_FUNC1	    0xE0001038
-
-#define DWT_COMP2 	  0xE0001040
-#define DWT_MASK2 	  0xE0001044
-#define DWT_FUNC2	    0xE0001048
-
-#define DWT_COMP3   	0xE0001050
-#define DWT_MASK3 	  0xE0001054
-#define DWT_FUNC3	    0xE0001058
-
+typedef struct 
+{
+  __IO uint32_t COMP;                  
+  __IO uint32_t MASK;              
+  __IO uint32_t FUNCTION;      
+       uint32_t RESERVED0[1];
+}DWT_COMP_Type;
+  
+#define DWT_COMP  ((DWT_COMP_Type*)&(DWT->COMP0))
 #define DWT_MATCHED_MASK		0x1000000
 
 #define DISABLE_DWTCOMPARATOR 0
@@ -68,6 +62,5 @@ typedef enum
 	WATCHPOINT_WORD
 }Watchpoint_DataSize;
 
-
-int getDWTComparatorNumber(uint32_t dwtCompNumber);
+int checkForValidDWTComparator(int dwtCompNumber);
 #endif // DWT_Utilities_H

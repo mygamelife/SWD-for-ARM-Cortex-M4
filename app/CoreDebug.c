@@ -226,6 +226,26 @@ int isSelectedDebugEventOccured(DebugEvent debugEvent)
 }
 
 /**
+ *	Use to clear the selected debug event 
+ *	
+ *  Input :   debugEvent is the debug event going to be checked
+ *				    Possible value :
+ *					    EXTERNAL_DEBUGEVENT       Clear external debug request debug event				    
+ *					    VCATCH_DEBUGEVENT				  Clear vector catch triggered debug event
+ *					    DWTTRAP_DEBUGEVENT 				Clear data watchpoint & trace unit debug event
+ *					    BKPT_DEBUGEVENT					  Clear breakpoint debug event
+ *					    HALTED_DEBUGEVENT				  Clear halt request debug event
+ *
+ */
+void clearSelectedDebugEvent(DebugEvent debugEvent)
+{
+  uint32_t configData = 0 ;
+  
+  configData = getClearDebugEventConfiguration(debugEvent);
+  memoryWriteWord(DFSR_REG,configData);
+}
+
+/**
  *  Enable the selected vector catch 
  *  Note : Enabling the selected vector catch will override any other enabled vector catch
  *

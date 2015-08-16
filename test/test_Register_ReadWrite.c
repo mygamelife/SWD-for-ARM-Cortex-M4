@@ -140,6 +140,8 @@ void test_memoryReadWord_given_Address_0x12345678_should_write_address_to_TAR_an
 {
 	uint32_t dataRead = 0 ;
 	
+  cswDataSize = CSW_WORD_SIZE ;
+  
 	//Write memory address to TAR
 	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 
@@ -169,10 +171,10 @@ void test_memoryWriteByte_should_set_CSW_REG_to_byte_and_write_address_to_TAR_an
 	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 	
 	//Write data to DRW
-	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x21);
 	
 	//Write data to DRW
-	memoryWriteByte(0x12345678,0x87654321);
+	memoryWriteByte(0x12345678,0x21);
   
 }
 
@@ -185,10 +187,10 @@ void test_memoryWriteByte_should_write_address_to_TAR_and_data_to_DRW()
 	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 	
 	//Write data to DRW
-	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x21);
 	
 	//Write data to DRW
-	memoryWriteByte(0x12345678,0x87654321);
+	memoryWriteByte(0x12345678,0x21);
 }
 
 //cswDataSize = CSW_BYTE_SIZE
@@ -206,10 +208,10 @@ void test_memoryWriteHalfword_should_set_CSW_REG_to_haflword_and_write_address_t
 	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 	
 	//Write data to DRW
-	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x4321);
 	
 	//Write data to DRW
-	memoryWriteHalfword(0x12345678,0x87654321);
+	memoryWriteHalfword(0x12345678,0x4321);
 }
 
 //cswDataSize = CSW_HALFWORD_SIZE
@@ -221,10 +223,10 @@ void test_memoryWriteHalfword_should_write_address_to_TAR_and_data_to_DRW()
 	emulateswdRegisterWrite(TAR_REG,AP,4,0x12345678);
 	
 	//Write data to DRW
-	emulateswdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	emulateswdRegisterWrite(DRW_REG,AP,4,0x4321);
 	
 	//Write data to DRW
-	memoryWriteHalfword(0x12345678,0x87654321);
+	memoryWriteHalfword(0x12345678,0x4321);
 }
 
 //cswDataSize = CSW_BYTE_SIZE
@@ -298,4 +300,39 @@ void test_swdWriteCSW_given_CSW_WORD_SIZE_and_Enable_ADDR_INC()
   
   TEST_ASSERT_EQUAL(1, ack);
   TEST_ASSERT_EQUAL(0x23000062, CSW_BIT_SET);
+}
+
+void test_memoryWriteDataAlignment_given_address_0_data_0xFF_should_return_0xFF()
+{
+  TEST_ASSERT_EQUAL(0xFF,memoryWriteDataAlignment(0,0xFF));
+}
+
+void test_memoryWriteDataAlignment_given_address_1_data_0xFF_should_return_0xFF00()
+{
+  TEST_ASSERT_EQUAL(0xFF00,memoryWriteDataAlignment(1,0xFF));
+}
+
+void test_memoryWriteDataAlignment_given_address_2_data_0xFF_should_return_0xFF0000()
+{
+  TEST_ASSERT_EQUAL(0xFF0000,memoryWriteDataAlignment(2,0xFF));
+}
+
+void test_memoryWriteDataAlignment_given_address_3_data_0xFF_should_return_0xFF000000()
+{
+  TEST_ASSERT_EQUAL(0xFF000000,memoryWriteDataAlignment(3,0xFF));
+}
+
+void test_memoryWriteDataAlignment_given_address_4_data_0xABCD_should_return_0xABCD()
+{
+  TEST_ASSERT_EQUAL(0xABCD,memoryWriteDataAlignment(4,0xABCD));
+}
+
+void test_memoryWriteDataAlignment_given_address_5_data_0xABCD_should_return_0xABCD00()
+{
+  TEST_ASSERT_EQUAL(0xABCD00,memoryWriteDataAlignment(5,0xABCD));
+}
+
+void test_memoryWriteDataAlignment_given_address_6_data_0xABCD_should_return_0xABCD0000()
+{
+  TEST_ASSERT_EQUAL(0xABCD0000,memoryWriteDataAlignment(6,0xABCD));
 }

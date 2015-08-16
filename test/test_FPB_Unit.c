@@ -24,6 +24,8 @@ void tearDown(void)
 /*-------------------------enableFPBUnit-----------------------*/
 void test_enableFPBUnit_should_write_ENABLE_FPB_to_FP_CTRL()
 {
+  cswDataSize = CSW_WORD_SIZE ;
+  
   emulateswdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
 	emulateswdRegisterWrite(DRW_REG,AP,4,ENABLE_FPB);
   

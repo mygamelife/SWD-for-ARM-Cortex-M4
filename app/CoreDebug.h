@@ -4,8 +4,8 @@
 #include "CoreDebug_Utilities.h"
 #include "Register_ReadWrite.h"
 
-#define enableDWTandITM()   {memoryWriteByte(DEMCR_REG+3,ENABLE_DWT_ITM);}
-#define disableDWTandITM()  {memoryWriteByte(DEMCR_REG+3,DISABLE_DWT_ITM);}
+#define enableDWTandITM()   {memoryWriteByte((DEMCR_REG+3),ENABLE_DWT_ITM);}
+#define disableDWTandITM()  {memoryWriteByte((DEMCR_REG+3),DISABLE_DWT_ITM);}
 
 #define enableVectorCatchCoreReset()  {enableSelectedVectorCatch(VC_CORERESET);}
 #define enableVectorCatchMMERR()      {enableSelectedVectorCatch(VC_MMERR);}
@@ -23,6 +23,9 @@
 #define isBreakpointDebugEventOccured()   ((isSelectedDebugEventOccured(BKPT_DEBUGEVENT)) ? 1 : 0)
 #define isHaltedDebugEventOccured()       ((isSelectedDebugEventOccured(HALTED_DEBUGEVENT)) ? 1 : 0)
 
+#define clearBreakpointDebugEvent()       {clearSelectedDebugEvent(BKPT_DEBUGEVENT);}
+#define clearDWTTrapDebugEvent()          {clearSelectedDebugEvent(DWTTRAP_DEBUGEVENT);}
+
 void setCoreMode(CoreMode mode);
 CoreMode getCoreMode();
 
@@ -34,6 +37,7 @@ void readCoreRegister(CoreRegister coreRegister,uint32_t *dataRead);
 void waitForCoreRegisterTransactionToComplete();
 
 int isSelectedDebugEventOccured(DebugEvent debugEvent);
+void clearSelectedDebugEvent(DebugEvent debugEvent);
 
 void enableSelectedVectorCatch(VectorCatch vectorCatch);
 

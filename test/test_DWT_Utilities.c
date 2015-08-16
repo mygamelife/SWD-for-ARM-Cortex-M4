@@ -17,30 +17,30 @@ void tearDown(void)
 {
 }
 
-/*-----getDWTComparatorNumber-------------*/
-void test_getDWTComparatorNumber_given_DWT_COMP0_should_return_0()
+/*-----checkForValidDWTComparator-------------*/
+void test_checkForValidDWTComparator_given_0_should_return_1()
 {
-  TEST_ASSERT_EQUAL(0,getDWTComparatorNumber(DWT_COMP0));
+  TEST_ASSERT_EQUAL(1,checkForValidDWTComparator(0));
 }
 
-void test_getDWTComparatorNumber_given_DWT_COMP1_should_return_1()
+void test_checkForValidDWTComparator_given_1_should_return_1()
 {
-  TEST_ASSERT_EQUAL(1,getDWTComparatorNumber(DWT_COMP1));
+  TEST_ASSERT_EQUAL(1,checkForValidDWTComparator(1));
 }
 
-void test_getDWTComparatorNumber_given_DWT_COMP2_should_return_2()
+void test_checkForValidDWTComparator_given_2_should_return_1()
 {
-  TEST_ASSERT_EQUAL(2,getDWTComparatorNumber(DWT_COMP2));
+  TEST_ASSERT_EQUAL(1,checkForValidDWTComparator(2));
 }
 
-void test_getDWTComparatorNumber_given_DWT_COMP3_should_return_3()
+void test_checkForValidDWTComparator_given_3_should_return_3()
 {
-  TEST_ASSERT_EQUAL(3,getDWTComparatorNumber(DWT_COMP3));
+  TEST_ASSERT_EQUAL(1,checkForValidDWTComparator(3));
 }
 
-void test_getDWTComparatorNumber_given_unknown_DWT_COMP_should_return_negative_1()
+void test_checkForValidDWTComparator_given_4_5_negative1_should_return_negative_1()
 {
-  TEST_ASSERT_EQUAL(-1,getDWTComparatorNumber(0));
-  TEST_ASSERT_EQUAL(-1,getDWTComparatorNumber(10000));
-  TEST_ASSERT_EQUAL(-1,getDWTComparatorNumber(00));
+  TEST_ASSERT_EQUAL(-1,checkForValidDWTComparator(-1));
+  TEST_ASSERT_EQUAL(-1,checkForValidDWTComparator(4));
+  TEST_ASSERT_EQUAL(-1,checkForValidDWTComparator(5));
 }

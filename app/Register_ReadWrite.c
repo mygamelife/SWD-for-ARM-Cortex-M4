@@ -1,6 +1,6 @@
 #include "Register_ReadWrite.h"
 
-int cswDataSize = CSW_WORD_SIZE; 
+int cswDataSize = -1;
  
 /***************************************************************
  **                   SWD-DP Register                         **
@@ -83,33 +83,42 @@ void swdRegisterRead(int address,int APnDP,int *ack,int *parity, uint32_t *data)
 int memoryReadWord(uint32_t address, uint32_t *dataRead)
 {
 
-	int ACK = 0, parity = 0 , status = 0;
+	int ack = 0, parity = 0 , status = 0;
 	
-	swdRegisterWrite(TAR_REG,AP,&ACK,address);
-	swdReadAP(DRW_REG,&ACK,&parity,dataRead);
+	if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
+	  {
+	    swdWriteCSW(&ack, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	    cswDataSize = CSW_WORD_SIZE;
+	  }
+
+	swdRegisterWrite(TAR_REG,AP,&ack,address);
+	swdReadAP(DRW_REG,&ack,&parity,dataRead);
 	
 	status = compare_ParityWithData(*dataRead,parity);
 	
 	return status ;
 }
 
-void memoryWriteByte(uint32_t address, uint32_t writeData)
+void memoryWriteByte(uint32_t address, uint8_t writeData)
 {
   int ack = 0;
+  uint32_t alignedData = 0;
   
   if(cswDataSize != CSW_BYTE_SIZE) // used to prevent setting same size again and again
   {  
     swdWriteCSW(&ack, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
     cswDataSize = CSW_BYTE_SIZE;
   }
+  alignedData = memoryWriteDataAlignment(address,writeData);
   
   swdWriteAP(TAR_REG, &ack, address);
-  swdWriteAP(DRW_REG, &ack, writeData);
+  swdWriteAP(DRW_REG, &ack, alignedData);
 }
 
-void memoryWriteHalfword(uint32_t address, uint32_t writeData)
+void memoryWriteHalfword(uint32_t address, uint16_t writeData)
 {
   int ack = 0;
+  uint32_t alignedData = 0;
   
   if(cswDataSize != CSW_HALFWORD_SIZE) // used to prevent setting same size again and again
   {  
@@ -117,8 +126,10 @@ void memoryWriteHalfword(uint32_t address, uint32_t writeData)
     cswDataSize = CSW_HALFWORD_SIZE;
   }
   
+  alignedData = memoryWriteDataAlignment(address,writeData);
+  
   swdWriteAP(TAR_REG, &ack, address);
-  swdWriteAP(DRW_REG, &ack, writeData);
+  swdWriteAP(DRW_REG, &ack, alignedData);
 }
 
 
@@ -195,4 +206,24 @@ void swdWriteCSW(int *ack, uint32_t cswBitSet)  {
   
   /* Write cswBitSet into CSW register */
   swdWriteAP(CSW_REG, ack, cswBitSet);
+}
+
+/**
+ * Perform data alignment when performing byte or halfword memory write access
+ *
+ *  Input : address is the address where the data is going to be written into
+ *          writeData is the data going to be written into the address
+ *
+ *  Output : return 32bits of aligned data
+ */
+uint32_t memoryWriteDataAlignment(uint32_t address,uint16_t writeData)
+{ 
+  if(address % 4 == 0x1)
+    return writeData << 8 ;
+  if(address % 4 == 0x2)
+    return writeData << 16 ;
+  if(address % 4 == 0x3)
+    return writeData << 24 ;
+  
+  return writeData ;
 }

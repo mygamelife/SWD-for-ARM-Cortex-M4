@@ -372,20 +372,22 @@ void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERE
 
 
 /*------------------------------enableDWTandITM------------------------------------*/
-void test_enableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_1_to_DRW()
+void test_enableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_1000000_to_DRW()
 {
+  cswDataSize = CSW_WORD_SIZE;
+  
   //Set CSW to Byte Size
 	emulateswdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
 	emulateswdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
   
   emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
-  emulateswdRegisterWrite(DRW_REG,AP,4,1);
+  emulateswdRegisterWrite(DRW_REG,AP,4,0x1000000);
   
   enableDWTandITM();
 }
 
 /*------------------------------disableDWTandITM------------------------------------*/
-void test_disableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_0_to_DRW()
+void xtest_disableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_0_to_DRW()
 {
   emulateswdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
   emulateswdRegisterWrite(DRW_REG,AP,4,0);
