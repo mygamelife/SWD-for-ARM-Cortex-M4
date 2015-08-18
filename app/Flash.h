@@ -57,8 +57,8 @@ void flashMassErase(uint32_t banks);
 void flashEraseSector(uint32_t startSector, uint32_t endSector);
 void flashWrite(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
 void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
-void flashCopyFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length);
-void flashVerifyDataFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length);
+void flashCopyFromSRAMToFlash(uint32_t src, uint32_t dest, int length);
+void flashVerifyDataFromSRAMToFlash(uint32_t src, uint32_t dest, int length);
 
 void flashWriteByte(uint32_t address, uint8_t data);
 void flashWriteHalfWord(uint32_t address, uint16_t data);

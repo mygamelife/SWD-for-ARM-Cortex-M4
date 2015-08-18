@@ -1,40 +1,147 @@
 #include "TLV_Probe.h"
 
+/**
+  * load_SectorErase_Instruction is a function to load the sector erase
+  * instruction into SRAM to tell the swdStub
+  *
+  * input   : startAddress is the address to begin erase
+  *           endAddress is the address to end erase
+  *
+  * output  : NONE
+  */
+void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector)  {
+  uint32_t targetStatus = 0;
+  /* Continues wait for target to release */
+  do  {
+    targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
+  } while(targetStatus != TARGET_OK);
+  
+  /* load flash start and end address to sram */
+  memoryWriteWord(SWD_FLASH_START_ADDRESS, (uint32_t)startSector);
+  memoryWriteWord(SWD_FLASH_END_ADDRESS, (uint32_t)endSector);
+  
+  /* load instruction to sram */
+  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
+}
+
+/** loadMassEraseInstruction is a function to load the mass erase
+  * instruction into SRAM to tell the swdStub
+  *
+  * input   : bankSelect can be one of the following value
+  *            + FLASH_BANK_1: Bank1 to be erased
+  *            + FLASH_BANK_2: Bank2 to be erased
+  *            + FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
+  *
+  * output  : NONE
+  */
+void loadMassEraseInstruction(uint32_t bankSelect)  {
+  uint32_t targetStatus = 0;
+  /* Continues wait for target to release */
+  do  {
+    targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
+  } while(targetStatus != TARGET_OK);
+  
+  /* load bank select to sram */
+  memoryWriteWord(SWD_BANK_SELECT, bankSelect);
+  
+  /* load instruction to sram */
+  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
+}
+
+/** loadCopyInstruction is a function copy data from src (SRAM) to dest (Flash)
+  *
+  * input   : src is the beginning SRAM address contain all the information
+  *           dest is the flash address all the information need to copy over there
+  *           length is to determine how many words need to copy over
+  *
+  * output  : NONE
+  */
+void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAddress, int size) {
+  uint32_t targetStatus = 0;
+  /* Continues wait for target to release */
+  do  {
+    targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
+  } while(targetStatus != TARGET_OK);
+
+  /* load SRAM start address into sram */
+  memoryWriteWord(SWD_SRAM_START_ADDRESS, (uint32_t)dataAddress);
+  
+  /* load Flash start address into sram */
+  memoryWriteWord(SWD_FLASH_START_ADDRESS, (uint32_t)destAddress);
+  
+  /* load length into sram */
+  memoryWriteWord(SWD_DATA_SIZE, size);
+
+	/* load copy instructoin into sram */
+  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
+}
+
 /** <!For internal use only!>
-  * tlvReceiveInstructionFromHost is a function to receive instruction sent by host
+  * waitIncomingData is a function to waiting data coming from host
   *
   * input     : 
   *
   * return    : NONE
   */
-void tlvWaitInstructionFromHost(UART_HandleTypeDef *uartHandle) {
+void waitIncomingData(UART_HandleTypeDef *uartHandle, uint8_t *buffer) {
   int received = 0;
-  
-  while(!received) {
-    if(stm32UartGetByte(uartHandle) == TLV_START_TRANSMISSION) {
-      received = 1;
-    }
+
+  while(HAL_UART_Receive(uartHandle, buffer, ONE_BYTE, 5000) == HAL_OK) {
+      break;
   }
 }
 
-/** tlvDecodePacket is a function the decode the tlv packet and extract all information outp
+/** tlvDecodeAndWriteToRam
   *
   * input   :   buffer is a pointer poiniting to an array that contain tlvPacket
   *
-  * return  :   tlv is a TLV type structure address
+  * return  :   1 data is successful write into target ram
+  *             0 data fail to write into target ram
   */
-// TLV *tlvDecodePacket(uint8_t *buffer) {
-  // static TLV tlv;
-  // tlv.errorCode = TLV_CLEAR_ERROR;
+int tlvDecodeAndWriteToRam(uint8_t *buffer) {
+  int i = 0, verifyStatus = 0;
   
-  // tlv.type  = buffer[0];
+  /* Decode packet from buffer */
+  TLV *tlv = (TLV *)buffer;
+  uint8_t length = tlv->length - CHECKSUM_LENGTH - ADDRESS_LENGTH;
+  uint32_t value = (*(uint32_t *)(&tlv->value[4]));
+  uint32_t value2 = (*(uint32_t *)(&tlv->value[8]));
+  uint32_t addr = (*(uint32_t *)(&tlv->value[0]));
+  uint32_t address = get4Byte(&tlv->value[0]);
   
-  // tlv.length  = buffer[1];
+  verifyStatus = verifyValue(&tlv->value[4], length);
   
-  // tlvGetValue(buffer, tlv.value, 6, tlv.length - ADDRESS_LENGTH);
+  if(verifyStatus)  {
+    /* Write to ram using swd */
+    for(i = 0; i < length; i += 4)  {
+      /* Data start at position 4 */
+      memoryWriteWord(address, get4Byte(&tlv->value[i + 4]));
+      address = address + 4;
+    }
+      return WRITE_SUCCESS;
+  }
+  else  return WRITE_FAIL;
+}
+
+/** verifyValue is a function to verify tlv data by adding
+  * with the checksum value
+  *
+  * input     : data is a pointer pointing to TLV structure
+  *
+  * return    : 1   data is invalid
+  *             0   data is valid
+  */
+int verifyValue(uint8_t *data, uint8_t length) {
+  int i = 0;  uint8_t sum = 0;
   
-  // return &tlv;
-// }
+  for(i; i < length + 1; i++) {
+    sum += data[i];
+  }
+  
+  if(sum == 0)  return 1;
+  
+  else  return 0;
+}
 
 /** tlvWriteToTargetRam
   *
@@ -42,31 +149,42 @@ void tlvWaitInstructionFromHost(UART_HandleTypeDef *uartHandle) {
   *
   * return    : NONE
   */
-void tlvWriteToTargetRam(TLVProbe_TypeDef *tlvProbe)  {
-  uint8_t transmissionState = 0;
-
-  switch(tlvProbe->state) {
-    case TLV_INITIATE :
-    	tlvWaitInstructionFromHost(tlvProbe->uartHandle);
-    	tlvProbe->state = TLV_RECEIVE_PACKET;
+void probeProgrammer(Probe_TypeDef *probe)  {
+	int writeRamStatus = 0, i;
+  switch(probe->state)
+  {
+    case PROBE_WAIT :
+      waitIncomingData(probe->uartHandle, probe->rxBuffer);
+      probe->state = PROBE_INTERPRET_INSTRUCTION;
       break;
       
-    case TLV_RECEIVE_PACKET :
-      // stm32UartSendByte(UART_HandleTypeDef *uartHandle, uint8_t data);
-    	while(transmissionState != TLV_END_TRANSMISSION) {
-        if(stm32UartGetBytes(tlvProbe->uartHandle, tlvProbe->rxBuffer) == HAL_OK)  {
-          //write to ram here
-          //
-          
-          /* Reply to host probe is ready for next packet */
-          stm32UartSendByte(tlvProbe->uartHandle, PROBE_OK);
-        }
-        transmissionState = tlvProbe->rxBuffer[0];
+    case PROBE_INTERPRET_INSTRUCTION :
+      if(probe->rxBuffer[0] == TLV_START_TRANSMISSION) {
+        stm32UartSendByte(probe->uartHandle, PROBE_OK);
       }
-    	tlvProbe->state = TLV_END;
-      break;
 
-    case TLV_END :
+      else if(probe->rxBuffer[0] == TLV_WRITE) {
+        writeRamStatus = tlvDecodeAndWriteToRam(probe->rxBuffer);
+        //stm32UartSendByte(probe->uartHandle, PROBE_OK);
+        if(WRITE_SUCCESS) {
+          probe->txBuffer[0] = PROBE_OK;
+        }
+        else  {
+          probe->txBuffer[0] = TLV_DATA_CORRUPTED;
+        }
+        HAL_UART_Transmit(probe->uartHandle, probe->txBuffer, 1, 5000);
+      }
+
+      else if(probe->rxBuffer[0] == TLV_END_TRANSMISSION) {
+    	  int i;
+
+    	  for(i = 0; i < 255; i ++)
+    		  probe->rxBuffer[i] = 0;
+
+        probe->state = PROBE_END;
+        return;
+      }
+      probe->state = PROBE_WAIT;
       break;
   }
 }
@@ -118,28 +236,7 @@ void tlvWriteToTargetRam(TLVProbe_TypeDef *tlvProbe)  {
     // return 0;
 // }
 
-/** tlvVerifyValue is a function to verify tlv data by adding
-  * with the checksum value
-  *
-  * input     : data is a pointer pointing to TLV structure
-  *
-  * return    : 0   data is invalid
-  *             1   data is valid
-  */
-// int tlvVerifyValue(TLV *data) {
-  // int i = 0, length = data->length - ADDRESS_LENGTH;
-  // uint8_t sum = 0;
-  
-  // for(i; i < length; i++) {
-    // sum += data->value[i];
-    // printf("data->value[] %x\n", data->value[i]);
-  // }
-  
-  // if(sum == 0)
-    // return 1;
-  
-  // return 0;
-// }
+
 
 /** tlvConvertDataFromByteToWord is a function convert the data from bytes to word
   *

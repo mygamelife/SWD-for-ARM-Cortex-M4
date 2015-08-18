@@ -10,8 +10,6 @@
 #include "mock_configurePort.h"
 #include "mock_IO_Operations.h"
 
-uint32_t readDummy = 0xFFFFFFFF;
-
 void setUp(void)  {}
 
 void tearDown(void) {}
@@ -59,79 +57,4 @@ void test_stubCopy_should_get_flash_sram_start_address_length_and_call_Flash_Cop
   sramWrite_Expect(SWD_TARGET_STATUS, TARGET_OK);
   
   stubCopyFromSRAMToFlash();
-}
-
-void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_before_load_instruction(void)
-{
-  /* Read target status */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_TARGET_STATUS);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,readDummy);
-  emulateswdRegisterRead(DRW_REG,AP,OK,1,TARGET_BUSY);
-  
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_TARGET_STATUS);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,readDummy);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,TARGET_OK);
-  
-  /* Load start addres */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_FLASH_START_ADDRESS);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,ADDR_FLASH_SECTOR_20);
-  
-  /* Load end addres */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_FLASH_END_ADDRESS);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,ADDR_FLASH_SECTOR_22);
-  
-  /* Load Instruction */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_INSTRUCTION);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,INSTRUCTION_ERASE_SECTOR);
-  
-  loadEraseSectorInstruction((uint32_t *)ADDR_FLASH_SECTOR_20, (uint32_t *)ADDR_FLASH_SECTOR_22);
-}
-
-void test_loadMassEraseInstruction_should_wait_untill_target_response_OK_before_load_instruction(void)
-{
-  /* Read target status */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_TARGET_STATUS);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,readDummy);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,TARGET_OK);
-  
-  /* Load bank select */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_BANK_SELECT);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,FLASH_BANK_BOTH);
-  
-  /* Load Instruction */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_INSTRUCTION);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,INSTRUCTION_MASS_ERASE);
-  
-  loadMassEraseInstruction(FLASH_BANK_BOTH);
-}
-
-void test_loadCopyInstruction_should_load_src_address_dest_address_and_length_into_SRAM_instruction_address(void)
-{
-  /* Read target status */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_TARGET_STATUS);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,readDummy);
-  emulateswdRegisterRead(DRW_REG,AP,OK,0,TARGET_OK);
-  
-  /* Load Source address */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_SRAM_START_ADDRESS);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,SWD_SRAM_DATA32_ADDRESS);
-  
-  /* Load Destination address */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_FLASH_START_ADDRESS);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,ADDR_FLASH_SECTOR_18);
-  
-  /* Load length */
-<<<<<<< HEAD
-  emulateSWDRegister_Write(TAR_REG,AP,OK,SWD_DATA_SIZE);
-  emulateSWDRegister_Write(DRW_REG,AP,OK,2000);
-=======
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_DATA_LENGTH);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,2000);
->>>>>>> 13e98e75490f3e9bc536f2e9c3e8775977e3a6a1
-  
-  /* Load Instruction */
-  emulateswdRegisterWrite(TAR_REG,AP,OK,SWD_INSTRUCTION);
-  emulateswdRegisterWrite(DRW_REG,AP,OK,INSTRUCTION_COPY);
-  
-  loadCopyFromSRAMToFlashInstruction((uint32_t *)SWD_SRAM_DATA32_ADDRESS, (uint32_t *)ADDR_FLASH_SECTOR_18, 2000);
 }

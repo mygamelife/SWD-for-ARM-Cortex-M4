@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -g2 -Map=FlashProgrammer.map -O0 --gc-sections -LC:\Users\susan_000\AppData\Roaming\CooCox\CoIDE\configuration\ProgramData\FlashProgrammer -TC:\Users\susan_000\AppData\Roaming\CooCox\CoIDE\configuration\ProgramData\FlashProgrammer/arm-gcc-link.ld -g">
+      <target file="FlashProgrammer.elf" lastModified="14f3b41a441">
+         <source file="..\obj\LED.o" lastModified="14f3b41a23d"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="14f3b41a078"/>
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="14f3b41a1d0"/>
+         <source file="..\obj\configurePort.o" lastModified="14f3b41a172"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="14f3b419fdc"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="14f3b41a0d6"/>
+         <source file="..\obj\main.o" lastModified="14f3b419f6f"/>
+      </target>
+   </processor>
+</history>

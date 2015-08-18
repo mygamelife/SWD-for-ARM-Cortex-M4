@@ -18,9 +18,10 @@
 	void turnOffLED4();
 #endif // !defined(TEST)
 
-#define SWDIO_PIN 			GPIO_PIN_12
-#define SWDCLK_PIN			GPIO_PIN_11
-#define SWDNRST_PIN			GPIO_PIN_8
+/* SWD Port Configuration */
+#define SWDIO_PIN       GPIO_PIN_12
+#define SWDCLK_PIN      GPIO_PIN_11
+#define SWDNRST_PIN     GPIO_PIN_8
 #define SWD_PORT        GPIOC
 
 #define CLK_EN()	do{								\
@@ -40,7 +41,7 @@
 #define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
 
 /* USARTx Baud Rate */
-#define USART_BAUD_RATE                  115200
+#define USART_BAUD_RATE                  9600//115200
 
 /* Definition for USARTx Pins */
 #define USARTx_TX_PIN                    GPIO_PIN_9

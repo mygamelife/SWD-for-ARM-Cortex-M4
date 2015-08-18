@@ -23,28 +23,42 @@ typedef enum
 
 typedef enum
 {
-  TLV_INITIATE = 0,
-  TLV_START,
-  TLV_WAIT_INSTRUCTION,
-  TLV_RECEIVE_PACKET,
+  TLV_START = 0,
   TLV_TRANSMIT_DATA,
   TLV_WAIT_REPLY,
-  TLV_WRITE_TO_RAM,
   TLV_END,
   TLV_COMPLETE
 } TLV_State;
 
+typedef enum
+{
+  PROBE_START = 0,
+  PROBE_WAIT,
+  PROBE_INTERPRET_INSTRUCTION,
+  PROBE_END
+} Probe_Programmer_State;
+
+/* TLV Instruction */
+typedef enum
+{
+  TLV_START_TRANSMISSION  = 10,
+  TLV_END_TRANSMISSION    = 88,
+  TLV_WRITE               = 30,
+  TLV_DATA_CORRUPTED      = 40
+} TLV_Instruction;
+
 typedef enum  {
-  PROBE_BUSY = 0,
+  NO_RESPONSE = 0,
   PROBE_FAULT,
   PROBE_OK,
-  PROBE_COMPLETE
+  PROBE_COMPLETE,
+  WRITE_SUCCESS,
+  WRITE_FAIL
 } ProbeStatus;
 
-#define ONE_BYTE                  256
+#define ONE_BYTE                  255
 #define ADDRESS_LENGTH            4
 #define CHECKSUM_LENGTH           1
-#define BAUD_RATE                 9600
 
 #define TLV_TYPE_INDEX            0
 #define TLV_ADDRESS_INDEX         0
@@ -53,12 +67,8 @@ typedef enum  {
 /* TLV Instruction */
 #define TLV_BUFFER_EMPTY          0
 #define TLV_CLEAR                 (uint8_t)0x11
-#define TLV_WRITE                 (uint8_t)0x12
 #define TLV_READ                  (uint8_t)0x13
 #define TLV_BUSY                  (uint8_t)0x14
 #define TLV_ABORT                 (uint8_t)0x15
-#define TLV_DATA_CORRUPTED        (uint8_t)0x16
-#define TLV_START_TRANSMISSION    (uint8_t)0x17
-#define TLV_END_TRANSMISSION      (uint8_t)0x18
 
 #endif // TLV_State_H

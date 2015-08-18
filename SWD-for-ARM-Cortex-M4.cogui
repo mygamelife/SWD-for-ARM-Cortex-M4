@@ -24,45 +24,65 @@
 <part id="6"/>
 <part id="7"/>
 <part id="8"/>
+<part id="9"/>
+<part id="10"/>
+<part id="11"/>
+<part id="12"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_State.h" partName="TLV_State.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_State.h" title="TLV_State.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_State.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/TLV_State.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="8" selectionOffset="769" selectionTopPixel="694"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.c" partName="TLV_Probe.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_Probe.c" title="TLV_Probe.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_Probe.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1695" selectionTopPixel="1040"/>
+<editorState selectionHorizontalPixel="0" selectionLength="8" selectionOffset="1070" selectionTopPixel="1013"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.h" partName="TLV_Probe.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_Probe.h" title="TLV_Probe.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_Probe.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="16" selectionOffset="265" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="447" selectionTopPixel="173"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="UART.c" partName="UART.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/UART.c" title="UART.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/UART.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/UART.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="874"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="930" selectionTopPixel="90"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="UART.h" partName="UART.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/UART.h" title="UART.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/UART.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/UART.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="62" selectionOffset="396" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.c" partName="TLV_Probe.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_Probe.c" title="TLV_Probe.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/TLV_Probe.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3020" selectionTopPixel="1600"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Register_ReadWrite.h" partName="Register_ReadWrite.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/Register_ReadWrite.h" title="Register_ReadWrite.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/Register_ReadWrite.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Register_ReadWrite.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="13" selectionOffset="2576" selectionTopPixel="1189"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="CoreDebug.h" partName="CoreDebug.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/CoreDebug.h" title="CoreDebug.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/CoreDebug.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1597" selectionTopPixel="373"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="CoreDebug.c" partName="CoreDebug.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/CoreDebug.c" title="CoreDebug.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/CoreDebug.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4479" selectionTopPixel="1860"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/main.c" title="main.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/main.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="371" selectionTopPixel="330"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Flash.c" partName="Flash.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/Flash.c" title="Flash.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/Flash.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Flash.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="60" selectionOffset="13496" selectionTopPixel="8180"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.h" partName="main.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/main.h" title="main.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/main.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/main.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" partName="configurePort.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/configurePort.h" title="configurePort.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/configurePort.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1122" selectionTopPixel="480"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/main.c" title="main.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/main.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="101" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1499" selectionTopPixel="540"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" partName="startup_stm32f429xx.s" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/Hardware/startup_stm32f429xx.s" title="startup_stm32f429xx.s" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/Hardware/startup_stm32f429xx.s" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3665" selectionTopPixel="1400"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="swdStub.c" partName="swdStub.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/swdStub.c" title="swdStub.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/swdStub.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/swdStub.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="41" selectionOffset="6411" selectionTopPixel="3774"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="swdStub.h" partName="swdStub.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/swdStub.h" title="swdStub.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/app/swdStub.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/swdStub.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="13" selectionOffset="454" selectionTopPixel="90"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
 </editors>
 <views>
@@ -80,7 +100,7 @@
 <element path="/SWD-for-ARM-Cortex-M4/STM32F4"/>
 </expanded>
 <selection>
-<element path="/SWD-for-ARM-Cortex-M4/Code/swdStub.c"/>
+<element path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 </selection>
 </viewState>
 </view>
@@ -114,7 +134,7 @@
 </view>
 <view id="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" partName="Memory Browser">
 <viewState>
-<MemoryBroser ComboItemsValue="0x081C0000;" FocuseTabIndex="0" TabsValue="0x81c0000;" TextValue="0x81c0000" horizontalPosition="0" verticalPosition="0"/>
+<MemoryBroser ComboItemsValue="0x081C0000;" FocuseTabIndex="0" TabsValue="" TextValue="0x81c0000" horizontalPosition="0" verticalPosition="0"/>
 </viewState>
 </view>
 <view id="org.eclipse.cdt.dsf.debug.ui.disassembly.view" partName="Disassembly">
@@ -179,7 +199,7 @@
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@711d50" ratio="0.7138194" ratioLeft="656" ratioRight="263" relationship="4" relative="org.eclipse.ui.internal.ViewStack@3baae9">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@711d50" ratio="0.64961916" ratioLeft="597" ratioRight="322" relationship="4" relative="org.eclipse.ui.internal.ViewStack@3baae9">
 <folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.views.ProblemView" label="Problems"/>
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
@@ -190,7 +210,7 @@
 </folder>
 </info>
 <info part="org.eclipse.ui.editorss" ratio="0.16186485" ratioLeft="309" ratioRight="1600" relationship="2" relative="org.eclipse.ui.internal.ViewStack@3baae9"/>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@151beb5" ratio="0.71983916" ratioLeft="1074" ratioRight="418" relationship="2" relative="org.eclipse.ui.editorss">
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@151beb5" ratio="0.89972144" ratioLeft="969" ratioRight="108" relationship="2" relative="org.eclipse.ui.editorss">
 <folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
 <page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
@@ -257,45 +277,61 @@
 <view id="org.eclipse.cdt.dsf.debug.ui.disassembly.view"/>
 <fastViewBars/>
 <viewLayoutRec closeable="false" id="org.eclipse.debug.ui.DebugView"/>
-<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<layout>
+<mainWindow>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1062c97">
+<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
+<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="954" ratioRight="318" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="954" ratioRight="318" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
 <page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@6df156" ratio="0.69977427" ratioLeft="620" ratioRight="266" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@6df156" ratio="0.69977427" ratioLeft="620" ratioRight="266" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1062c97">
+<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
+<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
 <part id="1"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@1c835de" ratio="0.5" ratioLeft="636" ratioRight="636" relationship="2" relative="org.eclipse.ui.internal.ViewStack@6df156">&#x0A;<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1c835de" ratio="0.5" ratioLeft="636" ratioRight="636" relationship="2" relative="org.eclipse.ui.internal.ViewStack@6df156">
+<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">
+<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
 <page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
 <page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" label="Memory Browser"/>
 <page content="org.eclipse.debug.ui.ExpressionView" label="Expressions"/>
 <page content="org.eclipse.debug.ui.MemoryView" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
 <part id="1"/>
 <part id="2"/>
 <part id="3"/>
 </presentation>
 </folder>
 </info>
-<info folder="true" part="org.eclipse.ui.internal.ViewStack@60d73d" ratio="0.68203247" ratioLeft="1302" ratioRight="607" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder activePageID="org.eclipse.debug.ui.RegisterView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@60d73d" ratio="0.8239916" ratioLeft="1573" ratioRight="336" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97">
+<folder activePageID="org.eclipse.debug.ui.RegisterView" appearance="2" expanded="2">
+<page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
 <page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="Disassembly"/>
 <page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
 <page content="org.coocox.coassistant.view.CoAssistantView_debug" label="LabelNotFound"/>
-<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
 <part id="1"/>
 </presentation>
 </folder>
 </info>
-<info part="org.eclipse.ui.editorss" ratio="0.29979035" ratioLeft="286" ratioRight="668" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97"/>
+<info part="org.eclipse.ui.editorss" ratio="0.22016937" ratioLeft="286" ratioRight="1013" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97"/>
 </mainWindow>
 </layout>
 </perspective>
@@ -303,171 +339,163 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/TLV_State.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/UART.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/CoreDebug.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/swdStub.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/swdStub.h"/>
 </editors>
-<item historyLabel="startup_stm32f429xx.s" index="2">
-<position/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
 </item>
-<item historyLabel="main.c" index="3">
-<position info="not_deleted" x="101" y="0"/>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="5422" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1635" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.h" index="4">
-<position info="not_deleted" x="265" y="16"/>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="4807" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1635" y="0"/>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="5262" y="0"/>
 </item>
-<item historyLabel="TLV_State.h" index="5">
-<position info="not_deleted" x="769" y="8"/>
-</item>
-<item historyLabel="configurePort.h" index="1">
-<position info="not_deleted" x="1122" y="0"/>
-</item>
-<item historyLabel="startup_stm32f429xx.s" index="2">
-<position/>
-</item>
-<item historyLabel="main.c" index="6">
-<position info="not_deleted" x="101" y="0"/>
-</item>
-<item historyLabel="configurePort.h" index="1">
-<position info="not_deleted" x="1122" y="0"/>
-</item>
-<item historyLabel="main.c" index="6">
-<position info="not_deleted" x="101" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1770" y="0"/>
-</item>
-<item historyLabel="startup_stm32f429xx.s" index="2">
-<position/>
-</item>
-<item historyLabel="main.c" index="7">
-<position info="not_deleted" x="101" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1789" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="8">
-<position info="not_deleted" x="55084" y="0"/>
-</item>
-<item historyLabel="UART.c" index="9">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1789" y="0"/>
-</item>
-<item historyLabel="main.c" index="7">
-<position info="not_deleted" x="0" y="0"/>
-</item>
-<item historyLabel="TLV_State.h" index="5">
-<position info="not_deleted" x="769" y="8"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1789" y="0"/>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="3968" y="0"/>
 </item>
 <item historyLabel="startup_stm32f429xx.s" index="2">
 <position info="not_deleted" x="3665" y="0"/>
 </item>
-<item historyLabel="main.c" index="7">
-<position info="not_deleted" x="101" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1789" y="0"/>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="4807" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1430" y="0"/>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="5262" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1514" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="702" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="10">
-<position info="not_deleted" x="27275" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="744" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="10">
-<position info="not_deleted" x="27301" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="786" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal.c" index="11">
-<position info="not_deleted" x="13295" y="0"/>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="828" y="0"/>
 </item>
-<item historyLabel="UART.c" index="9">
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="870" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="914" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="958" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1002" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1046" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1090" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1173" y="0"/>
+</item>
+<item historyLabel="TLV_Probe.h" index="3">
+<position info="not_deleted" x="280" y="0"/>
+</item>
+<item historyLabel="TLV_State.h" index="4">
+<position info="not_deleted" x="1070" y="8"/>
+</item>
+<item historyLabel="TLV_Probe.c" index="1">
+<position info="not_deleted" x="3020" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="2">
+<position info="not_deleted" x="3665" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="2">
+<position info="not_deleted" x="3665" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="2">
+<position info="not_deleted" x="3665" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="702" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="744" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="786" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="828" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="870" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="914" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="958" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1002" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1046" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1090" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="1173" y="0"/>
+</item>
+<item historyLabel="CoreDebug.h" index="5">
+<position info="not_deleted" x="1597" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="910" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="2">
+<position info="not_deleted" x="3665" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="399" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="700" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="711" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="6">
 <position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1514" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position/>
-</item>
-<item historyLabel="startup_stm32f429xx.s" index="12">
-<position info="not_deleted" x="3665" y="0"/>
-</item>
-<item historyLabel="main.c" index="7">
-<position info="not_deleted" x="101" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1749" y="0"/>
-</item>
-<item historyLabel="startup_stm32f429xx.s" index="12">
-<position info="not_deleted" x="3665" y="0"/>
-</item>
-<item historyLabel="main.c" index="7">
-<position info="not_deleted" x="101" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1747" y="0"/>
-</item>
-<item historyLabel="TLV_Probe.c" index="0">
-<position info="not_deleted" x="1695" y="0"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6411" y="41"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6492" y="0"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6411" y="41"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="4519" y="58"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="4627" y="0"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6448" y="0"/>
-</item>
-<item historyLabel="swdStub.h" index="14">
-<position info="not_deleted" x="454" y="13"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6448" y="0"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6442" y="0"/>
-</item>
-<item historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6318" y="58"/>
-</item>
-<item active="true" historyLabel="swdStub.c" index="13">
-<position info="not_deleted" x="6411" y="41"/>
+<item active="true" historyLabel="main.c" index="0">
+<position info="not_deleted" x="64" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -476,50 +504,47 @@
 <actionBarAdvisor/>
 </window>
 <mruList>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="swdStub.h" tooltip="SWD-for-ARM-Cortex-M4/Code/swdStub.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/swdStub.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="swdStub.c" tooltip="SWD-for-ARM-Cortex-M4/Code/swdStub.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/swdStub.c"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" tooltip="SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s">
 <persistable path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="SWD-for-ARM-Cortex-M4/Code/main.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" tooltip="SWD-for-ARM-Cortex-M4/Code/configurePort.h">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="UART.c" tooltip="SWD-for-ARM-Cortex-M4/Code/UART.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/UART.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.h" tooltip="SWD-for-ARM-Cortex-M4/Code/main.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/main.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.h" tooltip="SWD-for-ARM-Cortex-M4/Code/TLV_Probe.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.c" tooltip="SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Flash.c" tooltip="SWD-for-ARM-Cortex-M4/Code/Flash.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/Flash.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="SWD-for-ARM-Cortex-M4/Code/main.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_conf.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_conf.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_conf.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="swdProtocol.c" tooltip="SWD-for-ARM-Cortex-M4/Code/swdProtocol.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/swdProtocol.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="system_stm32f4xx.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/system_stm32f4xx.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/system_stm32f4xx.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="exploreCC/Library/main.c">
+<persistable path="/exploreCC/Library/main.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Timer.c" tooltip="exploreCC/Library/Timer.c">
+<persistable path="/exploreCC/Library/Timer.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" tooltip="exploreCC/startup_stm32f429xx.s">
+<persistable path="/exploreCC/startup_stm32f429xx.s"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="UART.h" tooltip="SWD-for-ARM-Cortex-M4/Code/UART.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/UART.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_it.c" tooltip="exploreCC/Hardware/stm32f4xx_it.c">
+<persistable path="/exploreCC/Hardware/stm32f4xx_it.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="SDLED2.c" tooltip="exploreCC/Library/SDLED2.c">
+<persistable path="/exploreCC/Library/SDLED2.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="SDLED1.c" tooltip="exploreCC/Library/SDLED1.c">
+<persistable path="/exploreCC/Library/SDLED1.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="SDLED1.c" tooltip="exploreCC/Library/SDLED1.c">
+<persistable path="/exploreCC/Library/SDLED1.c"/>
 </file>
 </mruList>
 </workbench>

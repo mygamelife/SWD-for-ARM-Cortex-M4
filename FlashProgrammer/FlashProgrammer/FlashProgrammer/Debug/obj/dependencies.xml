@@ -1,0 +1,138 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dependencies>
+   <includePath signature="/I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer /I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\FlashProgrammer\app /I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\FlashProgrammer">
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx.h" lastModified="14f3af71117">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f429xx.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\app\configurePort.h" lastModified="14f3ae8db3b">
+         <include file="..\..\..\app\stm32f4xx_hal_gpio.h"/>
+         <include file="..\..\..\app\stm32f4xx_hal_rcc.h"/>
+         <include file="..\..\..\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\app\system_stm32f4xx.h" lastModified="14eea53cd75">
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_def.h" lastModified="14eea53cfb7">
+         <include file="..\..\..\app\stm32f4xx.h"/>
+         <include file="..\..\..\app\Legacy\stm32_hal_legacy.h"/>
+      </source>
+      <source file="..\..\..\app\configurePort.c" lastModified="14f358ebdad">
+         <include file="..\..\..\app\configurePort.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_rcc_ex.h" lastModified="14eea53cc1d">
+         <include file="..\..\..\app\stm32f4xx_hal_def.h"/>
+      </source>
+      <source file="..\..\..\app\system_stm32f4xx.c" lastModified="14eea53cd75">
+         <include file="..\..\..\app\stm32f4xx.h"/>
+      </source>
+      <source file="..\..\..\app\core_cmInstr.h" lastModified="14eea53d758">
+      </source>
+      <source file="..\..\..\app\stm32f4xx.h" lastModified="14f3af71117">
+         <include file="..\..\..\app\stm32f429xx.h"/>
+         <include file="..\..\..\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\configurePort.h" lastModified="14f3ae8db3b">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_gpio.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_rcc.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_gpio.h" lastModified="14eea53cbee">
+         <include file="..\..\..\app\stm32f4xx_hal_def.h"/>
+         <include file="..\..\..\app\stm32f4xx_hal_gpio_ex.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_gpio.c" lastModified="14eea53cbee">
+         <include file="..\..\..\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cmFunc.h" lastModified="14eea53d758">
+      </source>
+      <source file="..\..\..\app\LED.h" lastModified="14f3abfc8b5">
+         <include file="..\..\..\app\configurePort.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_gpio.h" lastModified="14eea53cbee">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_def.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_gpio_ex.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f429xx.h" lastModified="14eea53d15d">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cm4.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\system_stm32f4xx.h"/>
+      </source>
+      <source file="..\..\..\app\LED.c" lastModified="14f3ac09452">
+         <include file="..\..\..\app\LED.h"/>
+      </source>
+      <source file="..\..\..\app\Legacy\stm32_hal_legacy.h" lastModified="14eea53cb91">
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_rcc.h" lastModified="14eea53cc0e">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_def.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_rcc_ex.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cmInstr.h" lastModified="14eea53d758">
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal.h" lastModified="14eea53cbbf">
+         <include file="..\..\..\app\stm32f4xx_hal_conf.h"/>
+      </source>
+      <source file="..\..\..\app\core_cmFunc.h" lastModified="14eea53d758">
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\main.c" lastModified="14f3b419692">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\LED.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f429xx.h" lastModified="14eea53d15d">
+         <include file="..\..\..\app\core_cm4.h"/>
+         <include file="..\..\..\app\system_stm32f4xx.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_gpio_ex.h" lastModified="14eea53cbee">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_def.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cm4.h" lastModified="14eea53cf88">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cmInstr.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cmFunc.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cmSimd.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal.c" lastModified="14f3b0dcb26">
+         <include file="..\..\..\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_conf.h" lastModified="14f3af8a94b">
+         <include file="..\..\..\app\stm32f4xx_hal_rcc.h"/>
+         <include file="..\..\..\app\stm32f4xx_hal_gpio.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_rcc_ex.h" lastModified="14eea53cc1d">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_def.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_conf.h" lastModified="14f3af8a94b">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_rcc.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_gpio.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal.h" lastModified="14eea53cbbf">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_conf.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx_hal_def.h" lastModified="14eea53cfb7">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\stm32f4xx.h"/>
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\Legacy\stm32_hal_legacy.h"/>
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_rcc.h" lastModified="14eea53cc0e">
+         <include file="..\..\..\app\stm32f4xx_hal_def.h"/>
+         <include file="..\..\..\app\stm32f4xx_hal_rcc_ex.h"/>
+      </source>
+      <source file="..\..\..\app\core_cm4.h" lastModified="14eea53cf88">
+         <include file="..\..\..\app\core_cmInstr.h"/>
+         <include file="..\..\..\app\core_cmFunc.h"/>
+         <include file="..\..\..\app\core_cmSimd.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\core_cmSimd.h" lastModified="14eea53d758">
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_rcc.c" lastModified="14eea53cc0e">
+         <include file="..\..\..\app\stm32f4xx_hal.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\Legacy\stm32_hal_legacy.h" lastModified="14eea53cb91">
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\LED.h" lastModified="14f3abfc8b5">
+         <include file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\configurePort.h"/>
+      </source>
+      <source file="..\..\..\app\core_cmSimd.h" lastModified="14eea53d758">
+      </source>
+      <source file="..\..\..\app\stm32f4xx_hal_gpio_ex.h" lastModified="14eea53cbee">
+         <include file="..\..\..\app\stm32f4xx_hal_def.h"/>
+      </source>
+      <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\system_stm32f4xx.h" lastModified="14eea53cd75">
+      </source>
+   </includePath>
+</dependencies>

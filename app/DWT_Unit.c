@@ -37,6 +37,7 @@
 int setAddressWatchpoint(uint32_t dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,Watchpoint_AccessMode accessMode)
 { 
   int result = 0 ;
+  DWT_COMP[0].COMP =123;
   uint32_t dwtMaskReg = dwtCompNumber + 4 ;
   uint32_t dwtFuncReg = dwtCompNumber + 8 ;
   

@@ -5,6 +5,8 @@ void assertTLV(uint8_t type, uint8_t length, uint32_t address, uint8_t *dataAddr
   
   TEST_ASSERT_EQUAL(type, actual->type);
   TEST_ASSERT_EQUAL(length, actual->length);
+  
+  // printf("address %x\n", address);
   TEST_ASSERT_EQUAL_HEX32(address, get4Byte(&actual->value[0]));
 
   for(i = 0; i < actual->length - ADDRESS_LENGTH - 1; i++) {

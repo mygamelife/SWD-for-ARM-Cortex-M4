@@ -3,8 +3,6 @@
 static FLASH_EraseInitTypeDef EraseInitStruct;
 static FLASH_ErrorTypeDef FLASH_ERROR_CODE = 0;
 static uint32_t SectorError = 0;
-static int timeExpired = 1;
-static State state = START;
 
 /**
   * flashMassErase use to perform bank 1, 2 erase or full chip erase both bank
@@ -150,7 +148,8 @@ void flashWrite(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint
   * output :   NONE
   */
 void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
-	__IO uint32_t data32 = 0, MemoryProgramStatus = 0;
+	State state = START; int counter = 10;
+  __IO uint32_t data32 = 0, MemoryProgramStatus = 0;
 	uint32_t address = 0;
 	__IO uint32_t tick = 0;
   
@@ -179,8 +178,8 @@ void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
   {
     /* No error detected. Switch on LED3 */
     #if !defined(TEST)
-      while(timeExpired)	{
-        LED3_Blink(&state, &timeExpired);
+      while(state != HALT)	{
+        blinkLED3(&state, &counter);
       }
     #endif
   }
@@ -329,9 +328,9 @@ uint32_t flashGetSector(uint32_t Address)
   */
 void flashErrorHandler(void)
 {
-  uint32_t CHECK_ERROR_CODE = 0;
+  uint32_t ERROR_CODE = 0;
 
-  CHECK_ERROR_CODE = FLASH_ERROR_CODE;
+  ERROR_CODE = HAL_FLASH_GetError();
 
   /* Turn LED4 on */
   turnOnLED4();
@@ -350,18 +349,17 @@ void flashErrorHandler(void)
   *
   * output :   NONE
   */
-void flashCopyFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length) {
+void flashCopyFromSRAMToFlash(uint32_t src, uint32_t dest, int length) {
   int i;
   __IO uint32_t data32 = 0;
-  uint32_t startSector, endSector, sramAddress, flashAddress;
+  uint32_t sramAddress, flashAddress;
 
   /* Assign src and dest to a template variable */
   sramAddress = src;
-  startSector = flashAddress = dest;
-  endSector = dest + length;
+  flashAddress = dest;
 
   /* Flash Erase Sector at specified address */
-  flashEraseSector(startSector, endSector);
+  flashEraseSector(dest, dest + length);
 
   /* Unlock the Flash to enable the flash control register access */
   HAL_FLASH_Unlock();
@@ -397,8 +395,8 @@ void flashCopyFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length) {
   *
   * output :   NONE
   */
-void flashVerifyDataFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length)	{
-  int i = 0;
+void flashVerifyDataFromSRAMToFlash(uint32_t src, uint32_t dest, int length)	{
+  State state = START;  int i = 0, counter = 10;
   __IO uint32_t dataFlash = 0, dataSRAM = 0, memoryProgramStatus = 0;
   uint32_t sramAddress, flashAddress;
 
@@ -430,8 +428,8 @@ void flashVerifyDataFromSRAMToFlash(uint32_t *src, uint32_t *dest, int length)	{
   {
     /* No error detected. Switch on LED3 */
     #if !defined(TEST)
-      while(timeExpired)	{
-        LED3_Blink(&state, &timeExpired);
+      while(state != HALT)	{
+        blinkLED3(&state, &counter);
       }
     #endif
   }

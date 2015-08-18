@@ -22,6 +22,7 @@ void stm32UartSendBytes(UART_HandleTypeDef *uartHandle, uint8_t *data);
 
 /* Uart Receive Function */
 uint8_t stm32UartGetByte(UART_HandleTypeDef *uartHandle);
-#define stm32UartGetBytes(uartHandle, buffer)   HAL_UART_Receive(uartHandle, buffer, sizeof(buffer), 5000)
+#define stm32UartGetBytes(uartHandle, __BUFFER__)   HAL_UART_Receive(uartHandle, buffer, sizeof(__BUFFER__), 5000)
+// #define COUNTOF(__BUFFER__)   (sizeof(__BUFFER__))
 
 #endif // UART_H

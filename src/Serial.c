@@ -93,3 +93,12 @@ uint8_t uartGetByte(HANDLE hSerial)  {
   
   return buffer;
 }
+
+DWORD uartSendByte(HANDLE hSerial, uint8_t data)  {
+  DWORD dwBytesRead = 0;
+	if(!WriteFile(hSerial, (uint8_t *)&data, 1, &dwBytesRead, NULL)){
+    DWORD errId = GetLastError();
+    printf("WriteFile Error: %d\n", errId);
+	}
+	return dwBytesRead;
+}

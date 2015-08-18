@@ -5,6 +5,17 @@
 #include "CoreDebug.h"
 #include "CoreDebug_Utilities.h"
 #include "Register_ReadWrite.h"
+#include "core_cm4.h"
+
+typedef struct 
+{
+  __IO uint32_t COMP;                  
+  __IO uint32_t MASK;              
+  __IO uint32_t FUNCTION;      
+       uint32_t RESERVED0[1];
+}DWT_COMP_Type;
+  
+#define DWT_COMP  ((DWT_COMP_Type*)&(DWT->COMP0))
 
 #define DWT_COMP0 	  0xE0001020
 #define DWT_MASK0 	  0xE0001024

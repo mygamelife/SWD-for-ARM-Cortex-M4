@@ -54,13 +54,13 @@ void test_stm32UartGetByte_should_receive_single_byte_data_from_uart_port(void)
   uint8_t byteData = stm32UartGetByte(uartHandle);
 }
 
-void test_stm32UartGetBytes_should_receive_multiple_bytes_data_from_uart_port(void)
-{
-  uint8_t buffer[1024];
+// void test_stm32UartGetBytes_should_receive_multiple_bytes_data_from_uart_port(void)
+// {
+  // uint8_t buffer[1024];
   
-  HAL_UART_Init_IgnoreAndReturn(HAL_OK);
-  UART_HandleTypeDef *uartHandle = initUart();
+  // HAL_UART_Init_IgnoreAndReturn(HAL_OK);
+  // UART_HandleTypeDef *uartHandle = initUart();
   
-  HAL_UART_Receive_IgnoreAndReturn(HAL_OK);
-  stm32UartGetBytes(uartHandle, buffer);
-}
+  // HAL_UART_Receive_IgnoreAndReturn(HAL_OK);
+  // stm32UartGetBytes(uartHandle, buffer);
+// }

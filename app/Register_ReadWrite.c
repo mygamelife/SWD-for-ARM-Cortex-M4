@@ -1,6 +1,6 @@
 #include "Register_ReadWrite.h"
 
-int cswDataSize = CSW_WORD_SIZE; 
+int cswDataSize = -1;
  
 /***************************************************************
  **                   SWD-DP Register                         **
@@ -80,9 +80,16 @@ void swdRegisterRead(int address,int APnDP,int *ack,int *parity, uint32_t *data)
 
 }
 
+/* Use for mocking purpose in test_TLV_Probe */
+uint32_t memoryReadAndReturnWord(uint32_t address) {
+  uint32_t dataRead = 0;
+  
+  memoryReadWord(address, &dataRead);
+  return dataRead;
+}
+
 int memoryReadWord(uint32_t address, uint32_t *dataRead)
 {
-
 	int ACK = 0, parity = 0 , status = 0;
 	
 	swdRegisterWrite(TAR_REG,AP,&ACK,address);
@@ -130,6 +137,7 @@ void memoryWriteWord(uint32_t address, uint32_t writeData)
   {  
     swdWriteCSW(&ack, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
     cswDataSize = CSW_WORD_SIZE;
+    //cswDataSizeSet = 1;
   }
  
   swdWriteAP(TAR_REG, &ack, address);
@@ -155,9 +163,10 @@ int swdReadAP(int address,int *ack,int *parity, uint32_t *data)
  *  return  : NONE
  */
 void powerUpSystemAndDebug()  {
-  int ack = 0;
+  int ack = 0, parity = 0;
 
   swdWriteCtrlStatus(&ack, POWERUP_SYSTEM);
+  // swdClearFlags(ack, WRITE, CTRLSTAT_REG, DP, parity, POWERUP_SYSTEM);
 }
 
 /*  readAHB_IDR is a function to access AHB-AP (based on the implementation of MEM-AP) register and select BankF read the register IDR

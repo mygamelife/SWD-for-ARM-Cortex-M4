@@ -2,10 +2,10 @@
 #define ErrorCode_H
 
 typedef enum{
-	ERR_FILE_NOT_EXIST,
-	ERR_BYTE_SELECTION,
-  ERR_RANGE_OFFSET,
+  ERR_RESPONSE_TIMEOUT,
+  ERR_CORRUPTED_DATA,
 } ErrorCode;
 
+void displayErrorCode(ErrorCode err);
 
-#endif //ErrorCode_H
+#endif // ErrorCode_H

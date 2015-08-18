@@ -1,8 +1,6 @@
 #include "LED.h"
 
-void LED3_Blink(State *state, int *pTimer)	{
-	static uint32_t previousTime = 0, counter = 0;
-
+void blinkLED3(State *state, int *counter)	{
 	switch (*state)
 	{
 		case START:
@@ -25,9 +23,9 @@ void LED3_Blink(State *state, int *pTimer)	{
 			break;
 
 		case COUNTER:
-			counter++;
-			if(counter == 10)	{
-				*pTimer = 0;
+			*counter -= 1;
+			if(*counter == 0)	{
+				*state = HALT;
 				break;
 			}
 

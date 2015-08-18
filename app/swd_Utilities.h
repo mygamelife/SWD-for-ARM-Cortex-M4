@@ -19,7 +19,7 @@
 #define OK_RESPONSE      0x1
 #define WAIT_RESPONSE    0x2
 #define FAULT_RESPONSE   0x4
-#define NO_RESPONSE      -1
+//#define NO_RESPONSE      -1
 
 int calculateParity_SWDRequest(int Address_bit3,int Address_bit2,int APnDP, int ReadWrite);
 int calculateParity_32bitData(uint32_t data);

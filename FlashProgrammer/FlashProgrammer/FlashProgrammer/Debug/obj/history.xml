@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc 4.8.1 mingw32 -mcpu=cortex-m4 -mthumb -g2 -Wall -O0 -c -DSTM32F429ZI -DSTM32F429xx -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\FlashProgrammer\app -I..\..\..\..\..\..\..\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\FlashProgrammer">
+      <target file="stm32f4xx_hal.o" lastModified="14f3b419fdc">
+         <source file="..\..\..\app\stm32f4xx_hal.c" lastModified="14f3b0dcb26"/>
+      </target>
+      <target file="LED.o" lastModified="14f3b41a23d">
+         <source file="..\..\..\app\LED.c" lastModified="14f3ac09452"/>
+      </target>
+      <target file="stm32f4xx_hal_gpio.o" lastModified="14f3b41a1d0">
+         <source file="..\..\..\app\stm32f4xx_hal_gpio.c" lastModified="14eea53cbee"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="14f3b41a0d6">
+         <source file="..\..\..\app\system_stm32f4xx.c" lastModified="14eea53cd75"/>
+      </target>
+      <target file="stm32f4xx_hal_rcc.o" lastModified="14f3b41a078">
+         <source file="..\..\..\app\stm32f4xx_hal_rcc.c" lastModified="14eea53cc0e"/>
+      </target>
+      <target file="main.o" lastModified="14f3b419f6f">
+         <source file="..\..\..\..\..\..\..\CoIDE\workspace\newProject\app\main.c" lastModified="14f3b419692"/>
+      </target>
+      <target file="configurePort.o" lastModified="14f3b41a172">
+         <source file="..\..\..\app\configurePort.c" lastModified="14f358ebdad"/>
+      </target>
+   </processor>
+</history>
