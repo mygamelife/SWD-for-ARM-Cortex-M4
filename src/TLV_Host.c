@@ -194,19 +194,26 @@ int tlvCheckDataSize(int size)  {
   *
   * return    : return response if valid else retry until timeout
   */
-void tlvWaitReplyFromProbe(HANDLE hSerial, TlvHost_TypeDef *host)  {
+void tlvWaitReplyFromProbe(TlvHost_TypeDef *host)  {
   int size = 0, response = 0, retries = 0, count = 0;
   
-  while(uartGetByte(hSerial) != PROBE_OK) {
-    printf("Retry %d\n", retries + 1);
-    tlvWriteDataChunk(host->dataAddress, host->destAddress, size, host->hSerial);
-    if(retries++ > 3) {
-      printf("TLV DATA CORRUPTED\n");
-      return;
+  while(response != PROBE_OK) {
+    response = uartGetByte(host->hSerial);
+    
+    if(response == TLV_DATA_CORRUPTED) {
+      if(retries++ > 3) {
+        #if defined (TEST)
+        Throw(ERR_DATA_CORRUPTED);
+        #else
+        printf("Retry %d\n", retries);
+        printf("TLV DATA CORRUPTED\n");
+        return;
+        #endif
+      }
+      tlvWriteDataChunk(host->dataAddress, host->destAddress, size, host->hSerial);
     }
-  }
-  while(uartGetByte(hSerial) != PROBE_OK) {
-    if(count++ == 300) {
+    
+    else if(count++ == 300) {
       printf("Probe no response\n");
       return;
     }
@@ -226,53 +233,27 @@ void tlvWriteRam(TlvHost_TypeDef *host) {
   
   /* Inform probe transmission is ready */
   uartSendByte(host->hSerial, TLV_START_TRANSMISSION);
-  printf("Start Transmission\n");
-  // response = tlvWaitReplyFromProbe(host->hSerial, 250);
-  while(uartGetByte(host->hSerial) != PROBE_OK) {
-    if(count++ == 200) {
-      printf("Probe no response\n");
-      return;
-    }
-  }
+  // printf("Start Transmission\n");
+  tlvWaitReplyFromProbe(host);
+  
   //printf("PROBE REPLY OK\n");
   while(host->fileSize > 0) {
     /* Ensure size is not is negative value */
     size = tlvCheckDataSize(host->fileSize);
     tlvWriteDataChunk(host->dataAddress, host->destAddress, size, host->hSerial);
-    while(uartGetByte(host->hSerial) == TLV_DATA_CORRUPTED) {
-      printf("Retry %d\n", retries + 1);
-      tlvWriteDataChunk(host->dataAddress, host->destAddress, size, host->hSerial);
-      if(retries++ > 3) {
-        printf("TLV DATA CORRUPTED\n");
-        return;
-      }
-    }
-    while(uartGetByte(host->hSerial) != PROBE_OK) {
-      if(count++ == 300) {
-        printf("Probe no response\n");
-        return;
-      }
-    }
-    printf("PROBE REPLY OK\n");
+    tlvWaitReplyFromProbe(host);
+    // printf("PROBE REPLY OK\n");
     
-    printf("filesize %x  dest %x\n", host->fileSize, host->destAddress);
+    // printf("filesize %x  dest %x\n", host->fileSize, host->destAddress);
     host->dataAddress += size;
     host->destAddress += size;
     host->fileSize -= size;
   }
   
-  // response = tlvWaitReplyFromProbe(host->hSerial, 250);
-  while(uartGetByte(host->hSerial) != PROBE_OK) {
-    if(count++ == 200) {
-      printf("Probe no response\n");
-      return;
-    }
-  }
-  printf("PROBE REPLY OK\n");
-
   /* Inform probe transmission is end */
+  tlvWaitReplyFromProbe(host);
   uartSendByte(host->hSerial, TLV_END_TRANSMISSION);
-  printf("End Transmission\n");
+  // printf("End Transmission\n");
 } 
    
 /** tlvCheckAcknowledge is function to change the acknowledge reply from probe

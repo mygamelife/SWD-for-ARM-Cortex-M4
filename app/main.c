@@ -26,14 +26,14 @@ int main(void)
   while(probe.state != PROBE_END)	{
 	  probeProgrammer(&probe);
   }
-  writeCoreRegister(CORE_REG_PC, 0x20000000);
+  writeCoreRegister(CORE_REG_PC, 0x10000000);
   setCoreMode(CORE_NORMAL_MODE);
-  memoryReadWord(0x20000000, &dataRead);
-  memoryReadWord(0x20000004, &dataRead);
-  memoryReadWord(0x20000008, &dataRead);
-  memoryReadWord(0x2000000C, &dataRead);
-  memoryReadWord(0x20000010, &dataRead);
-  memoryReadWord(0x2000001C, &dataRead);
+  //memoryReadWord(0x10000000, &dataRead);
+ // memoryReadWord(0x20000004, &dataRead);
+  //memoryReadWord(0x20000008, &dataRead);
+ // memoryReadWord(0x2000000C, &dataRead);
+ // memoryReadWord(0x20000010, &dataRead);
+ // memoryReadWord(0x2000001C, &dataRead);
 
   // memoryWriteWord(0x200051E0, 0xDEADBEEF);
   // memoryWriteWord(0x200051E4, 0xDEADBEEF);

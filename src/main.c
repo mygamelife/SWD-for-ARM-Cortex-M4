@@ -10,18 +10,18 @@ int main(void) {
   TlvHost_TypeDef host; ElfData *elfData;
   int index = 0;
   
-  elfData = openElfFile("../FlashProgrammer/FlashProgrammer.elf");
-  
-  index = getIndexOfSectionByName(elfData, ".isr_vector");
-  host.fileSize = getSectionSize(elfData, index);
-  host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  host.hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
-  
-  printf("Flash ISR_VECTOR \n");
-  tlvWriteRam(&host);
-  
   // elfData = openElfFile("../FlashProgrammer/FlashProgrammer.elf");
+  
+  // index = getIndexOfSectionByName(elfData, ".isr_vector");
+  // host.fileSize = getSectionSize(elfData, index);
+  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  // host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  // host.hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
+  
+  // printf("Flash ISR_VECTOR \n");
+  // tlvWriteRam(&host);
+  
+  // elfData = openElfFile("../FlashProgrammer/FlashProgrammerx.elf");
   // index = getIndexOfSectionByName(elfData, ".text");
   // host.fileSize = getSectionSize(elfData, index);
   // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
@@ -30,6 +30,17 @@ int main(void) {
   
   // printf("Flash FLASH_PROGRAMMER \n");
   // tlvWriteRam(&host);
+  
+  elfData = openElfFile("../FlashProgrammer/FlashProgrammerx.elf");
+  index = getIndexOfSectionByName(elfData, ".data");
+  host.fileSize = getSectionSize(elfData, index);
+  host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  host.hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
+  
+  printf("Flash DATA\n");
+  tlvWriteRam(&host);
+  
   
   closeSerialPort(host.hSerial);
   closeFileInTxt(elfData->myFile);

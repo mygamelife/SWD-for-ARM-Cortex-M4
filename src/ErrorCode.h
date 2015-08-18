@@ -3,7 +3,7 @@
 
 typedef enum{
   ERR_RESPONSE_TIMEOUT,
-  ERR_CORRUPTED_DATA,
+  ERR_DATA_CORRUPTED,
 } ErrorCode;
 
 void displayErrorCode(ErrorCode err);

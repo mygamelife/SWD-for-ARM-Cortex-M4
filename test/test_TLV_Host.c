@@ -261,226 +261,173 @@ void test_tlvWriteDataChunk_should_stop_send_chunk_of_data_when_size_is_zero(voi
 
 void test_tlvWaitReplyFromProbe_expect_probe_reply_PROBE_OK_in_first_try(void)
 {
-  HANDLE hSerial; TlvHost_TypeDef *host;
+  TlvHost_TypeDef host;  HANDLE hSerial; 
+  host.hSerial = hSerial;
   
   uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  tlvWaitReplyFromProbe(hSerial, host);
+  tlvWaitReplyFromProbe(&host);
 }
 
-// void test_tlvWaitReplyFromProbe_should_catch_error_when_probe_fail_to_reply_after_3_tries(void)
-// {
-  // CEXCEPTION_T err;
-  // HANDLE hSerial;
+void test_tlvWaitReplyFromProbe_should_catch_error_after_3_tries_when_TLV_DATA_CORRUPTED(void)
+{
+  CEXCEPTION_T err;
+  TlvHost_TypeDef host;  HANDLE hSerial; 
+  host.hSerial = hSerial;
   
-  // Try {
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // int response = tlvWaitReplyFromProbe(hSerial, 3);
-    // TEST_FAIL_MESSAGE("Should throw an error due to ERR_RESPONSE_TIMEOUT");
-  // }
-  // Catch(err)  {
-    // TEST_ASSERT_EQUAL_MESSAGE(ERR_RESPONSE_TIMEOUT, err, "Expect ERR_RESPONSE_TIMEOUT");
-  // }
-// }
+  Try {
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartSendBytes_IgnoreAndReturn(1);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    
+    tlvWaitReplyFromProbe(&host);
+    TEST_FAIL_MESSAGE("Should throw an error due to ERR_DATA_CORRUPTED");
+  }
+  Catch(err)  {
+    TEST_ASSERT_EQUAL_MESSAGE(ERR_DATA_CORRUPTED, err, "ERR_DATA_CORRUPTED");
+  }
+}
 
   /********************************************
   *                 TLV-HOST                  *
   *                                           *
   *********************************************/
-// void test_tlvWriteRam_should_stop_transmit_data_when_probe_is_not_reply()
-// {
-  // TlvHost_TypeDef host;
-  // HANDLE hSerial;
-  // CEXCEPTION_T err;
+void test_tlvWriteRam_should_stop_transmit_data_when_probe_is_not_reply()
+{
+  TlvHost_TypeDef host;
+  HANDLE hSerial;
+  CEXCEPTION_T err;
   
-  // ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
-  // int index = getIndexOfSectionByName(elfData, ".text");
-  // host.fileSize = getSectionSize(elfData, index);
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  // host.hSerial = hSerial;
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  host.fileSize = 248;
+  host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  host.hSerial = hSerial;
   
-  // Try {
-    // /* Send Instruction and wait for reply */
-    // uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
-    // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-      
-    // /* Send data to probe */
-    // uartSendBytes_IgnoreAndReturn(1);
-      
-    // /* Wait probe reply */
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-    // uartGetByte_ExpectAndReturn(hSerial, NO_RESPONSE);
-      
-    // tlvWriteRam(&host);
-    // TEST_FAIL_MESSAGE("Should throw an error due to ERR_RESPONSE_TIMEOUT");
-  // }
-  // Catch(err)  {
-    // TEST_ASSERT_EQUAL_MESSAGE(ERR_RESPONSE_TIMEOUT, err, "Expect ERR_RESPONSE_TIMEOUT");
-  // }
+  /* Send Instruction and wait for reply */
+  uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
   
-  // closeFileInTxt(elfData->myFile);
-  // free(elfData);
-// }
+  /* Send data to probe */
+  uartSendBytes_IgnoreAndReturn(1);
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
 
-// void test_tlvWriteRam_given_TLV_DATA_CORRUPTED_should_retry_3_times()
-// {
-  // TlvHost_TypeDef host;
-  // HANDLE hSerial;
-  // CEXCEPTION_T err;
+  /* Wait probe reply */
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+  uartSendByte_ExpectAndReturn(hSerial, TLV_END_TRANSMISSION, 1);  
+  tlvWriteRam(&host);
   
-  // ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
-  // int index = getIndexOfSectionByName(elfData, ".text");
-  // host.fileSize = getSectionSize(elfData, index);
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  // host.hSerial = hSerial;
-  
-  // Try {
-    // /* Send Instruction and wait for reply */
-    // uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
-    // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-      
-    // /* Send data to probe */
-    // uartSendBytes_IgnoreAndReturn(1);
-      
-    // /* Wait probe reply */
-    // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
-    // uartSendBytes_IgnoreAndReturn(1);
-    // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
-    // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
-    // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
-    // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
-      
-    // tlvWriteRam(&host);
-    // TEST_FAIL_MESSAGE("Should throw an error due to ERR_CORRUPTED_DATA");
-  // }
-  // Catch(err)  {
-    // TEST_ASSERT_EQUAL_MESSAGE(ERR_CORRUPTED_DATA, err, "Expect ERR_CORRUPTED_DATA");
-  // }
-  
-  // closeFileInTxt(elfData->myFile);
-  // free(elfData);
-// }
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}
 
-// void test_tlvWriteRam_should_stop_retry_if_probe_reply_ok()
-// {
-  // TlvHost_TypeDef host;
-  // HANDLE hSerial;
-  // CEXCEPTION_T err;
+void test_tlvWriteRam_given_TLV_DATA_CORRUPTED_should_retry_3_times()
+{
+  TlvHost_TypeDef host;
+  HANDLE hSerial;
+  CEXCEPTION_T err;
   
-  // ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
-  // int index = getIndexOfSectionByName(elfData, ".text");
-  // host.fileSize = 248 + 248 + 248;
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  // host.hSerial = hSerial;
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  host.fileSize = getSectionSize(elfData, index);
+  host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  host.hSerial = hSerial;
   
-  // /* Send Instruction and wait for reply */
-  // uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+  Try {
+    /* Send Instruction and wait for reply */
+    uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
+    uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+      
+    /* Send data to probe */
+    uartSendBytes_IgnoreAndReturn(1);
+      
+    /* Wait probe reply */
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartSendBytes_IgnoreAndReturn(1);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+    uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+      
+    tlvWriteRam(&host);
+    TEST_FAIL_MESSAGE("Should throw an error due to ERR_DATA_CORRUPTED");
+  }
+  Catch(err)  {
+    TEST_ASSERT_EQUAL_MESSAGE(ERR_DATA_CORRUPTED, err, "Expect ERR_DATA_CORRUPTED");
+  }
+  
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}
+
+void test_tlvWriteRam_should_stop_retry_if_probe_reply_ok()
+{
+  TlvHost_TypeDef host;
+  HANDLE hSerial;
+  CEXCEPTION_T err;
+  
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  host.fileSize = 248 + 248 + 248;
+  host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  host.hSerial = hSerial;
+  
+  /* Send Instruction and wait for reply */
+  uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
     
-  // /* Send data to probe */  
-  // uartSendBytes_IgnoreAndReturn(1);  
-  // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
+  /* Send data to probe */  
+  uartSendBytes_IgnoreAndReturn(1);  
+  uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
   
-  // uartSendBytes_IgnoreAndReturn(1);  
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK); 
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
   
-  // uartSendBytes_IgnoreAndReturn(1);  
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
   
-  // uartSendBytes_IgnoreAndReturn(1);  
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+  uartSendBytes_IgnoreAndReturn(1);  
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
 
-  // uartSendByte_ExpectAndReturn(hSerial, TLV_END_TRANSMISSION, 1);
+  uartSendByte_ExpectAndReturn(hSerial, TLV_END_TRANSMISSION, 1);
   
-  // tlvWriteRam(&host);
+  tlvWriteRam(&host);
 
-  // closeFileInTxt(elfData->myFile);
-  // free(elfData);
-// }
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}
 
-// void test_tlvWriteRam_should_retry_if_probe_reply_PROBE_FAULT_or_TLV_DATA_CORRUPTED()
-// {
-  // TlvHost_TypeDef host;
-  // HANDLE hSerial;
-  // CEXCEPTION_T err;
+void test_tlvWriteRam_should_send_end_transmission_when_file_size_is_zero()
+{
+  TlvHost_TypeDef host;
+  HANDLE hSerial;
+  CEXCEPTION_T err;
   
-  // ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
-  // int index = getIndexOfSectionByName(elfData, ".text");
-  // host.fileSize = 248 + 248 + 248;
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  // host.hSerial = hSerial;
+  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
+  int index = getIndexOfSectionByName(elfData, ".text");
+  host.fileSize = 0;
+  host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+
+  host.hSerial = hSerial;
   
-  // /* Send Instruction and wait for reply */
-  // uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
-  
-  // /* Send data to probe */  
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartSendBytes_IgnoreAndReturn(1);  
+  /* Send Instruction and wait for reply */
+  uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
     
-  // uartGetByte_ExpectAndReturn(hSerial, TLV_DATA_CORRUPTED);
-  // uartSendBytes_IgnoreAndReturn(1);  
+  /* Wait probe reply */
+  uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
+  uartSendByte_ExpectAndReturn(hSerial, TLV_END_TRANSMISSION, 1);
   
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartSendBytes_IgnoreAndReturn(1);  
+  tlvWriteRam(&host);
   
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_FAULT);
-  // uartSendBytes_IgnoreAndReturn(1);  
-  
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartSendBytes_IgnoreAndReturn(1);  
-  
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartSendByte_ExpectAndReturn(hSerial, TLV_END_TRANSMISSION, 1);
-  
-  // tlvWriteRam(&host);
-
-  // closeFileInTxt(elfData->myFile);
-  // free(elfData);
-// }
-
-// void test_tlvWriteRam_should_send_end_transmission_when_file_size_is_zero()
-// {
-  // TlvHost_TypeDef host;
-  // HANDLE hSerial;
-  // CEXCEPTION_T err;
-  
-  // ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
-  // int index = getIndexOfSectionByName(elfData, ".text");
-  // host.fileSize = 248 + 248;
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-
-  // host.hSerial = hSerial;
-  
-  // /* Send Instruction and wait for reply */
-  // uartSendByte_ExpectAndReturn(hSerial, TLV_START_TRANSMISSION, 1);
-    
-  // /* Wait probe reply */
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // /* Send data to probe */
-  // uartSendBytes_IgnoreAndReturn(1);
-    
-  // /* Wait probe reply */
-  // uartGetByte_ExpectAndReturn(hSerial, PROBE_OK);
-  // uartSendByte_ExpectAndReturn(hSerial, TLV_END_TRANSMISSION, 1);
-  
-  // tlvWriteRam(&host);
-  
-  // closeFileInTxt(elfData->myFile);
-  // free(elfData);
-// }
+  closeFileInTxt(elfData->myFile);
+  free(elfData);
+}
 
 // void test_tlvCheckAcknowledge_given_PROBE_OK_should_change_state_to_TLV_START()
 // {
