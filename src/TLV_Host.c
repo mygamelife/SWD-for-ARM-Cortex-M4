@@ -194,7 +194,7 @@ int tlvCheckDataSize(int size)  {
   *
   * return    : return response if valid else retry until timeout
   */
-void tlvWaitReplyFromProbe(TlvHost_TypeDef *host)  {
+int tlvWaitReplyFromProbe(TlvHost_TypeDef *host)  {
   int size = 0, response = 0, retries = 0, count = 0;
   
   while(response != PROBE_OK) {
@@ -207,7 +207,7 @@ void tlvWaitReplyFromProbe(TlvHost_TypeDef *host)  {
         #else
         printf("Retry %d\n", retries);
         printf("TLV DATA CORRUPTED\n");
-        return;
+        return -1;
         #endif
       }
       tlvWriteDataChunk(host->dataAddress, host->destAddress, size, host->hSerial);
@@ -215,9 +215,10 @@ void tlvWaitReplyFromProbe(TlvHost_TypeDef *host)  {
     
     else if(count++ == 300) {
       printf("Probe no response\n");
-      return;
+      return -1;
     }
   }
+  return 0;
 }
 
 /** tlvWriteRam is a function to write data from elf to sram
@@ -233,27 +234,37 @@ void tlvWriteRam(TlvHost_TypeDef *host) {
   
   /* Inform probe transmission is ready */
   uartSendByte(host->hSerial, TLV_START_TRANSMISSION);
-  // printf("Start Transmission\n");
-  tlvWaitReplyFromProbe(host);
+  printf("Start Transmission\n");
+  response = tlvWaitReplyFromProbe(host);
+  if(response == -1) {
+    return;
+  }
+    
   
   //printf("PROBE REPLY OK\n");
   while(host->fileSize > 0) {
     /* Ensure size is not is negative value */
     size = tlvCheckDataSize(host->fileSize);
     tlvWriteDataChunk(host->dataAddress, host->destAddress, size, host->hSerial);
-    tlvWaitReplyFromProbe(host);
-    // printf("PROBE REPLY OK\n");
+    response = tlvWaitReplyFromProbe(host);
+    if(response == -1) {
+      return;
+    }
+    printf("PROBE REPLY OK\n");
     
-    // printf("filesize %x  dest %x\n", host->fileSize, host->destAddress);
+    printf("filesize %x  dest %x\n", host->fileSize, host->destAddress);
     host->dataAddress += size;
     host->destAddress += size;
     host->fileSize -= size;
   }
   
   /* Inform probe transmission is end */
-  tlvWaitReplyFromProbe(host);
+  response = tlvWaitReplyFromProbe(host);
+  if(response == -1) {
+    return;
+  }
   uartSendByte(host->hSerial, TLV_END_TRANSMISSION);
-  // printf("End Transmission\n");
+  printf("End Transmission\n");
 } 
    
 /** tlvCheckAcknowledge is function to change the acknowledge reply from probe

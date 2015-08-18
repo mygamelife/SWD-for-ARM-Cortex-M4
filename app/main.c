@@ -26,7 +26,7 @@ int main(void)
   while(probe.state != PROBE_END)	{
 	  probeProgrammer(&probe);
   }
-  writeCoreRegister(CORE_REG_PC, 0x10000000);
+  writeCoreRegister(CORE_REG_PC, 0x20000001);
   setCoreMode(CORE_NORMAL_MODE);
   //memoryReadWord(0x10000000, &dataRead);
  // memoryReadWord(0x20000004, &dataRead);

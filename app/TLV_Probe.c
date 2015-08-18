@@ -84,10 +84,9 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
   * return    : NONE
   */
 void waitIncomingData(UART_HandleTypeDef *uartHandle, uint8_t *buffer) {
-  int received = 0;
 
-  while(HAL_UART_Receive(uartHandle, buffer, ONE_BYTE, 5000) == HAL_OK) {
-      break;
+  while(HAL_UART_Receive(uartHandle, buffer, ONE_BYTE, 5000) == HAL_OK)	{
+	  break;
   }
 }
 
@@ -104,13 +103,10 @@ int tlvDecodeAndWriteToRam(uint8_t *buffer) {
   /* Decode packet from buffer */
   TLV *tlv = (TLV *)buffer;
   uint8_t length = tlv->length - CHECKSUM_LENGTH - ADDRESS_LENGTH;
-  uint32_t value = (*(uint32_t *)(&tlv->value[4]));
-  uint32_t value2 = (*(uint32_t *)(&tlv->value[8]));
-  uint32_t addr = (*(uint32_t *)(&tlv->value[0]));
   uint32_t address = get4Byte(&tlv->value[0]);
   
   verifyStatus = verifyValue(&tlv->value[4], length);
-  
+
   if(verifyStatus)  {
     /* Write to ram using swd */
     for(i = 0; i < length; i += 4)  {
@@ -120,7 +116,9 @@ int tlvDecodeAndWriteToRam(uint8_t *buffer) {
     }
       return WRITE_SUCCESS;
   }
-  else  return WRITE_FAIL;
+  else {
+    return WRITE_FAIL;
+  }
 }
 
 /** verifyValue is a function to verify tlv data by adding
@@ -141,6 +139,27 @@ int verifyValue(uint8_t *data, uint8_t length) {
   if(sum == 0)  return 1;
   
   else  return 0;
+}
+
+/** readFromTargetRam
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+void readFromTargetRam(UART_HandleTypeDef *uartHandle, uint8_t *buffer)  {
+  TLV *tlv = (TLV *)buffer;
+  uint8_t length = tlv->length;
+  uint32_t startAddress = get4Byte(&tlv->value[0]);
+  uint32_t endAddress = startAddress + length;
+  uint32_t data = 0;
+  
+  /* start reading from ram */
+  while(startAddress < endAddress)  {
+    memoryReadWord(startAddress, &data);
+    stm32UartSendByte(uartHandle, data);
+    startAddress += 4;
+  }
 }
 
 /** tlvWriteToTargetRam
@@ -166,24 +185,24 @@ void probeProgrammer(Probe_TypeDef *probe)  {
       else if(probe->rxBuffer[0] == TLV_WRITE) {
         writeRamStatus = tlvDecodeAndWriteToRam(probe->rxBuffer);
         //stm32UartSendByte(probe->uartHandle, PROBE_OK);
-        if(WRITE_SUCCESS) {
-          probe->txBuffer[0] = PROBE_OK;
+        if(writeRamStatus == WRITE_FAIL) {
+          stm32UartSendByte(probe->uartHandle, TLV_DATA_CORRUPTED);
         }
-        else  {
-          probe->txBuffer[0] = TLV_DATA_CORRUPTED;
+        else if(writeRamStatus == WRITE_SUCCESS) {
+          stm32UartSendByte(probe->uartHandle, PROBE_OK);
         }
-        HAL_UART_Transmit(probe->uartHandle, probe->txBuffer, 1, 5000);
       }
 
+      else if(probe->rxBuffer[0] == TLV_READ) {
+        // readFromTargetRam(probe->uartHandle, probe->rxBuffer);
+      }
+      
       else if(probe->rxBuffer[0] == TLV_END_TRANSMISSION) {
-    	  int i;
-
-    	  for(i = 0; i < 255; i ++)
-    		  probe->rxBuffer[i] = 0;
-
+        probe->rxBuffer[0] = 0;
         probe->state = PROBE_END;
         return;
       }
+      
       probe->state = PROBE_WAIT;
       break;
   }

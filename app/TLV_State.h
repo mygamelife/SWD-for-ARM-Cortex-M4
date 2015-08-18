@@ -42,9 +42,10 @@ typedef enum
 typedef enum
 {
   TLV_START_TRANSMISSION  = 10,
-  TLV_END_TRANSMISSION    = 88,
+  TLV_END_TRANSMISSION    = 20,
   TLV_WRITE               = 30,
-  TLV_DATA_CORRUPTED      = 40
+  TLV_READ                = 40,
+  TLV_DATA_CORRUPTED      = 50
 } TLV_Instruction;
 
 typedef enum  {

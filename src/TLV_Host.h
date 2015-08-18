@@ -32,6 +32,6 @@ void tlvWriteDataChunk(uint8_t *dataAddress, uint32_t destAddress, int size, HAN
 
 /* <!For internal use only!> */
 int tlvVerifyResponse(int response);
-void tlvWaitReplyFromProbe(TlvHost_TypeDef *host);
+int tlvWaitReplyFromProbe(TlvHost_TypeDef *host);
 
 #endif // TLV_Host_H

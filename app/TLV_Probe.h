@@ -25,6 +25,10 @@ void getTlvInstruction(UART_HandleTypeDef *uartHandle);
 void waitIncomingData(UART_HandleTypeDef *uartHandle, uint8_t *buffer);
 void probeProgrammer(Probe_TypeDef *tlvProbe);
 
+void readFromTargetRam(UART_HandleTypeDef *uartHandle, uint8_t *buffer);
+
+//void readFromTargetFlash();
+
 int tlvDecodeAndWriteToRam(uint8_t *buffer);
 int verifyValue(uint8_t *data, uint8_t length);
 

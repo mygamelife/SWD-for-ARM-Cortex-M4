@@ -1,5 +1,6 @@
 #include "unity.h"
 #include "TLV_Probe.h"
+#include "TLV_State.h"
 #include <stdio.h>
 #include "Delay.h"
 #include "Emulator.h"
@@ -68,23 +69,23 @@ void test_loadCopyInstruction_should_load_src_address_dest_address_and_length_in
   loadCopyFromSRAMToFlashInstruction((uint32_t *)0x200001F0, (uint32_t *)ADDR_FLASH_SECTOR_18, 2000);
 }
 
-void test_waitIncomingData_should_get_out_the_loop_when_data_is_arrive(void)
+void xtest_waitIncomingData_should_get_out_the_loop_when_data_is_arrive(void)
 {
   UART_HandleTypeDef uartHandle;
   uint8_t buffer[1024];
   
-  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, 4, 5000, HAL_OK);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, ONE_BYTE, 5000, HAL_OK);
   waitIncomingData(&uartHandle, buffer);
 }
 
-void test_waitIncomingData_should_wait_until_data_is_arrive(void)
+void xtest_waitIncomingData_should_wait_until_data_is_arrive(void)
 {
   UART_HandleTypeDef uartHandle;
   uint8_t buffer[1024] = {0};
   
-  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, 4, 5000, HAL_ERROR);
-  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, 4, 5000, HAL_ERROR);
-  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, 4, 5000, HAL_OK);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, ONE_BYTE, 5000, HAL_ERROR);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, ONE_BYTE, 5000, HAL_ERROR);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, buffer, ONE_BYTE, 5000, HAL_OK);
   waitIncomingData(&uartHandle, buffer);
 }
 
@@ -138,7 +139,7 @@ void test_verifyValue_given_wrong_chksum_should_return_0(void ) {
   TEST_ASSERT_EQUAL(result, 0);
 }
 
-void test_probeProgrammer_given_PROBE_WAIT_state_should_wait_for_instruction(void)
+void xtest_probeProgrammer_given_PROBE_WAIT_state_should_wait_for_instruction(void)
 {
   UART_HandleTypeDef uartHandle;
   Probe_TypeDef probe;
@@ -146,8 +147,8 @@ void test_probeProgrammer_given_PROBE_WAIT_state_should_wait_for_instruction(voi
   probe.state = PROBE_WAIT;
   probe.uartHandle = &uartHandle;
   
-  HAL_UART_Receive_ExpectAndReturn(&uartHandle, probe.rxBuffer, 4, 5000, HAL_ERROR);
-  HAL_UART_Receive_ExpectAndReturn(&uartHandle, probe.rxBuffer, 4, 5000, HAL_OK);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, probe.rxBuffer, ONE_BYTE, 5000, HAL_ERROR);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, probe.rxBuffer, ONE_BYTE, 5000, HAL_OK);
   
   probeProgrammer(&probe);
   
@@ -242,7 +243,7 @@ void test_probeProgrammer_probe_reply_TLV_DATA_CORRUPTED_when_fail_to_write_into
   probe.rxBuffer[16] = 0xCC;
   probe.rxBuffer[17] = 0xDD;
   /* Checksum */
-  probe.rxBuffer[18] = 0x53;
+  probe.rxBuffer[18] = 0x23;
   
   stm32UartSendByte_Expect(&uartHandle, TLV_DATA_CORRUPTED);
   probeProgrammer(&probe);
@@ -250,6 +251,22 @@ void test_probeProgrammer_probe_reply_TLV_DATA_CORRUPTED_when_fail_to_write_into
   TEST_ASSERT_EQUAL(PROBE_WAIT, probe.state);
 }
 
+void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(void)
+{ 
+  UART_HandleTypeDef uartHandle;
+  uint32_t data = 0;
+  
+  uint8_t buffer[] = {TLV_READ,  //type
+                      0x8,
+                      0xAB, 0xCD, 0xEF, 0x00}; //length
+  
+  memoryReadWord_ExpectAndReturn(0xABCDEF00, &data, 0);
+  stm32UartSendByte_Expect(&uartHandle, data);
+  memoryReadWord_ExpectAndReturn(0xABCDEF04, &data, 0);
+  stm32UartSendByte_Expect(&uartHandle, data);
+  
+  readFromTargetRam(&uartHandle, buffer);
+}
 // void test_tlvDecodePacket_should_decode_after_receive_TLV_Packet(void)
 // {
   // uint8_t txBuffer[1024], chksum = 0;
