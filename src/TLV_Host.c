@@ -35,14 +35,14 @@ TLV *tlvCreateNewPacket(uint8_t type) {
   *
   * return  : chksum is the check sum of the data in buffer
   */
-uint8_t tlvCalculateCheckSum(uint8_t *buffer, int length, int index) {
-  uint8_t sum = 0;
+void tlvInsertCheckSum(uint8_t *buffer, int length) {
+  uint8_t chksum = 0, index = 0;
   
   for(index; index < length; index++) {
-    sum += buffer[index];
+    chksum += buffer[index];
   }
   
-  return ~sum + 1;
+  buffer[length - 1] = ~chksum + 1;
 }
 
 /**
@@ -86,6 +86,15 @@ void tlvPack4ByteAddress(uint32_t address, TLV *tlv)  {
   tlv->value[1] = (address & 0x00ff0000) >> 16;
   tlv->value[2] = (address & 0x0000ff00) >> 8;
   tlv->value[3] = (address & 0x000000ff) >> 0;
+  
+  tlv->length += 4;
+}
+
+void tlvPack4ByteData(TLV *tlv, uint32_t data, int index)  {
+  tlv->value[index]     = (data & 0xff000000) >> 24;
+  tlv->value[index + 1] = (data & 0x00ff0000) >> 16;
+  tlv->value[index + 2] = (data & 0x0000ff00) >> 8;
+  tlv->value[index + 3] = (data & 0x000000ff) >> 0;
   
   tlv->length += 4;
 }
@@ -159,7 +168,7 @@ void tlvGetBytesData(uint8_t *dataAddress, TLV *tlv, int size) {
 void tlvWriteDataChunk(uint8_t *dataAddress, uint32_t destAddress, int size, HANDLE hSerial)  {
   uint8_t txBuffer[1024] = {0};
   
-  TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
+  TLV *tlv = tlvCreateNewPacket(TLV_WRITE_RAM);
   
   /* Pack destAddress into tlv->value */
   tlvPack4ByteAddress((uint32_t)destAddress, tlv);
@@ -214,7 +223,7 @@ int tlvWaitReplyFromProbe(TlvHost_TypeDef *host)  {
     }
     
     else if(count++ == 300) {
-      printf("Probe no response\n");
+      // printf("Probe no response\n");
       return -1;
     }
   }
@@ -240,7 +249,6 @@ void tlvWriteRam(TlvHost_TypeDef *host) {
     return;
   }
     
-  
   //printf("PROBE REPLY OK\n");
   while(host->fileSize > 0) {
     /* Ensure size is not is negative value */
@@ -250,7 +258,7 @@ void tlvWriteRam(TlvHost_TypeDef *host) {
     if(response == -1) {
       return;
     }
-    printf("PROBE REPLY OK\n");
+    // printf("PROBE REPLY OK\n");
     
     printf("filesize %x  dest %x\n", host->fileSize, host->destAddress);
     host->dataAddress += size;
@@ -265,41 +273,206 @@ void tlvWriteRam(TlvHost_TypeDef *host) {
   }
   uartSendByte(host->hSerial, TLV_END_TRANSMISSION);
   printf("End Transmission\n");
-} 
-   
-/** tlvCheckAcknowledge is function to change the acknowledge reply from probe
-  * and decise the next tlv state
+}
+
+/** tlvReadRam is to read target ram
   *
-  * input     : acknowledge is the response from probe
+  * input     : host is a pointer pointing to TlvHost_TypeDef 
   *
-  * return    : TLV State 
+  * return    : NONE 
   */
-TLV_State tlvCheckAcknowledge(uint8_t acknowledge)  {
-  static count = 0;
+void tlvReadRam(TlvHost_TypeDef *host)  {
+  uint8_t response = 0, size = 0;
   
-  if(acknowledge == PROBE_OK)  {
-    // printf("Probe reply OK!\n");
-    return TLV_START;
-  }
+  TLV *tlv = tlvCreateNewPacket(TLV_READ); 
+  
+  /* Inform probe transmission is ready */
+  uartSendByte(host->hSerial, TLV_START_TRANSMISSION);
+  // printf("Start Transmission\n");
+  response = tlvWaitReplyFromProbe(host);
+  if(response == -1) {return;}
+  
+  // printf("PROBE REPLY OK\n");
+  while(host->fileSize > 0) {
+    /* Ensure size is not is negative value */
+    size = tlvCheckDataSize(host->fileSize);      
+    /** Send tlv packet to request probe to read data in
+        specified memory from target ram according **/
+    /* Pack destAddress into tlv->value */
+    tlvPack4ByteAddress(host->destAddress, tlv);
+    tlv->length = size;
+    /* pack tlv packet into txBuffer */
+    tlvPackPacketIntoBuffer(host->txBuffer, tlv);
+    uartSendBytes(host->hSerial, host->txBuffer, ONE_BYTE);
       
-  else if(acknowledge == PROBE_FAULT)  {
-    /** Retries 3 times if probe still reply fault acknowledgement it may due to 
-      * 1.  Wire connection problem
-      * 2.  Power supply problem
-      * And many other possible season can cause this problem
-      */
-      if(count++ == 3)  {
-        count = 0; //clear count
-        return TLV_ABORT;
-      }
-      else  {
-        return TLV_TRANSMIT_DATA;
-      }
+    while(uartGetBytes(host->hSerial, host->rxBuffer, ONE_BYTE) > 0)  {
+      if(host->rxBuffer[0] == TLV_SEND) break;
+    }
+    // printf("Verifying..........\n");
+    verifyReadDataFromRam(host, size);
+    host->dataAddress += size;
+    host->destAddress += size;
+    host->fileSize -= size;
   }
   
-  else if(acknowledge == PROBE_COMPLETE)
-    return TLV_COMPLETE;
+  /* Inform probe transmission is end */
+  response = tlvWaitReplyFromProbe(host);
+  if(response == -1) {return;}
+  uartSendByte(host->hSerial, TLV_END_TRANSMISSION);
+  // printf("End Transmission\n");
+}
+
+/** verifyReadDataFromRam is a function to verify data in ram send from target
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+void verifyReadDataFromRam(TlvHost_TypeDef *host, int sizeToRead) {
+  int index = 0;
+  uint32_t receive = 0, actual = 0;
   
+  for(index = 0; index < sizeToRead; index += 4)  {
+    receive = get4Byte(&host->rxBuffer[index + 1]);
+    actual = get4Byte(&host->dataAddress[index]);
+    if(receive != actual) {
+      // printf("NOT MATCH! index %d, rxBuffer %x, dataAddress %x\n", index, receive, actual);
+      return;
+    }
+    // printf("data %x %x %x %x\n", get4Byte(&host->rxBuffer[index + 1]), get4Byte(index + 5), get4Byte(index + 9), get4Byte(index + 13));
+  }
+  host->rxBuffer[0] = 0;
+}
+
+TLV_Session *createTLVSession(void) {
+  static TLV_Session session;
+  
+  session.hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
+  return &session;
+}
+
+TLV *createTlvPacket(uint8_t command, uint8_t size, uint8_t *data)  {
+  int i, chksum = 0; static TLV tlv;
+  
+  tlv.type = command;
+  tlv.length = size + 1;//extra length for checksum
+  
+  for(i = 0; i < tlv.length; i++) {
+    tlv.value[i] = data[i];
+    chksum += tlv.value[i];
+  }
+  
+  tlv.value[tlv.length - 1] = ~chksum + 1;
+  
+  return &tlv;
+}
+
+void tlvSend(TLV_Session *session, TLV *tlv)  {
+  
+  /** TLV contain type, length and value 
+    * the buffer size need to plus 2 is because need
+    * to include the tlv->type and tlv->length
+    */
+  uartSendBytes(session->hSerial, (uint8_t *)tlv, ONE_BYTE);
+}
+
+/** tlvReceive is a function to receive tlv packet and verify the instruction if it is valid
+  *
+  */
+TLV *tlvReceive(TLV_Session *session) {
+  static TLV tlv;
+  
+  /** Read first 2 byte of the tlv packet which is 
+    * TLV->Type and TLV->Length
+    */
+  while(uartGetBytes(session->hSerial, session->rxBuffer, 2) == 0);
+  tlv.type = session->rxBuffer[0];
+  tlv.length = session->rxBuffer[1];
+  
+  /** Verify instruction */
+  if(tlv.type == -1) {
+    Throw(ERR_INVALID_INSTRUCTION);
+  }
+  /** Verify data length */
+  else if(tlv.length > 0) {
+    uartGetBytes(session->hSerial, session->rxBuffer, tlv.length);
+    tlv.values = session->rxBuffer;
+  }
+  
+  return &tlv;
+}
+
+uint8_t *convertWordToByte(uint32_t wordData) {
+  static uint8_t buffer[4];
+  
+  buffer[0] = (wordData & 0xff000000) >> 24 ;
+  buffer[1] = (wordData & 0x00ff0000) >> 16;
+  buffer[2] = (wordData & 0x0000ff00) >> 8;
+  buffer[3] = (wordData & 0x000000ff) >> 0;
+
+  return buffer;
+}
+
+void tlvReadTargetRegister(TLV_Session *session, uint32_t registerAddress)  {  
+  uint8_t *byteData;
+  
+  byteData = convertWordToByte(registerAddress);
+  TLV *tlv = createTlvPacket(TLV_READ_REGISTER, 4, byteData);
+  
+  tlvSend(session, tlv);
+  TLV *probeReply = tlvReceive(session);
+  if(probeReply->type == PROBE_OK && probeReply->length > 0)  {
+    
+    printf("target register value %x\n", get4Byte(&probeReply->values[0]));
+  }
   else
-    printf("Invalid response from PROBE\n");
+    printf("no value\n");
+}
+
+void tlvWriteTargetRegister(TLV_Session *session, uint32_t registerAddress, uint32_t data)  {
+  TLV *tlv = tlvCreateNewPacket(TLV_WRITE_REGISTER);
+  uint8_t *regAddress, *regData;
+  
+  tlvPack4ByteData(tlv, registerAddress, 0);
+  tlvPack4ByteData(tlv, data, 4);
+  tlvInsertCheckSum(tlv->value, tlv->length);
+
+  tlvSend(session, tlv);
+  TLV *probeReply = tlvReceive(session);
+}
+
+void tlvHaltTarget(TLV_Session *session)  {
+  uint8_t *byteData;
+  
+  /**from CoreDebug_Utilities SET_CORE_DEBUG_HALT */
+  byteData = convertWordToByte(SET_CORE_DEBUG_HALT); 
+  TLV *tlv = createTlvPacket(TLV_HALT_TARGET, 4, byteData);
+  
+  tlvSend(session, tlv);
+  TLV *probeReply = tlvReceive(session);
+}
+
+void tlvRunTarget(TLV_Session *session)  {
+  uint8_t *byteData;
+  
+  /** from CoreDebug_Utilities SET_CORE_NORMAL */
+  byteData = convertWordToByte(SET_CORE_NORMAL); 
+  TLV *tlv = createTlvPacket(TLV_RUN_TARGET, 4, byteData);
+  
+  tlvSend(session, tlv);
+  TLV *probeReply = tlvReceive(session);
+}
+
+/**
+  * nInstructions is numbers of instruction as defined by this paramenter
+  */
+void tlvStep(TLV_Session *session, int nInstructions)  {
+  TLV *tlv = createTlvPacket(TLV_STEP, 1, (uint8_t*)&nInstructions);
+  
+  tlvSend(session, tlv);
+  TLV *probeReply = tlvReceive(session);
+}
+
+void debugInterface() {
+  
 }

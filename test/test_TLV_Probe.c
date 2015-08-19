@@ -9,6 +9,8 @@
 #include "mock_swdStub.h"
 #include "swd_Utilities.h"
 #include "mock_configurePort.h"
+#include "mock_CoreDebug.h"
+#include "CoreDebug_Utilities.h"
 #include "mock_IO_Operations.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
@@ -91,7 +93,7 @@ void xtest_waitIncomingData_should_wait_until_data_is_arrive(void)
 
 void test_tlvDecodeAndWriteToRam_should_decode_when_chksum_is_correct(void)
 {
-	uint8_t buffer[] = {  TLV_WRITE,  //type
+	uint8_t buffer[] = {  TLV_WRITE_RAM,  //type
                         9, //length
                         0xAA, 0xBB, 0xCC, 0xDD, //Address
                         0x10, 0x20, 0x30, 0x40, //Data
@@ -103,7 +105,7 @@ void test_tlvDecodeAndWriteToRam_should_decode_when_chksum_is_correct(void)
 
 void test_tlvDecodeAndWriteToRam_shouldnt_decode_when_chksum_is_diff_from_sum_up_value(void)
 {
-	uint8_t buffer[] = {  TLV_WRITE,  //type
+	uint8_t buffer[] = {  TLV_WRITE_RAM,  //type
                         17, //length
                         0xAA, 0xBB, 0xCC, 0xDD, //Address
                         0x10, 0x20, 0x30, 0x40, //Data
@@ -142,15 +144,16 @@ void test_verifyValue_given_wrong_chksum_should_return_0(void ) {
 void xtest_probeProgrammer_given_PROBE_WAIT_state_should_wait_for_instruction(void)
 {
   UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
   Probe_TypeDef probe;
   
   probe.state = PROBE_WAIT;
   probe.uartHandle = &uartHandle;
-  
   HAL_UART_Receive_ExpectAndReturn(&uartHandle, probe.rxBuffer, ONE_BYTE, 5000, HAL_ERROR);
   HAL_UART_Receive_ExpectAndReturn(&uartHandle, probe.rxBuffer, ONE_BYTE, 5000, HAL_OK);
   
-  probeProgrammer(&probe);
+  probeProgrammer(&probe, session);
   
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_INSTRUCTION, probe.state);
 }
@@ -158,6 +161,8 @@ void xtest_probeProgrammer_given_PROBE_WAIT_state_should_wait_for_instruction(vo
 void test_probeProgrammer_given_TLV_START_TRANSMISSION_instruction_probe_should_reply_OK(void)
 {
   UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
   Probe_TypeDef probe;
   
   probe.state = PROBE_INTERPRET_INSTRUCTION;
@@ -166,21 +171,23 @@ void test_probeProgrammer_given_TLV_START_TRANSMISSION_instruction_probe_should_
   
   stm32UartSendByte_Expect(&uartHandle, PROBE_OK);
   
-  probeProgrammer(&probe);
+  probeProgrammer(&probe, session);
   
   TEST_ASSERT_EQUAL(PROBE_WAIT, probe.state);
 }
 
-void test_probeProgrammer_given_TLV_WRITE_instruction_probe_write_data_to_ram_and_reply_OK_when_done_writing(void)
+void test_probeProgrammer_given_TLV_WRITE_RAM_instruction_probe_write_data_to_ram_and_reply_OK_when_done_writing(void)
 {
   UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
   Probe_TypeDef probe;
   
   probe.state = PROBE_INTERPRET_INSTRUCTION;
   probe.uartHandle = &uartHandle;
   
   /* Type */
-  probe.rxBuffer[0] = TLV_WRITE;
+  probe.rxBuffer[0] = TLV_WRITE_RAM;
   /* Length */
   probe.rxBuffer[1] = 13;
   /* Address */
@@ -205,7 +212,7 @@ void test_probeProgrammer_given_TLV_WRITE_instruction_probe_write_data_to_ram_an
   memoryWriteWord_Expect(0x20002000, 0xBEEFCAFE);
   
   stm32UartSendByte_Expect(&uartHandle, PROBE_OK);
-  probeProgrammer(&probe);
+  probeProgrammer(&probe, session);
   
   TEST_ASSERT_EQUAL(PROBE_WAIT, probe.state);
 }
@@ -213,13 +220,15 @@ void test_probeProgrammer_given_TLV_WRITE_instruction_probe_write_data_to_ram_an
 void test_probeProgrammer_probe_reply_TLV_DATA_CORRUPTED_when_fail_to_write_into_target_ram(void)
 {
   UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
   Probe_TypeDef probe;
   
   probe.state = PROBE_INTERPRET_INSTRUCTION;
   probe.uartHandle = &uartHandle;
   
   /* Type */
-  probe.rxBuffer[0] = TLV_WRITE;
+  probe.rxBuffer[0] = TLV_WRITE_RAM;
   /* Length */
   probe.rxBuffer[1] = 17;
   /* Address */
@@ -246,27 +255,110 @@ void test_probeProgrammer_probe_reply_TLV_DATA_CORRUPTED_when_fail_to_write_into
   probe.rxBuffer[18] = 0x23;
   
   stm32UartSendByte_Expect(&uartHandle, TLV_DATA_CORRUPTED);
-  probeProgrammer(&probe);
+  probeProgrammer(&probe, session);
   
   TEST_ASSERT_EQUAL(PROBE_WAIT, probe.state);
 }
 
-void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(void)
+void test_createTlvPacket_should_contain_command_size_and_data(void)
+{ 
+  uint8_t data[] = {0x89, 0xAB, 0xCD, 0xEF};
+  
+  TLV *tlv = createTlvPacket(TLV_READ, 4, data);
+  
+  TEST_ASSERT_EQUAL(TLV_READ, tlv->type);
+  TEST_ASSERT_EQUAL(5, tlv->length);
+  TEST_ASSERT_EQUAL_HEX32(0x89ABCDEF, get4Byte(&tlv->value[0]));
+  TEST_ASSERT_EQUAL_HEX8(0xE4, tlv->value[4]);
+}
+
+void test_sendTLV_should_send_tlv_packet(void)
 { 
   UART_HandleTypeDef uartHandle;
-  uint32_t data = 0;
+  uint8_t data[] = {0xAB, 0xCD, 0xEF};
   
-  uint8_t buffer[] = {TLV_READ,  //type
-                      0x8,
-                      0xAB, 0xCD, 0xEF, 0x00}; //length
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
+  TLV *tlv = createTlvPacket(TLV_READ, 3, data);
+  
+  stm32UartSendBytes_Expect(session->uartHandle, (uint8_t *)tlv);
+  tlvSend(session, tlv);
+}
+
+void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(void)
+{ 
+  uint32_t data = 0; 
+  Probe_TypeDef probe;
+  UART_HandleTypeDef uartHandle;
+  
+  probe.uartHandle = &uartHandle;
+  probe.rxBuffer[0] = TLV_READ;
+  probe.rxBuffer[1] = 0x8;
+  probe.rxBuffer[2] = 0xAB;
+  probe.rxBuffer[3] = 0xCD;
+  probe.rxBuffer[4] = 0xEF;
+  probe.rxBuffer[5] = 0x00;
   
   memoryReadWord_ExpectAndReturn(0xABCDEF00, &data, 0);
-  stm32UartSendByte_Expect(&uartHandle, data);
   memoryReadWord_ExpectAndReturn(0xABCDEF04, &data, 0);
-  stm32UartSendByte_Expect(&uartHandle, data);
   
-  readFromTargetRam(&uartHandle, buffer);
+  stm32UartSendBytes_Expect(&uartHandle, probe.txBuffer); 
+  
+  readFromTargetRam(&probe);
 }
+
+
+void test_readTargetRegister_should_read_the_register_value_and_sendTLV_to_host(void)
+{ 
+  UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
+  uint32_t data = 0; 
+  uint8_t buffer[] = {0xA0, 0xB0, 0xC0, 0xD0};
+  
+  TLV *tlv = createTlvPacket(TLV_READ, 4, buffer);
+  
+  readCoreRegister_Expect(CORE_REG_PC, &data);
+  //setCoreMode_Expect(SET_CORE_NORMAL);
+  stm32UartSendBytes_Expect(&uartHandle, (uint8_t*)tlv); 
+  
+  readTargetRegister(session, CORE_REG_PC);
+}
+
+void test_writeTargetRegister_given_CORE_REG_R0_and_data_0xDEADBEEF_should_write_into_register_0(void)
+{ 
+  UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
+  
+  TLV *tlv = createTlvPacket(PROBE_OK, 0, 0);
+  
+  writeCoreRegister_Expect(CORE_REG_FPREGS1, 0xCAFEBEEF);
+  //setCoreMode_Expect(SET_CORE_NORMAL);
+  stm32UartSendBytes_Expect(&uartHandle, (uint8_t*)tlv); 
+  
+  writeTargetRegister(session, CORE_REG_FPREGS1, 0xCAFEBEEF);
+}
+
+void test_tlvReceive_should_receive_the_whole_TLV_packet(void)
+{ 
+  UART_HandleTypeDef uartHandle;
+  initUart_ExpectAndReturn(&uartHandle);
+  TLV_Session *session = createTlvSession();
+
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, session->receive, 2, 5000, HAL_ERROR); 
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, session->receive, 2, 5000, HAL_ERROR);
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, session->receive, 2, 5000, HAL_OK);
+  session->receive[1] = 10;
+  session->receive[2] = 20;
+  session->receive[3] = 30;
+  session->receive[4] = 40;
+  session->receive[5] = 50;  
+   
+  HAL_UART_Receive_ExpectAndReturn(&uartHandle, session->receive, 10, 5000, HAL_OK); 
+  TLV *tlv = tlvReceive(session);
+}
+
 // void test_tlvDecodePacket_should_decode_after_receive_TLV_Packet(void)
 // {
   // uint8_t txBuffer[1024], chksum = 0;
@@ -274,12 +366,12 @@ void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(
   // pElfSection = elfGetSectionInfoFromFile("test/ELF_File/FlashProgrammer.elf", ".text");
   
   // /* Create Packet */
-  // TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
+  // TLV *tlv = tlvCreateNewPacket(TLV_WRITE_RAM);
   
   // /* Put Data into Buffer */
   // tlvGetDataFromElf(tlv, pElfSection);
   
-  // TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 253, pElfSection, tlv);
+  // TEST_ASSERT_EQUAL_TLV(TLV_WRITE_RAM, 253, pElfSection, tlv);
   
   // /* Pack into TXBUFFER */
   // tlvPackPacketIntoTxBuffer(txBuffer, tlv);
@@ -290,7 +382,7 @@ void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(
   // TEST_ASSERT_EQUAL(tlvDecode->errorCode, TLV_CLEAR_ERROR); 
   
   // /* Type */
-  // TEST_ASSERT_EQUAL(tlvDecode->type, TLV_WRITE);  
+  // TEST_ASSERT_EQUAL(tlvDecode->type, TLV_WRITE_RAM);  
   // /* Length */
   // TEST_ASSERT_EQUAL(tlvDecode->length, 253);
   // /* Address */
@@ -377,9 +469,9 @@ void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(
   // TEST_ASSERT_EQUAL_HEX8(tlv.value[12], 0xFF);
 // }
 
-// void test_tlvVerifyType_given_TLV_WRITE_should_return_1(void ) {
+// void test_tlvVerifyType_given_TLV_WRITE_RAM_should_return_1(void ) {
   
-  // TEST_ASSERT_EQUAL(tlvVerifyType(TLV_WRITE), 1);
+  // TEST_ASSERT_EQUAL(tlvVerifyType(TLV_WRITE_RAM), 1);
 // }
 
 // void test_tlvVerifyType_given_INVALID_TYPE_should_return_0(void ) {
@@ -416,16 +508,16 @@ void test_readFromTargetRam_should_read_the_given_address_and_send_back_to_host(
   // TEST_ASSERT_EQUAL(data32, 0xDEADCAFE);
 // }
 
-// void test_tlvCheckOperation_given_TLV_WRITE_should_write_into_RAM(void) {
+// void test_tlvCheckOperation_given_TLV_WRITE_RAM_should_write_into_RAM(void) {
   // int i = 0;
-  // uint8_t buffer[] = {  TLV_WRITE,  //type
+  // uint8_t buffer[] = {  TLV_WRITE_RAM,  //type
                         // 13, //length
                         // 0xCA, 0xCA, 0xCA, 0xCA,  //address
                         // 0xFA, 0xCE, 0xDE, 0xAF,  //data
                         // 0xDE, 0xAD, 0xCA, 0xFE,
                         // 0xAD};  //chksum
   // TLV *tlv = tlvDecodePacket(buffer);
-  // TEST_ASSERT_EQUAL_HEX8(tlv->type, TLV_WRITE);
+  // TEST_ASSERT_EQUAL_HEX8(tlv->type, TLV_WRITE_RAM);
   // TEST_ASSERT_EQUAL(tlv->length, 13);
   
   // uint32_t address = tlv->sectionAddress;

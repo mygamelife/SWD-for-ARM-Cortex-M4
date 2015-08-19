@@ -3,7 +3,7 @@
 int main(void)
 {
   Probe_TypeDef probe;
-  uint32_t idr = 0, dataRead = 0, ack = 0;
+  uint32_t idr = 0, dataRead = 0, dataRead2 = 0, ack = 0;
 
   /* Hardware configuration */
   HAL_Init();
@@ -20,28 +20,22 @@ int main(void)
   swdWriteCSW(&ack, CSW_DEFAULT_MASK | CSW_WORD_SIZE);
 
   probe.state = PROBE_WAIT;
-  probe.uartHandle = initUart();
+  TLV_Session *session = createTlvSession();
+  //probe.uartHandle = initUart();
 
-  setCoreMode(CORE_DEBUG_HALT);
-  while(probe.state != PROBE_END)	{
-	  probeProgrammer(&probe);
-  }
-  writeCoreRegister(CORE_REG_PC, 0x20000001);
-  setCoreMode(CORE_NORMAL_MODE);
-  //memoryReadWord(0x10000000, &dataRead);
- // memoryReadWord(0x20000004, &dataRead);
-  //memoryReadWord(0x20000008, &dataRead);
- // memoryReadWord(0x2000000C, &dataRead);
- // memoryReadWord(0x20000010, &dataRead);
- // memoryReadWord(0x2000001C, &dataRead);
+  //setCoreMode(CORE_DEBUG_HALT);
+  //writeCoreRegister(CORE_REG_PC, 0x20000001);
+  //setCoreMode(CORE_NORMAL_MODE);
 
-  // memoryWriteWord(0x200051E0, 0xDEADBEEF);
-  // memoryWriteWord(0x200051E4, 0xDEADBEEF);
-  // memoryWriteWord(0x200051E8, 0xDEADBEEF);
-  // memoryWriteWord(0x200051EC, 0xDEADBEEF);
-  // loadCopyFromSRAMToFlashInstruction(0x200051E0, 0x081C0000, 16);
+  //readCoreRegister(CORE_REG_PC, &dataRead);
+  //setCoreMode(CORE_NORMAL_MODE);
 
+  //readCoreRegister(CORE_REG_PC, &dataRead);
+  //setCoreMode(CORE_NORMAL_MODE);
 
   while(1)
-  { }
+  {
+	  probeProgrammer(&probe, session);
+
+  }
 }

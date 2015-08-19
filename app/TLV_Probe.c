@@ -147,18 +147,189 @@ int verifyValue(uint8_t *data, uint8_t length) {
   *
   * return    : NONE
   */
-void readFromTargetRam(UART_HandleTypeDef *uartHandle, uint8_t *buffer)  {
-  TLV *tlv = (TLV *)buffer;
+void readFromTargetRam(Probe_TypeDef *probe)  {
+  TLV *tlv = (TLV *)probe->rxBuffer;
+  int i;
+  //uint8_t txBuffer[255] = {0};
   uint8_t length = tlv->length;
-  uint32_t startAddress = get4Byte(&tlv->value[0]);
-  uint32_t endAddress = startAddress + length;
+  uint32_t address = get4Byte(&tlv->value[0]);
   uint32_t data = 0;
   
+  probe->txBuffer[0] = TLV_SEND;
   /* start reading from ram */
-  while(startAddress < endAddress)  {
-    memoryReadWord(startAddress, &data);
-    stm32UartSendByte(uartHandle, data);
-    startAddress += 4;
+  for(i = 1; i < length; i+= 4) {
+    memoryReadWord(address, &data);
+    probe->txBuffer[i]     = (data & 0xff000000) >> 24 ;
+    probe->txBuffer[i + 1] = (data & 0x00ff0000) >> 16;
+    probe->txBuffer[i + 2] = (data & 0x0000ff00) >> 8;
+    probe->txBuffer[i + 3] = (data & 0x000000ff) >> 0;
+    address = address + 0x4;
+  }
+  
+  stm32UartSendBytes(probe->uartHandle, probe->txBuffer);
+}
+
+uint8_t *convertWordToByte(uint32_t wordData) {
+  static uint8_t buffer[4];
+  
+  buffer[0] = (wordData & 0xff000000) >> 24 ;
+  buffer[1] = (wordData & 0x00ff0000) >> 16;
+  buffer[2] = (wordData & 0x0000ff00) >> 8;
+  buffer[3] = (wordData & 0x000000ff) >> 0;
+  
+  return buffer;
+}
+
+/** 
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+void writeTargetRegister(TLV_Session *session, uint32_t registerAddress, uint32_t data) {
+  TLV *tlv;
+  
+  writeCoreRegister(registerAddress, data);
+  //setCoreMode(SET_CORE_NORMAL);
+  
+  tlv = createTlvPacket(PROBE_OK, 0, 0);
+  tlvSend(session, tlv);
+}
+
+/** 
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+void readTargetRegister(TLV_Session *session, uint32_t registerAddress) {
+  uint8_t *byteData;  uint32_t data = 0;
+  TLV *tlv;
+  
+  readCoreRegister(registerAddress, &data);
+  //setCoreMode(SET_CORE_NORMAL);
+  
+  byteData = convertWordToByte(data);
+  tlv = createTlvPacket(PROBE_OK, 4, byteData);
+  tlvSend(session, tlv);
+}
+
+void haltTarget(TLV_Session *session, uint32_t setCoreCommand) {
+  setCoreMode(setCoreCommand);
+  
+  TLV *tlv = createTlvPacket(PROBE_OK, 0, 0);
+  tlvSend(session, tlv);
+}
+
+void runTarget(TLV_Session *session, uint32_t setCoreCommand) {
+  setCoreMode(setCoreCommand);
+  
+  TLV *tlv = createTlvPacket(PROBE_OK, 0, 0);
+  tlvSend(session, tlv);
+}
+
+void step(TLV_Session *session, int nInstructions)  {
+  stepOnly(nInstructions);
+  
+  TLV *tlv = createTlvPacket(PROBE_OK, 0, 0);
+  tlvSend(session, tlv);
+}
+
+/** 
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+TLV_Session *createTlvSession(void) {
+  static TLV_Session session;
+  
+  session.uartHandle = initUart();
+  
+  return &session;
+}
+
+/** 
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+TLV *createTlvPacket(uint8_t command, uint8_t size, uint8_t *data) {
+  int i, chksum = 0; static TLV tlv;
+  
+  tlv.type = command;
+  tlv.length = size + 1; //extrac length for chksum
+  
+  if(size > 0)  
+  {
+    for(i = 0; i < tlv.length; i++) 
+    {
+      tlv.value[i] = data[i];
+      chksum += tlv.value[i];
+    }
+    tlv.value[tlv.length - 1] = ~chksum + 1;  
+  }
+  
+  return &tlv;
+}
+
+/** 
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+void tlvSend(TLV_Session *session, TLV *tlv) {
+  
+  /* TLV contain type, length and value **/
+  stm32UartSendBytes(session->uartHandle, (uint8_t *)tlv);
+}
+
+/** 
+  *
+  * input     : 
+  *
+  * return    : NONE
+  */
+TLV *tlvReceive(TLV_Session *session) {
+  static TLV tlv; 
+
+  while(HAL_UART_Receive(session->uartHandle, session->receive, 2, 5000) != HAL_OK);
+  tlv.type = session->receive[0];
+  tlv.length = session->receive[1];
+  
+  if(tlv.length > 0)  {
+    HAL_UART_Receive(session->uartHandle, session->receive, tlv.length, 5000);
+    tlv.values = session->receive;
+  }
+  
+  return &tlv;
+}
+
+void verifyTlvData()  {
+  
+}
+
+void verifyTlvInstruction(TLV *tlv) {
+  switch(tlv->type) {
+    case TLV_READ_RAM :
+      break;
+    case TLV_WRITE_RAM :
+      break;
+    case TLV_READ_REGISTER :
+      break;
+    case TLV_WRITE_REGISTER :
+      break;
+    case TLV_HALT_TARGET :
+      break;
+    case TLV_RUN_TARGET :
+      break;
+    case TLV_STEP :
+      break;
+      
+    default :
+      break;  
   }
 }
 
@@ -168,39 +339,69 @@ void readFromTargetRam(UART_HandleTypeDef *uartHandle, uint8_t *buffer)  {
   *
   * return    : NONE
   */
-void probeProgrammer(Probe_TypeDef *probe)  {
+void probeProgrammer(Probe_TypeDef *probe, TLV_Session *session)  {
 	int writeRamStatus = 0, i;
   switch(probe->state)
   {
     case PROBE_WAIT :
-      waitIncomingData(probe->uartHandle, probe->rxBuffer);
+      waitIncomingData(session->uartHandle, probe->rxBuffer);
+      verifyTlvInstruction((TLV *)probe->rxBuffer);
       probe->state = PROBE_INTERPRET_INSTRUCTION;
       break;
       
     case PROBE_INTERPRET_INSTRUCTION :
       if(probe->rxBuffer[0] == TLV_START_TRANSMISSION) {
-        stm32UartSendByte(probe->uartHandle, PROBE_OK);
+        stm32UartSendByte(session->uartHandle, PROBE_OK);
       }
 
-      else if(probe->rxBuffer[0] == TLV_WRITE) {
+      else if(probe->rxBuffer[0] == TLV_WRITE_RAM) {
         writeRamStatus = tlvDecodeAndWriteToRam(probe->rxBuffer);
         //stm32UartSendByte(probe->uartHandle, PROBE_OK);
         if(writeRamStatus == WRITE_FAIL) {
-          stm32UartSendByte(probe->uartHandle, TLV_DATA_CORRUPTED);
+          stm32UartSendByte(session->uartHandle, TLV_DATA_CORRUPTED);
         }
         else if(writeRamStatus == WRITE_SUCCESS) {
-          stm32UartSendByte(probe->uartHandle, PROBE_OK);
+          stm32UartSendByte(session->uartHandle, PROBE_OK);
         }
       }
-
-      else if(probe->rxBuffer[0] == TLV_READ) {
-        // readFromTargetRam(probe->uartHandle, probe->rxBuffer);
-      }
       
+      else if(probe->rxBuffer[0] == TLV_READ_REGISTER) {
+        readTargetRegister(session, get4Byte(&probe->rxBuffer[2]));
+        probe->rxBuffer[0] = 0;
+      }
+
+      else if(probe->rxBuffer[0] == TLV_WRITE_REGISTER) {
+    	writeTargetRegister(session, get4Byte(&probe->rxBuffer[2]), get4Byte(&probe->rxBuffer[5]));
+        probe->rxBuffer[0] = 0;
+      }
+
+      else if(probe->rxBuffer[0] == TLV_HALT_TARGET) {
+        writeTargetRegister(session, get4Byte(&probe->rxBuffer[2]), get4Byte(&probe->rxBuffer[5]));
+          probe->rxBuffer[0] = 0;
+      }
+
+      else if(probe->rxBuffer[0] == TLV_RUN_TARGET) {
+        writeTargetRegister(session, get4Byte(&probe->rxBuffer[2]), get4Byte(&probe->rxBuffer[5]));
+          probe->rxBuffer[0] = 0;
+      }
+
+      else if(probe->rxBuffer[0] == TLV_STEP) {
+        writeTargetRegister(session, get4Byte(&probe->rxBuffer[2]), get4Byte(&probe->rxBuffer[5]));
+          probe->rxBuffer[0] = 0;
+      }
+
+      else if(probe->rxBuffer[0] == TLV_WRITE_REGISTER) {
+          	writeTargetRegister(session, get4Byte(&probe->rxBuffer[2]), get4Byte(&probe->rxBuffer[5]));
+              probe->rxBuffer[0] = 0;
+            }
+      else if(probe->rxBuffer[0] == TLV_READ_RAM) {
+        readFromTargetRam(probe);
+      }
+
       else if(probe->rxBuffer[0] == TLV_END_TRANSMISSION) {
         probe->rxBuffer[0] = 0;
-        probe->state = PROBE_END;
-        return;
+        stm32UartSendByte(session->uartHandle, TLV_SEND);
+        //return;
       }
       
       probe->state = PROBE_WAIT;

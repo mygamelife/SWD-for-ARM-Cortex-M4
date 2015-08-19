@@ -53,7 +53,7 @@ void stm32UartSendByte(UART_HandleTypeDef *uartHandle, uint8_t data)  {
   * return    :   NONE
   */
 void stm32UartSendBytes(UART_HandleTypeDef *uartHandle, uint8_t *data)  {
-  if(HAL_UART_Transmit(uartHandle, data, sizeof(data), 5000)!= HAL_OK)  {
+  if(HAL_UART_Transmit(uartHandle, data, 256, 5000)!= HAL_OK)  {
     /* Capture error here to prevent transmission go on */
     uartErrorHandler();
   }

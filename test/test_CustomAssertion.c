@@ -16,7 +16,7 @@ void tearDown(void) {}
 
 void test_assertTLV_given_type_length_address_dataAddress_and_index(void)
 { 
-  TLV *tlv = tlvCreateNewPacket(TLV_WRITE);
+  TLV *tlv = tlvCreateNewPacket(TLV_WRITE_RAM);
   
   ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
   int index = getIndexOfSectionByName(elfData, ".text");
@@ -30,13 +30,13 @@ void test_assertTLV_given_type_length_address_dataAddress_and_index(void)
   
   //Data
   tlv->value[4] = 0x80;
-  tlv->value[5] = 0xb5;
-  tlv->value[6] = 0x86;
-  tlv->value[7] = 0xb0;
+  tlv->value[5] = 0xb4;
+  tlv->value[6] = 0x00;
+  tlv->value[7] = 0xAF;
   
   tlv->length += 8;
   
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE, 9, 0xDEADBEEF, dataAddress, tlv);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE_RAM, 9, 0xDEADBEEF, dataAddress, tlv);
   
   closeFileInTxt(elfData->myFile);
   free(elfData);

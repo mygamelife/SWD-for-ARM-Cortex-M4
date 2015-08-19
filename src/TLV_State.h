@@ -12,6 +12,7 @@ typedef struct
   uint8_t type;
   uint8_t length;
   uint8_t value[255];
+  uint8_t *values;
 } TLV;
 
 typedef enum
@@ -38,14 +39,20 @@ typedef enum
   PROBE_END
 } Probe_Programmer_State;
 
-/* TLV Instruction */
 typedef enum
 {
-  TLV_START_TRANSMISSION  = 10,
-  TLV_END_TRANSMISSION    = 20,
-  TLV_WRITE               = 30,
-  TLV_READ                = 40,
-  TLV_DATA_CORRUPTED      = 50
+  TLV_START_TRANSMISSION  = 11,
+  TLV_END_TRANSMISSION,
+  TLV_WRITE_RAM,
+  TLV_READ_RAM,
+  TLV_SEND,
+  TLV_DATA_CORRUPTED,
+  TLV_STOP,
+  TLV_WRITE_REGISTER,
+  TLV_READ_REGISTER,
+  TLV_HALT_TARGET,
+  TLV_RUN_TARGET,
+  TLV_STEP
 } TLV_Instruction;
 
 typedef enum  {

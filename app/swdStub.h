@@ -13,13 +13,13 @@
   */
 #define TWO_KBYTES                        2048 //2k byte
 #define FOUR_KBYTES                       4096 //4k byte
-#define SWD_INSTRUCTION                   ((uint32_t)0x20000000)
-#define SWD_BANK_SELECT                   ((uint32_t)0x20000004)
-#define SWD_DATA_SIZE                     ((uint32_t)0x20000008)
-#define SWD_FLASH_START_ADDRESS           ((uint32_t)0x2000000C)
-#define SWD_FLASH_END_ADDRESS             ((uint32_t)0x20000010)
-#define SWD_SRAM_START_ADDRESS            ((uint32_t)0x20000014)
-#define SWD_TARGET_STATUS                 ((uint32_t)0x20000018)
+#define SWD_INSTRUCTION                   ((uint32_t)0x20012700)
+#define SWD_BANK_SELECT                   ((uint32_t)0x20012704)
+#define SWD_DATA_SIZE                     ((uint32_t)0x20012708)
+#define SWD_FLASH_START_ADDRESS           ((uint32_t)0x2001270C)
+#define SWD_FLASH_END_ADDRESS             ((uint32_t)0x20012710)
+#define SWD_SRAM_START_ADDRESS            ((uint32_t)0x20012714)
+#define SWD_TARGET_STATUS                 ((uint32_t)0x20012718)
 #define SWD_SRAM_DATA32_ADDRESS           ((uint32_t)0x20000800)
 
 /** SWD Instruction 
