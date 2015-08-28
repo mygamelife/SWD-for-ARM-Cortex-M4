@@ -2,14 +2,12 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "Serial.h"
-#include "TLV_Host.h"
+#include "Tlv.h"
 #include "GetHeaders.h"
-#include "CoreDebug_Utilities.h"
-// #include "CException.h"
 
 int main(void) {
-  TlvHost_TypeDef host; ElfData *elfData;
-  int index = 0;
+  //TlvHost_TypeDef host; ElfData *elfData;
+  //int index = 0;
   
   // elfData = openElfFile("../FlashProgrammer/FlashProgrammer.elf");
   
@@ -44,24 +42,19 @@ int main(void) {
   // printf("LOADING FLASH_PROGRAMMER............\n");
   // tlvWriteRam(&host);
   
-  // while(uartGetBytes(host.hSerial, host.rxBuffer, ONE_BYTE))  {
-    // if(host.rxBuffer[0] == TLV_SEND) 
-    // {
-      // printf("Probe is ready for next task!\n");
-      // break;
-    // }
-  // }
-  // host.fileSize = getSectionSize(elfData, index);
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  uint8_t buffer[] = { 0xBE, 0xEF, 0xCA, 0xFE, 0xAA, 0xBB, 0xCC, 0xDD,
+                       0xBE, 0xEF, 0xCA, 0xFE, 0xAA, 0xBB, 0xCC, 0xDD,
+                       0xBE, 0xEF, 0xCA, 0xFE, 0xAA, 0xBB, 0xCC, 0xDD};
+  Tlv_Session *session = tlvCreateSession();
+	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
+	// Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   
-  // printf("READING Target RAM..........\n");
-  // tlvReadRam(&host);
-  TLV_Session *session = createTLVSession();
-  printf("READ CORE DEBUG REGISTER..........\n");
-  tlvReadTargetRegister(session, CORE_REG_PC);
+  printf("Opening port\n");
   
-  closeSerialPort(host.hSerial);
+  tlvSend(session, tlv);
+  
+  printf("Closing port\n");
+  closeSerialPort(session->hSerial);
   // closeFileInTxt(elfData->myFile);
   // free(elfData);
   return 0;
