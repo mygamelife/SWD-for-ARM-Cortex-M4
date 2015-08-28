@@ -17,8 +17,8 @@ typedef struct
 typedef struct
 {
   HANDLE hSerial;
-  uint8_t txBuffer[0];
-  uint8_t rxBuffer[0];
+  uint8_t txBuffer[255];
+  uint8_t rxBuffer[255];
 } Tlv_Session;
 
 Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data);

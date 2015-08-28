@@ -52,6 +52,7 @@ int main(void) {
   printf("Opening port\n");
   
   tlvSend(session, tlv);
+  Tlv *tlvPacket = tlvReceive(session);
   
   printf("Closing port\n");
   closeSerialPort(session->hSerial);

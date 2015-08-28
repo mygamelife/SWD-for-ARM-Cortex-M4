@@ -23,7 +23,7 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   return &tlv;
 }
 
-/** tlvCreateSession
+/** tlvCreateSession use to create information needed by the fucntion
   *
   * input   : NONE
   *
@@ -68,7 +68,7 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   *
   * input   : session contain all the information needed by the  function
   *
-  * return  : NONE
+  * return  : tlv structure
   */
 Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv; int time = 100;
@@ -76,10 +76,10 @@ Tlv *tlvReceive(Tlv_Session *session) {
   /** wait for a short time period and throw
       an exception if time expired */
   do  {
-    /** Waiting first 2 byte of tlv packet to arrive */
     if(time == 0) {
       Throw(ERR_TIME_OUT);
     }
+    /** Waiting first 2 byte of tlv packet to arrive */
     else if(uartGetBytes(session->hSerial, session->rxBuffer, 2) != 0) break;
   } while(time-- != 0);
   
@@ -89,7 +89,7 @@ Tlv *tlvReceive(Tlv_Session *session) {
   /** Retrieve data from buffer only length is greater than one */
   if(tlv.length > 1) {
     uartGetBytes(session->hSerial, session->rxBuffer, tlv.length);
-    tlv.value = session->rxBuffer;
+    tlv.value = &session->rxBuffer[2];
   }
   
   return &tlv;
