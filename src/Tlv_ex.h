@@ -3,10 +3,11 @@
 
 #define TLV_DATA_SIZE   248
 
-#define getByte(x)      (*(uint8_t *)(x))
-#define get4Byte(x)     ((*(uint32_t *)(x)) >> 24 ) | (((*(uint32_t *)(x)) << 8) & 0x00ff0000) |  \
-                        (((*(uint32_t *)(x)) >> 8) & 0x0000ff00) | ((*(uint32_t *)(x)) << 24)
-
+#define getByte(x)                (*(uint8_t *)(x))
+#define get4Byte(x)               ((*(uint32_t *)(x)) >> 24 ) | (((*(uint32_t *)(x)) << 8) & 0x00ff0000) |  \
+                                  (((*(uint32_t *)(x)) >> 8) & 0x0000ff00) | ((*(uint32_t *)(x)) << 24)
+#define convertToLittleEndian(x)  (((x>>24)&0x000000ff) | ((x<<8)&0x00ff0000) | ((x>>8)&0x0000ff00) | ((x<<24)&0xff000000))
+                                  
 /* Tlv Command */
 typedef enum
 {
