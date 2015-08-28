@@ -15,7 +15,7 @@ typedef struct
        uint32_t RESERVED0[1];
 }DWT_COMP_Type;
   
-#define DWT_COMP  ((DWT_COMP_Type*)&(DWT->COMP0))
+#define DWT_COMP            ((DWT_COMP_Type*)&(DWT->COMP0))
 #define DWT_MATCHED_MASK		0x1000000
 
 #define DISABLE_DWTCOMPARATOR 0

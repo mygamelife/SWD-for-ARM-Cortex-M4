@@ -26,7 +26,7 @@
  *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword						
  *
  *  Output :  return 0 if instruction breakpoint is set
- *            retunr -1 if invalid comparator is chosen
+ *            return -1 if invalid comparator is chosen
  */
 int setInstructionBreakpoint(uint32_t instructionCOMPno,uint32_t instructionAddress,int matchingMode)
 {

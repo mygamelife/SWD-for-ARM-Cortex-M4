@@ -2,18 +2,9 @@
 #define Register_ReadWrite_H
 
 #include <stdint.h>
-#include "Clock.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "configurePort.h"
 #include "swd_Utilities.h"
-#include "IO_Operations.h"
-
-/** Debug Core Register
-  */
-#define DHCSR             ((uint32_t)0xE000EDF0)    //Debug Halting Control Status Register
-#define DCRSR             ((uint32_t)0xE000EDF4)    //Debug Core Register Selector Register
-#define DCRDR             ((uint32_t)0xE000EDF8)    //Debug Core Register Data Register
-#define DEMCR             ((uint32_t)0xE000EDFC)    //Debug Exception and Monitor Control Register
 
 /** AHB-AP register
   */

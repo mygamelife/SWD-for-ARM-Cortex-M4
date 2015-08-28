@@ -6,9 +6,9 @@
 #include "Delay.h"
 #include "Flash.h"
 #include "swd_Utilities.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "Register_ReadWrite.h"
-#include "mock_IO_Operations.h"
+#include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"
 #include "mock_stm32f4xx_hal_flash.h"
 #include "mock_stm32f4xx_hal_flash_ex.h"
@@ -24,12 +24,12 @@ void tearDown(void)
 
 void test_convertMSB_LSB_given_0xEE2805D4_should_return_0x2BA01477()
 {
-	TEST_ASSERT_EQUAL(0x2BA01477,convertMSB_LSB(0xEE2805D4));
+	TEST_ASSERT_EQUAL(0x2BA01477,interconvertMSBandLSB(0xEE2805D4));
 }
 
 void test_convertMSB_LSB_given_0x2BA01477_should_return_0xEE2805D4()
 {
-	TEST_ASSERT_EQUAL(0xEE2805D4,convertMSB_LSB(0x2BA01477));
+	TEST_ASSERT_EQUAL(0xEE2805D4,interconvertMSBandLSB(0x2BA01477));
 }
 
 
@@ -78,14 +78,14 @@ void test_emulateTurnAroundRead_clock_should_off_once()
 {
   emulateTurnAroundRead();
   
-	turnAround_ToRead();
+	turnAroundRead();
 }
 
 void test_emulateTurnAroundWrite_clock_should_on_off_on()
 {
   emulateTurnAroundWrite();
   
-	turnAround_ToWrite();
+	turnAroundWrite();
 }
 
 void test_emulateSwdInput()
@@ -109,14 +109,14 @@ void test_emulateIdleClock_should_generate_SWDIO_low_and_SWDCLK_OFF_ON_8_times()
   extraIdleClock(8);
 }
 
-void test_emulateLineReset_given_60clock_should_generate_clock_cycles_with_SWDIO_High()
+void test_emulateLineReset_given_60clock_should_generate_clock_cycles_with_setHighSWDIO()
 {
 	emulateLineReset(60);
 	
 	lineReset(60);
 }
 
-void test_emulateResetTarget_should_call_ResetPinLow_ResetPin_High()
+void test_emulateResetTarget_should_call_ResetPinLow_setHighNRST()
 {
 	emulateResetTarget();
 	
@@ -127,7 +127,7 @@ void test_emulateswdRegisterWrite_should_send_SWD_Request_readACK_and_Write_data
 {
 	int ACK = 0 ;
 	
-	emulateswdRegisterWrite(TAR_REG,AP,4,0x2BA01477);
+	emulateSwdRegisterWrite(TAR_REG,AP,4,0x2BA01477);
 	swdRegisterWrite(TAR_REG,AP,&ACK,0x2BA01477);
 	
 	TEST_ASSERT_EQUAL(1,ACK);
@@ -138,7 +138,7 @@ void test_emulateswdRegisterRead_should_send_SWD_Request_readACK_and_readData_re
 	int ACK = 0 , Parity = 0;
 	uint32_t dataRead ;
 	
-	emulateswdRegisterRead(TAR_REG,AP,4,1,0xEE2805D4);
+	emulateSwdRegisterRead(TAR_REG,AP,4,1,0xEE2805D4);
 	swdRegisterRead(TAR_REG,AP,&ACK,&Parity,&dataRead);
 	
 	TEST_ASSERT_EQUAL(0x2BA01477,dataRead);

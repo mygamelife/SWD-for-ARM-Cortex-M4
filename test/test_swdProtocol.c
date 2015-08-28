@@ -1,13 +1,11 @@
 #include "unity.h"
 #include "Emulator.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "swd_Utilities.h"
-#include "Clock.h"
 #include "Delay.h"
-#include "Reset.h"
 #include "swdProtocol.h"
 #include "Register_ReadWrite.h"
-#include "mock_IO_Operations.h"
+#include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"
 
 void setUp(void)
@@ -54,7 +52,7 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	//send 0xA5
 	emulateWrite(0xA5,8);
 
-	//turnAround_ToRead
+	//turnAroundRead
 	emulateTurnAroundRead();
 	
 	//SWDIO Input mode
@@ -69,7 +67,7 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	//read Parity
 	emulateRead(0,1);
 
-	//turnAround_ToWrite
+	//turnAroundWrite
 	emulateTurnAroundWrite();
 	
 	//SWDIO_Output mode

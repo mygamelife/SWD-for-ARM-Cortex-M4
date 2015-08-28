@@ -17,7 +17,7 @@
  *            return 0 for false
  *
  */
-int isCoreModeRequiresHaltedAndDebug(CoreMode mode)
+int doesCoreModeRequiresHaltedAndDebug(CoreMode mode)
 {
   if(mode == CORE_NORMAL_MASKINT || mode == CORE_SINGLE_STEP || mode == CORE_SINGLE_STEP_MASKINT)
     return 1;
@@ -43,124 +43,38 @@ int isCoreModeRequiresHaltedAndDebug(CoreMode mode)
  */
 CoreMode determineCoreModeFromDataRead(uint32_t dataRead)
 {
-  int debugEnableBit = 0 , haltBit = 0 , stepBit = 0 , maskIntBit = 0 , haltedStatusBit = 0 , snapStallBit = 0 ;
+  int debugEnableBit = 0 , stepBit = 0 , maskIntBit = 0 , haltedStatusBit = 0 , snapStallBit = 0 ;
 
-  debugEnableBit    =  dataRead & DHCSR_C_DEBUGEN_MASK ;
-  haltBit           = (dataRead & DHCSR_C_HALT_MASK)      >> 1 ;
-  stepBit           = (dataRead & DHCSR_C_STEP_MASK)      >> 2 ;
-  maskIntBit        = (dataRead & DHCSR_C_MASKINTS_MASK)  >> 3 ;
-  snapStallBit      = (dataRead & DHCSR_C_SNAPSTALL_MASK) >> 4 ;
-  haltedStatusBit   = (dataRead & DHCSR_S_HALT_MASK)      >> 16 ;
+  debugEnableBit    =  dataRead & CoreDebug_DHCSR_C_DEBUGEN_Msk ;
+  stepBit           = (dataRead & CoreDebug_DHCSR_C_STEP_Msk)      >> CoreDebug_DHCSR_C_STEP_Pos ;
+  maskIntBit        = (dataRead & CoreDebug_DHCSR_C_MASKINTS_Msk)  >> CoreDebug_DHCSR_C_MASKINTS_Pos ;
+  snapStallBit      = (dataRead & CoreDebug_DHCSR_C_SNAPSTALL_Msk) >> CoreDebug_DHCSR_C_SNAPSTALL_Pos ;
+  haltedStatusBit   = (dataRead & CoreDebug_DHCSR_S_HALT_Msk)      >> CoreDebug_DHCSR_S_HALT_Pos ;
 
-  if ( !(debugEnableBit) && !(haltBit) && !(stepBit) && !(maskIntBit) && !(snapStallBit) && !(haltedStatusBit) )
-    return CORE_NORMAL_MODE ;
-
-  if ( !(debugEnableBit) && !(haltBit) && !(stepBit) &&  (maskIntBit) && !(snapStallBit) && !(haltedStatusBit) )
-    return CORE_NORMAL_MASKINT ;
-
-  if (  (debugEnableBit) && !(haltBit) && !(stepBit) && !(maskIntBit) && !(snapStallBit) && !(haltedStatusBit) )
-    return CORE_DEBUG_MODE ;
-
-  if (  (debugEnableBit) &&  (haltBit) && !(stepBit) && !(maskIntBit) && !(snapStallBit) &&  (haltedStatusBit) )
-    return CORE_DEBUG_HALT ;
-
-  if (  (debugEnableBit) &&  (haltBit) &&  (stepBit) && !(maskIntBit) && !(snapStallBit) &&  (haltedStatusBit) )
-    return CORE_SINGLE_STEP ;
-
-  if (  (debugEnableBit) &&  (haltBit) &&  (stepBit) &&  (maskIntBit) && !(snapStallBit) &&  (haltedStatusBit) )
-    return CORE_SINGLE_STEP_MASKINT ;
-
-  if (  (debugEnableBit) &&  (haltBit) && !(stepBit) && !(maskIntBit) &&  (snapStallBit) &&  (haltedStatusBit) )
-    return CORE_SNAPSTALL ;
-
-  return -1 ;
-}
-
-/**
- *	Use to get the configuration data going to be written into Debug Halting and Control Status Register based on CoreMode
- *
- *	Input : mode is the desired core mode to be set
- *				     Possible value :
- *					      CORE_NORMAL_MODE				    Normal operation mode without masking of PendSV,SysTick and external configurable interrupts
- *					      CORE_NORMAL_MASKINT				  Normal operation mode with masking of PendSV,SysTick and external configurable interrupts
- *					      CORE_DEBUG_MODE 				    Enable debug mode
- *					      CORE_DEBUG_HALT					    Enable halting debug mode
- *					      CORE_SINGLE_STEP				    Enable processor single stepping without masking of PendSV,SysTick and external configurable interrupts
- *					      CORE_SINGLE_STEP_MASKINT		Enable processor single stepping with masking of PendSV,SysTick and external configurable interrupts
- *					      CORE_SNAPSTALL					    Force to enter imprecise debug mode (Used when processor is stalled )
- *
- *	Output : return the 32bits of configuration data to be written into Debug Halting and Control Status Register
- */
-uint32_t getCoreModeConfiguration(CoreMode mode)
-{
-	uint32_t data = 0 ;
-
-	switch(mode)
-	{
-		case CORE_NORMAL_MODE			    :
-                                    data = SET_CORE_NORMAL;
-                                    break ;
-		case CORE_NORMAL_MASKINT		  :
-                                    data = SET_CORE_NORMAL_MASKINT ;
-                                    break ;
-		case CORE_DEBUG_MODE 			    :
-                                    data = SET_CORE_DEBUG ;
-                                    break ;
-		case CORE_DEBUG_HALT			    :
-                                    data = SET_CORE_DEBUG_HALT ;
-                                    break ;
-		case CORE_SINGLE_STEP	        :
-                                    data = SET_CORE_STEP ;
-                                    break ;
-		case CORE_SINGLE_STEP_MASKINT	:
-                                    data = SET_CORE_STEP_MASKINT ;
-                                    break ;
-		case CORE_SNAPSTALL				    :
-                                    data = SET_CORE_SNAPSTALL ;
-                                    break ;
-		default : break ;
-	}
-
-	return data ;
-}
-
-/**
- *	Use to get the configuration data going to be written into Debug Fault Status Register to clear the selected debug event
- *
- *  Input :   debugEvent is the debug event going to be checked
- *				    Possible value :
- *					    EXTERNAL_DEBUGEVENT       Clear external debug request debug event				    
- *					    VCATCH_DEBUGEVENT				  Clear vector catch triggered debug event
- *					    DWTTRAP_DEBUGEVENT 				Clear data watchpoint & trace unit debug event
- *					    BKPT_DEBUGEVENT					  Clear breakpoint debug event
- *					    HALTED_DEBUGEVENT				  Clear halt request debug event
- *
- *	Output : return the 32bits of configuration data to be written into Debug Fault Status Register 
- */
-uint32_t getClearDebugEventConfiguration(DebugEvent debugEvent)
-{
-  uint32_t data = 0 ;
-  
-  switch(debugEvent)
+  if (!debugEnableBit)
   {
-    case EXTERNAL_DEBUGEVENT  : 
-                                data = CLEAR_EXTERNAL_EVENT ;                            
-                                break ;
-    case VCATCH_DEBUGEVENT    :
-                                data = CLEAR_VCATCH_EVENT ;                              
-                                break ;
-    case DWTTRAP_DEBUGEVENT   :
-                                data = CLEAR_DWTTRAP_EVENT ;                               
-                                break ;
-    case BKPT_DEBUGEVENT      :
-                                data = CLEAR_BKPT_EVENT ;        
-                                break ;
-    case HALTED_DEBUGEVENT    :
-                                data = CLEAR_HALTED_EVENT ; 
-                                break ; 
-    default :             
-                                break ;
+    if(maskIntBit)
+      return CORE_NORMAL_MASKINT ;
+    
+    return CORE_NORMAL_MODE ;
+  }
+  else
+  {
+    if(!haltedStatusBit)
+      return CORE_DEBUG_MODE ;
+    
+    if(!stepBit)
+      return CORE_DEBUG_HALT ;
+    else
+    {
+      if(maskIntBit)
+        return CORE_SINGLE_STEP_MASKINT ;
+      
+      return CORE_SINGLE_STEP ;
+    }
+    if(snapStallBit)
+      return CORE_SNAPSTALL ;
   }
   
-  return data ;
+  return -1 ;
 }

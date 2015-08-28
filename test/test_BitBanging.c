@@ -1,40 +1,39 @@
 #include "unity.h"
 #include "Emulator.h"
-#include "Clock.h"
-#include "Reset.h"
+#include "IoOperations.h"
 #include "Delay.h"
 #include "swd_Utilities.h"
 #include "Register_ReadWrite.h"
-#include "mock_IO_Operations.h"
+#include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"
-#include "Bit_Operations.h"
+
 
 void setUp(void){}
 
 void tearDown(void){}
 
-void test_sendBit_data_1_should_call_SWDIO_High_SWCLK_OFF_SWCLK_ON()
+void test_sendBit_data_1_should_call_setHighSWDIO_setLowSWCLK_setHighSWCLK()
 {
 	emulateWrite(1,1);
 	
 	sendBit(1);
 }
 
-void test_sendBit_data_0_should_call_SWDIO_Low_SWCLK_OFF_SWCLK_ON()
+void test_sendBit_data_0_should_call_setLowSWDIO_setLowSWCLK_setHighSWCLK()
 {
 	emulateWrite(0,1);
 	
 	sendBit(0);
 }
 
-void test_readBit_should_call_SWCLK_ON_SWCLK_OFF_readSWDIO_Pin_read_1_and_return_1()
+void test_readBit_should_call_setHighSWCLK_setLowSWCLK_readSWDIO_read_1_and_return_1()
 {
 	emulateRead(1,1);
 	
 	TEST_ASSERT_EQUAL(1,readBit());
 }
 
-void test_readBit_should_call_SWCLK_ON_SWCLK_OFF_readSWDIO_Pin_read_0_and_return_0()
+void test_readBit_should_call_setHighSWCLK_setLowSWCLK_readSWDIO_read_0_and_return_0()
 {
 	emulateRead(0,1);
 	
@@ -111,5 +110,6 @@ void test_read32bit_given_0xEE2805D4_should_read_0x2ba01477()
 	
 	read32bit(&data);
 	
+  TEST_ASSERT_EQUAL(0x2ba01477,interconvertMSBandLSB(0xEE2805D4));
 	TEST_ASSERT_EQUAL(0x2ba01477,data);
 }

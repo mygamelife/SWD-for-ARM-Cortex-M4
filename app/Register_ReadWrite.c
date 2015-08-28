@@ -42,12 +42,12 @@ void swdRegisterWrite(int address,int APnDP,int *ack, uint32_t data)
 
 	send8bit(SWD_Request);
 
-	turnAround_ToRead();
+	turnAroundRead();
 	SWDIO_InputMode();
 
 	read3bit(ack);
 
-	turnAround_ToWrite();
+	turnAroundWrite();
 	SWDIO_OutputMode();
 
 	send32bit(data);
@@ -64,7 +64,7 @@ void swdRegisterRead(int address,int APnDP,int *ack,int *parity, uint32_t *data)
 
 	send8bit(SWD_Request);
 
-	turnAround_ToRead();
+	turnAroundRead();
 	SWDIO_InputMode();
 
 	read3bit(ack);
@@ -73,7 +73,7 @@ void swdRegisterRead(int address,int APnDP,int *ack,int *parity, uint32_t *data)
 
 	*parity = readBit();
 
-	turnAround_ToWrite();
+	turnAroundWrite();
 	SWDIO_OutputMode();
 
 	extraIdleClock(8);

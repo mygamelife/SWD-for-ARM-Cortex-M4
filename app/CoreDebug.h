@@ -2,29 +2,28 @@
 #define CoreDebug_H
 
 #include "CoreDebug_Utilities.h"
-#include "Register_ReadWrite.h"
 
 #define enableDWTandITM()   {memoryWriteByte((DEMCR_REG+3),ENABLE_DWT_ITM);}
 #define disableDWTandITM()  {memoryWriteByte((DEMCR_REG+3),DISABLE_DWT_ITM);}
 
-#define enableVectorCatchCoreReset()  {enableSelectedVectorCatch(VC_CORERESET);}
-#define enableVectorCatchMMERR()      {enableSelectedVectorCatch(VC_MMERR);}
-#define enableVectorCatchNOCPERR()    {enableSelectedVectorCatch(VC_NOCPERR);}
-#define enableVVectorCatchCHKERR()    {enableSelectedVectorCatch(VC_CHKERR);}
-#define enableVectorCatchSTATERR()    {enableSelectedVectorCatch(VC_STATERR);}
-#define enableVectorCatchBUSERR()     {enableSelectedVectorCatch(VC_BUSERR);}
-#define enableVectorCatchINTERR()     {enableSelectedVectorCatch(VC_INTERR);}
-#define enableVectorCatchHARDERR()    {enableSelectedVectorCatch(VC_HARDERR);}
-#define disableAllVectorCatch()       {enableSelectedVectorCatch(VC_DISABLEALL);}
+#define enableVectorCatchCoreReset()  {enableVectorCatch(VC_CORERESET);}
+#define enableVectorCatchMMERR()      {enableVectorCatch(VC_MMERR);}
+#define enableVectorCatchNOCPERR()    {enableVectorCatch(VC_NOCPERR);}
+#define enableVVectorCatchCHKERR()    {enableVectorCatch(VC_CHKERR);}
+#define enableVectorCatchSTATERR()    {enableVectorCatch(VC_STATERR);}
+#define enableVectorCatchBUSERR()     {enableVectorCatch(VC_BUSERR);}
+#define enableVectorCatchINTERR()     {enableVectorCatch(VC_INTERR);}
+#define enableVectorCatchHARDERR()    {enableVectorCatch(VC_HARDERR);}
+#define disableAllVectorCatch()       {enableVectorCatch(VC_DISABLEALL);}
 
-#define isExternalDebugEventOccured()     ((isSelectedDebugEventOccured(EXTERNAL_DEBUGEVENT)) ? 1 : 0)
-#define isVectorCatchDebugEventOccured()  ((isSelectedDebugEventOccured(VCATCH_DEBUGEVENT)) ? 1 : 0)
-#define isDWTTrapDebugEventOccured()      ((isSelectedDebugEventOccured(DWTTRAP_DEBUGEVENT)) ? 1 : 0)
-#define isBreakpointDebugEventOccured()   ((isSelectedDebugEventOccured(BKPT_DEBUGEVENT)) ? 1 : 0)
-#define isHaltedDebugEventOccured()       ((isSelectedDebugEventOccured(HALTED_DEBUGEVENT)) ? 1 : 0)
+#define hasExternalDebugEventOccured()     ((readDebugEventRegister() & EXTERNAL_DEBUGEVENT))
+#define hasVectorCatchDebugEventOccured()  ((readDebugEventRegister() & VCATCH_DEBUGEVENT))
+#define hasDWTTrapDebugEventOccured()      ((readDebugEventRegister() & DWTTRAP_DEBUGEVENT))
+#define hasBreakpointDebugEventOccured()   ((readDebugEventRegister() & BKPT_DEBUGEVENT))
+#define hasHaltedDebugEventOccured()       ((readDebugEventRegister() & HALTED_DEBUGEVENT))
 
-#define clearBreakpointDebugEvent()       {clearSelectedDebugEvent(BKPT_DEBUGEVENT);}
-#define clearDWTTrapDebugEvent()          {clearSelectedDebugEvent(DWTTRAP_DEBUGEVENT);}
+#define clearBreakpointDebugEvent()       {clearDebugEvent(BKPT_DEBUGEVENT);}
+#define clearDWTTrapDebugEvent()          {clearDebugEvent(DWTTRAP_DEBUGEVENT);}
 
 void setCoreMode(CoreMode mode);
 CoreMode getCoreMode();
@@ -36,12 +35,10 @@ void readCoreRegister(CoreRegister coreRegister,uint32_t *dataRead);
 
 void waitForCoreRegisterTransactionToComplete();
 
-int isSelectedDebugEventOccured(DebugEvent debugEvent);
-void clearSelectedDebugEvent(DebugEvent debugEvent);
+uint32_t readDebugEventRegister();
+void clearDebugEvent(uint32_t debugEvent);
 
-void enableSelectedVectorCatch(VectorCatch vectorCatch);
-
-void enableSelectedVectorCatch(VectorCatch vectorCatch);
+void enableVectorCatch(uint32_t vectorCatch);
 
 void performHaltOnReset();
 

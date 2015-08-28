@@ -5,10 +5,10 @@
 #include "DWT_Utilities.h"
 #include "Yield.h"
 
-#define COMPARTOR_0  0
-#define COMPARTOR_1  1
-#define COMPARTOR_2  2
-#define COMPARTOR_3  3
+#define COMPARATOR_0  0
+#define COMPARATOR_1  1
+#define COMPARATOR_2  2
+#define COMPARATOR_3  3
 
 int setAddressWatchpoint(int dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,Watchpoint_AccessMode accessMode);
 int setDataWatchpoint_MatchingOneComparator(int dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,

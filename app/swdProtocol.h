@@ -1,12 +1,10 @@
 #ifndef swdProtocol_H
 #define swdProtocol_H
 
-#include "Clock.h"
 #include "Delay.h"
-#include "Reset.h"
 #include "swd_Utilities.h"
 #include "configurePort.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "Register_ReadWrite.h"
 
 void switchJTAGtoSWD();

@@ -1,12 +1,8 @@
-#include "swdProtocol.h"
-#include "configurePort.h"
-#include "Register_ReadWrite.h"
-#include "CoreDebug.h"
-#include "FPB_Unit.h"
-#include "DWT_Unit.h"
+#include "main.h"
 int main(void)
 {
  	uint32_t errorFlag  = 0 ;
+ 	uint32_t dataRead = 0 ;
  	
 	configure_IOPorts();
 	resetTarget();
@@ -16,9 +12,7 @@ int main(void)
 	errorFlag = swdCheckErrorFlag() ;
 	swdClearErrorFlagInAbort(errorFlag); //Clear error flag
 
-	powerUpSystemAndDebug();
-
-
+	readAhbIDR(&dataRead);
 
 	while(1)
 	{
