@@ -5,27 +5,18 @@
  *
  *  Input :  dwtCompNumber is the selected DWT Comparator register
  *				   Possible value :
- *					    DWT_COMP0	
- *					    DWT_COMP1	
- *					    DWT_COMP2	
- *					    DWT_COMP3	
+ *					    0	            DWT Comparator Register 0
+ *					    1	            DWT Comparator Register 1
+ *					    2	            DWT Comparator Register 2
+ *					    3	            DWT Comparator Register 3
  *
- *  Output :  return number of the comparator
+ *  Output :  return 1 if it is valid
  *			      return -1 for invalid comparator
  */
-int getDWTComparatorNumber(uint32_t dwtCompNumber)
+int checkForValidDWTComparator(int dwtCompNumber)
 {	
-	if (dwtCompNumber == DWT_COMP0)
-		return 0 ;
-	
-	if (dwtCompNumber == DWT_COMP1)
-		return 1 ;
-	
-	if (dwtCompNumber == DWT_COMP2)
-		return 2 ;
-	
-	if (dwtCompNumber == DWT_COMP3)
-		return 3 ;
-	
-	return -1 ;
+	if( dwtCompNumber == 0 || dwtCompNumber == 1 || dwtCompNumber == 2 || dwtCompNumber == 3)
+    return 1 ;
+  else
+    return -1 ;
 }

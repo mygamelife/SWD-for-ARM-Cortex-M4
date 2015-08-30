@@ -2,7 +2,7 @@
 #include "Emulator.h"
 
 
-uint32_t convertMSB_LSB(uint32_t input)
+uint32_t interconvertMSBandLSB(uint32_t input)
 {
 	// swap odd and even bits
     input = (((input & 0xaaaaaaaa) >> 1) | ((input & 0x55555555) << 1));
@@ -26,11 +26,11 @@ void emulateWrite(int data, int numOfBits)  {
 		bitValue = bitValue >> i;
 
     if (bitValue != 0 )
-      SWDIO_High_Expect();
+      setHighSWDIO_Expect();
 
-    else  SWDIO_Low_Expect();
+    else  setLowSWDIO_Expect();
 
-    SWCLK_OFF_Expect(); SWCLK_ON_Expect();
+    setLowSWCLK_Expect(); setHighSWCLK_Expect();
 	}
 }
 
@@ -39,30 +39,30 @@ void emulateRead(int data, int numOfBits)  {
 
 	for (i = 0; i < numOfBits; i++)
 	{
-    SWCLK_ON_Expect(); SWCLK_OFF_Expect();
+    setHighSWCLK_Expect(); setLowSWCLK_Expect();
 		bitValue = data & (1 << (numOfBits - 1 - i));
 
     if (bitValue != 0 ) {
       //printf("1");
-      readSWDIO_Pin_ExpectAndReturn(1);
+      readSWDIO_ExpectAndReturn(1);
     }
       
 
     else {
       //printf("0");
-      readSWDIO_Pin_ExpectAndReturn(0);
+      readSWDIO_ExpectAndReturn(0);
     } 
 	}
 }
 
 void emulateTurnAroundRead()  {
-  SWCLK_OFF_Expect();
+  setLowSWCLK_Expect();
 }
 
 void emulateTurnAroundWrite() {
-	SWCLK_ON_Expect();
-	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
+	setHighSWCLK_Expect();
+	setLowSWCLK_Expect();
+	setHighSWCLK_Expect();
 }
 
 void emulateSwdOutput() {
@@ -76,10 +76,10 @@ void emulateSwdInput()  {
 void emulateIdleClock(int numOfClocks)  {
   int i;
   
-  SWDIO_Low_Expect();
+  setLowSWDIO_Expect();
 
 	for(i = 0; i < numOfClocks; i++)  {
-		SWCLK_OFF_Expect();SWCLK_ON_Expect();
+		setLowSWCLK_Expect();setHighSWCLK_Expect();
 	}
 }
 
@@ -91,23 +91,23 @@ void emulateLineReset(int numOfClocks)
 		numOfClocks = 50 ;
 	
 	//lineReset
-	SWDIO_High_Expect();
+	setHighSWDIO_Expect();
 	for (i = 0 ; i < numOfClocks ; i ++)
-	{	SWCLK_OFF_Expect();
-		SWCLK_ON_Expect();
+	{	setLowSWCLK_Expect();
+		setHighSWCLK_Expect();
 	}
 }
 
 void emulateResetTarget()
 {
-	ResetPin_Low_Expect();
-	ResetPin_High_Expect();
+	setLowNRST_Expect();
+	setHighNRST_Expect();
 }
 
-void emulateswdRegisterWrite(int Address,int APnDP,int emulateACK, uint32_t data)
+void emulateSwdRegisterWrite(int address,int APnDP,int emulateACK, uint32_t data)
 {
 	int SWD_Request = 0 , parity = 0;
-	SWD_Request = getSWD_Request(Address,APnDP,WRITE);
+	SWD_Request = getSWD_Request(address,APnDP,WRITE);
 	parity = calculateParity_32bitData(data);
 	
 	emulateWrite(SWD_Request,8);
@@ -125,10 +125,10 @@ void emulateswdRegisterWrite(int Address,int APnDP,int emulateACK, uint32_t data
 	emulateIdleClock(8);
 }
 
-void emulateswdRegisterRead(int Address,int APnDP,int emulateACK,int emulateParity, uint32_t emulateData)
+void emulateSwdRegisterRead(int address,int APnDP,int emulateACK,int emulateParity, uint32_t emulateData)
 {
 	int SWD_Request = 0 ;
-	SWD_Request = getSWD_Request(Address,APnDP,READ);
+	SWD_Request = getSWD_Request(address,APnDP,READ);
 
 	emulateWrite(SWD_Request,8);
 

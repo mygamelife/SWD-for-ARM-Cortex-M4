@@ -16,15 +16,10 @@
  */
 void setCoreMode(CoreMode mode)
 {
-  uint32_t configData = 0 ;
-  
-  configData = getCoreModeConfiguration(mode);
-  
-  if(isCoreModeRequiresHaltedAndDebug(mode))
+  if(doesCoreModeRequiresHaltedAndDebug(mode))
     setCoreMode(CORE_DEBUG_HALT);
   
-  memoryWriteWord(DHCSR_REG,configData);
-    
+  memoryWriteWord(DHCSR_REG,mode);
 }
 
 /**
@@ -50,7 +45,7 @@ CoreMode getCoreMode()
 }
 
 /**
- *  Step  n numbers of instruction as defined by the pass in paramenter
+ *  Step n numbers of instruction as defined by the pass in paramenter
  *
  *  Input : nInstructions is the number of instructions going to be stepped
  */
@@ -170,59 +165,42 @@ void waitForCoreRegisterTransactionToComplete()
 	
   do
 	{		
-		memoryReadWord(DHCSR,&dataRead) ;
-    completed = (dataRead & DHCSR_S_REGRDY_MASK) >> 16;
+		memoryReadWord(DHCSR_REG,&dataRead) ;
+    completed = (dataRead & CoreDebug_DHCSR_S_REGRDY_Msk) >> CoreDebug_DHCSR_S_REGRDY_Pos;
   }while(completed != 1);
 
 }
 
+
 /**
- *	Use to check whether is the selected debug event occured 
- *	
- *  Input :   debugEvent is the debug event going to be checked
- *				    Possible value :
- *					    EXTERNAL_DEBUGEVENT       Check for external debug request debug event				    
- *					    VCATCH_DEBUGEVENT				  Check for vector catch triggered debug event
- *					    DWTTRAP_DEBUGEVENT 				Check for data watchpoint & trace unit debug event
- *					    BKPT_DEBUGEVENT					  Check for breakpoint debug event
- *					    HALTED_DEBUGEVENT				  Check for halt request debug event
+ *	Read DFSR register to be checked for which debug event occured later
  *
- *  Output :  return 1 if the selected debug event occured 
- *            return 0 if the selected debug event not occured 
+ *  Output : return data read from DFSR register
  */
-int isSelectedDebugEventOccured(DebugEvent debugEvent)
+uint32_t readDebugEventRegister()
 {
-  int result = 0 ;
-  uint32_t dataRead = 0 ; 
+  uint32_t dataRead = 0 ;
   
   memoryReadWord(DFSR_REG,&dataRead);
   
-  switch(debugEvent)
-  {
-    case EXTERNAL_DEBUGEVENT  : 
-                                if ((dataRead & DFSR_EXTERNAL_MASK) > 0)
-                                  result = 1 ;                               
-                                break ;
-    case VCATCH_DEBUGEVENT    :
-                                if ((dataRead & DFSR_VCATCH_MASK) > 0)
-                                  result = 1 ;                             
-                                break ;
-    case DWTTRAP_DEBUGEVENT   :
-                                if ((dataRead & DFSR_DWTTRAP_MASK) > 0)
-                                  result = 1 ;                              
-                                break ;
-    case BKPT_DEBUGEVENT      :
-                                if ((dataRead & DFSR_BKPT_MASK) > 0)
-                                  result = 1 ;       
-                                break ;
-    case HALTED_DEBUGEVENT    :
-                                if ((dataRead & DFSR_HALTED_MASK) > 0)
-                                  result = 1 ;
-                                break ; 
-    default :
-                                break ;
-  }
-  return result ;
+  return dataRead ;
+}
+
+/**
+ *	Use to clear the selected debug event 
+ *	
+ *  Input :   debugEvent is the debug event going to be checked
+ *				    Possible value :
+ *					    EXTERNAL_DEBUGEVENT       Clear external debug request debug event				    
+ *					    VCATCH_DEBUGEVENT				  Clear vector catch triggered debug event
+ *					    DWTTRAP_DEBUGEVENT 				Clear data watchpoint & trace unit debug event
+ *					    BKPT_DEBUGEVENT					  Clear breakpoint debug event
+ *					    HALTED_DEBUGEVENT				  Clear halt request debug event
+ *
+ */
+void clearDebugEvent(uint32_t debugEvent)
+{
+  memoryWriteWord(DFSR_REG,debugEvent);
 }
 
 /**
@@ -231,17 +209,17 @@ int isSelectedDebugEventOccured(DebugEvent debugEvent)
  *
  *  Input : vectorCatch is the vector catch going to be enabled
  *          Possible value :
- *            VC_DISABLEALL     Disable all vector catch
- *            VC_CORERESET      Enable reset vector catch
- *            VC_MMERR          Enable memory management exception vector catch
- *            VC_NOCPERR        Enable usage fault caused by access to Coprocessor vector catch
- *            VC_CHKERR         Enable usage fault exception casued by checking error vector catch
- *            VC_STATERR        Enable usage fault exception casued by state information error vector catch
- *            VC_BUSERR         Enable bus fault exception vector catch
- *            VC_INTERR         Enable interrupt/exception entry & return vector catch
- *            VC_HARDERR        Enable hard fault exception vector catch
+ *            VC_DISABLEALL             Disable all vector catch
+ *            VC_CORERESET              Enable reset vector catch
+ *            VC_MMERR                  Enable memory management exception vector catch
+ *            VC_NOCPERR                Enable usage fault caused by access to Coprocessor vector catch
+ *            VC_CHKERR                 Enable usage fault exception casued by checking error vector catch
+ *            VC_STATERR                Enable usage fault exception casued by state information error vector catch
+ *            VC_BUSERR                 Enable bus fault exception vector catch
+ *            VC_INTERR                 Enable interrupt/exception entry & return vector catch
+ *            VC_HARDERR                Enable hard fault exception vector catch
  */
-void enableSelectedVectorCatch(VectorCatch vectorCatch)
+void enableVectorCatch(uint32_t vectorCatch)
 {
   memoryWriteHalfword(DEMCR_REG,vectorCatch);
 }

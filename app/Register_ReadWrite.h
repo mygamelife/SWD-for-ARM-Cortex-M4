@@ -2,18 +2,9 @@
 #define Register_ReadWrite_H
 
 #include <stdint.h>
-#include "Clock.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "configurePort.h"
 #include "swd_Utilities.h"
-#include "IO_Operations.h"
-
-/** Debug Core Register
-  */
-#define DHCSR             ((uint32_t)0xE000EDF0)    //Debug Halting Control Status Register
-#define DCRSR             ((uint32_t)0xE000EDF4)    //Debug Core Register Selector Register
-#define DCRDR             ((uint32_t)0xE000EDF8)    //Debug Core Register Data Register
-#define DEMCR             ((uint32_t)0xE000EDFC)    //Debug Exception and Monitor Control Register
 
 /** AHB-AP register
   */
@@ -99,12 +90,14 @@ void swdRegisterWrite(int Address,int APnDP,int *ACK, uint32_t data);
 /* Used for mocking */
 uint32_t memoryReadAndReturnWord(uint32_t address);
 
-int memoryReadWord(uint32_t Address,uint32_t *dataRead);
-void memoryWriteByte(uint32_t address, uint32_t writeData);
-void memoryWriteHalfword(uint32_t address, uint32_t writeData);
-void memoryWriteWord(uint32_t Address,uint32_t WriteData);
+int memoryReadWord(uint32_t address,uint32_t *dataRead);
+void memoryWriteByte(uint32_t address, uint8_t writeData);
+void memoryWriteHalfword(uint32_t address, uint16_t writeData);
+void memoryWriteWord(uint32_t address,uint32_t writeData);
 
 int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
 void readAhbIDR(uint32_t *data_IDR);
 void swdWriteCSW(int *ack, uint32_t cswBitSet);
+
+uint32_t memoryWriteDataAlignment(uint32_t address,uint16_t writeData);
 #endif // Register_ReadWrite_H

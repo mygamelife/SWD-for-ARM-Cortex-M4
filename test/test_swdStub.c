@@ -1,21 +1,20 @@
 #include "unity.h"
-#include "Clock.h"
 #include "swdStub.h"
 #include "Emulator.h"
 #include "mock_SRAM.h"
 #include "mock_Flash.h"
 #include "swd_Utilities.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "Register_ReadWrite.h"
 #include "mock_configurePort.h"
-#include "mock_IO_Operations.h"
+#include "mock_LowLevelIO.h"
 
 void setUp(void)  {}
 
 void tearDown(void) {}
 
 void test_stubEraseSector_should_get_start_and_end_flash_address_and_call_flashEraseSector_func()  {
-  
+  cswDataSize = CSW_WORD_SIZE ;
   sramWrite_Expect(SWD_TARGET_STATUS, TARGET_BUSY);
   
   sramRead_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_12);

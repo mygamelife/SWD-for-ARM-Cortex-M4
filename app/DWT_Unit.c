@@ -6,10 +6,10 @@
  *
  *  Input : dwtCompNumber is the comparator going to be used 
  *          Possible value :
- *              DWT_COMP0       Comparator Number 0
- *              DWT_COMP1       Comparator Number 1
- *              DWT_COMP2       Comparator Number 2
- *              DWT_COMP3       Comparator Number 3
+ *              COMPARATOR_0               DWT Comparator Number 0
+ *              COMPARATOR_1               DWT Comparator Number 1
+ *              COMPARATOR_2               DWT Comparator Number 2
+ *              COMPARATOR_3               DWT Comparator Number 3
  *
  *          address is the address to be compared
  *          addressMask is the mask going to be applied to the address 
@@ -34,26 +34,24 @@
  *  Output :  return 0 if watchpoint is set 
  *            return -1 if invalid comparator is selected
  */
-int setAddressWatchpoint(uint32_t dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,Watchpoint_AccessMode accessMode)
+int setAddressWatchpoint(int dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,Watchpoint_AccessMode accessMode)
 { 
   int result = 0 ;
-  DWT_COMP[0].COMP =123;
-  uint32_t dwtMaskReg = dwtCompNumber + 4 ;
-  uint32_t dwtFuncReg = dwtCompNumber + 8 ;
+  int valid = checkForValidDWTComparator(dwtCompNumber) ;
+  
+  if(valid == -1)
+    return -1 ;
   
   enableDWTandITM(); //enable global enable for DWT (Needed for reading & writing DWT Register)
   setCoreMode(CORE_DEBUG_MODE);
-
-  if(getDWTComparatorNumber(dwtCompNumber) == -1)
-    return -1 ;
   
-  memoryWriteWord(dwtFuncReg,DISABLE_DWTCOMPARATOR); //disable selected comparator first
+  memoryWriteWord((uint32_t)(&DWT_COMP[dwtCompNumber].FUNCTION),DISABLE_DWTCOMPARATOR); //disable selected comparator first
 
-  memoryWriteWord(dwtCompNumber,address);
-  memoryWriteWord(dwtMaskReg,addressMask);
+  memoryWriteWord((uint32_t)(&DWT_COMP[dwtCompNumber].COMP),address);
+  memoryWriteWord((uint32_t)(&DWT_COMP[dwtCompNumber].MASK),addressMask);
   
-  if(accessMode !=DISABLE_DWTCOMPARATOR)//prevent setting to disable mode twice
-    memoryWriteWord(dwtFuncReg,accessMode);
+  if(accessMode != DISABLE_DWTCOMPARATOR)//prevent setting to disable mode twice
+    memoryWriteWord((uint32_t)(&DWT_COMP[dwtCompNumber].FUNCTION),accessMode);
   
   return result ;
 }
@@ -62,11 +60,11 @@ int setAddressWatchpoint(uint32_t dwtCompNumber,uint32_t address,Watchpoint_Addr
  *  Set watchpoint for data comparison with another 1 comparator used for data address matching
  *  Note : Will automatically set processor to CORE_DEBUG_MODE
  *
- *  Input : dwtCompNumber is the comparator going to be used for data address matching
+ *  Input : matchingCompNumber is the comparator going to be used for data address matching
  *          Possible value :
- *              DWT_COMP0       Comparator Number 0
- *              DWT_COMP2       Comparator Number 2
- *              DWT_COMP3       Comparator Number 3
+ *              COMPARATOR_0               DWT Comparator Number 0
+ *              COMPARATOR_2               DWT Comparator Number 2
+ *              COMPARATOR_3               DWT Comparator Number 3
  *
  *          address is the address to be used for data address matching
  *          addressMask is the mask going to be applied to the address 
@@ -98,29 +96,26 @@ int setAddressWatchpoint(uint32_t dwtCompNumber,uint32_t address,Watchpoint_Addr
  *  Output :  return 0 if watchpoint is set 
  *            return -1 if invalid comparator is selected 
  */
-int setDataWatchpoint_MatchingOneComparator(uint32_t dwtCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,
+int setDataWatchpoint_MatchingOneComparator(int matchingCompNumber,uint32_t address,Watchpoint_AddressMask addressMask,
                                             uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode)
 {
   int result = 0 ;
-  int matchingCompNumber = 0 ;
+  int valid = 0 ;
   uint32_t configData = 0 ;
   
-  matchingCompNumber = getDWTComparatorNumber(dwtCompNumber);
-  if(dwtCompNumber == DWT_COMP1)
+  valid = checkForValidDWTComparator(matchingCompNumber);
+  if(matchingCompNumber == 1 || valid == -1)
     return -1 ;
   
-  if(matchingCompNumber == -1)
-    return -1 ;
-
   configData = (matchingCompNumber << 16) + (matchingCompNumber << 12) + (dataSize << 10) + (DATA_COMPARISON << 8) + accessMode ;
  
-  setAddressWatchpoint(dwtCompNumber,address,addressMask,DISABLE_DWTCOMPARATOR);
+  setAddressWatchpoint(matchingCompNumber,address,addressMask,DISABLE_DWTCOMPARATOR);
   
-  memoryWriteWord(DWT_FUNC1,DISABLE_DWTCOMPARATOR); //disable selected comparator first
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].FUNCTION),DISABLE_DWTCOMPARATOR); //disable selected comparator first
   
-  memoryWriteWord(DWT_COMP1,matchedData);
-  memoryWriteWord(DWT_MASK1,WATCHPOINT_MASK_NOTHING);
-  memoryWriteWord(DWT_FUNC1,configData);
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].COMP),matchedData);
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].MASK),WATCHPOINT_MASK_NOTHING);
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].FUNCTION),configData);
   
   return result ;
 }
@@ -129,11 +124,11 @@ int setDataWatchpoint_MatchingOneComparator(uint32_t dwtCompNumber,uint32_t addr
  *  Set watchpoint for data comparison with another 2 comparator used for data address matching
  *  Note : Will automatically set processor to CORE_DEBUG_MODE
  *
- *  Input : dwtCompNumber1 is the first comparator going to be used for data address matching
+ *  Input : matchingCompNumber1 is the first comparator going to be used for data address matching
  *          Possible value :
- *              DWT_COMP0       Comparator Number 0
- *              DWT_COMP2       Comparator Number 2
- *              DWT_COMP3       Comparator Number 3
+ *              COMPARATOR_0               DWT Comparator Number 0
+ *              COMPARATOR_2               DWT Comparator Number 2
+ *              COMPARATOR_3               DWT Comparator Number 3
  *
  *          address1 is the first address to be used for data address matching
  *          addressMask1 is the mask going to be applied to the first address 
@@ -149,11 +144,11 @@ int setDataWatchpoint_MatchingOneComparator(uint32_t dwtCompNumber,uint32_t addr
  *							WATCHPOINT_MASK_BIT13_BIT0		Ignore Bit13 to Bit 0 of address set in DWT_COMPn during comparison
  *							WATCHPOINT_MASK_BIT14_BIT0	  Ignore Bit14 to Bit 0 of address set in DWT_COMPn during comparison
  *
- *          dwtCompNumber2 is the second comparator going to be used for data address matching
+ *          matchingCompNumber2 is the second comparator going to be used for data address matching
  *          Possible value :
- *              DWT_COMP0       Comparator Number 0
- *              DWT_COMP2       Comparator Number 2
- *              DWT_COMP3       Comparator Number 3
+ *              COMPARATOR_0               DWT Comparator Number 0
+ *              COMPARATOR_2               DWT Comparator Number 2
+ *              COMPARATOR_3               DWT Comparator Number 3
  *
  *          address2 is the second address to be used for data address matching
  *          addressMask2 is the mask going to be applied to the second address 
@@ -185,39 +180,36 @@ int setDataWatchpoint_MatchingOneComparator(uint32_t dwtCompNumber,uint32_t addr
  *  Output :  return 0 if watchpoint is set 
  *            return -1 if invalid comparator is selected 
  */
-int setDataWatchpoint_MatchingTwoComparator(uint32_t dwtCompNumber1,uint32_t address1,Watchpoint_AddressMask addressMask1,
-                                            uint32_t dwtCompNumber2,uint32_t address2,Watchpoint_AddressMask addressMask2,
+int setDataWatchpoint_MatchingTwoComparator(int matchingCompNumber1,uint32_t address1,Watchpoint_AddressMask addressMask1,
+                                            int matchingCompNumber2,uint32_t address2,Watchpoint_AddressMask addressMask2,
                                             uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode)
 {
   int result = 0 ;
-  int matchingCompNumber1 = 0, matchingCompNumber2 = 0 ;
+  int valid1 = 0 , valid2 = 0 ;
   uint32_t configData = 0 ;
   
-  matchingCompNumber1 = getDWTComparatorNumber(dwtCompNumber1);
-  matchingCompNumber2 = getDWTComparatorNumber(dwtCompNumber2);
-  
-  if(dwtCompNumber1 == DWT_COMP1 || dwtCompNumber2 == DWT_COMP1)
-    return -1 ;
-  
-  if(matchingCompNumber1 == -1 || matchingCompNumber2 == -1  )
-    return -1 ;
+  valid1 = checkForValidDWTComparator(matchingCompNumber1);
+  valid2 = checkForValidDWTComparator(matchingCompNumber2);
 
+  if(matchingCompNumber1 == 1 || matchingCompNumber1 == 1 || valid1 == -1 || valid2 == -1)
+    return -1 ;
+  
   configData = (matchingCompNumber2 << 16) + (matchingCompNumber1 << 12) + (dataSize << 10) + (DATA_COMPARISON << 8) + accessMode ;
  
-  setAddressWatchpoint(dwtCompNumber1,address1,addressMask1,DISABLE_DWTCOMPARATOR);
-  setAddressWatchpoint(dwtCompNumber2,address2,addressMask2,DISABLE_DWTCOMPARATOR);
+  setAddressWatchpoint(matchingCompNumber1,address1,addressMask1,DISABLE_DWTCOMPARATOR);
+  setAddressWatchpoint(matchingCompNumber2,address2,addressMask2,DISABLE_DWTCOMPARATOR);
   
-  memoryWriteWord(DWT_FUNC1,DISABLE_DWTCOMPARATOR); //disable selected comparator first
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].FUNCTION),DISABLE_DWTCOMPARATOR); //disable selected comparator first
   
-  memoryWriteWord(DWT_COMP1,matchedData);
-  memoryWriteWord(DWT_MASK1,WATCHPOINT_MASK_NOTHING);
-  memoryWriteWord(DWT_FUNC1,configData);
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].COMP),matchedData);
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].MASK),WATCHPOINT_MASK_NOTHING);
+  memoryWriteWord((uint32_t)(&DWT_COMP[1].FUNCTION),configData);
   
   return result ;
 }
 
 /**
- *  Check if data watchpoint occur
+ *  Check if data watchpoint occurs
  *
  *  Output :  return 1 for true
  *            return 0 for false
@@ -226,8 +218,8 @@ int isDataWatchpointOccurred()
 {
   uint32_t dataRead = 0 ;
   
-  if(isDWTTrapDebugEventOccured())
-    memoryReadWord(DWT_FUNC1,&dataRead);
+  if(hasDWTTrapDebugEventOccured())
+    memoryReadWord((uint32_t)(&DWT_COMP[1].FUNCTION),&dataRead);
   
   dataRead = (dataRead & DWT_MATCHED_MASK) >> 24 ;
   return (int)dataRead ;
@@ -236,20 +228,27 @@ int isDataWatchpointOccurred()
 /**
  *  Check if address watchpoint occur
  *
+ *  Input : dwtCompNumber is the comparator going to be checked
+ *          Possible value :
+ *              COMPARATOR_0               DWT Comparator Number 0
+ *              COMPARATOR_1               DWT Comparator Number 1
+ *              COMPARATOR_2               DWT Comparator Number 2
+ *              COMPARATOR_3               DWT Comparator Number 3
  *  Output :  return 1 for true
  *            return 0 for false
  *            return -1 if invalid comparator is selected 
  */
-int isAddressWatchpointOccurred(uint32_t dwtCompNumber)
+int isAddressWatchpointOccurred(int dwtCompNumber)
 {
   uint32_t dataRead = 0 ;
-  uint32_t dwtFuncReg = dwtCompNumber + 8 ;
+  int valid = 0 ;
   
-  if(getDWTComparatorNumber(dwtCompNumber) == -1)
-    return -1 ;
+  valid = checkForValidDWTComparator(dwtCompNumber) ;
+  if(valid == -1)
+    return valid ;
   
-  if(isDWTTrapDebugEventOccured())
-    memoryReadWord(dwtFuncReg,&dataRead);
+  if(hasDWTTrapDebugEventOccured())
+    memoryReadWord((uint32_t)(&DWT_COMP[dwtCompNumber].FUNCTION),&dataRead);
   
   dataRead = (dataRead & DWT_MATCHED_MASK) >> 24 ;
   
@@ -261,35 +260,23 @@ int isAddressWatchpointOccurred(uint32_t dwtCompNumber)
  *
  *  Input : dwtCompNumber is the comparator going to be used 
  *          Possible value :
- *              DWT_COMP0       Comparator Number 0
- *              DWT_COMP1       Comparator Number 1
- *              DWT_COMP2       Comparator Number 2
- *              DWT_COMP3       Comparator Number 3
+ *              COMPARATOR_0               DWT Comparator Number 0
+ *              COMPARATOR_1               DWT Comparator Number 1
+ *              COMPARATOR_2               DWT Comparator Number 2
+ *              COMPARATOR_3               DWT Comparator Number 3
  *
  *  Output :  return 0 if the comparator is disabled
  *            return -1 if invalid comparator is selected 
  */
-int disableDWTComparator(uint32_t dwtCompNumber)
+int disableDWTComparator(int dwtCompNumber)
 {
-  uint32_t dwtFuncReg = dwtCompNumber + 8 ;
-    
-  if(getDWTComparatorNumber(dwtCompNumber) == -1)
-    return -1 ;
+  int valid = 0 ;
   
-  memoryWriteWord(dwtFuncReg,DISABLE_DWTCOMPARATOR);
+  valid = checkForValidDWTComparator(dwtCompNumber) ;
+  if(valid == -1)
+    return valid ;
+    
+  memoryWriteWord((uint32_t)(&DWT_COMP[dwtCompNumber].FUNCTION),DISABLE_DWTCOMPARATOR);
   
   return 0 ;
 }
-
-/**
- *  Disable all DWT Comparator
- *
- */
-void disableAllDWTComparators()
-{ 
-  memoryWriteWord(DWT_FUNC0,DISABLE_DWTCOMPARATOR);
-  memoryWriteWord(DWT_FUNC1,DISABLE_DWTCOMPARATOR);
-  memoryWriteWord(DWT_FUNC2,DISABLE_DWTCOMPARATOR);
-  memoryWriteWord(DWT_FUNC3,DISABLE_DWTCOMPARATOR);
-}
-

@@ -1,12 +1,10 @@
 #include "unity.h"
 #include "Emulator.h"
-#include "Clock.h"
-#include "Reset.h"
+#include "IoOperations.h"
 #include "Delay.h"
 #include "swd_Utilities.h"
 #include "Register_ReadWrite.h"
-#include "Bit_Operations.h"
-#include "mock_IO_Operations.h"
+#include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"
 void setUp(void)
 {
@@ -16,30 +14,30 @@ void tearDown(void)
 {
 }
 
-void test_clockGenerator_1cycle_should_turn_off_SWCLK_and_turn_on_SWCLK()
+void test_generateOneClockCycle_should_turn_off_SWCLK_and_turn_on_SWCLK()
 {
-	SWCLK_OFF_Expect();
-	SWCLK_ON_Expect();
+	setLowSWCLK_Expect();
+	setHighSWCLK_Expect();
 	
-	clockGenerator_1cycle();
+	generateOneClockCycle();
 }
 
-void test_turnAround_ToRead_should_call_SWCLK_OFF()
+void test_turnAroundRead_should_call_setLowSWCLK()
 {
 	emulateTurnAroundRead();
 	
-	turnAround_ToRead();
+	turnAroundRead();
 }
 
-void test_turnAround_ToWrite_should_call_SWCLK_ON_SWCLK_OFF_SWCLK_ON()
+void test_turnAroundWrite_should_call_setHighSWCLK_setLowSWCLK_setHighSWCLK()
 {
 	emulateTurnAroundWrite();
 	
-	turnAround_ToWrite();
+	turnAroundWrite();
 }
 
 
-void test_extraIdleClock_given_1_clock_should_set_SWDIO_Low_and_turn_off_SWCLK_and_turn_on_SWCLK()
+void test_extraIdleClock_given_1_clock_should_set_setLowSWDIO_and_turn_off_SWCLK_and_turn_on_SWCLK()
 {
 	emulateIdleClock(1);
 	

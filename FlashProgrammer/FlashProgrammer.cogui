@@ -1,0 +1,555 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench version="2.0">
+<workbenchAdvisor/>
+<window>
+<fastViewData fastViewLocation="1024">
+<orientation position="512" view="org.eclipse.debug.ui.ExpressionView"/>
+<orientation position="512" view="org.coocox.codebugger.trace.ui.traceview"/>
+<orientation position="512" view="org.eclipse.ui.console.ConsoleView"/>
+<orientation position="512" view="org.eclipse.debug.ui.VariableView"/>
+</fastViewData>
+<perspectiveBar/>
+<page aggregateWorkingSetId="Aggregate for window 1437210452330" focus="true" label="Workspace - CooCox CoBuilder">
+<editors>
+<editorArea activeWorkbook="DefaultEditorWorkbook">
+<info part="DefaultEditorWorkbook">
+<folder appearance="1" expanded="2">
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+<part id="3"/>
+<part id="4"/>
+<part id="5"/>
+<part id="6"/>
+<part id="7"/>
+<part id="8"/>
+<part id="9"/>
+<part id="10"/>
+<part id="11"/>
+<part id="12"/>
+<part id="13"/>
+<part id="14"/>
+<part id="15"/>
+<part id="16"/>
+<part id="17"/>
+<part id="18"/>
+</presentation>
+</folder>
+</info>
+</editorArea>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="LED.c" partName="LED.c" title="LED.c" tooltip="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\app\LED.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/LED.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="18" selectionOffset="0" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" partName="configurePort.h" title="configurePort.h" tooltip="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\app\configurePort.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/configurePort.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="33" selectionOffset="74" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" partName="stm32f4xx_hal.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal.c" title="stm32f4xx_hal.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Hardware/stm32f4xx_hal.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="20" selectionOffset="11547" selectionTopPixel="4970"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_def.h" partName="stm32f4xx_hal_def.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal_def.h" title="stm32f4xx_hal_def.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal_def.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Hardware/stm32f4xx_hal_def.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6320" selectionTopPixel="2400"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_conf.h" partName="stm32f4xx_hal_conf.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal_conf.h" title="stm32f4xx_hal_conf.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal_conf.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Hardware/stm32f4xx_hal_conf.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3508" selectionTopPixel="1020"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_it.h" partName="stm32f4xx_it.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_it.h" title="stm32f4xx_it.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_it.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Hardware/stm32f4xx_it.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="788"/>
+</editor>
+<editor id="org.eclipse.ui.DefaultTextEditor" name="toflash.ld" partName="toflash.ld" title="toflash.ld" tooltip="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\FlashProgrammer\toflash.ld" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.ide.FileStoreEditorInputFactory" uri="file:/C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/toflash.ld"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4162" selectionTopPixel="2357"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/main.c" title="main.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/main.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/main.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="75" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="LED.h" partName="LED.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/LED.h" title="LED.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/LED.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/configuration/LED.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="160" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="swd_Utilities.h" partName="swd_Utilities.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/swd_Utilities.h" title="swd_Utilities.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/swd_Utilities.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/swd_Utilities.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="375" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Flash.h" partName="Flash.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Flash.h" title="Flash.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Flash.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/Flash.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="10" selectionOffset="2775" selectionTopPixel="788"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="swdStub.c" partName="swdStub.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/swdStub.c" title="swdStub.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/swdStub.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/swdStub.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3344" selectionTopPixel="2278"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Flash.c" partName="Flash.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Flash.c" title="Flash.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Flash.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/Flash.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="13138" selectionTopPixel="8438"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="swdStub.h" partName="swdStub.h" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/swdStub.h" title="swdStub.h" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/swdStub.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/swdStub.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="35" selectionOffset="1302" selectionTopPixel="380"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_flash.c" partName="stm32f4xx_hal_flash.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal_flash.c" title="stm32f4xx_hal_flash.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Hardware/stm32f4xx_hal_flash.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Hardware/stm32f4xx_hal_flash.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="16592" selectionTopPixel="8980"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="IO_Operations.c" partName="IO_Operations.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/IO_Operations.c" title="IO_Operations.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/IO_Operations.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/IO_Operations.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Register_ReadWrite.c" partName="Register_ReadWrite.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Register_ReadWrite.c" title="Register_ReadWrite.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/Register_ReadWrite.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/Register_ReadWrite.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SystemConfigure.c" partName="SystemConfigure.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/SystemConfigure.c" title="SystemConfigure.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/SystemConfigure.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/Code/SystemConfigure.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="30" selectionOffset="3078" selectionTopPixel="968"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="LED.c" partName="LED.c" path="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/LED.c" title="LED.c" tooltip="C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/FlashProgrammer/app/LED.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/FlashProgrammer/configuration/LED.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="217" selectionTopPixel="0"/>
+</editor>
+</editors>
+<views>
+<view id="org.eclipse.debug.ui.ExpressionView" partName="Expressions">
+<viewState>
+<ExpressionKeySet ExpKeys="head,listRemoveHead,runningTcb,readyQueue,"/>
+</viewState>
+</view>
+<view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
+<viewState CommonNavigator.LINKING_ENABLED="1" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="10">
+<expanded>
+<element path="/FlashProgrammer"/>
+<element path="/FlashProgrammer/Code"/>
+<element path="/FlashProgrammer/configuration"/>
+<element path="/FlashProgrammer/Hardware"/>
+<element path="/FlashProgrammer/startup"/>
+</expanded>
+<selection>
+<element path="/FlashProgrammer/Code/main.c"/>
+</selection>
+</viewState>
+</view>
+<view id="org.eclipse.debug.ui.RegisterView" partName="Registers">
+<viewState/>
+</view>
+<view id="org.coocox.codebugger.trace.ui.traceview" partName="Semihosting">
+<viewState/>
+</view>
+<view id="org.eclipse.debug.ui.DebugView" partName="Debug">
+<viewState/>
+</view>
+<view id="org.coocox.component.ui.view.ComponentView" partName="Component View">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.console.ConsoleView" partName="Console">
+<viewState/>
+</view>
+<view id="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" partName="Memory Browser">
+<viewState>
+<MemoryBroser ComboItemsValue="0x20001000;" FocuseTabIndex="0" TabsValue="0x20001000;" TextValue="0x20001000" horizontalPosition="0" verticalPosition="0"/>
+</viewState>
+</view>
+<view id="org.eclipse.cdt.dsf.debug.ui.disassembly.view" partName="Disassembly">
+<viewState disassembly.syncActiveContext="true" disassembly.trackExpression="false"/>
+</view>
+<view id="org.eclipse.debug.ui.VariableView" partName="Variables">
+<viewState/>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<viewState/>
+</view>
+</views>
+<perspectives activePart="org.coocox.builder.ui.views.ProjectView" activePerspective="org.coocox.builder.perspective.CoBuilder">
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="org.coocox.builder.ui.PerspectiveCoBuilder" id="org.coocox.builder.perspective.CoBuilder" label="CooCox CoBuilder"/>
+<alwaysOnActionSet id="org.coocox.welcome.ui.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showMemoryAction"/>
+<hide_menu_item_id id="org.eclipse.jdt.ui.refactoring.menu"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.ShowDisassemblyAction"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showExpressionsAction"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showDebugAction"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showConsoleAction"/>
+<hide_menu_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
+<hide_menu_item_id id="org.eclipse.jdt.ui.source.menu"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showMemoryBrowserAction"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showVariablesAction"/>
+<hide_menu_item_id id="org.coocox.builder.ui.openProjectExplorerAction"/>
+<hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
+<hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
+<hide_menu_item_id id="org.coocox.codebugger.configuration.showRegistersAction"/>
+<hide_toolbar_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<hide_toolbar_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
+<view id="org.coocox.builder.ui.views.ProjectView"/>
+<view id="org.coocox.component.ui.view.ComponentView"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
+<fastViewBars/>
+<layout>
+<mainWindow>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1b97a13">
+<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">
+<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<page content="org.coocox.component.ui.view.ComponentView" label="Component View"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="1434" ratioRight="478" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1b97a13">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1358a7" ratio="0.6995662" ratioLeft="645" ratioRight="277" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1b97a13">
+<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
+<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.21966527" ratioLeft="420" ratioRight="1492" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1b97a13"/>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1fd8296" ratio="0.71983916" ratioLeft="1074" ratioRight="418" relationship="2" relative="org.eclipse.ui.editorss">
+<folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
+<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
+<page content="org.coocox.coassistant.view.CoAssistantView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+</mainWindow>
+</layout>
+</perspective>
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="org.coocox.codebugger.configuration.ui.Perspective" id="org.coocox.codebugger.configuration.perspective" label="CoDebugger"/>
+<alwaysOnActionSet id="org.coocox.welcome.ui.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.breakpointActionSet"/>
+<alwaysOnActionSet id="org.eclipse.debug.ui.debugActionSet"/>
+<hide_menu_item_id id="org.coocox.builder.ui.newFolder"/>
+<hide_menu_item_id id="org.coocox.welcome.ui.action.repository"/>
+<hide_menu_item_id id="org.eclipse.ui.file.save"/>
+<hide_menu_item_id id="org.eclipse.jdt.ui.refactoring.menu"/>
+<hide_menu_item_id id="org.coocox.builder.ui.rebuild"/>
+<hide_menu_item_id id="org.eclipse.ui.file.saveAll"/>
+<hide_menu_item_id id="org.coocox.builder.ui.openFile"/>
+<hide_menu_item_id id="org.eclipse.ui.file.saveAs"/>
+<hide_menu_item_id id="org.coocox.builder.rcp.projectMenu"/>
+<hide_menu_item_id id="org.coocox.builder.rcp.flashMenu"/>
+<hide_menu_item_id id="org.coocox.builder.ui.debug"/>
+<hide_menu_item_id id="org.coocox.builder.ui.showHelpViewAction"/>
+<hide_menu_item_id id="org.coocox.builder.ui.newFile"/>
+<hide_menu_item_id id="org.coocox.builder.ui.actions.ConfigurationAction"/>
+<hide_menu_item_id id="org.eclipse.jdt.ui.source.menu"/>
+<hide_menu_item_id id="org.coocox.builder.ui.build"/>
+<hide_menu_item_id id="org.coocox.welcome.ui.action.welcome"/>
+<hide_menu_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.actions.TargetManageAction"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.newProject"/>
+<hide_toolbar_item_id id="org.coocox.welcome.ui.action.repository"/>
+<hide_toolbar_item_id id="org.eclipse.ui.file.save"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.rebuild"/>
+<hide_toolbar_item_id id="org.coocox.codebugger.configuration.coideFlashEraseAction"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.debug"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.newFile"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.actions.ConfigurationAction"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<hide_toolbar_item_id id="org.coocox.builder.ui.build"/>
+<hide_toolbar_item_id id="org.coocox.welcome.ui.action.welcome"/>
+<hide_toolbar_item_id id="org.coocox.component.ui.ShowRepositoryAction"/>
+<hide_toolbar_item_id id="org.coocox.codebugger.configuration.coideProgramDownloadAction"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
+<view id="org.eclipse.debug.ui.DebugView"/>
+<view id="org.coocox.codebugger.trace.ui.traceview"/>
+<view id="org.eclipse.debug.ui.VariableView"/>
+<view id="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser"/>
+<view id="org.eclipse.debug.ui.ExpressionView"/>
+<view id="org.coocox.builder.ui.views.ProjectView"/>
+<view id="org.eclipse.debug.ui.RegisterView"/>
+<view id="org.eclipse.cdt.dsf.debug.ui.disassembly.view"/>
+<fastViewBars/>
+<viewLayoutRec closeable="false" id="org.eclipse.debug.ui.DebugView"/>
+<layout>&#x0A;<mainWindow>&#x0A;<info folder="true" part="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder activePageID="org.coocox.builder.ui.views.ProjectView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.builder.ui.views.ProjectView" label="Project"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.75" ratioLeft="954" ratioRight="318" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder appearance="2" expanded="2">&#x0A;<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@6df156" ratio="0.71926004" ratioLeft="661" ratioRight="258" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
+<page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
+<page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@1c835de" ratio="0.5" ratioLeft="636" ratioRight="636" relationship="2" relative="org.eclipse.ui.internal.ViewStack@6df156">&#x0A;<folder activePageID="org.eclipse.debug.ui.VariableView" appearance="2" expanded="2">&#x0A;<page content="org.coocox.codebugger.trace.ui.traceview" label="Semihosting"/>
+<page content="org.eclipse.debug.ui.VariableView" label="Variables"/>
+<page content="org.eclipse.cdt.debug.ui.memory.memorybrowser.MemoryBrowser" label="Memory Browser"/>
+<page content="org.eclipse.debug.ui.ExpressionView" label="Expressions"/>
+<page content="org.eclipse.debug.ui.MemoryView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+<part id="3"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="org.eclipse.ui.internal.ViewStack@60d73d" ratio="0.5987428" ratioLeft="1143" ratioRight="766" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97">&#x0A;<folder activePageID="org.eclipse.cdt.dsf.debug.ui.disassembly.view" appearance="2" expanded="2">&#x0A;<page content="org.eclipse.debug.ui.RegisterView" label="Registers"/>
+<page content="org.eclipse.cdt.dsf.debug.ui.disassembly.view" label="Disassembly"/>
+<page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
+<page content="org.coocox.coassistant.view.CoAssistantView_debug" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">&#x0A;<part id="0"/>
+<part id="1"/>
+</presentation>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.22016937" ratioLeft="286" ratioRight="1013" relationship="2" relative="org.eclipse.ui.internal.ViewStack@1062c97"/>
+</mainWindow>
+</layout>
+</perspective>
+</perspectives>
+<workingSets/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/FlashProgrammer/startup/startup_flashProgrammer.s"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Code/swdStub.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Code/Flash.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Code/Flash.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Hardware/stm32f4xx_hal_flash_ex.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/configuration/LED.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Hardware/stm32f4xx_hal_gpio.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/Code/SystemConfigure.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/FlashProgrammer/configuration/LED.c"/>
+</editors>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="9975" y="0"/>
+</item>
+<item historyLabel="swdStub.c" index="2">
+<position info="not_deleted" x="2849" y="0"/>
+</item>
+<item historyLabel="Flash.h" index="3">
+<position info="not_deleted" x="3045" y="91"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="startup_flashProgrammer.s" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="75" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="9975" y="0"/>
+</item>
+<item historyLabel="Flash.h" index="3">
+<position info="not_deleted" x="2775" y="10"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="15633" y="0"/>
+</item>
+<item historyLabel="startup_flashProgrammer.s" index="1">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="75" y="0"/>
+</item>
+<item historyLabel="stm32f4xx_hal_flash_ex.c" index="5">
+<position info="not_deleted" x="9457" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13434" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13466" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13488" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13556" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13823" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13992" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14099" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14129" y="0"/>
+</item>
+<item historyLabel="LED.c" index="6">
+<position info="not_deleted" x="66" y="0"/>
+</item>
+<item historyLabel="LED.c" index="6">
+<position info="not_deleted" x="103" y="0"/>
+</item>
+<item historyLabel="stm32f4xx_hal_gpio.c" index="7">
+<position info="not_deleted" x="18023" y="0"/>
+</item>
+<item historyLabel="stm32f4xx_hal_gpio.c" index="7">
+<position info="not_deleted" x="18109" y="0"/>
+</item>
+<item historyLabel="stm32f4xx_hal_gpio.c" index="7">
+<position info="not_deleted" x="18159" y="0"/>
+</item>
+<item historyLabel="LED.c" index="6">
+<position info="not_deleted" x="122" y="0"/>
+</item>
+<item historyLabel="LED.c" index="6">
+<position info="not_deleted" x="144" y="0"/>
+</item>
+<item historyLabel="LED.c" index="6">
+<position info="not_deleted" x="569" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14099" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14129" y="0"/>
+</item>
+<item historyLabel="LED.c" index="6">
+<position info="not_deleted" x="172" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14129" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="75" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14129" y="0"/>
+</item>
+<item historyLabel="swdStub.c" index="2">
+<position info="not_deleted" x="2849" y="0"/>
+</item>
+<item historyLabel="SystemConfigure.c" index="8">
+<position info="not_deleted" x="3078" y="30"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="14129" y="0"/>
+</item>
+<item historyLabel="swdStub.c" index="2">
+<position info="not_deleted" x="3432" y="20"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="334" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="15676" y="0"/>
+</item>
+<item historyLabel="swdStub.c" index="2">
+<position info="not_deleted" x="3344" y="0"/>
+</item>
+<item historyLabel="Flash.c" index="4">
+<position info="not_deleted" x="13138" y="0"/>
+</item>
+<item historyLabel="main.c" index="0">
+<position/>
+</item>
+<item historyLabel="main.c" index="0">
+<position info="not_deleted" x="75" y="0"/>
+</item>
+<item historyLabel="LED.c" index="9">
+<position info="not_deleted" x="172" y="0"/>
+</item>
+<item historyLabel="LED.c" index="9">
+<position info="not_deleted" x="217" y="0"/>
+</item>
+<item active="true" historyLabel="main.c" index="0">
+<position info="not_deleted" x="75" y="0"/>
+</item>
+</navigationHistory>
+<input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
+</page>
+<workbenchWindowAdvisor/>
+<actionBarAdvisor/>
+</window>
+<mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" tooltip="SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/startup_stm32f429xx.s"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.h" tooltip="SWD-for-ARM-Cortex-M4/Code/main.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/main.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="UART.c" tooltip="SWD-for-ARM-Cortex-M4/Code/UART.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/UART.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="UART.h" tooltip="SWD-for-ARM-Cortex-M4/Code/UART.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/UART.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="SWD-for-ARM-Cortex-M4/Code/main.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" tooltip="SWD-for-ARM-Cortex-M4/Code/configurePort.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_State.h" tooltip="SWD-for-ARM-Cortex-M4/Code/TLV_State.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/TLV_State.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.h" tooltip="SWD-for-ARM-Cortex-M4/Code/TLV_Probe.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="TLV_Probe.c" tooltip="SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/TLV_Probe.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_flash_ex.c" tooltip="FlashProgrammer/Hardware/stm32f4xx_hal_flash_ex.c">
+<persistable path="/FlashProgrammer/Hardware/stm32f4xx_hal_flash_ex.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_flashProgrammer.s" tooltip="FlashProgrammer/startup/startup_flashProgrammer.s">
+<persistable path="/FlashProgrammer/startup/startup_flashProgrammer.s"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_flash_ex.c" tooltip="FlashProgrammer/Hardware/stm32f4xx_hal_flash_ex.c">
+<persistable path="/FlashProgrammer/Hardware/stm32f4xx_hal_flash_ex.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+</file>
+</mruList>
+</workbench>
