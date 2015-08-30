@@ -2,8 +2,8 @@
 
 int main(void)
 {
-  Probe_TypeDef probe;
-  uint32_t idr = 0, dataRead = 0, dataRead2 = 0, ack = 0;
+  uint32_t idr = 0, dataRead = 0, dataRead2 = 0;
+  int ack = 0;
 
   /* Hardware configuration */
   HAL_Init();
@@ -19,23 +19,23 @@ int main(void)
   readAhbIDR(&idr);
   swdWriteCSW(&ack, CSW_DEFAULT_MASK | CSW_WORD_SIZE);
 
-  probe.state = PROBE_WAIT;
-  TLV_Session *session = createTlvSession();
-  //probe.uartHandle = initUart();
-
-  //setCoreMode(CORE_DEBUG_HALT);
-  //writeCoreRegister(CORE_REG_PC, 0x20000001);
-  //setCoreMode(CORE_NORMAL_MODE);
-
-  //readCoreRegister(CORE_REG_PC, &dataRead);
-  //setCoreMode(CORE_NORMAL_MODE);
-
-  //readCoreRegister(CORE_REG_PC, &dataRead);
-  //setCoreMode(CORE_NORMAL_MODE);
-
+  Tlv *receive;
+  Tlv_Session *session = tlvCreateWorkerSession();
+  uint32_t address, data;
   while(1)
   {
-	  probeProgrammer(&probe, session);
+	  receive = tlvReceive(session);
+	  if(receive != NULL)	{
+		  if(receive->type == TLV_WRITE_REGISTER) {
+			  address = get4Byte(&receive->value[0]);
+			  data = get4Byte(&receive->value[4]);
 
+			  writeTargetRegister(session, &address, &data);
+		  }
+		  else if(receive->type == TLV_READ_REGISTER) {
+			  address = get4Byte(&receive->value[0]);
+			  readTargetRegister(session, &address);
+		  }
+	  }
   }
 }

@@ -1,62 +1,43 @@
-#include <windows.h>
-#include <stdint.h>
-#include <stdio.h>
-#include "Serial.h"
-#include "Tlv.h"
-#include "GetHeaders.h"
+#include "ProgramLoader.h"
+#include "CoreDebug_Utilities.h"
+#include <stdlib.h>
 
 int main(void) {
-  //TlvHost_TypeDef host; ElfData *elfData;
-  //int index = 0;
+  // uint32_t buffer32[] = { 0xBEEFCAFE, 0xAABBCCDD,
+                          // 0xDEADBEEF, 0xAABBCCDD,
+                          // 0xBEEFCAFE, 0xAABBCCDD };
+  Tlv *tlv, *receivedPacket;
   
-  // elfData = openElfFile("../FlashProgrammer/FlashProgrammer.elf");
+  int time = 10, lastIndex = 0;
+  uint32_t address = CORE_REG_R0;
+  uint32_t data = 0xDEADBEEF;
   
-  // index = getIndexOfSectionByName(elfData, ".isr_vector");
-  // host.fileSize = getSectionSize(elfData, index);
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  // host.hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
-  
-  // printf("Flash ISR_VECTOR............\n");
-  // tlvWriteRam(&host);
-  
-  // while(uartGetBytes(host.hSerial, host.rxBuffer, ONE_BYTE) == 0);
-  // printf("Probe is ready for next task!\n");
-  
-  // index = getIndexOfSectionByName(elfData, ".data");
-  // host.fileSize = getSectionSize(elfData, index);
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  
-  // printf("Flash DATA............\n");
-  // tlvWriteRam(&host);
-  
-  // while(uartGetBytes(host.hSerial, host.rxBuffer, ONE_BYTE) == 0);
-  // printf("Probe is ready for next task!\n");
-  
-  // index = getIndexOfSectionByName(elfData, ".text");
-  // host.fileSize = getSectionSize(elfData, index);
-  // host.dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  // host.destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
-  
-  // printf("LOADING FLASH_PROGRAMMER............\n");
-  // tlvWriteRam(&host);
-  
-  uint8_t buffer[] = { 0xBE, 0xEF, 0xCA, 0xFE, 0xAA, 0xBB, 0xCC, 0xDD,
-                       0xBE, 0xEF, 0xCA, 0xFE, 0xAA, 0xBB, 0xCC, 0xDD,
-                       0xBE, 0xEF, 0xCA, 0xFE, 0xAA, 0xBB, 0xCC, 0xDD};
-  Tlv_Session *session = tlvCreateSession();
-	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-	// Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
+  Tlv_Session *session = tlvCreateLoaderSession();
   printf("Opening port\n");
   
-  tlvSend(session, tlv);
-  Tlv *tlvPacket = tlvReceive(session);
+  printf("Write register\n");
+  tlvWriteTargetRegister(session, &address, &data);
+  receivedPacket = tlvReceive(session);
+  
+  if(receivedPacket->type == TLV_OK)  {
+    printf("Probe reply OK\n");
+    printf("chksum valu %x\n", receivedPacket->value[receivedPacket->length - 1]);
+  }
+  
+  printf("Read register\n");
+  tlvReadTargetRegister(session, &address);
+
+  receivedPacket = tlvReceive(session);
+  if(receivedPacket->type == TLV_READ_REGISTER)  {
+    printf("value %x\n", get4Byte(&receivedPacket->value[0]));
+    lastIndex = receivedPacket->length - 1;
+    printf("chksum valu %x\n", receivedPacket->value[lastIndex]);
+  }
+  
+
   
   printf("Closing port\n");
-  closeSerialPort(session->hSerial);
-  // closeFileInTxt(elfData->myFile);
-  // free(elfData);
+  closeSerialPort(session->handler);
+  
   return 0;
 }

@@ -13,17 +13,9 @@ typedef struct
   uint8_t value[256];
 } Tlv;
 
-typedef enum
-{
-  TLV_DO_NOTHING = 1,
-  TLV_SEND,
-  TLV_RECEIVE
-} Tlv_State;
-
 typedef struct
 {
   void *handler;
-  Tlv_State state;
   uint8_t txBuffer[256];
   uint8_t rxBuffer[256];
 } Tlv_Session;
@@ -48,12 +40,12 @@ typedef enum
 
 typedef enum
 {
-  TLV_DATA_CORRUPTED = -1,
+  TLV_NOT_OK = -1
 } Tlv_Nack;
 
 typedef enum
 {
-  ERR_TIME_OUT = 1,
+  ERR_TIME_OUT = -10,
 } Tlv_ErrorCode;
 
 #endif // Tlv_ex_H

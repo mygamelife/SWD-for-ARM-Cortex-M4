@@ -1,4 +1,26 @@
-#include "Tlv.h"
+#include "Tlv_Loader.h"
+
+/** tlvPackIntoBuffer is a function to pack currentBuffer into targetBuffer
+  *
+  */
+void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length) {
+  int index = 0;
+  uint8_t chksum = 0;
+  
+  for(index; index < length; index++) {
+    chksum += targetBuffer[index] = currentBuffer[index];
+  }
+  targetBuffer[index] = ~chksum + 1;
+}
+
+/** tlvCreateSession is a function to create a useful element for TLV protocol use
+  */
+Tlv_Session *tlvCreateLoaderSession(void) {
+  static Tlv_Session session;
+  session.handler = initSerialComm(UART_PORT, UART_BAUD_RATE);
+  
+  return &session;
+}
 
 /** tlvCreatePacket create a packet contain all the information needed for tlv protocol
   *
@@ -18,22 +40,9 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   
   tlv.type = command;
   tlv.length = size + 1; //extra length for chksum
-  tlv.value = data;
+  tlvPackIntoBuffer(tlv.value, data, size);
   
   return &tlv;
-}
-
-/** tlvCreateSession use to create information needed by the fucntion
-  *
-  * input   : NONE
-  *
-  * return  : NONE
-  */
-Tlv_Session *tlvCreateSession(void) {
-  static Tlv_Session session;
-  
-  session.hSerial = initSerialComm(UART_PORT, UART_BAUD_RATE);
-  return &session;
 }
 
 /** tlvSend is function to send tlv packet
@@ -44,24 +53,14 @@ Tlv_Session *tlvCreateSession(void) {
   * return  : NONE
   */
 void tlvSend(Tlv_Session *session, Tlv *tlv)  {
-  int index;  uint8_t sum = 0, chksum = 0;
-  
   /** Send first 2 bytes of Tlv packet 
-    * tlv->type and tlv->length
-    */
-  uartSendBytes(session->hSerial, (uint8_t *)tlv, 2);
+    * tlv->type and tlv->length */
+  HANDLE hSerial = (HANDLE)session->handler;
+  uartSendBytes(hSerial, (uint8_t *)tlv, 2);
   
   /** Send tlv->value according to the tlv->length
-    * and calculate chksum at the same time
-    */
-  for(index = 0; index < tlv->length - 1; index++)  {
-    sum += tlv->value[index];
-    uartSendBytes(session->hSerial, &tlv->value[index], 1);
-  }
-  
-  /** Send tlv->value according to the tlv->length  */
-  chksum = ~sum + 1;
-  uartSendBytes(session->hSerial, &chksum, 1);
+    * and calculate chksum at the same time */
+  uartSendBytes(hSerial, tlv->value, tlv->length);
 }
 
 /** tlvReceive is a function to receive tlv packet
@@ -72,6 +71,7 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   */
 Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv; int time = 100;
+  HANDLE hSerial = (HANDLE)session->handler;
   
   /** wait for a short time period and throw
       an exception if time expired */
@@ -80,18 +80,16 @@ Tlv *tlvReceive(Tlv_Session *session) {
       Throw(ERR_TIME_OUT);
     }
     /** Waiting first 2 byte of tlv packet to arrive */
-    else if(uartGetBytes(session->hSerial, session->rxBuffer, 2) != 0) break;
+    else if(uartGetBytes(hSerial, session->rxBuffer, 2) != 0) {
+      tlv.type = session->rxBuffer[0];
+      tlv.length = session->rxBuffer[1];
+      break;
+    }
   } while(time-- != 0);
   
-  tlv.type = session->rxBuffer[0];
-  tlv.length = session->rxBuffer[1];
+  /** Retrieve tlv data from buffer according to the tlv->length*/
+  uartGetBytes(hSerial, session->rxBuffer, tlv.length);
+  tlvPackIntoBuffer(tlv.value, session->rxBuffer, tlv.length);
 
-  /** Retrieve data from buffer only length is greater than one */
-  if(tlv.length > 1) {
-    uartGetBytes(session->hSerial, session->rxBuffer, tlv.length);
-    tlv.value = &session->rxBuffer[2];
-  }
-  
   return &tlv;
 }
-

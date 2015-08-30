@@ -14,7 +14,7 @@
   :test_file_prefix: test_
 
 :release_build:
-  :output: MyApp.out
+  :output: main.exe
 #  :use_assembly: FALSE
 
 :environment:

@@ -41,5 +41,6 @@ void swdStub(uint32_t swdInstruction);
 void stubCopyFromSRAMToFlash(void);
 void stubEraseSector(void);
 void stubMassErase(void);
+void stubVerify(void);
 void flashProgrammer(void);
 #endif // swdStub_H

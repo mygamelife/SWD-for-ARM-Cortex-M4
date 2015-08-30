@@ -29,8 +29,8 @@ void swdStub(uint32_t swdInstruction) {
   * return  : NONE
   */
 void stubCopyFromSRAMToFlash(void) {
-  __IO uint32_t flashStartAddress = 0xABC;
-  __IO uint32_t sramStartAddress = 0xCBA;
+  __IO uint32_t flashStartAddress = 0;
+  __IO uint32_t sramStartAddress = 0;
 
   uint32_t size = 0;
   
@@ -120,7 +120,41 @@ void stubMassErase(void)  {
   sramWrite(SWD_TARGET_STATUS, TARGET_OK);
 }
 
-void flashProgrammer() {
+/**
+  * stubVerify is small program routine to verify the
+  * program from sram to flash if correct LED will blink 10times
+  *
+  * input   : NONE
+  * return  : NONE
+  */
+void stubVerify(void) {
+  __IO uint32_t flashStartAddress = 0;
+  __IO uint32_t sramStartAddress = 0;
+
+  uint32_t size = 0;
+  
+  /* Change target status to busy to prevent other function to interrupt */
+  sramWrite(SWD_TARGET_STATUS, TARGET_BUSY);
+  
+  /* Read SRAM source address from sram */
+  sramStartAddress  = (__IO uint32_t)sramRead(SWD_SRAM_START_ADDRESS);
+  /* Read flash destination address from sram */
+  flashStartAddress = (__IO uint32_t)sramRead(SWD_FLASH_START_ADDRESS);
+  /* Read Data Length from sram */
+  size  = (__IO int)sramRead(SWD_DATA_SIZE);
+  
+  flashVerifyDataFromSRAMToFlash(sramStartAddress, flashStartAddress, size);
+  
+  /* Clear instruction prevent keep erase */
+  sramWrite(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
+  /* Tell probe now target is ready for next instruction */
+  sramWrite(SWD_TARGET_STATUS, TARGET_OK);
+}
+
+/**
+  *
+  */
+void flashProgrammer(void) {
   __IO uint32_t swdInstruction = 0;
   
   /* Initialize hardware and configure system clock */

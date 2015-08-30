@@ -1,7 +1,7 @@
 #include "unity.h"
 #include "CustomAssertion.h"
-#include "TLV_Host.h"
-#include "TLV_State.h"
+#include "Tlv_Loader.h"
+#include "Tlv_ex.h"
 #include "mock_Serial.h"
 #include "GetHeaders.h"
 #include "Read_File.h"
@@ -16,28 +16,8 @@ void tearDown(void) {}
 
 void test_assertTLV_given_type_length_address_dataAddress_and_index(void)
 { 
-  TLV *tlv = tlvCreateNewPacket(TLV_WRITE_RAM);
+  uint32_t buffer[3] = {0xDEADBEEF, 0xABCDABCD, 0xAABBCCDD};
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 12, (uint8_t *)buffer);
   
-  ElfData *elfData = openElfFile("test/ELF_File/FlashProgrammer.elf");
-  int index = getIndexOfSectionByName(elfData, ".text");
-  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
-  
-  //Address
-  tlv->value[0] = 0xDE;
-  tlv->value[1] = 0xAD;
-  tlv->value[2] = 0xBE;
-  tlv->value[3] = 0xEF;
-  
-  //Data
-  tlv->value[4] = 0x80;
-  tlv->value[5] = 0xb4;
-  tlv->value[6] = 0x00;
-  tlv->value[7] = 0xAF;
-  
-  tlv->length += 8;
-  
-  TEST_ASSERT_EQUAL_TLV(TLV_WRITE_RAM, 9, 0xDEADBEEF, dataAddress, tlv);
-  
-  closeFileInTxt(elfData->myFile);
-  free(elfData);
+  TEST_ASSERT_EQUAL_TLV(TLV_WRITE_RAM, 13, 0xDEADBEEF, (uint8_t *)&buffer[1], tlv);
 }

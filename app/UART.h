@@ -13,6 +13,9 @@
 #include "stm32f4xx_hal_dma.h"
 #include "stm32f429i_discovery.h"
 
+#define FIVE_SEC    5000
+#define TEN_SEC     10000
+
 UART_HandleTypeDef *initUart(void);
 void uartErrorHandler(void);
 

@@ -4,7 +4,7 @@
 #include <windows.h>
 #include <stdint.h>
 
-#define UART_PORT               "COM5"
+#define UART_PORT               "COM7"
 #define UART_BAUD_RATE          9600//115200
 
 void closeSerialPort(HANDLE hSerial);
