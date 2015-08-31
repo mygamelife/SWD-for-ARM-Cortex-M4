@@ -14,12 +14,12 @@
  */
 void SWD_Initialisation()
 {
-	int ack = 0, parity = 0;
+	int ack = 0, parity = 0, error = 0;
 	uint32_t idcode = 0;
 
 	resetTarget();
 	switchJTAGtoSWD();
-	swdRegisterRead(IDCODE_REG, DP, &ack, &parity, &idcode);
+	error = swdReadDP(IDCODE_REG, &idcode);
 }
 
 /**

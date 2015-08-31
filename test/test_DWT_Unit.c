@@ -33,7 +33,7 @@ void test_setAddressWatchpoint_given_DWT_COMP0_address_0x12345677_mask_WATCHPOIN
   emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM);
 
   // Set CSW to Word Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
   // Set CORE_DEBUG_MODE
@@ -75,7 +75,7 @@ void test_setDataWatchpoint_MatchingOneComparator()
   emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM);
 
   //Set CSW to Word Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
   //Set CORE_DEBUG_MODE
@@ -128,7 +128,7 @@ void test_setDataWatchpoint_MatchingTwoComparator()
   emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM);
 
   //Set CSW to Word Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
   //Set CORE_DEBUG_MODE

@@ -22,6 +22,6 @@ void emulateSwdInput();
 void emulateIdleClock(int numOfClocks);
 void emulateLineReset(int numOfClocks);
 void emulateResetTarget();
-void emulateSwdRegisterWrite(int address,int APnDP,int emulateACK, uint32_t data);
-void emulateSwdRegisterRead(int address,int APnDP,int emulateACK,int emulateParity, uint32_t emulateData);
+void emulateSwdRegisterWrite(int address, int pointType, int ack, uint32_t data);
+void emulateSwdRegisterRead(int address, int pointType, int ack, int parity, uint32_t data);
 #endif // Emulator_H

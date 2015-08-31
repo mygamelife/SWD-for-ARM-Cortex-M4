@@ -124,23 +124,17 @@ void test_emulateResetTarget_should_call_ResetPinLow_setHighNRST()
 
 void test_emulateswdRegisterWrite_should_send_SWD_Request_readACK_and_Write_data()
 {
-	int ACK = 0 ;
-	
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x2BA01477);
-	swdRegisterWrite(TAR_REG,AP,&ACK,0x2BA01477);
-	
-	TEST_ASSERT_EQUAL(1,ACK);
+	emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x2BA01477);
+	swdRegisterWrite(TAR_REG, AP, 0x2BA01477);
 }
 
 void test_emulateswdRegisterRead_should_send_SWD_Request_readACK_and_readData_readParity()
 {
-	int ACK = 0 , Parity = 0;
-	uint32_t dataRead ;
+	int ACK = 0;
+	uint32_t dataRead;
 	
-	emulateSwdRegisterRead(TAR_REG,AP,4,1,0xEE2805D4);
-	swdRegisterRead(TAR_REG,AP,&ACK,&Parity,&dataRead);
+	emulateSwdRegisterRead(TAR_REG, AP, OK, 0, 0xEE2805D4);
+	swdRegisterRead(TAR_REG, AP, &dataRead);
 	
-	TEST_ASSERT_EQUAL(0x2BA01477,dataRead);
-	TEST_ASSERT_EQUAL(1,ACK);
-	TEST_ASSERT_EQUAL(1,Parity);
+	TEST_ASSERT_EQUAL(0x2BA01477, dataRead);
 }

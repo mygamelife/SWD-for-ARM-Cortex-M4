@@ -320,8 +320,8 @@ void test_clearDebugEvent_HALTED_should_write_0x1_to_DFSR()
 void test_enableSelectedVectorCatch_given_VC_HARDERR_should_writeHalfWord_0x400_to_DEMCR()
 {
   
-  //Write BANK_0 to select register
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+  //Write SELECT_BANK0 to select register
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	//Write CSW_HALFWORD_SIZE to csw register
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
   
@@ -334,8 +334,8 @@ void test_enableSelectedVectorCatch_given_VC_HARDERR_should_writeHalfWord_0x400_
 void test_enableSelectedVectorCatch_given_VC_CORERESET_should_writeHalfWord_0x1_to_DEMCR()
 {
   cswDataSize = CSW_BYTE_SIZE ;
-  //Write BANK_0 to select register
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+  //Write SELECT_BANK0 to select register
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	//Write CSW_HALFWORD_SIZE to csw register
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
   
@@ -359,7 +359,7 @@ void test_enableSelectedVectorCatch_given_VC_DISABLEALL_should_writeHalfWord_0_t
 void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERESET_and_write_REQUEST_SYTEM_RESET_to_ARICR_REG()
 {
   //Set CSW to Word Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
   //Set to CORE_DEBUG_HALT 
@@ -368,7 +368,7 @@ void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERE
   
   
   //Set CSW to Halfword Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
   
   //Enable VC_CORERESET
@@ -376,7 +376,7 @@ void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERE
   emulateSwdRegisterWrite(DRW_REG,AP,4,0x1);
   
   //Set CSW to Word Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
   //Write REQUEST_SYSTEM_RESET to AIRCR_REG
@@ -393,7 +393,7 @@ void test_enableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_1000000_t
   cswDataSize = CSW_WORD_SIZE;
   
   //Set CSW to Byte Size
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, BANK_0);
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
   
   emulateSwdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);

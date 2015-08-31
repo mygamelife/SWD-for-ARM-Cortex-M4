@@ -104,40 +104,41 @@ void emulateResetTarget()
 	setHighNRST_Expect();
 }
 
-void emulateSwdRegisterWrite(int address,int APnDP,int emulateACK, uint32_t data)
+void emulateSwdRegisterWrite(int address, int pointType, int ack, uint32_t data)
 {
-	int SWD_Request = 0 , parity = 0;
-	SWD_Request = getSWD_Request(address,APnDP,WRITE);
+	int swdRequest, parity;
+  
+	swdRequest = getSWD_Request(address, pointType, WRITE);
 	parity = calculateParity_32bitData(data);
 	
-	emulateWrite(SWD_Request,8);
+	emulateWrite(swdRequest, 8);
 	emulateTurnAroundRead();
 	emulateSwdInput();
 
-	emulateRead(emulateACK,3);
+	emulateRead(ack, 3);
 
 	emulateTurnAroundWrite();
 	emulateSwdOutput();
 
-	emulateWrite(data,32);
-	emulateWrite(parity,1);
+	emulateWrite(data, 32);
+	emulateWrite(parity, 1);
 
 	emulateIdleClock(8);
 }
 
-void emulateSwdRegisterRead(int address,int APnDP,int emulateACK,int emulateParity, uint32_t emulateData)
+void emulateSwdRegisterRead(int address, int pointType, int ack, int parity, uint32_t data)
 {
-	int SWD_Request = 0 ;
-	SWD_Request = getSWD_Request(address,APnDP,READ);
+	int swdRequest;
+	swdRequest = getSWD_Request(address, pointType, READ);
 
-	emulateWrite(SWD_Request,8);
+	emulateWrite(swdRequest, 8);
 
 	emulateTurnAroundRead();
 	emulateSwdInput();
 
-	emulateRead(emulateACK,3);
-	emulateRead(emulateData,32);
-	emulateRead(emulateParity,1);
+	emulateRead(ack, 3);
+	emulateRead(data, 32);
+	emulateRead(parity, 1);
 	emulateTurnAroundWrite();
 	emulateSwdOutput();
 
