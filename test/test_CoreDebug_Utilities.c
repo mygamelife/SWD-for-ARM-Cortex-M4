@@ -1,23 +1,23 @@
 #include "unity.h"
+#include <stdint.h>
 #include "CoreDebug_Utilities.h"
 #include "Misc_Utilities.h"
 
-void setUp(void)
-{
-}
+void setUp(void)  {}
 
-void tearDown(void)
-{
-}
+void tearDown(void) {}
 
 /*-------------------------------determineCoreModeFromDataRead---------------------------------*/
 void test_determineCoreModeFromDataRead_given_0x0_should_return_CORE_NORMAL_MODE()
 {
-  TEST_ASSERT_EQUAL(CORE_NORMAL_MODE,determineCoreModeFromDataRead(0));
+  int result = 0;
+  result = doesCoreModeRequiresHaltedAndDebug(0);
+  TEST_ASSERT_EQUAL(CORE_NORMAL_MODE, result);
 }
 
 void test_determineCoreModeFromDataRead_given_0x8_should_return_CORE_NORMAL_MASKINT()
 {
+  TEST_ASSERT_EQUAL_HEX32(CORE_NORMAL_MODE, 123);
   TEST_ASSERT_EQUAL(CORE_NORMAL_MASKINT,determineCoreModeFromDataRead(0x8));
 }
 

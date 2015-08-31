@@ -51,6 +51,7 @@ CoreMode determineCoreModeFromDataRead(uint32_t dataRead)
   snapStallBit      = (dataRead & CoreDebug_DHCSR_C_SNAPSTALL_Msk) >> CoreDebug_DHCSR_C_SNAPSTALL_Pos ;
   haltedStatusBit   = (dataRead & CoreDebug_DHCSR_S_HALT_Msk)      >> CoreDebug_DHCSR_S_HALT_Pos ;
 
+  printf("CORE_NORMAL_MODE %x\n", CORE_NORMAL_MODE);
   if (!debugEnableBit)
   {
     if(maskIntBit)

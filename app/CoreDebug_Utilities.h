@@ -67,7 +67,7 @@ typedef enum
 	CORE_SINGLE_STEP = 0xA05F0005,
 	CORE_SINGLE_STEP_MASKINT = 0xA05F000D,
 	CORE_SNAPSTALL = 0xA05F0023
-}CoreMode ;
+} CoreMode;
 
 
 typedef enum
