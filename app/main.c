@@ -3,7 +3,7 @@
 int main(void)
 {
   uint32_t idr = 0, dataRead = 0, dataRead2 = 0;
-  int ack = 0;
+  int errorCode = 0;
 
   /* Hardware configuration */
   HAL_Init();
@@ -14,10 +14,9 @@ int main(void)
   /* Hardware reset target board */
   resetTarget();
   /* Initialize SWD Protocol */
-  SWD_Initialisation();
+  errorCode = SWD_Initialisation();
   /* Power Up AHB Port */
-  readAhbIDR(&idr);
-  swdWriteCSW(&ack, CSW_DEFAULT_MASK | CSW_WORD_SIZE);
+  errorCode = readAhbIDR(&idr);
 
   Tlv *receive;
   Tlv_Session *session = tlvCreateWorkerSession();

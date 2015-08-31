@@ -1,4 +1,4 @@
-#include "swdProtocol.h"
+#include "swd.h"
 
 /**
  *  Initialise SWD on the target by 
@@ -12,14 +12,16 @@
  * 8. Generate a turn around and switch to output mode
  * 9. Generate idle clock cycles to prepare for next transaction / stop
  */
-void SWD_Initialisation()
+SwdError swdInit(void)
 {
-	int ack = 0, parity = 0, error = 0;
+	int error = 0;
 	uint32_t idcode = 0;
 
 	resetTarget();
 	switchJTAGtoSWD();
 	error = swdReadDP(IDCODE_REG, &idcode);
+  
+  return error;
 }
 
 /**

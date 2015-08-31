@@ -1,7 +1,7 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
-#include "swdProtocol.h"
+#include "swd.h"
 #include "configurePort.h"
 #include "Register_ReadWrite.h"
 #include "CoreDebug.h"

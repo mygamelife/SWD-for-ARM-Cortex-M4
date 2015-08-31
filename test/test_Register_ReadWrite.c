@@ -60,25 +60,6 @@ void test_readAhbIDR_should_clear_flags_after_readSelect_and_readAP()
   TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
 }
 
-void test_readAhbIDR_return_WAIT_RESPONSE_should_retries_DPABORT_and_resend()
-{
-  uint32_t data_IDR = 0;
-	emulateSwdRegisterWrite(CTRLSTAT_REG, DP, OK, POWERUP_SYSTEM);
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANKF);
-	emulateSwdRegisterRead(IDR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x24770011));
-	emulateSwdRegisterRead(IDR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x24770011));
-  
-  // Retries
-  emulateSwdRegisterRead(IDR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x24770011));
-	emulateSwdRegisterRead(IDR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x24770011));
-  
-  emulateSwdRegisterRead(IDR_REG, AP, OK, 1, interconvertMSBandLSB(0x24770011));
-	emulateSwdRegisterRead(IDR_REG, AP, OK, 1, interconvertMSBandLSB(0x24770011));
-  
-  readAhbIDR(&data_IDR);
-  TEST_ASSERT_EQUAL(data_IDR, 0x24770011);
-}
-
 void test_swdSelectMemorySize_given_CSW_WORD_SIZE_should_select_BANK_0_and_set_CSW_register()
 {
   int ack = 0;

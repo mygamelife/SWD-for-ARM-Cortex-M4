@@ -96,19 +96,19 @@ SwdError swdReadAP(int address, uint32_t *data)
  *  input   : data_IDR is the variable pass-in by user to store the IDR
  *  return  : NONE
  */
-void readAhbIDR(uint32_t *data_IDR)	{
+SwdError readAhbIDR(uint32_t *data_IDR)	{
   int error = 0;
   uint32_t data = 0;
 
   /**Power up/wake up debug system before using */
   swdWriteDP(CTRLSTAT_REG, POWERUP_SYSTEM);
 
-  data = SELECT_BANKF;
-  error = swdWriteDP(SELECT_REG, data);
-  swdErrorHandler(error, WRITE, DP, SELECT_REG, &data);
+  error = swdWriteDP(SELECT_REG, SELECT_BANKF);
+  if(error != NO_ERROR) return error;
 
   error = swdReadAP(IDR_REG, data_IDR);
-  swdErrorHandler(error, READ, AP, IDR_REG, data_IDR);
+  
+  return error;
 }
 
 /** swdSelectMemorySize is a function to set the memory access size bit in CSW register

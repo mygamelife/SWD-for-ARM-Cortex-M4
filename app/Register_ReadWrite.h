@@ -88,7 +88,7 @@ SwdError swdReadAP(int address, uint32_t *data);
 
 /**-------------------------------- AHB-AP Register Function-----------------------------------
   */
-void readAhbIDR(uint32_t *data_IDR);
+SwdError readAhbIDR(uint32_t *data_IDR);
 SwdError swdSelectMemorySize(uint32_t memorySize);
 
 /* Used for mocking */
