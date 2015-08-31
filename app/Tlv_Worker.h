@@ -13,4 +13,5 @@ void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length
 void tlvSend(Tlv_Session *session, Tlv *tlv);
 Tlv *tlvReceive(Tlv_Session *session);
 
+int tlvVerifyData(Tlv *tlv);
 #endif // Tlv_Worker_H

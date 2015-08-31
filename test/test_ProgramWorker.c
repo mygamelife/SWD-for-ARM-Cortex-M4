@@ -81,7 +81,7 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
 {
   Tlv tlv;  
   Tlv_Session session;
-  
+
   uint32_t address = 0xBEEFBEEF, data = 0;
   
   readCoreRegister_Ignore();
@@ -117,4 +117,33 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
   tlvSend_Expect(&session, &tlv);
   
   performHardResetOnTarget(&session);
+}
+
+void test_programWorker_given_initial_state_waiting_packet_when_packet_arrived_should_change_state(void)
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  session.state = WAITING_PACKET;
+
+  tlvReceive_ExpectAndReturn(&session, &tlv);
+  
+  programWorker(&session);
+  
+  TEST_ASSERT_EQUAL(INTERPRET_PACKET, session.state);
+}
+
+void test_programWorker_given_tlv_packet_with_invalid_data_should_send_tlv_error_code(void)
+{
+  Tlv tlv, error;
+  uint8_t errorCode = ERR_CORRUPTED_DATA;
+  Tlv_Session session;
+  session.state = INTERPRET_PACKET;
+
+  tlvVerifyData_IgnoreAndReturn(DATA_INVALID);
+  tlvCreatePacket_ExpectAndReturn(TLV_NOT_OK, 1, &errorCode, &error);
+  tlvSend_Expect(&session, &error);
+  
+  programWorker(&session);
+  
+  TEST_ASSERT_EQUAL(WAITING_PACKET, session.state);
 }

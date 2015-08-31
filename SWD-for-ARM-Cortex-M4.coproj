@@ -78,11 +78,12 @@
     <File name="Code/DWT_Utilities.h" path="app/DWT_Utilities.h" type="1"/>
     <File name="Hardware/stm32f429i_discovery.c" path="app/Hardware/stm32f429i_discovery.c" type="1"/>
     <File name="Code/Read_File.c" path="app/Read_File.c" type="1"/>
+    <File name="Code/swd.c" path="app/swd.c" type="1"/>
     <File name="Code/CoreDebug.c" path="app/CoreDebug.c" type="1"/>
     <File name="Code/DWT_Unit.c" path="app/DWT_Unit.c" type="1"/>
     <File name="Code/FPB_Utilities.h" path="app/FPB_Utilities.h" type="1"/>
-    <File name="Core/core_cmSimd.h" path="app/Hardware/core_cmSimd.h" type="1"/>
     <File name="STM32F4" path="" type="2"/>
+    <File name="Core/core_cmSimd.h" path="app/Hardware/core_cmSimd.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_spi.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_spi.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_pwr_ex.h" type="1"/>
@@ -100,7 +101,6 @@
     <File name="Code/IoOperations.c" path="app/IoOperations.c" type="1"/>
     <File name="Code" path="" type="2"/>
     <File name="Code/FPB_Utilities.c" path="app/FPB_Utilities.c" type="1"/>
-    <File name="Code/swdProtocol.c" path="app/swdProtocol.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_dma.h" path="app/Hardware/stm32f4xx_hal_dma.h" type="1"/>
     <File name="Hardware" path="" type="2"/>
     <File name="Code/Register_ReadWrite.c" path="app/Register_ReadWrite.c" type="1"/>
@@ -117,11 +117,10 @@
     <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_rcc.h" type="1"/>
     <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
-    <File name="Code/swdProtocol.h" path="app/swdProtocol.h" type="1"/>
     <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
-    <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Projects/STM32F429I-Discovery/Templates/Src/stm32f4xx_it.c" type="1"/>
     <File name="Code/Read_File.h" path="app/Read_File.h" type="1"/>
+    <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
     <File name="Code/swdStub.c" path="app/swdStub.c" type="1"/>
     <File name="Code/Misc_Utilities.c" path="app/Misc_Utilities.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c" type="1"/>
@@ -176,6 +175,7 @@
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Code/Flash.c" path="app/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_uart.c" path="app/Hardware/stm32f4xx_hal_uart.c" type="1"/>
+    <File name="Code/swd.h" path="app/swd.h" type="1"/>
     <File name="Code/LowLevelIO.c" path="app/LowLevelIO.c" type="1"/>
     <File name="Core" path="" type="2"/>
   </Files>

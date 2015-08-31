@@ -15,9 +15,8 @@ typedef struct
 
 typedef enum
 {
-  TLV_DO_NOTHING = 1,
-  TLV_SEND,
-  TLV_RECEIVE
+  WAITING_PACKET,
+  INTERPRET_PACKET,
 } Tlv_State;
 
 typedef struct
@@ -43,17 +42,24 @@ typedef enum
 /* Tlv acknowledge */
 typedef enum
 {
-  TLV_OK = 1,
+  TLV_OK = 1
 } Tlv_Ack;
 
 typedef enum
 {
-  TLV_DATA_CORRUPTED = -1,
+  TLV_NOT_OK = 2
 } Tlv_Nack;
 
 typedef enum
 {
   ERR_TIME_OUT = 1,
+  ERR_CORRUPTED_DATA,
+  ERR_INVALID_COMMAND
 } Tlv_ErrorCode;
+
+typedef enum  {
+  DATA_VALID = 0,
+  DATA_INVALID
+} Tlv_Validation;
 
 #endif // Tlv_ex_H

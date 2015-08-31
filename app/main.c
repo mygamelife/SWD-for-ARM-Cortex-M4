@@ -14,27 +14,14 @@ int main(void)
   /* Hardware reset target board */
   hardResetTarget();
   /* Initialize SWD Protocol */
-  errorCode = SWD_Initialisation();
+  errorCode = swdInit();
   /* Power Up AHB Port */
   errorCode = readAhbIDR(&idr);
 
-  Tlv *receive;
   Tlv_Session *session = tlvCreateWorkerSession();
-  uint32_t address, data;
+
   while(1)
   {
-	  receive = tlvReceive(session);
-	  if(receive != NULL)	{
-		  if(receive->type == TLV_WRITE_REGISTER) {
-			  address = get4Byte(&receive->value[0]);
-			  data = get4Byte(&receive->value[4]);
-
-			  writeTargetRegister(session, &address, &data);
-		  }
-		  else if(receive->type == TLV_READ_REGISTER) {
-			  address = get4Byte(&receive->value[0]);
-			  readTargetRegister(session, &address);
-		  }
-	  }
+	  programWorker(session);
   }
 }

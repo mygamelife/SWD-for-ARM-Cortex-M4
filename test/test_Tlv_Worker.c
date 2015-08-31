@@ -188,3 +188,22 @@ void test_tlvReceive_should_receive_tlv_packet_contain_8_data(void)  {
   TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&tlv->value[2]));
   TEST_ASSERT_EQUAL_HEX32(0x10203040, get4Byte(&tlv->value[6]));
 }
+
+void test_tlvVerifyData_should_verify_the_data_in_the_given_tlv_packet(void)
+{
+  uint8_t buffer[] = {0xEF, 0xBE, 0xAD, 0xDE};
+  
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
+	
+  TEST_ASSERT_EQUAL(DATA_VALID, tlvVerifyData(tlv));
+}
+
+void test_tlvVerifyData_given_wrong_length_should_return_data_invalid(void)
+{
+  uint8_t buffer[] = {0xEF, 0xBE, 0xAD, 0xDE};
+  
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
+	tlv->length = 2;
+  
+  TEST_ASSERT_EQUAL(DATA_INVALID, tlvVerifyData(tlv));
+}

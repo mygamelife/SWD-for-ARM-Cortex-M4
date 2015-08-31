@@ -131,3 +131,57 @@ void performHardResetOnTarget(Tlv_Session *session)
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 }
+
+/** selectInstruction is a function to select instruction 
+  * base on tlv->type
+  *
+  * Input   : tlv is pointer pointing to tlv packet
+  *
+  * Return  : NONE
+  */
+void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
+  Tlv *error; uint8_t errorCode = 0;
+  
+  switch(tlv->type) {
+    case TLV_WRITE_RAM      : break;
+    case TLV_READ_RAM       : break;
+    case TLV_WRITE_REGISTER : writeTargetRegister(session, &get4Byte(&tlv->value[0]), &get4Byte(&tlv->value[4])); break;
+    case TLV_READ_REGISTER  : readTargetRegister(session, &get4Byte(&tlv->value[0])); break;
+    case TLV_HALT_TARGET    : break;
+    case TLV_RUN_TARGET     : break;
+    case TLV_STEP           : break;
+    
+    default :
+      errorCode = ERR_INVALID_COMMAND;
+      error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+      tlvSend(session, error);
+      break;
+  }
+}
+
+/** programWorker
+  */
+void programWorker(Tlv_Session *session)  {
+  Tlv *packet, *error;
+  uint8_t errorCode = 0;
+  
+  switch(session->state)  {
+    case WAITING_PACKET :
+      packet = tlvReceive(session);
+      if(packet != NULL)
+        session->state = INTERPRET_PACKET;
+      break;
+      
+    case INTERPRET_PACKET :
+      if(tlvVerifyData(packet) == DATA_VALID)  {
+        selectInstruction(session, packet);
+      }
+      else  {
+        errorCode = ERR_CORRUPTED_DATA;
+        error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+        tlvSend(session, error);
+      }
+      session->state = WAITING_PACKET;
+      break;
+  }
+}

@@ -18,6 +18,7 @@ void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length
 Tlv_Session *tlvCreateWorkerSession(void) {
   static Tlv_Session session;
   session.handler = initUart();
+  session.state = WAITING_PACKET;
   
   return &session;
 }
@@ -85,4 +86,24 @@ Tlv *tlvReceive(Tlv_Session *session) {
   tlvPackIntoBuffer(tlv.value, session->rxBuffer, tlv.length);
   
   return &tlv;
+}
+
+/** verifyTlvData is a function to verify the data inside 
+  * tlv packet by sum up all the data
+  *
+  * input   : tlv is pointer pointing tlv packet
+  *
+  * return  : DATA_VALID data is correct
+  *           DATA_INVALID data is corrupted
+  */
+int tlvVerifyData(Tlv *tlv) {
+  int i; uint8_t result = 0;
+  
+  for(i = 0; i < tlv->length; i++)
+    result += tlv->value[i];
+  
+  if(result == 0)
+    return DATA_VALID;
+  
+  else return DATA_INVALID;
 }
