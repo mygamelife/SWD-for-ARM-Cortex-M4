@@ -80,7 +80,7 @@ void lineReset(int numberOfClock)
  *
  * Note : It is recommended to perform a hard reset as the target device might not respond
  */
-void resetTarget()
+void hardResetTarget()
 {
 	setLowNRST();
 	delay(500,1,1);

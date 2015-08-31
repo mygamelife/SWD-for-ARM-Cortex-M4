@@ -2,6 +2,7 @@
 #include "Tlv_ex.h"
 #include "ProgramWorker.h"
 #include "CoreDebug_Utilities.h"
+#include "mock_IoOperations.h"
 #include "mock_UART.h"
 #include "mock_CoreDebug.h"
 #include "mock_Tlv_Worker.h"
@@ -88,4 +89,32 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
   tlvSend_Expect(&session, &tlv);
  
   readTargetRegister(&session, &address);
+}
+
+
+/*--------------performSoftResetOnTarget--------------------*/
+void test_performSoftResetOnTarget_should_call_softResetTarget_and_send_TLV_ack()
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_SYSTEM_RESET,NO_ERROR);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_OK, 0, 0, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  performSoftResetOnTarget(&session);
+}
+
+/*--------------performHardResetOnTarget--------------------*/
+void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack()
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  hardResetTarget_Expect();
+  tlvCreatePacket_ExpectAndReturn(TLV_OK, 0, 0, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  performHardResetOnTarget(&session);
 }

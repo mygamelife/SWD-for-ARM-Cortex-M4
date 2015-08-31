@@ -3,27 +3,29 @@
 
 #include "CoreDebug_Utilities.h"
 
-#define enableDWTandITM()   {memoryWriteByte((DEMCR_REG+3),ENABLE_DWT_ITM);}
-#define disableDWTandITM()  {memoryWriteByte((DEMCR_REG+3),DISABLE_DWT_ITM);}
+#define enableDWTandITM()                   {memoryWriteByte((DEMCR_REG+3),ENABLE_DWT_ITM);}
+#define disableDWTandITM()                  {memoryWriteByte((DEMCR_REG+3),DISABLE_DWT_ITM);}
 
-#define enableVectorCatchCoreReset()  {enableVectorCatch(VC_CORERESET);}
-#define enableVectorCatchMMERR()      {enableVectorCatch(VC_MMERR);}
-#define enableVectorCatchNOCPERR()    {enableVectorCatch(VC_NOCPERR);}
-#define enableVVectorCatchCHKERR()    {enableVectorCatch(VC_CHKERR);}
-#define enableVectorCatchSTATERR()    {enableVectorCatch(VC_STATERR);}
-#define enableVectorCatchBUSERR()     {enableVectorCatch(VC_BUSERR);}
-#define enableVectorCatchINTERR()     {enableVectorCatch(VC_INTERR);}
-#define enableVectorCatchHARDERR()    {enableVectorCatch(VC_HARDERR);}
-#define disableAllVectorCatch()       {enableVectorCatch(VC_DISABLEALL);}
+#define enableVectorCatchCoreReset()        {enableVectorCatch(VC_CORERESET);}
+#define enableVectorCatchMMERR()            {enableVectorCatch(VC_MMERR);}
+#define enableVectorCatchNOCPERR()          {enableVectorCatch(VC_NOCPERR);}
+#define enableVVectorCatchCHKERR()          {enableVectorCatch(VC_CHKERR);}
+#define enableVectorCatchSTATERR()          {enableVectorCatch(VC_STATERR);}
+#define enableVectorCatchBUSERR()           {enableVectorCatch(VC_BUSERR);}
+#define enableVectorCatchINTERR()           {enableVectorCatch(VC_INTERR);}
+#define enableVectorCatchHARDERR()          {enableVectorCatch(VC_HARDERR);}
+#define disableAllVectorCatch()             {enableVectorCatch(VC_DISABLEALL);}
 
-#define hasExternalDebugEventOccured()     ((readDebugEventRegister() & EXTERNAL_DEBUGEVENT))
-#define hasVectorCatchDebugEventOccured()  ((readDebugEventRegister() & VCATCH_DEBUGEVENT))
-#define hasDWTTrapDebugEventOccured()      ((readDebugEventRegister() & DWTTRAP_DEBUGEVENT))
-#define hasBreakpointDebugEventOccured()   ((readDebugEventRegister() & BKPT_DEBUGEVENT))
-#define hasHaltedDebugEventOccured()       ((readDebugEventRegister() & HALTED_DEBUGEVENT))
+#define hasExternalDebugEventOccured()      (readDebugEventRegister() & EXTERNAL_DEBUGEVENT)
+#define hasVectorCatchDebugEventOccured()   (readDebugEventRegister() & VCATCH_DEBUGEVENT)
+#define hasDWTTrapDebugEventOccured()       (readDebugEventRegister() & DWTTRAP_DEBUGEVENT)
+#define hasBreakpointDebugEventOccured()    (readDebugEventRegister() & BKPT_DEBUGEVENT)
+#define hasHaltedDebugEventOccured()        (readDebugEventRegister() & HALTED_DEBUGEVENT)
 
-#define clearBreakpointDebugEvent()       {clearDebugEvent(BKPT_DEBUGEVENT);}
-#define clearDWTTrapDebugEvent()          {clearDebugEvent(DWTTRAP_DEBUGEVENT);}
+#define clearBreakpointDebugEvent()         {clearDebugEvent(BKPT_DEBUGEVENT);}
+#define clearDWTTrapDebugEvent()            {clearDebugEvent(DWTTRAP_DEBUGEVENT);}
+
+#define softResetTarget()                   {memoryWriteWord(AIRCR_REG,REQUEST_SYSTEM_RESET);}             
 
 void setCoreMode(CoreMode mode);
 CoreMode getCoreMode();

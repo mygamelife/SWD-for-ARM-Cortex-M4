@@ -25,7 +25,7 @@ void tearDown(void)
 /*--------------------------------setCoreMode---------------------------------------*/
 //CORE_NORMAL_MODE
 void test_setCoreMode_CORE_NORMAL_MODE_should_write_0xA05F0000_to_DHCSR()
-{
+{ 
   cswDataSize = CSW_WORD_SIZE ;
   
 	emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
@@ -355,13 +355,22 @@ void test_enableSelectedVectorCatch_given_VC_DISABLEALL_should_writeHalfWord_0_t
   enableVectorCatch(VC_DISABLEALL);
 }
 
-/*------------------------------performHaltOnReset------------------------------------*/
-void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERESET_and_write_REQUEST_SYTEM_RESET_to_ARICR_REG()
+/*------------------------------softResetTarget------------------------------------*/
+void test_softResetTarget_should_write_REQUEST_SYTEM_RESET_to_AIRCR_REG()
 {
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
+  //Write REQUEST_SYSTEM_RESET to AIRCR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,AIRCR_REG);
+  emulateSwdRegisterWrite(DRW_REG,AP,4,REQUEST_SYSTEM_RESET);
+  softResetTarget();
+}
+
+/*------------------------------performHaltOnReset------------------------------------*/
+void test_performHaltOnReset_should_setCoreMode_CORE_DEBUG_HALT_enable_VC_CORERESET_and_write_REQUEST_SYTEM_RESET_to_AIRCR_REG()
+{
   //Set to CORE_DEBUG_HALT 
 	emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
 	emulateSwdRegisterWrite(DRW_REG,AP,4,0xA05F0003);

@@ -17,7 +17,7 @@ SwdError swdInit(void)
 	int error = 0;
 	uint32_t idcode = 0;
 
-	resetTarget();
+	hardResetTarget();
 	switchJTAGtoSWD();
 	error = swdReadDP(IDCODE_REG, &idcode);
   

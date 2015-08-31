@@ -37,7 +37,7 @@ void test_switchJTAGtoSWD_should_call_SWDIO_Output_lineReset_send0xE79E_lineRese
 void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAround_readACK_readID_readParity_turnAround_SWDIO_Output_IdleClock()
 {
   //Reset Target
-  emulateResetTarget();
+  emulatehardResetTarget();
   
 	//lineReset
 	emulateLineReset(55);

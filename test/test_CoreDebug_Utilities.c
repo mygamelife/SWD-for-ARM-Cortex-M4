@@ -10,14 +10,11 @@ void tearDown(void) {}
 /*-------------------------------determineCoreModeFromDataRead---------------------------------*/
 void test_determineCoreModeFromDataRead_given_0x0_should_return_CORE_NORMAL_MODE()
 {
-  int result = 0;
-  result = doesCoreModeRequiresHaltedAndDebug(0);
-  TEST_ASSERT_EQUAL(CORE_NORMAL_MODE, result);
+  TEST_ASSERT_EQUAL(CORE_NORMAL_MODE, determineCoreModeFromDataRead(0));
 }
 
 void test_determineCoreModeFromDataRead_given_0x8_should_return_CORE_NORMAL_MASKINT()
 {
-  TEST_ASSERT_EQUAL_HEX32(CORE_NORMAL_MODE, 123);
   TEST_ASSERT_EQUAL(CORE_NORMAL_MASKINT,determineCoreModeFromDataRead(0x8));
 }
 

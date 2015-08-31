@@ -30,9 +30,9 @@ void test_lineReset_given_60_should_generate_at_60clocks_with_setHighSWDIO()
 	lineReset(60);
 }
 
-void test_ResetTarget_should_set_ResetPinLow_ResetPinHigh()
+void test_hardResetTarget_should_set_ResetPinLow_ResetPinHigh()
 {
-	emulateResetTarget();
+	emulatehardResetTarget();
 	
-	resetTarget();
+	hardResetTarget();
 }

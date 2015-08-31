@@ -12,7 +12,7 @@ int main(void)
   SystemClock_Config();
 
   /* Hardware reset target board */
-  resetTarget();
+  hardResetTarget();
   /* Initialize SWD Protocol */
   errorCode = SWD_Initialisation();
   /* Power Up AHB Port */

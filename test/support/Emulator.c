@@ -98,7 +98,7 @@ void emulateLineReset(int numOfClocks)
 	}
 }
 
-void emulateResetTarget()
+void emulatehardResetTarget()
 {
 	setLowNRST_Expect();
 	setHighNRST_Expect();
