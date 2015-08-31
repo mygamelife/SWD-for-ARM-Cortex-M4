@@ -19,6 +19,8 @@
  */
 int doesCoreModeRequiresHaltedAndDebug(CoreMode mode)
 {
+  printf("\nnormal %x\n",CORE_NORMAL_MODE);
+  
   if(mode == CORE_NORMAL_MASKINT || mode == CORE_SINGLE_STEP || mode == CORE_SINGLE_STEP_MASKINT)
     return 1;
   
@@ -51,6 +53,8 @@ CoreMode determineCoreModeFromDataRead(uint32_t dataRead)
   snapStallBit      = (dataRead & CoreDebug_DHCSR_C_SNAPSTALL_Msk) >> CoreDebug_DHCSR_C_SNAPSTALL_Pos ;
   haltedStatusBit   = (dataRead & CoreDebug_DHCSR_S_HALT_Msk)      >> CoreDebug_DHCSR_S_HALT_Pos ;
 
+  printf("NORMLAL %x\n",CORE_NORMAL_MODE);
+  
   if (!debugEnableBit)
   {
     if(maskIntBit)

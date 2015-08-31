@@ -233,6 +233,6 @@ void performHaltOnReset()
 	setCoreMode(CORE_DEBUG_HALT);
 
 	enableVectorCatchCoreReset();
-  memoryWriteWord(AIRCR_REG,REQUEST_SYSTEM_RESET);
+  softResetTarget();
 }
 

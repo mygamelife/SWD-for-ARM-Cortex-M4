@@ -13,4 +13,7 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
 void writeTargetRegister(Tlv_Session *session, uint32_t *registerAddress, uint32_t *data);
 void readTargetRegister(Tlv_Session *session, uint32_t *registerAddress);
 
+void performSoftResetOnTarget(Tlv_Session *session);
+void performHardResetOnTarget(Tlv_Session *session);
+
 #endif // ProgramWorker_H

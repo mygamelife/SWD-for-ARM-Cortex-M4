@@ -14,7 +14,7 @@ void turnAroundRead();
 void turnAroundWrite();
 
 void lineReset(int numberOfClock);
-void resetTarget();
+void hardResetTarget();
 
 void sendBit(int data);
 void sendBits(uint32_t data,int numberOfBits);

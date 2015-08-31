@@ -107,3 +107,27 @@ void readTargetRegister(Tlv_Session *session, uint32_t *registerAddress) {
   Tlv *tlv = tlvCreatePacket(TLV_READ_REGISTER, 4, (uint8_t *)&data);
   tlvSend(session, tlv);
 }
+
+/** Perform a soft reset on the target device
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void performSoftResetOnTarget(Tlv_Session *session)
+{
+  softResetTarget();
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session, tlv);
+}
+
+/** Perform a hard reset on the target device
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void performHardResetOnTarget(Tlv_Session *session)
+{
+  hardResetTarget();
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session, tlv);
+}

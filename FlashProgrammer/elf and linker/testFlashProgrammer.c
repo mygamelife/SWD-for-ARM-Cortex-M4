@@ -10,7 +10,7 @@ int main(void)
 	/* Configure SWD I/O Port */
 	configure_IOPorts();
 	/* Hardware reset target board */
-	resetTarget();
+	hardResetTarget();
 	/* Initialize SWD Protocol */
 	SWD_Initialisation();
 	/* Power Up AHB Port */

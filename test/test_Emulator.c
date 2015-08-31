@@ -115,11 +115,11 @@ void test_emulateLineReset_given_60clock_should_generate_clock_cycles_with_setHi
 	lineReset(60);
 }
 
-void test_emulateResetTarget_should_call_ResetPinLow_setHighNRST()
+void test_emulatehardResetTarget_should_call_ResetPinLow_setHighNRST()
 {
-	emulateResetTarget();
+	emulatehardResetTarget();
 	
-	resetTarget();
+	hardResetTarget();
 }
 
 void test_emulateswdRegisterWrite_should_send_SWD_Request_readACK_and_Write_data()
