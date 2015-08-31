@@ -13,28 +13,28 @@
       <target file="stm32f4xx_hal_flash.o" lastModified="14f803752c3">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash.c" lastModified="14c0ebff272"/>
       </target>
-      <target file="swdStub.o" lastModified="14f80374e4f">
+      <target file="swdStub.o" lastModified="14f83a482dc">
          <source file="..\..\..\app\swdStub.c" lastModified="14f6fc06c05"/>
       </target>
       <target file="stm32f429i_discovery.o" lastModified="14f80375cc6">
          <source file="..\..\..\app\Hardware\stm32f429i_discovery.c" lastModified="14f6fc06b78"/>
       </target>
-      <target file="swd_Utilities.o" lastModified="14f80374c0c">
-         <source file="..\..\..\app\swd_Utilities.c" lastModified="14f6fc06c05"/>
+      <target file="swd_Utilities.o" lastModified="14f83a481d1">
+         <source file="..\..\..\app\swd_Utilities.c" lastModified="14f8375b258"/>
       </target>
-      <target file="CoreDebug.o" lastModified="14f80374f29">
+      <target file="CoreDebug.o" lastModified="14f83a48366">
          <source file="..\..\..\app\CoreDebug.c" lastModified="14f8022a37b"/>
       </target>
       <target file="stm32f4xx_hal_cortex.o" lastModified="14f80375767">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.c" lastModified="14c0ebff33c"/>
       </target>
-      <target file="Register_ReadWrite.o" lastModified="14f80375498">
-         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14f80287884"/>
+      <target file="Register_ReadWrite.o" lastModified="14f83a48788">
+         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14f8397815f"/>
       </target>
-      <target file="DWT_Unit.o" lastModified="14f8037514c">
+      <target file="DWT_Unit.o" lastModified="14f83a48588">
          <source file="..\..\..\app\DWT_Unit.c" lastModified="14f802a6002"/>
       </target>
-      <target file="FPB_Unit.o" lastModified="14f80374fa6">
+      <target file="FPB_Unit.o" lastModified="14f83a483e5">
          <source file="..\..\..\app\FPB_Unit.c" lastModified="14f8022a38a"/>
       </target>
       <target file="stm32f4xx_hal_rcc.o" lastModified="14f8037565d">
@@ -46,7 +46,7 @@
       <target file="stm32f4xx_hal_uart.o" lastModified="14f80374d16">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_uart.c" lastModified="14f6fc06be5"/>
       </target>
-      <target file="Flash.o" lastModified="14f80375525">
+      <target file="Flash.o" lastModified="14f83a4881b">
          <source file="..\..\..\app\Flash.c" lastModified="14f6fc06b78"/>
       </target>
       <target file="FPB_Utilities.o" lastModified="14f80374dd2">
@@ -61,26 +61,26 @@
       <target file="IoOperations.o" lastModified="14f80374d83">
          <source file="..\..\..\app\IoOperations.c" lastModified="14f8022a816"/>
       </target>
-      <target file="Misc_Utilities.o" lastModified="14f803758ed">
+      <target file="Misc_Utilities.o" lastModified="14f83a48861">
          <source file="..\..\..\app\Misc_Utilities.c" lastModified="14f6fc06bf5"/>
       </target>
-      <target file="LED.o" lastModified="14f80375c49">
-         <source file="..\..\..\app\LED.c" lastModified="14f6fc06bf5"/>
+      <target file="ProgramWorker.o" lastModified="14f83a484e5">
+         <source file="..\..\..\app\ProgramWorker.c" lastModified="14f801e65d8"/>
       </target>
       <target file="stm32f4xx_hal_dma.o" lastModified="14f80375bcc">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_dma.c" lastModified="14c0ebff32d"/>
       </target>
-      <target file="ProgramWorker.o" lastModified="14f803750cf">
-         <source file="..\..\..\app\ProgramWorker.c" lastModified="14f801e65d8"/>
+      <target file="LED.o" lastModified="14f80375c49">
+         <source file="..\..\..\app\LED.c" lastModified="14f6fc06bf5"/>
       </target>
       <target file="stm32f4xx_hal_flash_ex.o" lastModified="14f803756ea">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_flash_ex.c" lastModified="14c0ebff31d"/>
       </target>
-      <target file="CoreDebug_Utilities.o" lastModified="14f80374b80">
+      <target file="CoreDebug_Utilities.o" lastModified="14f83a48142">
          <source file="..\..\..\app\CoreDebug_Utilities.c" lastModified="14f8022a38a"/>
       </target>
-      <target file="swdProtocol.o" lastModified="14f80375246">
-         <source file="..\..\..\app\swdProtocol.c" lastModified="14f6fc06c05"/>
+      <target file="swdProtocol.o" lastModified="14f83a4867f">
+         <source file="..\..\..\app\swdProtocol.c" lastModified="14f837ce2c6"/>
       </target>
       <target file="SystemConfigure.o" lastModified="14f80374b03">
          <source file="..\..\..\app\SystemConfigure.c" lastModified="14f6fc06c05"/>
@@ -91,7 +91,7 @@
       <target file="stm32f4xx_hal_spi.o" lastModified="14f80374882">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_spi.c" lastModified="14c0ebff38a"/>
       </target>
-      <target file="stm32f4xx_it.o" lastModified="14f803751c9">
+      <target file="stm32f4xx_it.o" lastModified="14f83a48608">
          <source file="..\..\..\..\stm32cubef4\STM32Cube_FW_F4_V1.5.0\Projects\STM32F429I-Discovery\Templates\Src\stm32f4xx_it.c" lastModified="14c21982900"/>
       </target>
       <target file="UART.o" lastModified="14f8037596a">
@@ -100,11 +100,11 @@
       <target file="stm32f4xx_hal_gpio.o" lastModified="14f803758af">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.c" lastModified="14c0ebff197"/>
       </target>
-      <target file="DWT_Utilities.o" lastModified="14f80374c7a">
+      <target file="DWT_Utilities.o" lastModified="14f83a48251">
          <source file="..\..\..\app\DWT_Utilities.c" lastModified="14f8022a38a"/>
       </target>
-      <target file="main.o" lastModified="14f80375043">
-         <source file="..\..\..\app\main.c" lastModified="14f8027ce47"/>
+      <target file="main.o" lastModified="14f83a48462">
+         <source file="..\..\..\app\main.c" lastModified="14f83a401d3"/>
       </target>
       <target file="LowLevelIO.o" lastModified="14f803759f7">
          <source file="..\..\..\app\LowLevelIO.c" lastModified="14f8022a816"/>
@@ -118,11 +118,11 @@
       <target file="stm32f4xx_hal_usart.o" lastModified="14f80374eac">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_usart.c" lastModified="14f6fc06be5"/>
       </target>
+      <target file="SRAM.o" lastModified="14f83a48702">
+         <source file="..\..\..\app\SRAM.c" lastModified="14f6fc06bf5"/>
+      </target>
       <target file="stm32f4xx_hal_pwr_ex.o" lastModified="14f80375a84">
          <source file="..\..\..\..\STM32Cube_FW_F4_V1.5.0\Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_pwr_ex.c" lastModified="14c0ebff436"/>
-      </target>
-      <target file="SRAM.o" lastModified="14f8037541b">
-         <source file="..\..\..\app\SRAM.c" lastModified="14f6fc06bf5"/>
       </target>
    </processor>
 </history>

@@ -3,7 +3,7 @@
 #include "IoOperations.h"
 #include "swd_Utilities.h"
 #include "Delay.h"
-#include "swdProtocol.h"
+#include "swd.h"
 #include "Register_ReadWrite.h"
 #include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"

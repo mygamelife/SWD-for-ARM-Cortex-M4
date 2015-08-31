@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <breakpoints>
 <breakpoint enabled="true" persistant="true" registered="true">
-<resource path="/SWD-for-ARM-Cortex-M4/Code/Tlv_Worker.c" type="1"/>
-<marker lineNumber="64" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
-<attrib name="message" value="Line breakpoint: Tlv_Worker.c [line: 67]"/>
+<resource path="/SWD-for-ARM-Cortex-M4/Code/swdProtocol.c" type="1"/>
+<marker lineNumber="23" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
+<attrib name="message" value="Line breakpoint: swdProtocol.c [line: 23]"/>
 <attrib name="org.eclipse.cdt.debug.core.condition" value=""/>
 <attrib name="org.eclipse.debug.core.id" value="org.eclipse.cdt.debug.core"/>
 <attrib name="org.eclipse.cdt.debug.core.installCount" value="0"/>
-<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\app\Tlv_Worker.c"/>
+<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\app\swdProtocol.c"/>
 <attrib name="org.eclipse.cdt.debug.core.breakpointType" value="0"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
 <attrib name="org.eclipse.debug.core.enabled" value="true"/>

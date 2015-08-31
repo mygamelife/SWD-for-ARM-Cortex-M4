@@ -20,11 +20,11 @@ void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_bef
   memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_OK);
   
   /* load flash start and end address to sram */
-  memoryWriteWord_Expect(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_20);
-  memoryWriteWord_Expect(SWD_FLASH_END_ADDRESS, ADDR_FLASH_SECTOR_22);
+  memoryWriteWord_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_20, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(SWD_FLASH_END_ADDRESS, ADDR_FLASH_SECTOR_22, NO_ERROR);
   
   // /* load instruction to sram */
-  memoryWriteWord_Expect(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
+  memoryWriteWord_ExpectAndReturn(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR, NO_ERROR);
   
   loadEraseSectorInstruction((uint32_t *)ADDR_FLASH_SECTOR_20, (uint32_t *)ADDR_FLASH_SECTOR_22);
 }
@@ -35,10 +35,10 @@ void test_loadMassEraseInstruction_should_wait_untill_target_response_OK_before_
   memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_OK);
   
   /* load bank select to sram */
-  memoryWriteWord_Expect(SWD_BANK_SELECT, FLASH_BANK_BOTH);
+  memoryWriteWord_ExpectAndReturn(SWD_BANK_SELECT, FLASH_BANK_BOTH, NO_ERROR);
   
   /* load instruction to sram */
-  memoryWriteWord_Expect(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
+  memoryWriteWord_ExpectAndReturn(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE, NO_ERROR);  
   
   loadMassEraseInstruction(FLASH_BANK_BOTH);
 }
@@ -48,16 +48,16 @@ void test_loadCopyInstruction_should_load_src_address_dest_address_and_length_in
   memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_OK);
   
   /* load SRAM start address into sram */
-  memoryWriteWord_Expect(SWD_SRAM_START_ADDRESS, 0x200001F0);
+  memoryWriteWord_ExpectAndReturn(SWD_SRAM_START_ADDRESS, 0x200001F0, NO_ERROR);
   
   /* load Flash start address into sram */
-  memoryWriteWord_Expect(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_18);
+  memoryWriteWord_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_18, NO_ERROR);
   
   /* load length into sram */
-  memoryWriteWord_Expect(SWD_DATA_SIZE, 2000);
+  memoryWriteWord_ExpectAndReturn(SWD_DATA_SIZE, 2000, NO_ERROR);
 
 	/* load copy instructoin into sram */
-  memoryWriteWord_Expect(SWD_INSTRUCTION, INSTRUCTION_COPY);
+  memoryWriteWord_ExpectAndReturn(SWD_INSTRUCTION, INSTRUCTION_COPY, NO_ERROR);
   
   loadCopyFromSRAMToFlashInstruction((uint32_t *)0x200001F0, (uint32_t *)ADDR_FLASH_SECTOR_18, 2000);
 }

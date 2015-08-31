@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "unity.h"
+#include "Delay.h"
 #include "Emulator.h"
 #include "Misc_Utilities.h"
 #include "swd_Utilities.h"
@@ -8,13 +9,9 @@
 #include "mock_configurePort.h"
 #include "mock_LowLevelIO.h"
 
-void setUp(void)
-{
-}
+void setUp(void)  {}
 
-void tearDown(void)
-{
-}
+void tearDown(void) {}
 
 void test_calculateParity_SWDRequest_given_0000_should_return_0()
 {
@@ -162,24 +159,10 @@ void test_compare_ParityWithData_given_0x1_parity_0_should_return_ERR_INVALID_PA
 	TEST_ASSERT_EQUAL(ERR_INVALID_PARITY_RECEIVED,compare_ParityWithData(0x1,0));
 }
 
-void xtest_swdCheckErrorFlag_should_return_0x8_when_bit_7_of_the_readData_is_set_to_1() {
-  int i = 0, data = 0;
-
-  emulateWrite(0x8D, 8); //SWD 8bit protocol
-  emulateTurnAroundRead();
-  emulateSwdInput();
-  emulateRead(0x4, 3); //Acknowledgement
-  emulateRead(0x1000000, 32); //Read DATA (LSB)
-  emulateRead(0x1, 1); //Parity
-  emulateTurnAroundWrite();
-  emulateSwdOutput();
-  emulateIdleClock(8);
-}
 void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-
-	emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 1, interconvertMSBandLSB(0x80));
+	emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 0, interconvertMSBandLSB(0x80));
 
   flag = swdCheckErrorFlag();
   TEST_ASSERT_EQUAL(SWD_WDATA_ERROR_FLAG, flag);
@@ -188,7 +171,7 @@ void test_swdCheckErrorFlag_should_return_SWD_WDATAERR_FLAG_when_bit_7_of_the_re
 void test_swdCheckErrorFlag_should_return_SWD_STICKYERR_FLAG_when_bit_5_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 1, interconvertMSBandLSB(0x20));
+  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 0, interconvertMSBandLSB(0x20));
 
   flag = swdCheckErrorFlag();
 
@@ -198,7 +181,7 @@ void test_swdCheckErrorFlag_should_return_SWD_STICKYERR_FLAG_when_bit_5_of_the_r
 void test_swdCheckErrorFlag_should_return_SWD_STICKYCMP_FLAG_when_bit_4_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 1, interconvertMSBandLSB(0x10));
+  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 0, interconvertMSBandLSB(0x10));
 
   flag = swdCheckErrorFlag();
 
@@ -208,11 +191,56 @@ void test_swdCheckErrorFlag_should_return_SWD_STICKYCMP_FLAG_when_bit_4_of_the_r
 void test_swdCheckErrorFlag_should_return_SWD_STICKYORUN_FLAG_when_bit_1_of_the_readData_is_set_to_1() {
   uint32_t flag = 0;
 
-  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 1, interconvertMSBandLSB(0x02));
+  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 0, interconvertMSBandLSB(0x02));
 
   flag = swdCheckErrorFlag();
 
   TEST_ASSERT_EQUAL(SWD_STICKYORUN_ERROR_FLAG, flag);
+}
+
+void test_swdClearErrorFlag_should_clear_WDATAERR_flag() {
+  uint32_t flag = 0;
+
+  emulateSwdRegisterWrite(ABORT_REG, DP, OK, SWD_WDERR_CLEAR_FLAG);
+
+  swdClearErrorFlag(SWD_WDATA_ERROR_FLAG);
+}
+
+void test_swdClearErrorFlag_should_clear_STICKYERR_flag() {
+  uint32_t flag = 0;
+
+  emulateSwdRegisterWrite(ABORT_REG, DP, OK, SWD_STKERR_CLEAR_FLAG);
+
+  swdClearErrorFlag(SWD_STICKY_ERROR_FLAG);
+}
+
+void test_swdClearErrorFlag_should_clear_STICKYCMP_flag() {
+  uint32_t flag = 0;
+
+  emulateSwdRegisterWrite(ABORT_REG, DP, OK, SWD_STKCMP_CLEAR_FLAG);
+
+  swdClearErrorFlag(SWD_STICKYCMP_ERROR_FLAG);
+}
+
+void test_swdClearErrorFlag_should_clear_STICKYORUN_flag() {
+  uint32_t flag = 0;
+
+  emulateSwdRegisterWrite(ABORT_REG, DP, OK, SWD_ORUNERR_CLEAR_FLAG);
+
+  swdClearErrorFlag(SWD_STICKYORUN_ERROR_FLAG);
+}
+
+void test_swdGetAckResponse_should_ack_response_and_return_SwdError() {
+  int error = 0;
+
+  error = swdGetAckResponse(OK_RESPONSE);
+  TEST_ASSERT_EQUAL(NO_ERROR, error);
+  
+  error = swdGetAckResponse(WAIT_RESPONSE);
+  TEST_ASSERT_EQUAL(ERR_ACK_WAIT_RESPONSE, error);
+  
+  error = swdGetAckResponse(FAULT_RESPONSE);
+  TEST_ASSERT_EQUAL(ERR_ACK_FAULT_RESPONSE, error);
 }
 
 void test_swdReadDpWithRetries_should_repeat_readDP_transfer_3_times()  {
@@ -223,27 +251,42 @@ void test_swdReadDpWithRetries_should_repeat_readDP_transfer_3_times()  {
   emulateSwdRegisterRead(SELECT_REG, DP, WAIT, 1, interconvertMSBandLSB(0xABC));
   emulateSwdRegisterRead(SELECT_REG, DP, WAIT, 1, interconvertMSBandLSB(0xABC));
   
-  swdReadWriteDpWithRetries(READ, SELECT_REG, &ack, &parity, &readData, 3);
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, ack);
-  TEST_ASSERT_EQUAL(1, parity);
+  swdReadDpWithRetries(SELECT_REG, &readData, 3);
   TEST_ASSERT_EQUAL(0xABC, readData);
 }
 
-void test_swdReadDpWithRetries_should_repeat_writeDP_transfer_4_times()  {
+void test_swdReadDpWithRetries_should_repeat_ONCE_when_ack_is_OK()  {
+  int ack = 0, parity = 0;
+  uint32_t readData = 0;
+  
+  emulateSwdRegisterRead(SELECT_REG, DP, WAIT, 1, interconvertMSBandLSB(0xABC));
+  emulateSwdRegisterRead(SELECT_REG, DP, OK, 1, interconvertMSBandLSB(0xABC));
+  
+  swdReadDpWithRetries(SELECT_REG, &readData, 3);
+  TEST_ASSERT_EQUAL(0xABC, readData);
+}
+
+void test_swdWriteDpWithRetries_should_repeat_writeDP_transfer_4_times()  {
   int ack = 0, parity = 0;
   uint32_t writeData = 0xBEEFABC;
   
   emulateSwdRegisterWrite(ABORT_REG, DP, WAIT, writeData);
-  emulateSwdRegisterWrite(ABORT_REG, DP, OK, writeData);
+  emulateSwdRegisterWrite(ABORT_REG, DP, WAIT, writeData);
+  emulateSwdRegisterWrite(ABORT_REG, DP, WAIT, writeData);
   
-  swdReadWriteDpWithRetries(WRITE, ABORT_REG, &ack, &parity, &writeData, 4);
-  TEST_ASSERT_EQUAL(OK_RESPONSE, ack);
-  TEST_ASSERT_EQUAL(0, parity);
-  TEST_ASSERT_EQUAL(0xBEEFABC, writeData);
+  swdWriteDpWithRetries(ABORT_REG, writeData, 3);
 }
 
-void test_swdReadApWithRetries_should_repeat_writeAP_transfer_6_times()  {
+void test_swdWriteDpWithRetries_should_retries_one_time_with_ack_is_OK()  {
   int ack = 0, parity = 0;
+  uint32_t writeData = 0xBEEFABC;
+  
+  emulateSwdRegisterWrite(ABORT_REG, DP, OK, writeData);
+  
+  swdWriteDpWithRetries(ABORT_REG, writeData, 3);
+}
+
+void test_swdWriteApWithRetries_should_repeat_writeAP_transfer_6_times()  {
   uint32_t writeData = 0xD3ADB33F;
   
   emulateSwdRegisterWrite(CSW_REG, AP, WAIT, writeData);
@@ -253,64 +296,45 @@ void test_swdReadApWithRetries_should_repeat_writeAP_transfer_6_times()  {
   emulateSwdRegisterWrite(CSW_REG, AP, WAIT, writeData);
   emulateSwdRegisterWrite(CSW_REG, AP, OK, writeData);
   
-  swdReadWriteApWithRetries(WRITE, CSW_REG, &ack, &parity, &writeData, 6);
-  TEST_ASSERT_EQUAL(OK_RESPONSE, ack);
-  TEST_ASSERT_EQUAL(0, parity);
-  TEST_ASSERT_EQUAL(0xD3ADB33F, writeData);
+  swdWriteApWithRetries(CSW_REG, writeData, 6);
 }
 
 void test_swdReadApWithRetries_should_repeat_readAP_transfer_2_times()  {
-  int ack = 0, parity = 0;
   uint32_t readData = 0;
   
-  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1234ABCD));
-  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1234ABCD));
-  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1234ABCD));
-  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1234ABCD));
+  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 0, interconvertMSBandLSB(0x1234ABCD));
+  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 0, interconvertMSBandLSB(0x1234ABCD));
+  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 0, interconvertMSBandLSB(0x1234ABCD));
+  emulateSwdRegisterRead(TAR_REG, AP, WAIT, 0, interconvertMSBandLSB(0x1234ABCD));
   
-  swdReadWriteApWithRetries(READ, TAR_REG, &ack, &parity, &readData, 2);
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, ack);
-  TEST_ASSERT_EQUAL(1, parity);
+  swdReadApWithRetries(TAR_REG, &readData, 2);
   TEST_ASSERT_EQUAL(0x1234ABCD, readData);
 }
 
 void test_retriesSwdOperation_given_write_operation_should_write_AP_3_times_and_return_acknowledgement()  {
-  int parity = 0, result = 0;
+  int error = 0;
   uint32_t readData = 0, dummyData = 0xDEADBEEF;
   
   emulateSwdRegisterWrite(CSW_REG, AP, WAIT, dummyData);
   emulateSwdRegisterWrite(CSW_REG, AP, OK, dummyData);
   
-  result = retriesSwdOperation(WRITE, CSW_REG, AP, &parity, &dummyData, 3);
-  TEST_ASSERT_EQUAL(OK_RESPONSE, result);
-  TEST_ASSERT_EQUAL(0, parity);
-  TEST_ASSERT_EQUAL(0xDEADBEEF, dummyData);
+  error = swdRetriesOperation(WRITE, AP, CSW_REG, &dummyData, 3);
+  TEST_ASSERT_EQUAL(NO_ERROR, error);
 }
 
 void test_retriesSwdOperation_given_read_operation_should_read_AP_4_times_and_return_acknowledgement()  {
-  int parity = 0, result = 0;
+  int error = 0;
   uint32_t readData = 0;
   
   emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
   emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  
-  emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  
-  emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  
-  emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  emulateSwdRegisterRead(DRW_REG, AP, WAIT, 1, interconvertMSBandLSB(0x1EEA));
-  
-  result = retriesSwdOperation(READ, DRW_REG, AP, &parity, &readData, 4);
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, result);
-  TEST_ASSERT_EQUAL(1, parity);
-  TEST_ASSERT_EQUAL(0x1EEA, readData);
+
+  error = swdRetriesOperation(READ, AP, DRW_REG, &readData, 1);
+  TEST_ASSERT_EQUAL(ERR_ACK_WAIT_RESPONSE, error);
 }
 
 void test_retriesSwdOperation_given_read_operation_should_read_DP_6_times_and_return_acknowledgement()  {
-  int parity = 0, result = 0;
+  int error = 0;
   uint32_t readData = 0;
   
   emulateSwdRegisterRead(ABORT_REG, DP, WAIT, 1, interconvertMSBandLSB(0xA123A));
@@ -318,41 +342,31 @@ void test_retriesSwdOperation_given_read_operation_should_read_DP_6_times_and_re
   emulateSwdRegisterRead(ABORT_REG, DP, WAIT, 1, interconvertMSBandLSB(0xA123A));
   emulateSwdRegisterRead(ABORT_REG, DP, OK, 1, interconvertMSBandLSB(0xA123A));
   
-  result = retriesSwdOperation(READ, ABORT_REG, DP, &parity, &readData, 6);
-  TEST_ASSERT_EQUAL(OK_RESPONSE, result);
-  TEST_ASSERT_EQUAL(1, parity);
+  error = swdRetriesOperation(READ, DP, ABORT_REG, &readData, 6);
   TEST_ASSERT_EQUAL(0xA123A, readData);
+  TEST_ASSERT_EQUAL(NO_ERROR, error);
 }
 
-void test_swdClearFlags_given_WDERR_FLAG_bit_set_to_1_should_write_SWD_WDERR_CLEAR_FLAG_to_AP_ABORT_register() {
+void test_swdErrorHandler_given_WDERR_FLAG_bit_set_to_1_should_write_SWD_WDERR_CLEAR_FLAG_to_AP_ABORT_register() {
   int i = 0, data = 0;
 
   emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 1, interconvertMSBandLSB(0x80));
   emulateSwdRegisterWrite(ABORT_REG, DP, OK, SWD_WDERR_CLEAR_FLAG);
   
-  swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
+  swdErrorHandler(ERR_ACK_FAULT_RESPONSE, 0, 0, 0, 0);
 }
 
-void test_swdClearFlags_given_STICKYCMP_FLAG_bit_set_to_1_should_write_SWD_STKCMP_CLEAR_FLAG_to_AP_ABORT_register() {
-  int i = 0, data = 0;
-
-  emulateSwdRegisterRead(CTRLSTAT_REG, DP, OK, 1, interconvertMSBandLSB(0x10));
-  emulateSwdRegisterWrite(ABORT_REG, DP, OK, SWD_STKCMP_CLEAR_FLAG);
-  
-  swdClearFlags(FAULT_RESPONSE, 0, 0, 0, 0, 0);
-}
-
-void test_swdClearFlags_given_WAIT_RESPOND_should_retries_3_times_and_abort() {
+void test_swdErrorHandler_given_WAIT_RESPOND_should_retries_3_times_and_abort() {
   int parity = 0;
   uint32_t readData = 0;
   
-  //First AP read
+  // First AP read
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
-  //Second AP read
+  // Second AP read
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
-  //Third AP read
+  // Third AP read
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
   
@@ -360,21 +374,21 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_retries_3_times_and_abort() {
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
   emulateSwdRegisterRead(TAR_REG, AP, WAIT, 1, interconvertMSBandLSB(0xABC));
   
-  swdClearFlags(WAIT_RESPONSE, READ, TAR_REG, AP, parity, readData);
+  swdErrorHandler(ERR_ACK_WAIT_RESPONSE, READ, AP, TAR_REG, &readData);
 }
 
-void test_swdClearFlags_given_WAIT_RESPOND_should_AP_write_retries_3_times_if_success_dont_abort() {
+void test_swdErrorHandler_given_WAIT_RESPOND_should_AP_write_retries_3_times_if_success_dont_abort() {
   int parity = 0;
-  uint32_t readData = 0;
+  uint32_t writeData = 0xDEADBEEF;
   
   emulateSwdRegisterWrite(DRW_REG, AP, WAIT, 0xDEADBEEF);
   emulateSwdRegisterWrite(DRW_REG, AP, WAIT, 0xDEADBEEF);
   emulateSwdRegisterWrite(DRW_REG, AP, OK, 0xDEADBEEF);
   
-  swdClearFlags(WAIT_RESPONSE, WRITE, DRW_REG, AP, parity, 0xDEADBEEF);
+  swdErrorHandler(ERR_ACK_WAIT_RESPONSE, WRITE, AP, DRW_REG, &writeData);
 }
 
-void test_swdClearFlags_given_WAIT_RESPOND_should_DP_read_retries_3_times_abort_and_Resend() {
+void test_swdErrorHandler_given_WAIT_RESPOND_should_DP_read_retries_3_times_abort_and_Resend() {
   int parity = 0;
   uint32_t readData = 0;
   
@@ -386,5 +400,5 @@ void test_swdClearFlags_given_WAIT_RESPOND_should_DP_read_retries_3_times_abort_
   
   emulateSwdRegisterRead(SELECT_REG, DP, WAIT, 1, interconvertMSBandLSB(0xCBA987));
   
-  swdClearFlags(WAIT_RESPONSE, READ, SELECT_REG, DP, parity, 0xCBA987);
+  swdErrorHandler(ERR_ACK_WAIT_RESPONSE, READ, DP, SELECT_REG, &readData);
 }
