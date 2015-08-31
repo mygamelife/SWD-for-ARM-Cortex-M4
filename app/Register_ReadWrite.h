@@ -8,13 +8,13 @@
 
 /** AHB-AP register
   */
-#define CSW_REG           0x0
-#define TAR_REG           0x4
-#define IDR_REG           0xC
-#define DRW_REG           0xC
-#define SIZE_BYTE         0x1
-#define SIZE_HALFWORD     0x2
-#define SIZE_WORD         0x3
+#define CSW_REG           0x00
+#define TAR_REG           0x04
+#define IDR_REG           0x0C
+#define DRW_REG           0x0C
+#define SIZE_BYTE         0x01
+#define SIZE_HALFWORD     0x02
+#define SIZE_WORD         0x03
 #define ROM_TABLE         0xE00FF000
 
 /** DP Register
@@ -86,6 +86,9 @@ void swdRegisterWrite(int Address,int APnDP,int *ACK, uint32_t data);
 /**-------------------------------- AHB-AP Register Function-----------------------------------
   */
 #define swdWriteAP(address, ack, data)              swdRegisterWrite(address, AP, ack, data);
+
+/* Used for mocking */
+uint32_t memoryReadAndReturnWord(uint32_t address);
 
 int memoryReadWord(uint32_t address,uint32_t *dataRead);
 void memoryWriteByte(uint32_t address, uint8_t writeData);

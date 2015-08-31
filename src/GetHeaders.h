@@ -2,7 +2,6 @@
 #define Get_File_Header_H
 
 #include <stdio.h>
-//#include "unity.h"
 
 #include "Read_File.h"
 #include "elf.h"
@@ -16,61 +15,56 @@ typedef struct {
   _Elf32_Shdr *programElf;
   Elf32_Sym *st;
   Elf32_Rel *rel;
+  uint32_t *sectionAddress;
+  uint32_t *targetAddr;
 } ElfData;
 
-typedef struct {
-  int  index;
-  uint8_t *code;
-  uint32_t codeIndex;
-  uint32_t address;
-  uint32_t size;
-} ElfSection;
-
-extern ElfData *dataFromElf;
-extern ElfSection *pElfSection;
-void initElfData();
-
 // File Header
-Elf32_Ehdr *getElfHeader(ElfData *dataFromElf);
+Elf32_Ehdr *getElfHeader(ElfData *elfData);
 
 // Program Header
-Elf32_Phdr *getProgramHeaders(ElfData *dataFromElf);
+Elf32_Phdr *getProgramHeaders(ElfData *elfData);
 
 // Section Header
-Elf32_Shdr *getSectionHeaders(ElfData *dataFromElf);
+Elf32_Shdr *getSectionHeaders(ElfData *elfData);
 
 // Symbol Table
-Elf32_Sym *getSymbolTables(ElfData *dataFromElf);
+Elf32_Sym *getSymbolTables(ElfData *elfData);
 
 // Section info and Name
-char *getSectionInfoNameUsingIndex(ElfData *dataFromElf, int index);
-uint32_t *getSectionInfoUsingIndex(ElfData *dataFromElf, int index);
-_Elf32_Shdr *getAllSectionInfo(ElfData *dataFromElf);
+char *getSectionInfoNameUsingIndex(ElfData *elfData, int index);
+uint32_t *getSectionInfoUsingIndex(ElfData *elfData, int index);
+_Elf32_Shdr *getAllSectionInfo(ElfData *elfData);
+
+// ElfData initialization with file directory
+ElfData *openElfFile(char *fileName);
+
+//  Section Header Addr
+uint32_t getSectionHeaderAddrUsingIndex(ElfData *elfData, int index);
 
 //  Index, Address and Size of section
-int getIndexOfSectionByName(ElfData *dataFromElf, char *name);
-int getSectionAddress(ElfData *dataFromElf, int index);
-int getSectionSize(ElfData *dataFromElf, int index);
+int getIndexOfSectionByName(ElfData *elfData, char *name);
+uint32_t getSectionAddress(ElfData *elfData, int index);
+int getSectionSize(ElfData *elfData, int index);
 
 //  Physical and Virtual Address of Program Headers
-uint32_t getSectionPhysicalAddress(ElfData *dataFromElf, int index);
-uint32_t getSectionVirtualAddress(ElfData *dataFromElf, int index);
+uint32_t getSectionPhysicalAddress(ElfData *elfData, int index);
+uint32_t getSectionVirtualAddress(ElfData *elfData, int index);
 
 //  Status check for Executable, Writeable and Readable
-int isSectionExecutable(ElfData *dataFromElf, int index);
-int isSectionWriteable(ElfData *dataFromElf, int index);
-int isSectionReadable(ElfData *dataFromElf, int index);
+int isSectionExecutable(ElfData *elfData, int index);
+int isSectionWriteable(ElfData *elfData, int index);
+int isSectionReadable(ElfData *elfData, int index);
+
+//  Entries of Symbol Table
+int getSymbolTableEntries(ElfData *elfData);
 
 //  Symbol Table Size and Address from Name
-uint32_t getSymbolTableSizeUsingName(ElfData *dataFromElf, char *name);
-uint32_t getSymbolTableAddressUsingName(ElfData *dataFromElf, char *name);
+uint32_t getSymbolTableSizeUsingName(ElfData *elfData, char *name);
+uint32_t getSymbolTableAddressUsingName(ElfData *elfData, char *name);
 
-//  Relocation
-Elf32_Rel *getRelocation(ElfData *dataFromElf);
-char *getRelSymbolName(ElfData *dataFromElf, int index);
-uint32_t getRelType(ElfData *dataFromElf, int index);
+//  Name of Symbol Table
+char *getSymbolTableNameUsingIndex(ElfData *elfData, int index);
 
-//For TLV Protocol
-ElfSection *elfGetSectionInfoFromFile(char *fileName, char *sectionName);
 #endif // Get_File_Header_H
 

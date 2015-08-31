@@ -1,12 +1,10 @@
 #include "UART.h"
 
-static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength);
-
 /**  initUart is a function to configure the UART peripheral
   *
   */
 UART_HandleTypeDef *initUart(void) {
-  static UART_HandleTypeDef UartHandle;
+  static UART_HandleTypeDef uartHandle;
 
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
   /* UART1 configured as follow:
@@ -15,44 +13,64 @@ UART_HandleTypeDef *initUart(void) {
       - Parity = None
       - BaudRate = 9600 baud
       - Hardware flow control disabled (RTS and CTS signals) */
-  UartHandle.Instance          = USARTx;
+  uartHandle.Instance          = USARTx;
   
-  UartHandle.Init.BaudRate     = 9600;
-  UartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
-  UartHandle.Init.StopBits     = UART_STOPBITS_1;
-  UartHandle.Init.Parity       = UART_PARITY_NONE;
-  UartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
-  UartHandle.Init.Mode         = UART_MODE_TX_RX;
-  UartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
+  uartHandle.Init.BaudRate     = USART_BAUD_RATE;
+  uartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
+  uartHandle.Init.StopBits     = UART_STOPBITS_1;
+  uartHandle.Init.Parity       = UART_PARITY_NONE;
+  uartHandle.Init.HwFlowCtl    = UART_HWCONTROL_NONE;
+  uartHandle.Init.Mode         = UART_MODE_TX_RX;
+  uartHandle.Init.OverSampling = UART_OVERSAMPLING_16;
     
-  if(HAL_UART_Init(&UartHandle) != HAL_OK)
+  if(HAL_UART_Init(&uartHandle) != HAL_OK)
   {
-	  errorHandler();
+	  uartErrorHandler();
   }
   
-  return &UartHandle;
+  return &uartHandle;
 }
 
-/**
-  * @brief  Compares two buffers.
-  * @param  pBuffer1, pBuffer2: buffers to be compared.
-  * @param  BufferLength: buffer's length
-  * @retval 0  : pBuffer1 identical to pBuffer2
-  *         >0 : pBuffer1 differs from pBuffer2
+/** stm32UartSendByte is a function sending byte data from stm32 uart port
+  *
+  * input     :   uartHandle is UART_HandleTypeDef pointer pointing to the uart configuration structure
+  *               data is a single byte data need to transfer
+  *
+  * return    :   NONE
   */
-static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength)
-{
-  while (BufferLength--)
-  {
-    if ((*pBuffer1) != *pBuffer2)
-    {
-      return BufferLength;
-    }
-    pBuffer1++;
-    pBuffer2++;
+void stm32UartSendByte(UART_HandleTypeDef *uartHandle, uint8_t data)  {
+  if(HAL_UART_Transmit(uartHandle, &data, 1, 5000)!= HAL_OK)  {
+    /* Capture error here to prevent transmission go on */
+    uartErrorHandler();
   }
+}
 
-  return 0;
+/** stm32UartSendBytes is a function sending bytes data from stm32 uart port
+  *
+  * input     :   uartHandle is UART_HandleTypeDef pointer pointing to the uart configuration structure
+  *               data is a multiple bytes data need to transfer, usually is a buffer
+  *
+  * return    :   NONE
+  */
+void stm32UartSendBytes(UART_HandleTypeDef *uartHandle, uint8_t *data)  {
+  if(HAL_UART_Transmit(uartHandle, data, 256, 5000)!= HAL_OK)  {
+    /* Capture error here to prevent transmission go on */
+    uartErrorHandler();
+  }
+}
+
+/** stm32UartGetByte is a function receive single byte data from stm32 uart port
+  *
+  * input     :   uartHandle is UART_HandleTypeDef pointer pointing to the uart configuration structure
+  *
+  * return    :   rxBuffer contain single byte data received from uart port
+  */
+uint8_t stm32UartGetByte(UART_HandleTypeDef *uartHandle) {
+  uint8_t rxBuffer = 0;
+  
+  if(HAL_UART_Receive(uartHandle, &rxBuffer, 1, 5000) == HAL_OK)  {
+    return rxBuffer;
+  }
 }
 
 /**
@@ -60,7 +78,7 @@ static uint16_t Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferL
   * @param  None
   * @retval None
   */
-void errorHandler(void)
+void uartErrorHandler(void)
 {
   /* Turn LED4 on */
   BSP_LED_On(LED4);

@@ -10,10 +10,12 @@ typedef enum{
 	ON_LED3,
 	OFF_LED3,
 	COUNTER,
+  HALT,
 	FINAL
 }State;
 
 uint32_t getCurrentTime();
 int oneHundredMiliSecHasNotExpired();
-void LED3_Blink(State *state, int *pTimer);
+void LED3_Blink(State *state, int *enable);
+void blinkLED3(State *state, int *counter);
 #endif // LED_H

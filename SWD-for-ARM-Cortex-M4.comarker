@@ -1,23 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <breakpoints>
 <breakpoint enabled="true" persistant="true" registered="true">
-<resource path="/SWD-for-ARM-Cortex-M4/TestCode/WatchpointTest.c" type="1"/>
-<marker lineNumber="502" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
-<attrib name="enabled" value="true"/>
+<resource path="/SWD-for-ARM-Cortex-M4/Code/Tlv_Worker.c" type="1"/>
+<marker lineNumber="64" type="org.eclipse.cdt.debug.core.cLineBreakpointMarker">
+<attrib name="message" value="Line breakpoint: Tlv_Worker.c [line: 67]"/>
 <attrib name="org.eclipse.cdt.debug.core.condition" value=""/>
 <attrib name="org.eclipse.debug.core.id" value="org.eclipse.cdt.debug.core"/>
-<attrib name="workingset_name" value=""/>
-<attrib name="org.eclipse.cdt.debug.core.installCount" value="1"/>
-<attrib name="type" value="org.eclipse.cdt.debug.core.cLineBreakpointMarker"/>
-<attrib name="persistant" value="true"/>
+<attrib name="org.eclipse.cdt.debug.core.installCount" value="0"/>
+<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\susan_000\Desktop\SWD-for-ARM-Cortex-M4\app\Tlv_Worker.c"/>
 <attrib name="org.eclipse.cdt.debug.core.breakpointType" value="0"/>
-<attrib name="workingset_id" value="org.eclipse.debug.ui.breakpointWorkingSet"/>
-<attrib name="message" value="Line breakpoint: WatchpointTest.c [line: 502]"/>
-<attrib name="registered" value="true"/>
-<attrib name="path" value="/SWD-for-ARM-Cortex-M4/TestCode/WatchpointTest.c"/>
-<attrib name="org.eclipse.cdt.debug.core.sourceHandle" value="C:\Users\c_she\CoIDE\workspace\SWD-for-ARM-Cortex-M4\test\support\WatchpointTest.c"/>
-<attrib name="org.eclipse.debug.core.enabled" value="true"/>
 <attrib name="org.eclipse.cdt.debug.core.ignoreCount" value="0"/>
+<attrib name="org.eclipse.debug.core.enabled" value="true"/>
+<attrib name="workingset_name" value=""/>
+<attrib name="workingset_id" value="org.eclipse.debug.ui.breakpointWorkingSet"/>
 </marker>
 </breakpoint>
 </breakpoints>

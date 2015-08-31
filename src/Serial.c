@@ -57,7 +57,7 @@ HANDLE initSerialComm(LPCSTR portname, DWORD baudrate) {
   return hSerial;  
 }
 
-DWORD serialGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize) {
+DWORD uartGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize) {
   DWORD dwBytesRead = 0;
   if(!ReadFile(hSerial, buffer, buffersize, &dwBytesRead, NULL)){
     //handle error
@@ -67,7 +67,7 @@ DWORD serialGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize) {
   return dwBytesRead;
 }
 
-DWORD serialWriteByte(HANDLE hSerial, uint8_t * data, int length) {
+DWORD uartSendBytes(HANDLE hSerial, uint8_t * data, int length) {
 	DWORD dwBytesRead = 0;
 	if(!WriteFile(hSerial, data, length, &dwBytesRead, NULL)){
     DWORD errId = GetLastError();
@@ -81,14 +81,24 @@ void closeSerialPort(HANDLE hSerial) {
 	CloseHandle(hSerial);
 }
 
-uint8_t serialGetByte(HANDLE hSerial)  {
+uint8_t uartGetByte(HANDLE hSerial)  {
   DWORD dwBytesRead = 0;
-  uint8_t rxBuffer[1];
+  uint8_t buffer = 0;
   
-  if(!ReadFile(hSerial, rxBuffer, sizeof(rxBuffer), &dwBytesRead, NULL)){
+  if(!ReadFile(hSerial, &buffer, 1, &dwBytesRead, NULL)){
     //handle error
     DWORD errId = GetLastError();
     printf("ReadFile Error: %d\n", errId);
   }
-  return rxBuffer[0];  
+  
+  return buffer;
+}
+
+DWORD uartSendByte(HANDLE hSerial, uint8_t data)  {
+  DWORD dwBytesRead = 0;
+	if(!WriteFile(hSerial, (uint8_t *)&data, 1, &dwBytesRead, NULL)){
+    DWORD errId = GetLastError();
+    printf("WriteFile Error: %d\n", errId);
+	}
+	return dwBytesRead;
 }

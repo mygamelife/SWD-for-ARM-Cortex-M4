@@ -1,22 +1,41 @@
 #include "main.h"
+
 int main(void)
 {
- 	uint32_t errorFlag  = 0 ;
- 	uint32_t dataRead = 0 ;
- 	
-	configure_IOPorts();
-	resetTarget();
+  uint32_t idr = 0, dataRead = 0, dataRead2 = 0;
+  int ack = 0;
 
-	SWD_Initialisation();
+  /* Hardware configuration */
+  HAL_Init();
+  configureUartPorts();
+  configure_IOPorts();
+  SystemClock_Config();
 
-	errorFlag = swdCheckErrorFlag() ;
-	swdClearErrorFlagInAbort(errorFlag); //Clear error flag
+  /* Hardware reset target board */
+  resetTarget();
+  /* Initialize SWD Protocol */
+  SWD_Initialisation();
+  /* Power Up AHB Port */
+  readAhbIDR(&idr);
+  swdWriteCSW(&ack, CSW_DEFAULT_MASK | CSW_WORD_SIZE);
 
-	readAhbIDR(&dataRead);
+  Tlv *receive;
+  Tlv_Session *session = tlvCreateWorkerSession();
+  uint32_t address, data;
+  while(1)
+  {
+	  receive = tlvReceive(session);
+	  if(receive != NULL)	{
+		  if(receive->type == TLV_WRITE_REGISTER) {
+			  address = get4Byte(&receive->value[0]);
+			  data = get4Byte(&receive->value[4]);
 
-	while(1)
-	{
-	}
-
+			  writeTargetRegister(session, &address, &data);
+		  }
+		  else if(receive->type == TLV_READ_REGISTER) {
+			  address = get4Byte(&receive->value[0]);
+			  readTargetRegister(session, &address);
+		  }
+	  }
+  }
 }
-

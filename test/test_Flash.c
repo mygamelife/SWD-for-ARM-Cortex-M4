@@ -10,7 +10,9 @@ void setUp(void){}
 void tearDown(void){}
 
 void test_flashErrorHandler_should_turn_on_LED4()  {
+  HAL_FLASH_GetError_ExpectAndReturn(HAL_FLASH_ERROR_OPERATION);
   turnOnLED4_Expect();
+  
   flashErrorHandler();
 }
 

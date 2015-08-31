@@ -1,36 +1,43 @@
-#include <windows.h>
-#include <stdint.h>
-#include <stdio.h>
-#include "Serial.h"
-#include "TLV_Host.h"
-#include "GetHeaders.h"
+#include "ProgramLoader.h"
+#include "CoreDebug_Utilities.h"
+#include <stdlib.h>
 
 int main(void) {
-  TLVSession tlvSession;
-
-  initElfData();
+  // uint32_t buffer32[] = { 0xBEEFCAFE, 0xAABBCCDD,
+                          // 0xDEADBEEF, 0xAABBCCDD,
+                          // 0xBEEFCAFE, 0xAABBCCDD };
+  Tlv *tlv, *receivedPacket;
   
-  /* Initialize TlvSeesion structure */
-  tlvSession.state = TLV_START;
-  tlvSession.pElf = elfGetSectionInfoFromFile("C:/Users/susan_000/Desktop/SWD-for-ARM-Cortex-M4/test/ELF_File/FlashProgrammer.elf", ".text");
-  tlvSession.hSerial = initSerialComm("COM7", 115200);
+  int time = 10, lastIndex = 0;
+  uint32_t address = CORE_REG_R0;
+  uint32_t data = 0xDEADBEEF;
   
-  printf("Open Serial Port\n");
+  Tlv_Session *session = tlvCreateLoaderSession();
+  printf("Opening port\n");
   
-  /* Main Function run here */
-  while(tlvSession.state != TLV_COMPLETE) {
-    tlvHost(&tlvSession);
+  printf("Write register\n");
+  tlvWriteTargetRegister(session, &address, &data);
+  receivedPacket = tlvReceive(session);
+  
+  if(receivedPacket->type == TLV_OK)  {
+    printf("Probe reply OK\n");
+    printf("chksum valu %x\n", receivedPacket->value[receivedPacket->length - 1]);
   }
-
-  if(tlvSession.state == TLV_COMPLETE)
-    printf("TLV Transfer COMPLETE\n");
   
-  /* Close serial port, elf file and free and malloc */
-  printf("Closing Serial Port\n");  
-  closeFileInTxt(dataFromElf->myFile);
-  free(pElfSection);
-  free(dataFromElf);
-  closeSerialPort(tlvSession.hSerial);
+  printf("Read register\n");
+  tlvReadTargetRegister(session, &address);
 
+  receivedPacket = tlvReceive(session);
+  if(receivedPacket->type == TLV_READ_REGISTER)  {
+    printf("value %x\n", get4Byte(&receivedPacket->value[0]));
+    lastIndex = receivedPacket->length - 1;
+    printf("chksum valu %x\n", receivedPacket->value[lastIndex]);
+  }
+  
+
+  
+  printf("Closing port\n");
+  closeSerialPort(session->handler);
+  
   return 0;
 }

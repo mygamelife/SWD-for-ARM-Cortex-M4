@@ -1,8 +1,7 @@
 #include <stdint.h>
 #include "unity.h"
 #include "Emulator.h"
-#include "Clock.h"
-#include "Reset.h"
+#include "IoOperations.h"
 #include "Delay.h"
 #include "Flash.h"
 #include "swd_Utilities.h"

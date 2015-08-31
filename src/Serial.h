@@ -4,10 +4,13 @@
 #include <windows.h>
 #include <stdint.h>
 
-void closeSerialPort(HANDLE hSerial);
-DWORD serialWriteByte(HANDLE hSerial, uint8_t * data, int length);
-DWORD serialGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize);
-uint8_t serialGetByte(HANDLE hSerial);
-HANDLE initSerialComm(LPCSTR portname, DWORD baudrate);
+#define UART_PORT               "COM7"
+#define UART_BAUD_RATE          9600//115200
 
+void closeSerialPort(HANDLE hSerial);
+DWORD uartSendBytes(HANDLE hSerial, uint8_t * data, int length);
+DWORD uartGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize);
+uint8_t uartGetByte(HANDLE hSerial);
+DWORD uartSendByte(HANDLE hSerial, uint8_t data);
+HANDLE initSerialComm(LPCSTR portname, DWORD baudrate);
 #endif  // __Serial_H__
