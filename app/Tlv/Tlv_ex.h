@@ -9,22 +9,34 @@
 typedef struct
 {
   uint8_t type;
-  uint8_t length;
-  uint8_t value[256];
+  int length;
+  uint8_t value[255];
 } Tlv;
 
 typedef enum
 {
-  WAITING_PACKET,
-  INTERPRET_PACKET,
+  START_SEND,
+  END_SEND,
+  START_RECEIVE
 } Tlv_State;
+
+typedef enum
+{
+  TRANSMISSION_BUSY,
+  TRANSMISSION_FREE
+} Tlv_Transmission_State;
 
 typedef struct
 {
   void *handler;
-  Tlv_State state;
-  uint8_t txBuffer[256];
-  uint8_t rxBuffer[256];
+  uint8_t txBuffer[255];
+  uint8_t rxBuffer[255];
+  // Tlv *tlv tlvPacket;
+  Tlv_State sendState;
+  Tlv_State receiveState;
+  Tlv_Transmission_State tState;
+  bool TIMEOUT_FLAG;
+  bool DATA_ARRIVE_FLAG;
 } Tlv_Session;
 
 /* Tlv Command */

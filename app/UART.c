@@ -1,9 +1,9 @@
-#include "UART.h"
+#include "uart.h"
 
 /**  initUart is a function to configure the UART peripheral
   *
   */
-UART_HandleTypeDef *initUart(void) {
+UART_HandleTypeDef *uartInit(void) {
   static UART_HandleTypeDef uartHandle;
 
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
@@ -31,46 +31,18 @@ UART_HandleTypeDef *initUart(void) {
   return &uartHandle;
 }
 
-/** stm32UartSendByte is a function sending byte data from stm32 uart port
-  *
-  * input     :   uartHandle is UART_HandleTypeDef pointer pointing to the uart configuration structure
-  *               data is a single byte data need to transfer
-  *
-  * return    :   NONE
-  */
-void stm32UartSendByte(UART_HandleTypeDef *uartHandle, uint8_t data)  {
-  if(HAL_UART_Transmit(uartHandle, &data, 1, 5000)!= HAL_OK)  {
-    /* Capture error here to prevent transmission go on */
-    uartErrorHandler();
-  }
-}
-
-/** stm32UartSendBytes is a function sending bytes data from stm32 uart port
-  *
-  * input     :   uartHandle is UART_HandleTypeDef pointer pointing to the uart configuration structure
-  *               data is a multiple bytes data need to transfer, usually is a buffer
-  *
-  * return    :   NONE
-  */
-void stm32UartSendBytes(UART_HandleTypeDef *uartHandle, uint8_t *data)  {
-  if(HAL_UART_Transmit(uartHandle, data, 256, 5000)!= HAL_OK)  {
-    /* Capture error here to prevent transmission go on */
-    uartErrorHandler();
-  }
-}
-
-/** stm32UartGetByte is a function receive single byte data from stm32 uart port
-  *
-  * input     :   uartHandle is UART_HandleTypeDef pointer pointing to the uart configuration structure
-  *
-  * return    :   rxBuffer contain single byte data received from uart port
-  */
-uint8_t stm32UartGetByte(UART_HandleTypeDef *uartHandle) {
-  uint8_t rxBuffer = 0;
+/* Uart Transmit Function */
+uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
+  UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
   
-  if(HAL_UART_Receive(uartHandle, &rxBuffer, 1, 5000) == HAL_OK)  {
-    return rxBuffer;
-  }
+  return HAL_UART_Transmit(uartHandle, txBuffer, length, FIVE_SEC);
+}
+
+/* Uart Receive Function */
+uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
+  UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
+  
+  return HAL_UART_Receive(uartHandle, rxBuffer, length, TEN_SEC);
 }
 
 /**
@@ -81,8 +53,6 @@ uint8_t stm32UartGetByte(UART_HandleTypeDef *uartHandle) {
 void uartErrorHandler(void)
 {
   /* Turn LED4 on */
-  BSP_LED_On(LED4);
-  while(1)
-  {
-  }
+  turnOnLED4();
+  while(1)  {}
 }

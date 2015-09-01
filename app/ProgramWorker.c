@@ -75,6 +75,22 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
   memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
 }
 
+/** tlvCreateSession is a function to create necessary element needed by TLV protocol */
+Tlv_Session *tlvCreateWorkerSession(void) {
+  static Tlv_Session session;
+  
+  session.handler = uartInit();
+  /* Set Initial state for send and receive*/
+  session.sendState = END_SEND;
+  session.receiveState = START_RECEIVE;
+  
+  session.tState = TRANSMISSION_FREE;
+  session.TIMEOUT_FLAG = false;
+  session.DATA_ARRIVE_FLAG = false;
+  
+  return &session;
+}
+
 /** writeTargetRegister is a function to write value into target register using swd
   *
   * input     : session contain a element/handler used by tlv protocol
@@ -161,27 +177,27 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
 
 /** programWorker
   */
-void programWorker(Tlv_Session *session)  {
-  Tlv *packet, *error;
-  uint8_t errorCode = 0;
+// void programWorker(Tlv_Session *session)  {
+  // Tlv *packet, *error;
+  // uint8_t errorCode = 0;
   
-  switch(session->state)  {
-    case WAITING_PACKET :
-      packet = tlvReceive(session);
-      if(packet != NULL)
-        session->state = INTERPRET_PACKET;
-      break;
+  // switch(session->state)  {
+    // case WAITING_PACKET :
+      // packet = tlvReceive(session);
+      // if(packet != NULL)
+        // session->state = INTERPRET_PACKET;
+      // break;
       
-    case INTERPRET_PACKET :
-      if(tlvVerifyData(packet) == DATA_VALID)  {
-        selectInstruction(session, packet);
-      }
-      else  {
-        errorCode = ERR_CORRUPTED_DATA;
-        error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-        tlvSend(session, error);
-      }
-      session->state = WAITING_PACKET;
-      break;
-  }
-}
+    // case INTERPRET_PACKET :
+      // if(tlvVerifyData(packet) == DATA_VALID)  {
+        // selectInstruction(session, packet);
+      // }
+      // else  {
+        // errorCode = ERR_CORRUPTED_DATA;
+        // error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+        // tlvSend(session, error);
+      // }
+      // session->state = WAITING_PACKET;
+      // break;
+  // }
+// }

@@ -1,8 +1,5 @@
-//#include <windows.h>
-#include <stdio.h>
-#include "Serial.h"
+#include "uart.h"
 
-//  LPCSTR portname = "COM6";
 /**
  * Initialize and configure serial comm.
  * 
@@ -11,7 +8,7 @@
  * Return:
  *   The serial comm. handle
  */
-HANDLE initSerialComm(LPCSTR portname, DWORD baudrate) {
+HANDLE uartInit(LPCSTR portname, DWORD baudrate) {
   COMMTIMEOUTS timeouts={0};
   DCB dcbSerialParams = {0};
   DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
@@ -32,7 +29,7 @@ HANDLE initSerialComm(LPCSTR portname, DWORD baudrate) {
   if (!GetCommState(hSerial, &dcbSerialParams)) {
     //could not get the state of the comport
   }
-//  dcbSerialParams.BaudRate = 460800;
+  //  dcbSerialParams.BaudRate = 460800;
   dcbSerialParams.BaudRate = baudrate;
   dcbSerialParams.ByteSize = 8;
   dcbSerialParams.StopBits = ONESTOPBIT;
@@ -44,61 +41,53 @@ HANDLE initSerialComm(LPCSTR portname, DWORD baudrate) {
   }
   
   // The interval 
-  timeouts.ReadIntervalTimeout = 50;
-  timeouts.ReadTotalTimeoutConstant = 50;
-  timeouts.ReadTotalTimeoutMultiplier = 50;
-  timeouts.WriteTotalTimeoutConstant = 50;
-  timeouts.WriteTotalTimeoutMultiplier = 10;
+  timeouts.ReadIntervalTimeout = 500;
+  timeouts.ReadTotalTimeoutConstant = 500;
+  timeouts.ReadTotalTimeoutMultiplier = 500;
+  timeouts.WriteTotalTimeoutConstant = 100;
+  timeouts.WriteTotalTimeoutMultiplier = 100;
   if(!SetCommTimeouts(hSerial, &timeouts)){
     //handle error
      DWORD errId = GetLastError();
      printf("SetCommTimeouts Error: %d\n", errId);
   }  
-  return hSerial;  
+  return hSerial;
 }
 
-DWORD uartGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize) {
+/* Uart Transmit Function */
+uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
   DWORD dwBytesRead = 0;
-  if(!ReadFile(hSerial, buffer, buffersize, &dwBytesRead, NULL)){
-    //handle error
+  HANDLE *hSerial = (HANDLE *)handler;
+  // printf("after typecast\n");
+  if(!WriteFile(hSerial, txBuffer, length, &dwBytesRead, NULL)){
+    DWORD errId = GetLastError();
+    printf("WriteFile Error: %d\n", errId);
+    // printLastError();
+    return HAL_ERROR;
+	}
+  if(dwBytesRead > 0)
+    return UART_OK;
+  
+  else  return UART_ERROR;
+}
+
+/* Uart Receive Function */
+uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
+  DWORD dwBytesRead = 0;
+  HANDLE *hSerial = (HANDLE *)handler;
+  
+  if(!ReadFile(hSerial, rxBuffer, length, &dwBytesRead, NULL)){
+    // handle error
     DWORD errId = GetLastError();
     printf("ReadFile Error: %d\n", errId);
   }
-  return dwBytesRead;
-}
-
-DWORD uartSendBytes(HANDLE hSerial, uint8_t * data, int length) {
-	DWORD dwBytesRead = 0;
-	if(!WriteFile(hSerial, data, length, &dwBytesRead, NULL)){
-    DWORD errId = GetLastError();
-    printf("WriteFile Error: %d\n", errId);
-//		printLastError();
-	}
-	return dwBytesRead;
+  
+  if(dwBytesRead > 0)
+    return UART_OK;
+  
+  else  return UART_ERROR;
 }
 
 void closeSerialPort(HANDLE hSerial) {
 	CloseHandle(hSerial);
-}
-
-uint8_t uartGetByte(HANDLE hSerial)  {
-  DWORD dwBytesRead = 0;
-  uint8_t buffer = 0;
-  
-  if(!ReadFile(hSerial, &buffer, 1, &dwBytesRead, NULL)){
-    //handle error
-    DWORD errId = GetLastError();
-    printf("ReadFile Error: %d\n", errId);
-  }
-  
-  return buffer;
-}
-
-DWORD uartSendByte(HANDLE hSerial, uint8_t data)  {
-  DWORD dwBytesRead = 0;
-	if(!WriteFile(hSerial, (uint8_t *)&data, 1, &dwBytesRead, NULL)){
-    DWORD errId = GetLastError();
-    printf("WriteFile Error: %d\n", errId);
-	}
-	return dwBytesRead;
 }

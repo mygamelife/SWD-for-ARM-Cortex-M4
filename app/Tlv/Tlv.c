@@ -1,7 +1,6 @@
-#include "Tlv_Worker.h"
+#include "Tlv.h"
 
 /** tlvPackIntoBuffer is a function to pack currentBuffer into targetBuffer
-  *
   */
 void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length) {
   int index = 0;
@@ -13,15 +12,6 @@ void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length
   targetBuffer[index] = ~chksum + 1;
 }
 
-/** tlvCreateSession is a function to create a useful element for TLV protocol use
-  */
-Tlv_Session *tlvCreateWorkerSession(void) {
-  static Tlv_Session session;
-  session.handler = initUart();
-  session.state = WAITING_PACKET;
-  
-  return &session;
-}
 
 /** tlvCreatePacket create a packet contain all the information needed for tlv protocol
   *
@@ -36,7 +26,7 @@ Tlv_Session *tlvCreateWorkerSession(void) {
   *
   * return  : return a TLV type pointer address
   */
-Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
+Tlv *tlvCreatePacket(uint8_t command, int size, uint8_t *data) {
   static Tlv tlv;
   
   tlv.type = command;
@@ -54,14 +44,35 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   * return  : NONE
   */
 void tlvSend(Tlv_Session *session, Tlv *tlv)  {
-  /** Send first 2 bytes of Tlv packet
-    * tlv->type and tlv->length */
-  UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)session->handler;
-  HAL_UART_Transmit(uartHandle, (uint8_t *)tlv, 2, FIVE_SEC);
+  
+  session->txBuffer[0] = tlv->type;
+  session->txBuffer[1] = tlv->length;
+  tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length);
+  session->sendState = START_SEND;
+}
 
-  /** Send tlv->value according to the tlv->length
-    * and calculate chksum at the same time */
-  HAL_UART_Transmit(uartHandle, tlv->value, tlv->length, FIVE_SEC);
+/** tlvSendService is a state machine to handle the tlvSend
+  *
+  * input   : session contain all the information needed by the function
+  *
+  * return  : NONE
+  */
+void tlvSendService(Tlv_Session *session) {
+  int length = session->txBuffer[1] + 2;
+  
+  switch(session->sendState)  {
+    case START_SEND :
+      session->tState = TRANSMISSION_BUSY;
+      sendBytes(session->handler, session->txBuffer, length);
+      session->tState = TRANSMISSION_FREE;
+      
+      session->sendState = END_SEND;
+      break;
+      
+    case END_SEND :
+      // do nothing
+      break;
+  }
 }
 
 /** tlvReceive is a function to receive tlv packet
@@ -72,20 +83,48 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   */
 Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv;
-  UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)session->handler;
-  
-  /** return NULL if no data is arrive */
-  if(HAL_UART_Receive(uartHandle, session->rxBuffer, 2, FIVE_SEC) != HAL_OK)  {
-    return NULL;
-  }
+
+  if(session->DATA_ARRIVE_FLAG == false)  return NULL;
+
   tlv.type = session->rxBuffer[0];
   tlv.length = session->rxBuffer[1];
-
-  /** Retrieve data from buffer only length is greater than one */
-  HAL_UART_Receive(uartHandle, session->rxBuffer, tlv.length, FIVE_SEC);
-  tlvPackIntoBuffer(tlv.value, session->rxBuffer, tlv.length);
+  tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
   
   return &tlv;
+}
+
+/** tlvReceiveService is a state machine to handle the tlvReceive
+  *
+  * input   : session contain all the information needed by the function
+  *
+  * return  : NONE
+  */
+void tlvReceiveService(Tlv_Session *session) {
+  session->TIMEOUT_FLAG = false;
+  session->DATA_ARRIVE_FLAG = false;
+  int length = 0;
+  
+  switch(session->receiveState)  {
+    case START_RECEIVE :
+      if(!getBytes(session->handler, session->rxBuffer, 2))  {
+        /* set DATA_ARRIVE_FLAG when packet is arrived */
+        session->DATA_ARRIVE_FLAG = true;
+        length = session->rxBuffer[1];
+        if(getBytes(session->handler, &session->rxBuffer[2], length))	{
+          /* set TIMEOUT_FLAG when timeout occur */
+        	session->TIMEOUT_FLAG = true;
+        }
+      }
+      break;
+  }
+}
+
+/** tlvService is a function routine to handle asychronize send and synchronize 
+  * receive for tlv protocol
+  */
+void tlvService(Tlv_Session *session) {
+  tlvSendService(session);
+  tlvReceiveService(session);
 }
 
 /** verifyTlvData is a function to verify the data inside 
