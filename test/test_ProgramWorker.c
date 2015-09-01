@@ -4,7 +4,7 @@
 #include "ProgramWorker.h"
 #include "CoreDebug_Utilities.h"
 #include "mock_IoOperations.h"
-#include "mock_UART.h"
+#include "mock_uart.h"
 #include "mock_CoreDebug.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
