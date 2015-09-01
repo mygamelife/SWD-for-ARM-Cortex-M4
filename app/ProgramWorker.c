@@ -131,3 +131,73 @@ void performHardResetOnTarget(Tlv_Session *session)
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 }
+
+/** Halt the processor of the target device 
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void haltTarget(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  setCoreMode(CORE_DEBUG_HALT);
+  
+  if(getCoreMode() == CORE_DEBUG_HALT)
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  else
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, (uint8_t *)ERR_NOT_HALTED);
+  tlvSend(session, tlv);
+}
+
+/** Run the target device 
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void runTarget(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  setCoreMode(CORE_DEBUG_MODE);
+  
+  if(getCoreMode() == CORE_DEBUG_MODE)
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  else
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, (uint8_t *)ERR_NOT_RUNNING);
+  tlvSend(session, tlv);
+}
+
+/** Step the processor of target device once and send the current PC to host
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void singleStepTarget(Tlv_Session *session)
+{
+  uint32_t data = 0 ;
+  
+  setCoreMode(CORE_SINGLE_STEP);
+  readCoreRegister(CORE_REG_PC, &data);
+  setCoreMode(CORE_DEBUG_MODE);
+  
+  Tlv *tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
+  tlvSend(session, tlv);
+}
+
+/** Step the processor of target device multiple times and send the current PC to host
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *           : nInstructions is the number of instructions to step
+  *
+  */
+void multipleStepTarget(Tlv_Session *session,int nInstructions)
+{
+  uint32_t data = 0 ;
+  
+  stepOnly(nInstructions);
+  readCoreRegister(CORE_REG_PC, &data);
+  setCoreMode(CORE_DEBUG_MODE);
+  
+  Tlv *tlv = tlvCreatePacket(TLV_MULTI_STEP,4, (uint8_t *)&data);
+  tlvSend(session, tlv);
+}
+

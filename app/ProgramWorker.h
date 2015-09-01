@@ -16,4 +16,9 @@ void readTargetRegister(Tlv_Session *session, uint32_t *registerAddress);
 void performSoftResetOnTarget(Tlv_Session *session);
 void performHardResetOnTarget(Tlv_Session *session);
 
+void haltTarget(Tlv_Session *session);
+void runTarget(Tlv_Session *session);
+
+void singleStepTarget(Tlv_Session *session);
+void multipleStepTarget(Tlv_Session *session,int nInstructions);
 #endif // ProgramWorker_H

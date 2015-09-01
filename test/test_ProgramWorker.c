@@ -118,3 +118,97 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
   
   performHardResetOnTarget(&session);
 }
+
+/*--------------haltTarget--------------------*/
+void test_haltTarget_should_return_ACK_if_successful()
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  setCoreMode_Expect(CORE_DEBUG_HALT);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_OK, 0, 0, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  haltTarget(&session);
+}
+
+void test_haltTarget_should_return_NACK_if_not_successful()
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  setCoreMode_Expect(CORE_DEBUG_HALT);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_NOT_OK, 1, ERR_NOT_HALTED, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  haltTarget(&session);
+}
+
+/*--------------runTarget--------------------*/
+void test_runTarget_should_return_ACK_if_successful()
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_OK, 0, 0, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  haltTarget(&session);
+}
+
+void test_runTarget_should_return_NACK_if_unsuccessful()
+{
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_NOT_OK, 1, ERR_NOT_RUNNING, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  haltTarget(&session);  
+}
+
+/*---------singleStepTarget----------------------*/
+void test_singleStepTarget_should_step_readPC_run_and_return_PC()
+{
+  uint32_t data = 0 ;
+  
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  setCoreMode_Expect(CORE_SINGLE_STEP);
+  readCoreRegister_Ignore();
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_STEP, 4, (uint8_t *)&data, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  singleStepTarget(&session);    
+}
+
+/*---------multipleStepTarget----------------------*/
+void test_multipleStepTarget_should_step_readPC_run_and_return_PC()
+{
+  uint32_t data = 0 ;
+  
+  Tlv tlv;  
+  Tlv_Session session;
+  
+  stepOnly_Expect(5);
+  readCoreRegister_Ignore();
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  
+  tlvCreatePacket_ExpectAndReturn(TLV_STEP, 4, (uint8_t *)&data, &tlv);
+  tlvSend_Expect(&session, &tlv);
+  
+  multipleStepTarget(&session,5);    
+}
