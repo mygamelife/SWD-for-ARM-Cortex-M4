@@ -1,9 +1,11 @@
 #include "main.h"
 
+void dummyThrow(void);
+
 int main(void)
 {
   uint32_t idr = 0, dataRead = 0, dataRead2 = 0;
-  int errorCode = 0;
+  int errorCode = 0, dummy = 0;
 
   /* Hardware configuration */
   HAL_Init();
@@ -14,27 +16,22 @@ int main(void)
   /* Hardware reset target board */
   hardResetTarget();
   /* Initialize SWD Protocol */
-  errorCode = SWD_Initialisation();
+  errorCode = swdInit();
   /* Power Up AHB Port */
   errorCode = readAhbIDR(&idr);
 
-  Tlv *receive;
-  Tlv_Session *session = tlvCreateWorkerSession();
-  uint32_t address, data;
+  Tlv_Session session;
+  Tlv *tlv;
+
+  session.handler = uartInit();
+  session.receiveState = START_RECEIVE;
+  session.sendState = END_SEND;
+
   while(1)
   {
-	  receive = tlvReceive(session);
-	  if(receive != NULL)	{
-		  if(receive->type == TLV_WRITE_REGISTER) {
-			  address = get4Byte(&receive->value[0]);
-			  data = get4Byte(&receive->value[4]);
-
-			  writeTargetRegister(session, &address, &data);
-		  }
-		  else if(receive->type == TLV_READ_REGISTER) {
-			  address = get4Byte(&receive->value[0]);
-			  readTargetRegister(session, &address);
-		  }
-	  }
+	  tlvService(&session);
+	  tlv = tlvReceive(&session);
+	  if(tlv != NULL)
+		  tlvSend(&session, tlv);
   }
 }

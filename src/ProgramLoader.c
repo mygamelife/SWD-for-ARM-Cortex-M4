@@ -1,5 +1,21 @@
 #include "ProgramLoader.h"
 
+/** tlvCreateSession is a function to create necessary element needed by TLV protocol */
+Tlv_Session *tlvCreateLoaderSession(void) {
+  static Tlv_Session session;
+  
+  session.handler = uartInit(UART_PORT, UART_BAUD_RATE);
+  /* Set Initial state for send and receive*/
+  session.sendState = END_SEND;
+  session.receiveState = START_RECEIVE;
+  
+  session.tState = TRANSMISSION_FREE;
+  session.TIMEOUT_FLAG = false;
+  session.DATA_ARRIVE_FLAG = false;
+  
+  return &session;
+}
+
 /** tlvWriteTargetRegister is a function to write data into target register
   * 
   * input   : session contain a element/handler used by tlv protocol

@@ -1,9 +1,9 @@
 #include "unity.h"
+#include "swd.h"
 #include "Emulator.h"
 #include "IoOperations.h"
 #include "swd_Utilities.h"
 #include "Delay.h"
-#include "swd.h"
 #include "Register_ReadWrite.h"
 #include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"
@@ -78,5 +78,5 @@ void test_SWD_Initialisation_should_switchJTAGtoSWD_send0xA5_SWDIO_Input_turnAro
 	//extraIdleClock
 	emulateIdleClock(8);
   
-	SWD_Initialisation();
+	swdInit();
 }

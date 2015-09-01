@@ -1,8 +1,10 @@
 #ifndef ProgramLoader_H
 #define ProgramLoader_H
 
-#include "Tlv_Loader.h"
+#include "Tlv.h"
 #include "GetHeaders.h"
+
+Tlv_Session *tlvCreateLoaderSession(void);
 
 /* Read/Write target register */
 void tlvReadTargetRegister(Tlv_Session *session, uint32_t *registerAddress);

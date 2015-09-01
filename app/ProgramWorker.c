@@ -75,6 +75,22 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
   memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
 }
 
+/** tlvCreateSession is a function to create necessary element needed by TLV protocol */
+Tlv_Session *tlvCreateWorkerSession(void) {
+  static Tlv_Session session;
+  
+  session.handler = uartInit();
+  /* Set Initial state for send and receive*/
+  session.sendState = END_SEND;
+  session.receiveState = START_RECEIVE;
+  
+  session.tState = TRANSMISSION_FREE;
+  session.TIMEOUT_FLAG = false;
+  session.DATA_ARRIVE_FLAG = false;
+  
+  return &session;
+}
+
 /** writeTargetRegister is a function to write value into target register using swd
   *
   * input     : session contain a element/handler used by tlv protocol
@@ -131,6 +147,60 @@ void performHardResetOnTarget(Tlv_Session *session)
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 }
+
+/** selectInstruction is a function to select instruction 
+  * base on tlv->type
+  *
+  * Input   : tlv is pointer pointing to tlv packet
+  *
+  * Return  : NONE
+  */
+void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
+  Tlv *error; uint8_t errorCode = 0;
+  
+  switch(tlv->type) {
+    case TLV_WRITE_RAM      : break;
+    case TLV_READ_RAM       : break;
+    case TLV_WRITE_REGISTER : writeTargetRegister(session, &get4Byte(&tlv->value[0]), &get4Byte(&tlv->value[4])); break;
+    case TLV_READ_REGISTER  : readTargetRegister(session, &get4Byte(&tlv->value[0])); break;
+    case TLV_HALT_TARGET    : break;
+    case TLV_RUN_TARGET     : break;
+    case TLV_STEP           : break;
+    
+    default :
+      errorCode = ERR_INVALID_COMMAND;
+      error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+      tlvSend(session, error);
+      break;
+  }
+}
+
+/** programWorker
+  */
+// void programWorker(Tlv_Session *session)  {
+  // Tlv *packet, *error;
+  // uint8_t errorCode = 0;
+  
+  // switch(session->state)  {
+    // case WAITING_PACKET :
+      // packet = tlvReceive(session);
+      // if(packet != NULL)
+        // session->state = INTERPRET_PACKET;
+      // break;
+      
+    // case INTERPRET_PACKET :
+      // if(tlvVerifyData(packet) == DATA_VALID)  {
+        // selectInstruction(session, packet);
+      // }
+      // else  {
+        // errorCode = ERR_CORRUPTED_DATA;
+        // error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+        // tlvSend(session, error);
+      // }
+      // session->state = WAITING_PACKET;
+      // break;
+  // }
+// }
 
 /** Halt the processor of the target device 
   *
@@ -200,4 +270,3 @@ void multipleStepTarget(Tlv_Session *session,int nInstructions)
   Tlv *tlv = tlvCreatePacket(TLV_MULTI_STEP,4, (uint8_t *)&data);
   tlvSend(session, tlv);
 }
-
