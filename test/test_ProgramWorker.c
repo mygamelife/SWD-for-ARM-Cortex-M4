@@ -142,3 +142,81 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
   
   // TEST_ASSERT_EQUAL(WAITING_PACKET, session.state);
 // }
+
+/*--------------haltTarget--------------------*/
+void test_haltTarget_should_return_ACK_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+  
+  setCoreMode_Expect(CORE_DEBUG_HALT);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  
+  haltTarget(session);
+}
+
+void xtest_haltTarget_should_return_NACK_if_not_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+  
+  setCoreMode_Expect(CORE_DEBUG_HALT);
+  // getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  
+  haltTarget(session);
+}
+
+/*--------------runTarget--------------------*/
+void xtest_runTarget_should_return_ACK_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+  
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  
+  haltTarget(session);
+}
+
+void xtest_runTarget_should_return_NACK_if_unsuccessful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+  
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  
+  haltTarget(session);  
+}
+
+/*---------singleStepTarget----------------------*/
+void test_singleStepTarget_should_step_readPC_run_and_return_PC()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+  
+  setCoreMode_Expect(CORE_SINGLE_STEP);
+  readCoreRegister_Ignore();
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  
+  singleStepTarget(session);    
+}
+
+/*---------multipleStepTarget----------------------*/
+void test_multipleStepTarget_should_step_readPC_run_and_return_PC()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+  
+  stepOnly_Expect(5);
+  readCoreRegister_Ignore();
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  
+  multipleStepTarget(session, 5);    
+}

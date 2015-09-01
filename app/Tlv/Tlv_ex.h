@@ -48,7 +48,9 @@ typedef enum
   TLV_READ_REGISTER,
   TLV_HALT_TARGET,
   TLV_RUN_TARGET,
-  TLV_STEP
+  TLV_STEP,
+  TLV_MULTI_STEP,
+  TLV_BREAKPOINT
 } Tlv_Command;
 
 /* Tlv acknowledge */
@@ -66,7 +68,9 @@ typedef enum
 {
   ERR_TIME_OUT = 1,
   ERR_CORRUPTED_DATA,
-  ERR_INVALID_COMMAND
+  ERR_INVALID_COMMAND,
+  ERR_NOT_HALTED,
+  ERR_NOT_RUNNING
 } Tlv_ErrorCode;
 
 typedef enum  {

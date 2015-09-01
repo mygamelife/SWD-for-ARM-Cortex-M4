@@ -21,4 +21,9 @@ void performHardResetOnTarget(Tlv_Session *session);
 void selectInstruction(Tlv_Session *session, Tlv *tlv);
 void programWorker(Tlv_Session *session);
 
+void haltTarget(Tlv_Session *session);
+void runTarget(Tlv_Session *session);
+
+void singleStepTarget(Tlv_Session *session);
+void multipleStepTarget(Tlv_Session *session, int nInstructions);
 #endif // ProgramWorker_H
