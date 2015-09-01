@@ -4,7 +4,7 @@
 #include "ProgramWorker.h"
 #include "CoreDebug_Utilities.h"
 #include "mock_IoOperations.h"
-#include "mock_uart.h"
+#include "mock_UART.h"
 #include "mock_CoreDebug.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
@@ -156,32 +156,32 @@ void test_haltTarget_should_return_ACK_if_successful()
   haltTarget(session);
 }
 
-void xtest_haltTarget_should_return_NACK_if_not_successful()
+void test_haltTarget_should_return_NACK_if_not_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateWorkerSession();
   
   setCoreMode_Expect(CORE_DEBUG_HALT);
-  // getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
-  
-  haltTarget(session);
-}
-
-/*--------------runTarget--------------------*/
-void xtest_runTarget_should_return_ACK_if_successful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
-  
-  setCoreMode_Expect(CORE_DEBUG_MODE);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
   
   haltTarget(session);
 }
 
-void xtest_runTarget_should_return_NACK_if_unsuccessful()
+/*--------------runTarget--------------------*/
+void test_runTarget_should_return_ACK_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateWorkerSession();
+
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  
+  runTarget(session);
+}
+
+void test_runTarget_should_return_NACK_if_unsuccessful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -190,7 +190,7 @@ void xtest_runTarget_should_return_NACK_if_unsuccessful()
   setCoreMode_Expect(CORE_DEBUG_MODE);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
   
-  haltTarget(session);  
+  runTarget(session);  
 }
 
 /*---------singleStepTarget----------------------*/

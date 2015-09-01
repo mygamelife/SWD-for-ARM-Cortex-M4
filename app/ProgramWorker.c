@@ -210,12 +210,13 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
 void haltTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
+  uint8_t error = ERR_NOT_HALTED ;
   setCoreMode(CORE_DEBUG_HALT);
   
   if(getCoreMode() == CORE_DEBUG_HALT)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, (uint8_t *)ERR_NOT_HALTED);
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &error);
   tlvSend(session, tlv);
 }
 
@@ -226,13 +227,15 @@ void haltTarget(Tlv_Session *session)
   */
 void runTarget(Tlv_Session *session)
 {
+  printf("Code : %x\n",CORE_DEBUG_MODE);
   Tlv *tlv ;
+  uint8_t error = ERR_NOT_RUNNING ;
   setCoreMode(CORE_DEBUG_MODE);
   
   if(getCoreMode() == CORE_DEBUG_MODE)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, (uint8_t *)ERR_NOT_RUNNING);
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &error);
   tlvSend(session, tlv);
 }
 
