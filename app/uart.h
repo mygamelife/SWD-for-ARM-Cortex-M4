@@ -2,15 +2,17 @@
 #define uart_H
 
 #if !defined(TEST)
-  #include "stm32f4xx_it.h"
   #include "stm32f4xx_hal.h"
 #endif
 
 #include <stdint.h>
 #include "configurePort.h"
+#include "stm32f4xx_it.h"
 #include "stm32f4xx_hal_uart.h"
 
+#if !defined(TEST)
 extern __IO ITStatus uartReady;
+#endif
 
 #define FIVE_SEC    5000
 #define TEN_SEC     10000

@@ -1,5 +1,32 @@
 #include "Tlv.h"
 
+#ifdef TEST
+int uartReady = SET;
+#endif
+
+/** tlvCreateSession is a function to create necessary element needed by TLV protocol */
+Tlv_Session *tlvCreateSession(void) {
+  static Tlv_Session session;
+  
+  /* get uart handler */
+  #ifdef HOST
+  session.handler = uartInit(UART_PORT, UART_BAUD_RATE);
+  #else
+  session.handler = uartInit();
+  #endif
+  
+  /* Initialize begining state for send and receive */
+  session.sendState = SEND_END;
+  session.receiveState = RECEIVE_BEGIN;
+  
+  /* Initialize all the required flag */
+  session.TIMEOUT_FLAG = false;
+  session.DATA_SEND_FLAG = false;
+  session.DATA_ARRIVE_FLAG = false;
+  
+  return &session;
+}
+
 /** tlvPackIntoBuffer is a function to pack currentBuffer into targetBuffer
   */
 void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length) {
@@ -44,7 +71,8 @@ Tlv *tlvCreatePacket(uint8_t command, int size, uint8_t *data) {
   * return  : NONE
   */
 void tlvSend(Tlv_Session *session, Tlv *tlv)  {  
-  session->SEND_DATA_FLAG = true;
+  session->DATA_SEND_FLAG = true;
+  session->sendState = SEND_BEGIN;
   
   session->txBuffer[0] = tlv->type;
   session->txBuffer[1] = tlv->length;
@@ -57,27 +85,30 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   *
   * return  : NONE
   */
-#ifndef HOST
+#ifdef HOST
 void tlvSendService(Tlv_Session *session) {
   int length = 0;
   
   // printf("hi\n");
-  if(session->SEND_DATA_FLAG == true) {
+  if(session->DATA_SEND_FLAG == true) {
     length = session->txBuffer[1] + 2;
     sendBytes(session->handler, session->txBuffer, length);
-    session->SEND_DATA_FLAG = false;
+    session->DATA_SEND_FLAG = false;
   }
 }
 
 #else
 void tlvSendService(Tlv_Session *session)	{
+  int length = 0;
+  
   switch(session->sendState)  {
-    case START_SEND :
-      if(session->SEND_DATA_FLAG == true) {
+    case SEND_BEGIN :
+      if(session->DATA_SEND_FLAG == true) {
         if(uartReady == SET)  {
+          length = session->txBuffer[1] + 2;
           sendBytes(session->handler, session->txBuffer, length);
           uartReady = RESET;
-          session->SEND_DATA_FLAG = false;
+          session->DATA_SEND_FLAG = false;
         }    
       }
       break;
@@ -110,12 +141,10 @@ Tlv *tlvReceive(Tlv_Session *session) {
   * return  : NONE
   */
 void tlvReceiveService(Tlv_Session *session) {
-  session->TIMEOUT_FLAG = false;
-  session->DATA_ARRIVE_FLAG = false;
   int length = 0;
-  
+
   switch(session->receiveState)  {
-    case START_RECEIVE :
+    case RECEIVE_BEGIN :
       if(!getBytes(session->handler, session->rxBuffer, 2))  {
         /* set DATA_ARRIVE_FLAG when packet is arrived */
         session->DATA_ARRIVE_FLAG = true;

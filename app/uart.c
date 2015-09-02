@@ -1,6 +1,7 @@
 #include "uart.h"
 
 UART_HandleTypeDef uartHandle;
+
 __IO ITStatus uartReady = SET;
 
 /**  initUart is a function to configure the UART peripheral
@@ -8,6 +9,7 @@ __IO ITStatus uartReady = SET;
   */
 UART_HandleTypeDef *uartInit(void) {
   static UART_HandleTypeDef *pHandler;
+  
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
   /* UART1 configured as follow:
       - Word Length = 8 Bits

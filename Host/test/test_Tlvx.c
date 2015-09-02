@@ -106,21 +106,7 @@ void test_tlvSendService_should_change_state_after_tlvSend_and_do_nothing_after_
   
   sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
   tlvSendService(&session);
-  
   TEST_ASSERT_EQUAL(false, session.DATA_SEND_FLAG);
-}
-
-void test_tlvSendService_should_not_send_when_uartReady_is_not_SET(void)
-{ 
-  uartReady = RESET;
-  Tlv_Session session;
-  uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
-	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-  tlvSend(&session, tlv);
-  
-  tlvSendService(&session);
-  
-  TEST_ASSERT_EQUAL(true, session.DATA_SEND_FLAG);
 }
 
 void test_tlvReceive_should_return_NULL_if_no_data_is_arrive(void)  {
@@ -177,9 +163,8 @@ void test_tlvReceiveService_rxBuffer_should_stored_null_if_no_data_arrive(void)
   Tlv_Session session;
   
   session.receiveState = RECEIVE_BEGIN;
-  session.DATA_ARRIVE_FLAG = false;
   
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x01); //no data arrive
+  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x01); //data arrive
   
   tlvReceiveService(&session);
   TEST_ASSERT_EQUAL(false, session.DATA_ARRIVE_FLAG);
@@ -210,7 +195,6 @@ void test_tlvService_should_able_to_receive_while_sending(void)
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   tlvSend(&session, tlv);
   session.receiveState = RECEIVE_BEGIN;
-  session.TIMEOUT_FLAG = false;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 5;
@@ -220,74 +204,15 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   session.rxBuffer[5] = 0xAA;
   session.rxBuffer[6] = 0xFF; //dummy chksum
   
-  uartReady = SET;
   sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
   getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x00);
   getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00);
   
   tlvService(&session);
   
-  TEST_ASSERT_EQUAL(false, session.DATA_SEND_FLAG);
   TEST_ASSERT_EQUAL(true, session.DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(false, session.DATA_SEND_FLAG);
   TEST_ASSERT_EQUAL(false, session.TIMEOUT_FLAG);
-}
-
-void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
-{
-  Tlv_Session session;
-  uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
-  
-	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-  tlvSend(&session, tlv);
-  session.receiveState = RECEIVE_BEGIN;
-  session.TIMEOUT_FLAG = false;
-  
-  session.rxBuffer[0] = TLV_WRITE_RAM;
-  session.rxBuffer[1] = 5;
-  session.rxBuffer[2] = 0xDD;
-  session.rxBuffer[3] = 0xCC;
-  session.rxBuffer[4] = 0xBB;
-  session.rxBuffer[5] = 0xAA;
-  session.rxBuffer[6] = 0xFF; //dummy chksum
-  
-  uartReady = RESET;
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x00);
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00);
-  tlvService(&session);
-  
-  uartReady = SET;
-  sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x00);
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00);
-  tlvService(&session);
-  
-  TEST_ASSERT_EQUAL(false, session.DATA_SEND_FLAG);
-  TEST_ASSERT_EQUAL(true, session.DATA_ARRIVE_FLAG);
-  TEST_ASSERT_EQUAL(false, session.TIMEOUT_FLAG);
-}
-
-void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
-{
-  Tlv_Session session;
-  uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
-  
-	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-  tlvSend(&session, tlv);
-  session.receiveState = RECEIVE_BEGIN;
-  session.TIMEOUT_FLAG = false;
-  
-  session.rxBuffer[0] = TLV_WRITE_RAM;
-  session.rxBuffer[1] = 5;
-  
-  uartReady = SET;
-  sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x00);
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x01); //timeout occur
-  tlvService(&session);
-  
-  TEST_ASSERT_EQUAL(false, session.DATA_SEND_FLAG);
-  TEST_ASSERT_EQUAL(true, session.DATA_ARRIVE_FLAG);
-  TEST_ASSERT_EQUAL(true, session.TIMEOUT_FLAG);
 }
 
 void test_tlvVerifyData_should_verify_the_data_in_the_given_tlv_packet(void)

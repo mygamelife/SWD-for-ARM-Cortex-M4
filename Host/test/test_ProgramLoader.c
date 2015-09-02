@@ -1,6 +1,5 @@
 #include "Tlv.h"
 #include "unity.h"
-#include <windows.h>
 #include "Tlv_ex.h"
 #include <malloc.h>
 #include "Read_File.h"
@@ -8,6 +7,7 @@
 #include "ProgramElf.h"
 #include "mock_uart.h"
 #include "ProgramLoader.h"
+#include "Tlv_ErrorCode.h"
 
 void setUp(void)  {}
 
@@ -17,7 +17,7 @@ void test_tlvWriteTargetRegister_should_send_register_address_and_data_to_probe_
 {
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
-	Tlv_Session *session = tlvCreateLoaderSession();
+	Tlv_Session *session = tlvCreateSession();
   
   uint32_t address = 0x12345678;
   uint32_t data = 0xDEADBEEF;
@@ -35,7 +35,7 @@ void test_tlvReadTargetRegister_should_send_register_address_to_probe_using_UART
 {
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
-	Tlv_Session *session = tlvCreateLoaderSession();
+	Tlv_Session *session = tlvCreateSession();
   
   uint32_t address = 0x12345678;
   

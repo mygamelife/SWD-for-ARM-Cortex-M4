@@ -15,9 +15,10 @@ typedef struct
 
 typedef enum
 {
-  START_SEND,
-  END_SEND,
-  START_RECEIVE
+  SEND_BEGIN,
+  SEND_END,
+  RECEIVE_BEGIN,
+  RECEIVE_END
 } Tlv_State;
 
 typedef enum
@@ -31,13 +32,11 @@ typedef struct
   void *handler;
   uint8_t txBuffer[255];
   uint8_t rxBuffer[255];
-  // Tlv *tlv tlvPacket;
   Tlv_State sendState;
   Tlv_State receiveState;
-  Tlv_Transmission_State tState;
   bool TIMEOUT_FLAG;
   bool DATA_ARRIVE_FLAG;
-  bool SEND_DATA_FLAG;
+  bool DATA_SEND_FLAG;
 } Tlv_Session;
 
 /* Tlv Command */
@@ -64,15 +63,6 @@ typedef enum
 {
   TLV_NOT_OK = 2
 } Tlv_Nack;
-
-typedef enum
-{
-  ERR_TIME_OUT = 1,
-  ERR_CORRUPTED_DATA,
-  ERR_INVALID_COMMAND,
-  ERR_NOT_HALTED,
-  ERR_NOT_RUNNING
-} Tlv_ErrorCode;
 
 typedef enum  {
   DATA_VALID = 0,
