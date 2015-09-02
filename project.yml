@@ -29,7 +29,6 @@
   :source:
     - app/Tlv**
     - app/**
-    - src/**
   :support:
     - test/support
 

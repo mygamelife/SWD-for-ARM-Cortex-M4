@@ -230,7 +230,7 @@ void runTarget(Tlv_Session *session)
 void singleStepTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t errorCode = ERR_NOT_STEPPED ;
+  uint8_t errorCode = TLV_NOT_STEPPED ;
   uint32_t data = 0 ;
   
   setCoreMode(CORE_SINGLE_STEP);
@@ -255,7 +255,7 @@ void singleStepTarget(Tlv_Session *session)
 void multipleStepTarget(Tlv_Session *session,int nInstructions)
 {
   Tlv *tlv ;
-  uint8_t errorCode = ERR_NOT_STEPPED ;
+  uint8_t errorCode = TLV_NOT_STEPPED ;
   uint32_t data = 0 ;
   
   stepOnly(nInstructions);

@@ -68,7 +68,7 @@ void test_writeTargetRegister_given_register_address_and_data(void)
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   uint32_t address = 0xABCDABCE, data = 0x12345678;
   
@@ -81,7 +81,7 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
 
   uint32_t address = 0xBEEFBEEF, data = 0;
   
@@ -96,7 +96,7 @@ void test_performSoftResetOnTarget_should_call_softResetTarget_and_send_TLV_ack(
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_SYSTEM_RESET,NO_ERROR);
   
@@ -108,7 +108,7 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   hardResetTarget_Expect();
   
@@ -149,7 +149,7 @@ void test_haltTarget_should_return_ACK_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_DEBUG_HALT);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
@@ -161,7 +161,7 @@ void test_haltTarget_should_return_NACK_and_ERR_NOT_HALTED_if_not_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_DEBUG_HALT);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
@@ -174,7 +174,7 @@ void test_runTarget_should_return_ACK_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
 
   setCoreMode_Expect(CORE_DEBUG_MODE);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
@@ -186,7 +186,7 @@ void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_DEBUG_MODE);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
@@ -199,7 +199,7 @@ void test_singleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_SINGLE_STEP);
   getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
@@ -212,7 +212,7 @@ void test_singleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessfu
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_SINGLE_STEP);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
@@ -224,7 +224,7 @@ void test_multipleStepTarget_should_step_readPC_run_and_return_PC_if_successful(
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   stepOnly_Expect(5);
   getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
@@ -237,7 +237,7 @@ void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccess
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   stepOnly_Expect(5);
   getCoreMode_ExpectAndReturn(CORE_NORMAL_MODE);
@@ -250,9 +250,9 @@ void xtest_setBreakpoint_should_set_breakpoint_and_return_PC_if_breakpoint_occur
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
-  selectNextFreeInstructionComparator_ExpectAndReturn(INSTRUCTION_COMP1);
+  // selectNextFreeComparator_ExpectAndReturn(INSTRUCTION_TYPE,INSINSTRUCTION_COMP1);
 
   readCoreRegister_Ignore();
   
@@ -263,7 +263,7 @@ void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_NOTHIT_if_breakpoint_do
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setBreakpoint(0x12345678,MATCH_UPPERHALFWORD);
 }
@@ -272,7 +272,7 @@ void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparato
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateWorkerSession();
+  Tlv_Session *session = tlvCreateSession();
   
   setBreakpoint(0x12345678,MATCH_LOWERHALFWORD);
 }

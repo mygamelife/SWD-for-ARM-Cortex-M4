@@ -64,18 +64,6 @@ typedef enum
   TLV_NOT_OK = 2
 } Tlv_Nack;
 
-typedef enum
-{
-  ERR_TIME_OUT = 1,
-  ERR_CORRUPTED_DATA,
-  ERR_INVALID_COMMAND,
-  ERR_NOT_HALTED,
-  ERR_NOT_RUNNING,
-  ERR_NOT_STEPPED,
-  ERR_BKPT_NOTHIT,
-  ERR_BKPT_MAXSET,
-} Tlv_ErrorCode;
-
 typedef enum  {
   DATA_VALID = 0,
   DATA_INVALID
