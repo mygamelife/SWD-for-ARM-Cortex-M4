@@ -41,9 +41,11 @@
   :test:
     - *common_defines
     - TEST=
+    - HOST=
   :test_preprocess:
     - *common_defines
     - TEST=
+    - HOST=
 
 :cmock:
   :mock_prefix: mock_

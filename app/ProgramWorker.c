@@ -210,7 +210,7 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
 void haltTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t error = ERR_NOT_HALTED ;
+  uint8_t errorCode = ERR_NOT_HALTED ;
   setCoreMode(CORE_DEBUG_HALT);
   
   if(getCoreMode() == CORE_DEBUG_HALT)
@@ -227,9 +227,8 @@ void haltTarget(Tlv_Session *session)
   */
 void runTarget(Tlv_Session *session)
 {
-  printf("Code : %x\n",CORE_DEBUG_MODE);
   Tlv *tlv ;
-  uint8_t error = ERR_NOT_RUNNING ;
+  uint8_t errorCode = ERR_NOT_RUNNING ;
   setCoreMode(CORE_DEBUG_MODE);
   
   if(getCoreMode() == CORE_DEBUG_MODE)
