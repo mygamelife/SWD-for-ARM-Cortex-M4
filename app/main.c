@@ -1,7 +1,5 @@
 #include "main.h"
 
-void dummyThrow(void);
-
 int main(void)
 {
   uint32_t idr = 0, dataRead = 0, dataRead2 = 0;
@@ -9,8 +7,8 @@ int main(void)
 
   /* Hardware configuration */
   HAL_Init();
-  configureUartPorts();
   configure_IOPorts();
+  configureLED();
   SystemClock_Config();
 
   /* Hardware reset target board */
@@ -20,18 +18,24 @@ int main(void)
   /* Power Up AHB Port */
   errorCode = readAhbIDR(&idr);
 
-  Tlv_Session session;
-  Tlv *tlv;
+  Tlv_Session *session = tlvCreateSession();
 
-  session.handler = uartInit();
-  session.receiveState = START_RECEIVE;
-  session.sendState = END_SEND;
+  //uint8_t buffer[] = {0xDD, 0xCC, 0xBB, 0xAA};
+  //Tlv *tlv = tlvCreatePacket(TLV_WRITE_REGISTER, sizeof(buffer), buffer);
+  Tlv *received;
+  //tlvSend(session, tlv);
 
   while(1)
   {
-	  tlvService(&session);
-	  tlv = tlvReceive(&session);
-	  if(tlv != NULL)
-		  tlvSend(&session, tlv);
+    tlvService(session);
+    if(session->DATA_ARRIVE_FLAG == true) {
+      received = tlvReceive(session);
+      tlvSend(session, received);
+    }
+  }
+
+  while(1)
+  {
+
   }
 }
