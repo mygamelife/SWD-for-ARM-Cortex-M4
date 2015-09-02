@@ -109,9 +109,15 @@
     <File name="Code/CoreDebug.h" path="app/CoreDebug.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_usart.c" path="app/Hardware/stm32f4xx_hal_usart.c" type="1"/>
     <File name="Hardware/startup_stm32f429xx.s" path="app/Hardware/startup_stm32f429xx.s" type="1"/>
+<<<<<<< HEAD
     <File name="Hardware/stm32f4xx_hal_pwr.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c" type="1"/>
     <File name="Core/core_cmFunc.h" path="app/Hardware/core_cmFunc.h" type="1"/>
     <File name="Hardware/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
+=======
+    <File name="Hardware/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_pwr.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c" type="1"/>
+    <File name="Core/core_cmFunc.h" path="app/Hardware/core_cmFunc.h" type="1"/>
+>>>>>>> d077a321300c8d7404970b228378e8292c20460b
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c" type="1"/>
     <File name="STM32F4/system_stm32f4xx.c" path="app/system_stm32f4xx.c" type="1"/>
     <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
@@ -119,9 +125,15 @@
     <File name="Code/Tlv.c" path="app/Tlv/Tlv.c" type="1"/>
     <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
     <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
+<<<<<<< HEAD
     <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Projects/STM32F429I-Discovery/Templates/Src/stm32f4xx_it.c" type="1"/>
     <File name="Code/Read_File.h" path="app/Read_File.h" type="1"/>
+=======
+    <File name="Code/Read_File.h" path="app/Read_File.h" type="1"/>
+    <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
+    <File name="Hardware/stm32f4xx_it.c" path="../stm32cubef4/STM32Cube_FW_F4_V1.5.0/Projects/STM32F429I-Discovery/Templates/Src/stm32f4xx_it.c" type="1"/>
+>>>>>>> d077a321300c8d7404970b228378e8292c20460b
     <File name="Code/swdStub.c" path="app/swdStub.c" type="1"/>
     <File name="Code/Misc_Utilities.c" path="app/Misc_Utilities.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="../STM32Cube_FW_F4_V1.5.0/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c" type="1"/>

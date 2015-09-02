@@ -31,26 +31,6 @@
 							__GPIOG_CLK_ENABLE();	\
 					}while(0)
 
-/* Definition for USARTx clock resources */
-#define USARTx                           USART1
-#define USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE();
-#define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-#define USARTx_TX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
-
-#define USARTx_FORCE_RESET()             __HAL_RCC_USART2_FORCE_RESET()
-#define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
-
-/* USARTx Baud Rate */
-#define USART_BAUD_RATE                  9600//115200
-
-/* Definition for USARTx Pins */
-#define USARTx_TX_PIN                    GPIO_PIN_9
-#define USARTx_TX_GPIO_PORT              GPIOA
-#define USARTx_TX_AF                     GPIO_AF7_USART1
-#define USARTx_RX_PIN                    GPIO_PIN_10
-#define USARTx_RX_GPIO_PORT              GPIOA
-#define USARTx_RX_AF                     GPIO_AF7_USART1
-
 /* Button configuration */
 #define BUTTON_CLK_ENABLE()              __HAL_RCC_GPIOA_CLK_ENABLE()
 #define BUTTON_PORT                      GPIOA
@@ -65,6 +45,5 @@ void configure_IOPorts();
 void configureLED();
 void initButton();
 uint32_t Button_GetState();
-void configureUartPorts();
 
 #endif // configurePort_H

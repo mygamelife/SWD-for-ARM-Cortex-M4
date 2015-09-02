@@ -75,22 +75,6 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
   memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
 }
 
-/** tlvCreateSession is a function to create necessary element needed by TLV protocol */
-Tlv_Session *tlvCreateWorkerSession(void) {
-  static Tlv_Session session;
-  
-  session.handler = uartInit();
-  /* Set Initial state for send and receive*/
-  session.sendState = END_SEND;
-  session.receiveState = START_RECEIVE;
-  
-  session.tState = TRANSMISSION_FREE;
-  session.TIMEOUT_FLAG = false;
-  session.DATA_ARRIVE_FLAG = false;
-  
-  return &session;
-}
-
 /** writeTargetRegister is a function to write value into target register using swd
   *
   * input     : session contain a element/handler used by tlv protocol
@@ -168,7 +152,7 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
     case TLV_STEP           : break;
     
     default :
-      errorCode = ERR_INVALID_COMMAND;
+      errorCode = TLV_INVALID_COMMAND;
       error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
       tlvSend(session, error);
       break;
@@ -193,7 +177,7 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
         // selectInstruction(session, packet);
       // }
       // else  {
-        // errorCode = ERR_CORRUPTED_DATA;
+        // errorCode = TLV_CORRUPTED_DATA;
         // error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
         // tlvSend(session, error);
       // }
@@ -210,7 +194,7 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
 void haltTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t errorCode = ERR_NOT_HALTED ;
+  uint8_t errorCode = TLV_NOT_HALTED ;
   setCoreMode(CORE_DEBUG_HALT);
   
   if(getCoreMode() == CORE_DEBUG_HALT)
@@ -228,7 +212,7 @@ void haltTarget(Tlv_Session *session)
 void runTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t errorCode = ERR_NOT_RUNNING ;
+  uint8_t errorCode = TLV_NOT_RUNNING ;
   setCoreMode(CORE_DEBUG_MODE);
   
   if(getCoreMode() == CORE_DEBUG_MODE)

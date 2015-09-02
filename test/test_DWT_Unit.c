@@ -28,8 +28,8 @@ void test_setAddressWatchpoint_given_DWT_COMP0_address_0x12345677_mask_WATCHPOIN
   cswDataSize = CSW_BYTE_SIZE ;
 
   //Enable Global enable for DWT
-  emulateSwdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
-  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM);
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DEMCR_REG+3);
+  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM << 24);
 
   // Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
@@ -71,7 +71,7 @@ void test_setDataWatchpoint_MatchingOneComparator()
 
   //Enable Global enable for DWT
   emulateSwdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
-  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM);
+  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM <<24 );
 
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
@@ -118,13 +118,13 @@ void test_setDataWatchpoint_MatchingTwoComparator()
 {
   uint32_t configData = 0 ;
   configData = (3 << 16) + (2 << 12) + (WATCHPOINT_BYTE << 10) + (DATA_COMPARISON << 8) + WATCHPOINT_READWRITE ;
-  
+
   //Faking CSW to Byte Size
   cswDataSize = CSW_BYTE_SIZE ;
 
   //Enable Global enable for DWT
   emulateSwdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
-  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM);
+  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM <<24);
 
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
@@ -145,6 +145,22 @@ void test_setDataWatchpoint_MatchingTwoComparator()
   //Program 1st matching mask 
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)(&DWT_COMP[2].MASK));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,WATCHPOINT_MASK_BIT0);
+  
+  //Set CSW to Byte Size
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
+  
+  //Enable Global enable for DWT
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
+  emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_DWT_ITM <<24);
+  
+  //Set CSW to Word Size
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Set CORE_DEBUG_MODE
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xA05F0001);
   
   //Disable 2nd matching comparator
 	emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)(&DWT_COMP[3].FUNCTION));

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 <breakpoints>
 <breakpoint enabled="true" persistant="true" registered="true">
 <resource path="/SWD-for-ARM-Cortex-M4/Code/main.c" type="1"/>
@@ -21,3 +22,6 @@
 </marker>
 </breakpoint>
 </breakpoints>
+=======
+<breakpoints/>
+>>>>>>> d077a321300c8d7404970b228378e8292c20460b
