@@ -1,6 +1,6 @@
 #include "Tlv.h"
 
-#ifdef TEST
+#if !defined (HOST)
 int uartReady = SET;
 #endif
 
@@ -9,7 +9,7 @@ Tlv_Session *tlvCreateSession(void) {
   static Tlv_Session session;
   
   /* get uart handler */
-  #ifdef HOST
+  #ifdef HOST//__GNUC__
   session.handler = uartInit(UART_PORT, UART_BAUD_RATE);
   #else
   session.handler = uartInit();
@@ -85,19 +85,18 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   *
   * return  : NONE
   */
-#ifdef HOST
+#ifdef HOST//__GNUC__
 void tlvSendService(Tlv_Session *session) {
   int length = 0;
   
-  // printf("hi\n");
   if(session->DATA_SEND_FLAG == true) {
     length = session->txBuffer[1] + 2;
     sendBytes(session->handler, session->txBuffer, length);
     session->DATA_SEND_FLAG = false;
   }
 }
-
 #else
+/* uartReady is varibale used by the uart callback service routine */
 void tlvSendService(Tlv_Session *session)	{
   int length = 0;
   
