@@ -216,7 +216,7 @@ void haltTarget(Tlv_Session *session)
   if(getCoreMode() == CORE_DEBUG_HALT)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &error);
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
   tlvSend(session, tlv);
 }
 
@@ -234,7 +234,7 @@ void runTarget(Tlv_Session *session)
   if(getCoreMode() == CORE_DEBUG_MODE)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &error);
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
   tlvSend(session, tlv);
 }
 
@@ -245,13 +245,20 @@ void runTarget(Tlv_Session *session)
   */
 void singleStepTarget(Tlv_Session *session)
 {
+  Tlv *tlv ;
+  uint8_t errorCode = ERR_NOT_STEPPED ;
   uint32_t data = 0 ;
   
   setCoreMode(CORE_SINGLE_STEP);
-  readCoreRegister(CORE_REG_PC, &data);
-  setCoreMode(CORE_DEBUG_MODE);
   
-  Tlv *tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
+  if(getCoreMode() == CORE_SINGLE_STEP)
+  {
+    readCoreRegister(CORE_REG_PC, &data);
+    tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
+  } 
+  else
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  
   tlvSend(session, tlv);
 }
 
@@ -263,12 +270,24 @@ void singleStepTarget(Tlv_Session *session)
   */
 void multipleStepTarget(Tlv_Session *session,int nInstructions)
 {
+  Tlv *tlv ;
+  uint8_t errorCode = ERR_NOT_STEPPED ;
   uint32_t data = 0 ;
   
   stepOnly(nInstructions);
-  readCoreRegister(CORE_REG_PC, &data);
-  setCoreMode(CORE_DEBUG_MODE);
   
-  Tlv *tlv = tlvCreatePacket(TLV_MULTI_STEP,4, (uint8_t *)&data);
+  if(getCoreMode() == CORE_SINGLE_STEP)
+  {
+    readCoreRegister(CORE_REG_PC, &data);
+    tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
+  } 
+  else
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  
   tlvSend(session, tlv);
+}
+
+void setBreakpoint(uint32_t instructionAddress,int matchingMode)
+{
+  
 }

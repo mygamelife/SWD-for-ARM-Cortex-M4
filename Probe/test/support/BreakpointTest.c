@@ -12,7 +12,7 @@ void instructionBreakPointTestCase_2bytes_LowerHalfWord()
 {
   uint32_t PC = 0  ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
   setCoreMode(CORE_DEBUG_MODE);
@@ -37,7 +37,7 @@ void instructionBreakPointTestCase_2bytes_UpperHalfWord()
 {
   uint32_t PC = 0 ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP1,0x080003C0,MATCH_UPPERHALFWORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP1,0x080003C0,MATCH_UPPERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
   setCoreMode(CORE_DEBUG_MODE);
@@ -62,7 +62,7 @@ void instructionBreakPointTestCase_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C0,MATCH_WORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C0,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
   setCoreMode(CORE_DEBUG_MODE);
@@ -88,7 +88,7 @@ void instructionBreakPointTestCase_4bytes_UpperHalfWord()
 {
 	  uint32_t PC = 0 ;
 
-	  setInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_UPPERHALFWORD);
+	  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_UPPERHALFWORD);
 
 	  writeCoreRegister(CORE_REG_PC,0x080003B0);
 	  setCoreMode(CORE_DEBUG_MODE);
@@ -115,7 +115,7 @@ void instructionBreakPointTestCase_4bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_WORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003B0);
   setCoreMode(CORE_DEBUG_MODE);
@@ -143,7 +143,7 @@ void instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
 {
   uint32_t PC = 0 ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_LOWERHALFWORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_LOWERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003D0);
   setCoreMode(CORE_DEBUG_MODE);
@@ -172,7 +172,7 @@ void instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_WORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003D0);
   setCoreMode(CORE_DEBUG_MODE);
@@ -199,7 +199,7 @@ void instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  setInstructionBreakpoint(INSTRUCTION_COMP3,0x080003E4,MATCH_WORD);
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003E4,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003E0);
   setCoreMode(CORE_DEBUG_MODE);

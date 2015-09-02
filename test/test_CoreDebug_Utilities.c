@@ -1,7 +1,6 @@
 #include "unity.h"
 #include <stdint.h>
 #include "CoreDebug_Utilities.h"
-#include "Misc_Utilities.h"
 
 void setUp(void)  {}
 

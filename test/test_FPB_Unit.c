@@ -5,7 +5,6 @@
 #include "Delay.h"
 #include "CoreDebug.h"
 #include "CoreDebug_Utilities.h"
-#include "Misc_Utilities.h"
 #include "Emulator.h"
 #include "Register_ReadWrite.h"
 #include "swd_Utilities.h"
@@ -41,9 +40,9 @@ void test_disablePBUnit_should_write_DISABLE_FPB_to_FP_CTRL()
   disableFPBUnit();
 }
 
-/*-------------------------setInstructionBreakpoint-----------------------*/
+/*-------------------------manualSetInstructionBreakpoint-----------------------*/
 //MATCH_LOWERHALFWORD
-void test_setInstructionBreakpoint_givenINSTRUCTION_COMP1_address_0xFFFFFFFF_MATCH_LOWERHALFWORD()
+void test_manualSetInstructionBreakpoint_givenINSTRUCTION_COMP1_address_0xFFFFFFFF_MATCH_LOWERHALFWORD()
 {
   //disableFPBUnit
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
@@ -61,11 +60,11 @@ void test_setInstructionBreakpoint_givenINSTRUCTION_COMP1_address_0xFFFFFFFF_MAT
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
 	emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_FPB);
   
-  TEST_ASSERT_EQUAL(0,setInstructionBreakpoint(INSTRUCTION_COMP1,0xFFFFFFFF,MATCH_LOWERHALFWORD));
+  TEST_ASSERT_EQUAL(0,manualSetInstructionBreakpoint(INSTRUCTION_COMP1,0xFFFFFFFF,MATCH_LOWERHALFWORD));
 }
 
 //MATCH_UPPERHALFWORD
-void test_setInstructionBreakpoint_givenINSTRUCTION_COMP2_address_0xA55AA55A_MATCH_UPPERHALFWORD()
+void test_manualSetInstructionBreakpoint_givenINSTRUCTION_COMP2_address_0xA55AA55A_MATCH_UPPERHALFWORD()
 {
   //disableFPBUnit
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
@@ -83,11 +82,11 @@ void test_setInstructionBreakpoint_givenINSTRUCTION_COMP2_address_0xA55AA55A_MAT
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
 	emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_FPB);
   
-  TEST_ASSERT_EQUAL(0,setInstructionBreakpoint(INSTRUCTION_COMP2,0xA55AA55A,MATCH_UPPERHALFWORD));
+  TEST_ASSERT_EQUAL(0,manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0xA55AA55A,MATCH_UPPERHALFWORD));
 }
 
 //MATCH_WORD
-void test_setInstructionBreakpoint_givenINSTRUCTION_COMP3_address_0x02345670_MATCH_WORD()
+void test_manualSetInstructionBreakpoint_givenINSTRUCTION_COMP3_address_0x02345670_MATCH_WORD()
 {
   //disableFPBUnit
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
@@ -105,11 +104,11 @@ void test_setInstructionBreakpoint_givenINSTRUCTION_COMP3_address_0x02345670_MAT
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
 	emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_FPB);
   
-  TEST_ASSERT_EQUAL(0,setInstructionBreakpoint(INSTRUCTION_COMP3,0x02345670,MATCH_WORD));
+  TEST_ASSERT_EQUAL(0,manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x02345670,MATCH_WORD));
 }
 
-/*-------------------------setInstructionRemapping-----------------------*/
-void test_setInstructionRemapping_should_program_FP_REMAP_and_comparator()
+/*-------------------------manualSetInstructionRemapping-----------------------*/
+void test_manualSetInstructionRemapping_should_program_FP_REMAP_and_comparator()
 {
   //disableFPBUnit
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
@@ -131,10 +130,10 @@ void test_setInstructionRemapping_should_program_FP_REMAP_and_comparator()
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
 	emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_FPB);
   
-  TEST_ASSERT_EQUAL(0,setInstructionRemapping(INSTRUCTION_COMP0,0x02345670,0x22222222));
+  TEST_ASSERT_EQUAL(0,manualSetInstructionRemapping(INSTRUCTION_COMP0,0x02345670,0x22222222));
 }
-/*-------------------------setLiteralRemapping-----------------------*/
-void test_setLiteralRemapping_should_program_FP_REMAP_and_literal_Comparator()
+/*-------------------------manualSetLiteralRemapping-----------------------*/
+void test_manualSetLiteralRemapping_should_program_FP_REMAP_and_literal_Comparator()
 {
   //disableFPBUnit
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
@@ -156,7 +155,7 @@ void test_setLiteralRemapping_should_program_FP_REMAP_and_literal_Comparator()
   emulateSwdRegisterWrite(TAR_REG,AP,4,FP_CTRL);
 	emulateSwdRegisterWrite(DRW_REG,AP,4,ENABLE_FPB);
   
-  TEST_ASSERT_EQUAL(0,setLiteralRemapping(LITERAL_COMP1,0x12345678,0x3456789A));
+  TEST_ASSERT_EQUAL(0,manualSetLiteralRemapping(LITERAL_COMP1,0x12345678,0x3456789A));
 }
 
 /*-------------------------disableFPComparator-----------------------*/

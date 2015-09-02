@@ -4,7 +4,6 @@
 #include "DWT_Utilities.h"
 #include "CoreDebug.h"
 #include "CoreDebug_Utilities.h"
-#include "Misc_Utilities.h"
 #include "Emulator.h"
 #include "Register_ReadWrite.h"
 #include "swd_Utilities.h"

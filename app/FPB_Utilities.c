@@ -1,81 +1,59 @@
 #include "FPB_Utilities.h"
+int instructionComparatorReady[6] = {};
+int literalComparatorReady[2] = {};
 
-
-int checkForValidInstructionComparator(uint32_t instructionCOMPno)
+int checkForValidInstructionComparator(int instructionCOMPno)
 {
   int result = - 1;
   
-  switch(instructionCOMPno)
-  {
-    case INSTRUCTION_COMP0  :
-                              result = 1;
-                              break ;
-    case INSTRUCTION_COMP1  :
-                              result = 1;
-                              break ;
-    case INSTRUCTION_COMP2  :
-                              result = 1;
-                              break ;
-    case INSTRUCTION_COMP3  :
-                              result = 1;
-                              break ;
-    case INSTRUCTION_COMP4  :
-                              result = 1;
-                              break ;
-    case INSTRUCTION_COMP5  :
-                              result = 1;
-                              break ;
-    default                 :
-                              break ;
-  }
+  if(instructionCOMPno >= 0 && instructionCOMPno <= 5)
+    result = 1;
   
   return result ;
 }
 
-int checkForValidLiteralComparator(uint32_t literalCOMPno)
+int checkForValidLiteralComparator(int literalCOMPno)
 {
   int result = - 1;
   
-  if(literalCOMPno == LITERAL_COMP0 || literalCOMPno == LITERAL_COMP1)
+  if(literalCOMPno == 0 || literalCOMPno == 1)
     result = 1 ;
   
   return result ;
 }
 
-int checkForValidFPComparator(uint32_t compNo)
+/**
+ *  Use to select the next free/available instruction comparator to use
+ *
+ *  Output : return INSTRUCTION_COMP0 - INSTRUCTION_COMP5 if any one of them is free and INSTRUCTION_TYPE is chosen
+ *           return LITERAL_COMP0     - LITERAL_COMP1 if any one of them is free and LITERAL_TYPE is chosen
+ *           return -1 if all the comparators are busy
+ *
+ */
+uint32_t selectNextFreeComparator(int comparatorType)
 {
-   int result = - 1;
+  int *compFlagPtr ;
+  int nextComparator = 0 ;
+  int max = 0 ;
   
-  switch(compNo)
+  readAndUpdateComparatorReadyFlag(comparatorType);
+  
+  if(comparatorType == INSTRUCTION_TYPE)
   {
-    case FP_COMP0  :
-                     result = 1;
-                     break ;
-    case FP_COMP1  :
-                     result = 1;
-                     break ;
-    case FP_COMP2  :
-                     result = 1;
-                     break ;
-    case FP_COMP3  :
-                     result = 1;
-                     break ;
-    case FP_COMP4  :
-                     result = 1;
-                     break ;                 
-    case FP_COMP5  :
-                     result = 1;
-                     break ;   
-    case FP_COMP6  :
-                     result = 1;
-                     break ;
-    case FP_COMP7  :
-                     result = 1;
-                     break ;                  
-    default        :
-                     break ;
+    max = INSTRUCTION_COMP_NUM;
+    compFlagPtr = &(instructionComparatorReady[0]);
+  }
+  else
+  {
+    max = LITERAL_COMP_NUM;
+    compFlagPtr = &(literalComparatorReady[0]);
   }
   
-  return result ;
-}
+  for(nextComparator = 0 ; nextComparator < max ; nextComparator++)
+  {
+    if(compFlagPtr[nextComparator] == COMP_READY)
+      return nextComparator;
+  }
 
+  return -1 ;
+}

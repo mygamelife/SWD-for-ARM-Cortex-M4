@@ -2,9 +2,16 @@
 #define swd_Utilities_H
 
 #include <stdint.h>
-#include "Misc_Utilities.h"
 #include "Register_ReadWrite.h"
 
+
+typedef enum
+{
+  NO_ERROR = 0,
+  ERR_ACK_WAIT_RESPONSE = -1,
+  ERR_ACK_FAULT_RESPONSE = -2,
+	ERR_INVALID_PARITY_RECEIVED ,
+}ErrorCode;
 
 //SWD Protocol bit sequence
 #define DP 0

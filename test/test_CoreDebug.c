@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include "CoreDebug.h"
 #include "CoreDebug_Utilities.h"
-#include "Misc_Utilities.h"
 #include "Emulator.h"
 #include "Register_ReadWrite.h"
 #include "swd_Utilities.h"
@@ -11,8 +10,6 @@
 #include "core_cm4.h"
 #include "mock_configurePort.h"
 #include "mock_LowLevelIO.h"
-
-
 
 void setUp(void)
 {
