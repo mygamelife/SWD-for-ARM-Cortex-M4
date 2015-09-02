@@ -43,12 +43,12 @@ Tlv *tlvCreatePacket(uint8_t command, int size, uint8_t *data) {
   *
   * return  : NONE
   */
-void tlvSend(Tlv_Session *session, Tlv *tlv)  {
+void tlvSend(Tlv_Session *session, Tlv *tlv)  {  
+  session->SEND_DATA_FLAG = true;
   
   session->txBuffer[0] = tlv->type;
   session->txBuffer[1] = tlv->length;
   tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length);
-  session->sendState = START_SEND;
 }
 
 /** tlvSendService is a state machine to handle the tlvSend
@@ -57,23 +57,33 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   *
   * return  : NONE
   */
+#ifndef HOST
 void tlvSendService(Tlv_Session *session) {
-  int length = session->txBuffer[1] + 2;
+  int length = 0;
   
+  // printf("hi\n");
+  if(session->SEND_DATA_FLAG == true) {
+    length = session->txBuffer[1] + 2;
+    sendBytes(session->handler, session->txBuffer, length);
+    session->SEND_DATA_FLAG = false;
+  }
+}
+
+#else
+void tlvSendService(Tlv_Session *session)	{
   switch(session->sendState)  {
     case START_SEND :
-      session->tState = TRANSMISSION_BUSY;
-      sendBytes(session->handler, session->txBuffer, length);
-      session->tState = TRANSMISSION_FREE;
-      
-      session->sendState = END_SEND;
-      break;
-      
-    case END_SEND :
-      // do nothing
+      if(session->SEND_DATA_FLAG == true) {
+        if(uartReady == SET)  {
+          sendBytes(session->handler, session->txBuffer, length);
+          uartReady = RESET;
+          session->SEND_DATA_FLAG = false;
+        }    
+      }
       break;
   }
 }
+#endif
 
 /** tlvReceive is a function to receive tlv packet
   *

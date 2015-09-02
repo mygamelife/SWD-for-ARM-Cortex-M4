@@ -28,7 +28,7 @@
     - -:test/support
   :source:
     - app/Tlv**
-    - app/**
+    # - app/**
     - src/**
   :support:
     - test/support

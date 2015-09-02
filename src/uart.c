@@ -63,7 +63,6 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
     DWORD errId = GetLastError();
     printf("WriteFile Error: %d\n", errId);
     // printLastError();
-    return HAL_ERROR;
 	}
   if(dwBytesRead > 0)
     return UART_OK;
@@ -81,7 +80,7 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
     DWORD errId = GetLastError();
     printf("ReadFile Error: %d\n", errId);
   }
-  
+  // printf("dwBytesRead %d\n", dwBytesRead);
   if(dwBytesRead > 0)
     return UART_OK;
   

@@ -37,6 +37,7 @@ typedef struct
   Tlv_Transmission_State tState;
   bool TIMEOUT_FLAG;
   bool DATA_ARRIVE_FLAG;
+  bool SEND_DATA_FLAG;
 } Tlv_Session;
 
 /* Tlv Command */
