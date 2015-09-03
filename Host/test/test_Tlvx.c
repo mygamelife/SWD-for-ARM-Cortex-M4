@@ -218,21 +218,21 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   TEST_ASSERT_EQUAL(false, session.TIMEOUT_FLAG);
 }
 
-void test_tlvVerifyData_should_verify_the_data_in_the_given_tlv_packet(void)
+void test_verifyTlvData_should_verify_the_data_in_the_given_tlv_packet(void)
 {
   uint8_t buffer[] = {0xEF, 0xBE, 0xAD, 0xDE};
   
   Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
 	
-  TEST_ASSERT_EQUAL(DATA_VALID, tlvVerifyData(tlv));
+  TEST_ASSERT_EQUAL(1, verifyTlvData(tlv));
 }
 
-void test_tlvVerifyData_given_wrong_length_should_return_data_invalid(void)
+void test_verifyTlvData_given_wrong_length_should_return_data_invalid(void)
 {
   uint8_t buffer[] = {0xEF, 0xBE, 0xAD, 0xDE};
   
   Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
 	tlv->length = 2;
   
-  TEST_ASSERT_EQUAL(DATA_INVALID, tlvVerifyData(tlv));
+  TEST_ASSERT_EQUAL(0, verifyTlvData(tlv));
 }

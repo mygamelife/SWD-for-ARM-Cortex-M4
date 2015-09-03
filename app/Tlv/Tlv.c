@@ -16,13 +16,18 @@ Tlv_Session *tlvCreateSession(void) {
   #endif
   
   /* Initialize begining state for send and receive */
-  session.sendState = SEND_END;
+  session.sendState = SEND_BEGIN;
   session.receiveState = RECEIVE_BEGIN;
   
   /* Initialize all the required flag */
   session.TIMEOUT_FLAG = false;
   session.DATA_SEND_FLAG = false;
   session.DATA_ARRIVE_FLAG = false;
+  
+  session.readRegisterState = SEND_PACKET;
+  session.writeRegisterState = SEND_PACKET;
+  session.writeRAMState = SEND_PACKET;
+  session.readRAMState = SEND_PACKET;
   
   return &session;
 }
@@ -53,7 +58,7 @@ void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length
   *
   * return  : return a TLV type pointer address
   */
-Tlv *tlvCreatePacket(uint8_t command, int size, uint8_t *data) {
+Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   static Tlv tlv;
   
   tlv.type = command;
@@ -72,7 +77,6 @@ Tlv *tlvCreatePacket(uint8_t command, int size, uint8_t *data) {
   */
 void tlvSend(Tlv_Session *session, Tlv *tlv)  {  
   session->DATA_SEND_FLAG = true;
-  session->sendState = SEND_BEGIN;
   
   session->txBuffer[0] = tlv->type;
   session->txBuffer[1] = tlv->length;
@@ -129,6 +133,7 @@ Tlv *tlvReceive(Tlv_Session *session) {
   tlv.type = session->rxBuffer[0];
   tlv.length = session->rxBuffer[1];
   tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
+  session->DATA_ARRIVE_FLAG = false;
   
   return &tlv;
 }
@@ -165,22 +170,88 @@ void tlvService(Tlv_Session *session) {
   tlvReceiveService(session);
 }
 
+/**
+  * ==============================================================================
+                            ##### Tlv Helper function #####
+    ==============================================================================  
+  */
+  
 /** verifyTlvData is a function to verify the data inside 
   * tlv packet by sum up all the data
   *
   * input   : tlv is pointer pointing tlv packet
   *
-  * return  : DATA_VALID data is correct
-  *           DATA_INVALID data is corrupted
+  * return  : 1 data is correct
+  *           0 data is corrupted
   */
-int tlvVerifyData(Tlv *tlv) {
+int verifyTlvData(Tlv *tlv) {
   int i; uint8_t result = 0;
   
   for(i = 0; i < tlv->length; i++)
     result += tlv->value[i];
   
   if(result == 0)
-    return DATA_VALID;
+    return 1;
   
-  else return DATA_INVALID;
+  else return 0;
+}
+
+/** verifyTlvResponse is a function to verify the tlv response
+  * tlv packet by sum up all the data
+  *
+  * input   : tlv is pointer pointing tlv packet
+  *
+  * return  : 1 if response is ok
+  *           0 if response is NULL
+  */
+int verifyTlvResponse(Tlv *tlv) {
+  if(tlv != NULL) {
+    /** If tlv length is lesser or equal to 2 it must be acknowledgement 
+        or negative acknowledgement else this is a tlv command */
+    if(tlv->length <= 2)  {
+      if(tlv->type == TLV_OK) {
+        return 1;
+      }
+      else if(tlv->type == TLV_NOT_OK)  {
+        Throw(tlv->value[0]);
+      }     
+    }
+    if(!verifyTlvCommand(tlv->type))  {
+      Throw(TLV_INVALID_COMMAND);
+    }
+    else return 1;
+  }
+  else return 0;
+}
+
+/** verifyTlvCommand is a function to verify the tlv command
+  * tlv packet by sum up all the data
+  *
+  * input   : command can be one of the following value :
+  *               TLV_WRITE_RAM = 10,
+  *               TLV_READ_RAM,
+  *               TLV_WRITE_REGISTER,
+  *               TLV_READ_REGISTER,
+  *               TLV_HALT_TARGET,
+  *               TLV_RUN_TARGET,
+  *               TLV_STEP,
+  *               TLV_MULTI_STEP,
+  *               TLV_BREAKPOINT
+  *
+  * return  : 1 if command is valid
+  *           0 if command is invalid
+  */
+int verifyTlvCommand(uint8_t command) {
+  if(command == TLV_WRITE_RAM)              return 1;
+  else if(command == TLV_READ_RAM)          return 1;
+  else if(command == TLV_WRITE_REGISTER)    return 1;
+  else if(command == TLV_READ_REGISTER)     return 1;
+  else if(command == TLV_HALT_TARGET)       return 1;
+  else if(command == TLV_RUN_TARGET)        return 1;
+  else if(command == TLV_STEP)              return 1;
+  else if(command == TLV_MULTI_STEP)        return 1;
+  else if(command == TLV_BREAKPOINT)        return 1;
+  else if(command == TLV_WRITE_RAM)         return 1;
+  
+  else return 0;
 }

@@ -9,7 +9,7 @@
 typedef struct
 {
   uint8_t type;
-  int length;
+  uint8_t length;
   uint8_t value[255];
 } Tlv;
 
@@ -18,7 +18,9 @@ typedef enum
   SEND_BEGIN,
   SEND_END,
   RECEIVE_BEGIN,
-  RECEIVE_END
+  RECEIVE_END,
+  SEND_PACKET,
+  WAIT_RESPONSE
 } Tlv_State;
 
 typedef enum
@@ -34,6 +36,10 @@ typedef struct
   uint8_t rxBuffer[255];
   Tlv_State sendState;
   Tlv_State receiveState;
+  Tlv_State writeRegisterState;
+  Tlv_State readRegisterState;
+  Tlv_State writeRAMState;
+  Tlv_State readRAMState;
   bool TIMEOUT_FLAG;
   bool DATA_ARRIVE_FLAG;
   bool DATA_SEND_FLAG;
@@ -63,10 +69,5 @@ typedef enum
 {
   TLV_NOT_OK = 2
 } Tlv_Nack;
-
-typedef enum  {
-  DATA_VALID = 0,
-  DATA_INVALID
-} Tlv_Validation;
 
 #endif // Tlv_ex_H

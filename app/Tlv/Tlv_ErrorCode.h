@@ -7,7 +7,8 @@ typedef enum
   TLV_CORRUPTED_DATA,
   TLV_INVALID_COMMAND,
   TLV_NOT_HALTED,
-  TLV_NOT_RUNNING
+  TLV_NOT_RUNNING,
+  TLV_CHECKSUM_ERROR
 } Tlv_ErrorCode;
 
 #endif // Tlv_ErrorCode_H
