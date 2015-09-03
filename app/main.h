@@ -1,12 +1,6 @@
 #ifndef __MAIN_H
 #define __MAIN_H
 
-typedef enum  {
-  UART_START,
-  UART_WAIT,
-  UART_END
-} UART_STATE;
-
 #include "swd.h"
 #include "uart.h"
 #include "configurePort.h"
@@ -17,5 +11,5 @@ typedef enum  {
 #include "swdStub.h"
 #include "Tlv.h"
 #include "SystemConfigure.h"
-#include "CException.h"
+#include "ProgramWorker.h"
 #endif // main_H

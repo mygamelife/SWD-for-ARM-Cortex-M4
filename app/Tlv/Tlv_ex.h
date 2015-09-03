@@ -9,17 +9,33 @@
 typedef struct
 {
   uint8_t type;
-  int length;
+  uint8_t length;
   uint8_t value[255];
 } Tlv;
 
 typedef enum
 {
-  SEND_BEGIN,
-  SEND_END,
-  RECEIVE_BEGIN,
-  RECEIVE_END
+  TLV_SEND_BEGIN,
+  TLV_SEND_END,
+  TLV_RECEIVE_BEGIN,
+  TLV_RECEIVE_END,
+  TLV_SEND_PACKET,
+  TLV_RECEIVE_PACKET,
+  TLV_WAIT_RESPONSE
 } Tlv_State;
+
+typedef enum
+{
+  HOST_RECEIVE_COMMAND,
+  HOST_INTERPRET_COMMAND,
+  HOST_WAITING_RESPONSE
+} Host_State;
+
+typedef enum
+{
+  PROBE_RECEIVE_PACKET,
+  PROBE_INTERPRET_PACKET
+} Probe_State;
 
 typedef enum
 {
@@ -32,11 +48,22 @@ typedef struct
   void *handler;
   uint8_t txBuffer[255];
   uint8_t rxBuffer[255];
+  Tlv *userCommand;
   Tlv_State sendState;
   Tlv_State receiveState;
+  Tlv_State writeRegisterState;
+  Tlv_State readRegisterState;
+  Tlv_State writeRAMState;
+  Tlv_State readRAMState;
+  Host_State programmerState;
+  Probe_State taskManagerState;
   bool TIMEOUT_FLAG;
   bool DATA_ARRIVE_FLAG;
   bool DATA_SEND_FLAG;
+  bool ONGOING_PROCESS_FLAG;
+  uint8_t dataAddress;
+  uint32_t destAddress;
+  uint8_t size;
 } Tlv_Session;
 
 /* Tlv Command */
@@ -63,10 +90,5 @@ typedef enum
 {
   TLV_NOT_OK = 2
 } Tlv_Nack;
-
-typedef enum  {
-  DATA_VALID = 0,
-  DATA_INVALID
-} Tlv_Validation;
 
 #endif // Tlv_ex_H

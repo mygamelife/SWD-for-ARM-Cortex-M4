@@ -11,6 +11,7 @@
 #include "stm32f4xx_hal_uart.h"
 
 #if !defined(TEST)
+#define __IO volatile
 extern __IO ITStatus uartReady;
 #endif
 

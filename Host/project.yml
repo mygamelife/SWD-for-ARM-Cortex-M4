@@ -37,6 +37,9 @@
   #  1) remove the trailing [] from the :common: section
   #  2) add entries to the :common: section (e.g. :test: has TEST defined)
   :commmon: &common_defines []
+  :release:
+    - *common_defines
+    - HOST=
   :test:
     - *common_defines
     - TEST=
