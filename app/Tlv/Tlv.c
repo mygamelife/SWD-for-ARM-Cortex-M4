@@ -1,7 +1,7 @@
 #include "Tlv.h"
 
-#if !defined (HOST)
-int uartReady = SET;
+#if defined TEST
+int uartReady = 0;
 #endif
 
 /** tlvCreateSession is a function to create necessary element needed by TLV protocol */
@@ -16,18 +16,22 @@ Tlv_Session *tlvCreateSession(void) {
   #endif
   
   /* Initialize begining state for send and receive */
-  session.sendState = SEND_BEGIN;
-  session.receiveState = RECEIVE_BEGIN;
+  session.sendState = TLV_SEND_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   
   /* Initialize all the required flag */
   session.TIMEOUT_FLAG = false;
   session.DATA_SEND_FLAG = false;
   session.DATA_ARRIVE_FLAG = false;
   
-  session.readRegisterState = SEND_PACKET;
-  session.writeRegisterState = SEND_PACKET;
-  session.writeRAMState = SEND_PACKET;
-  session.readRAMState = SEND_PACKET;
+  session.readRegisterState = TLV_SEND_PACKET;
+  session.writeRegisterState = TLV_SEND_PACKET;
+  session.writeRAMState = TLV_SEND_PACKET;
+  session.readRAMState = TLV_SEND_PACKET;
+  
+  session.userCommand = NULL;
+  session.ONGOING_PROCESS_FLAG = false;
+  session.taskManagerState = PROBE_RECEIVE_PACKET;
   
   return &session;
 }
@@ -105,7 +109,7 @@ void tlvSendService(Tlv_Session *session)	{
   int length = 0;
   
   switch(session->sendState)  {
-    case SEND_BEGIN :
+    case TLV_SEND_BEGIN :
       if(session->DATA_SEND_FLAG == true) {
         if(uartReady == SET)  {
           length = session->txBuffer[1] + 2;
@@ -127,8 +131,12 @@ void tlvSendService(Tlv_Session *session)	{
   */
 Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv;
-
-  if(session->DATA_ARRIVE_FLAG == false)  return NULL;
+  
+  if(session->TIMEOUT_FLAG == true) {
+    session->TIMEOUT_FLAG == false;
+    Throw(TLV_TIME_OUT);
+  }
+  else if(session->DATA_ARRIVE_FLAG == false)  return NULL;
 
   tlv.type = session->rxBuffer[0];
   tlv.length = session->rxBuffer[1];
@@ -148,11 +156,14 @@ void tlvReceiveService(Tlv_Session *session) {
   int length = 0;
 
   switch(session->receiveState)  {
-    case RECEIVE_BEGIN :
+    case TLV_RECEIVE_BEGIN :
       if(!getBytes(session->handler, session->rxBuffer, 2))  {
         /* set DATA_ARRIVE_FLAG when packet is arrived */
+        // printf("!!!!!!!!!!!!!!!!DATa ARRIVED!!!!!!!!!!!!!!!!\n");
         session->DATA_ARRIVE_FLAG = true;
         length = session->rxBuffer[1];
+        // printf("type %x\n", session->rxBuffer[0]);
+        // printf("length %x\n", session->rxBuffer[1]);
         if(getBytes(session->handler, &session->rxBuffer[2], length))	{
           /* set TIMEOUT_FLAG when timeout occur */
         	session->TIMEOUT_FLAG = true;
@@ -187,8 +198,9 @@ void tlvService(Tlv_Session *session) {
 int verifyTlvData(Tlv *tlv) {
   int i; uint8_t result = 0;
   
-  for(i = 0; i < tlv->length; i++)
+  for(i = 0; i < tlv->length; i++)  {
     result += tlv->value[i];
+  }
   
   if(result == 0)
     return 1;
@@ -196,32 +208,23 @@ int verifyTlvData(Tlv *tlv) {
   else return 0;
 }
 
-/** verifyTlvResponse is a function to verify the tlv response
-  * tlv packet by sum up all the data
+/** isTlvAck is a function to verify tlv acknowledgement
   *
   * input   : tlv is pointer pointing tlv packet
   *
-  * return  : 1 if response is ok
-  *           0 if response is NULL
+  * return  : 1 if ack
+  *           0 if not ack
   */
-int verifyTlvResponse(Tlv *tlv) {
-  if(tlv != NULL) {
-    /** If tlv length is lesser or equal to 2 it must be acknowledgement 
-        or negative acknowledgement else this is a tlv command */
-    if(tlv->length <= 2)  {
-      if(tlv->type == TLV_OK) {
-        return 1;
-      }
-      else if(tlv->type == TLV_NOT_OK)  {
-        Throw(tlv->value[0]);
-      }     
+int isTlvAck(Tlv *tlv) {
+  if(tlv->length >= 1)  {
+    if(tlv->type == TLV_OK) {
+      return 1;
     }
-    if(!verifyTlvCommand(tlv->type))  {
-      Throw(TLV_INVALID_COMMAND);
+    else if(tlv->type == TLV_NOT_OK)  {
+      Throw(tlv->value[0]);
     }
-    else return 1;
+    else return 0;
   }
-  else return 0;
 }
 
 /** verifyTlvCommand is a function to verify the tlv command
@@ -241,7 +244,7 @@ int verifyTlvResponse(Tlv *tlv) {
   * return  : 1 if command is valid
   *           0 if command is invalid
   */
-int verifyTlvCommand(uint8_t command) {
+int isTlvCommand(uint8_t command) {
   if(command == TLV_WRITE_RAM)              return 1;
   else if(command == TLV_READ_RAM)          return 1;
   else if(command == TLV_WRITE_REGISTER)    return 1;
@@ -254,4 +257,39 @@ int verifyTlvCommand(uint8_t command) {
   else if(command == TLV_WRITE_RAM)         return 1;
   
   else return 0;
+}
+
+/** verifyTlvResponse is a function to verify the tlv response
+  * tlv packet by sum up all the data
+  *
+  * input   : tlv is pointer pointing tlv packet
+  *
+  * return  : 1 if response is ok
+  *           0 if response is NULL
+  */
+int verifyTlvPacket(Tlv *tlv) {
+  if(tlv != NULL) {
+    if(!isTlvAck(tlv)) {
+      if(!isTlvCommand(tlv->type))  
+        Throw(TLV_INVALID_COMMAND);
+    }
+    if(!verifyTlvData(tlv))
+      Throw(TLV_CHECKSUM_ERROR);
+    
+    return 1;
+  }
+  else return 0;
+}
+
+/** tlvReportError is a function to create a packet
+  * contain error code
+  *
+  * input   : errorCode is a error to represent the tlv error
+  *           can be one of the TLV_ERROR_CODE value
+  *
+  */
+void tlvReportError(Tlv_Session *session, uint8_t errorCode)  {
+  Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+
+  tlvSend(session, tlv);
 }

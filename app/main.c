@@ -28,14 +28,14 @@ int main(void)
   while(1)
   {
     tlvService(session);
-    if(session->DATA_ARRIVE_FLAG == true) {
-      received = tlvReceive(session);
-      tlvSend(session, received);
+    if(session->DATA_ARRIVE_FLAG == true)	{
+    	received = tlvReceive(session);
+    	if(received != NULL)	{
+    		if(received->type == TLV_WRITE_REGISTER)
+    			writeTargetRegister(session, &get4Byte(&received->value[0]), &get4Byte(&received->value[4]));
+    		if(received->type == TLV_READ_REGISTER)
+    			readTargetRegister(session, &get4Byte(&received->value[0]));
+    	}
     }
-  }
-
-  while(1)
-  {
-
   }
 }

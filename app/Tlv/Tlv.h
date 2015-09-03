@@ -28,7 +28,9 @@ void tlvService(Tlv_Session *session);
 
 /* Tlv helper function */
 int verifyTlvData(Tlv *tlv);
-int verifyTlvCommand(uint8_t command);
-int verifyTlvResponse(Tlv *tlv);
+int isTlvCommand(uint8_t command);
+int isTlvAck(Tlv *tlv);
+int verifyTlvPacket(Tlv *tlv);
+void tlvReportError(Tlv_Session *session, uint8_t errorCode);
 
 #endif // Tlv_H

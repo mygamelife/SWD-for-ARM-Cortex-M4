@@ -141,7 +141,7 @@ void test_tlvReceiveService_rxBuffer_should_stored_tlv_packet(void)
 {
   Tlv_Session session;
   
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 5;
@@ -162,7 +162,7 @@ void test_tlvReceiveService_rxBuffer_should_stored_null_if_no_data_arrive(void)
 {
   Tlv_Session session;
   
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   session.DATA_ARRIVE_FLAG = false;
   
   getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x01); //data arrive
@@ -175,7 +175,7 @@ void test_tlvReceiveService_should_set_time_out_flag_when_data_didnt_arrive_afte
 {
   Tlv_Session session;
   
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 10;
@@ -195,7 +195,7 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   tlvSend(&session, tlv);
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   session.DATA_ARRIVE_FLAG = false;
   session.TIMEOUT_FLAG = false;
   

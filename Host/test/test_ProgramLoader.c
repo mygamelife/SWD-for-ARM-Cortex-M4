@@ -10,6 +10,7 @@
 #include "Tlv_ErrorCode.h"
 #include "CException.h"
 #include "CustomAssertion.h"
+#include "mock_Interface.h"
 
 void setUp(void)  {}
 
@@ -24,11 +25,11 @@ void test_tlvWriteTargetRegister_should_send_register_address_and_data_to_probe_
   uint32_t address = 0x12345678;
   uint32_t data = 0xDEADBEEF;
   
-  session->writeRegisterState = SEND_PACKET;
+  session->writeRegisterState = TLV_SEND_PACKET;
   
   tlvWriteTargetRegister(session, &address, &data);
   
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, session->writeRegisterState);
+  TEST_ASSERT_EQUAL(TLV_WAIT_RESPONSE, session->writeRegisterState);
   TEST_ASSERT_EQUAL(TLV_WRITE_REGISTER, session->txBuffer[0]);
   TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
   TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&session->txBuffer[2]));
@@ -47,7 +48,7 @@ void test_tlvWriteTargetRegister_should_throw_exception_error_code_if_receive_NA
     uint32_t data = 0xDEADBEEF;
     
     session->DATA_ARRIVE_FLAG = true;
-    session->writeRegisterState = WAIT_RESPONSE;
+    session->writeRegisterState = TLV_WAIT_RESPONSE;
     session->rxBuffer[0] = TLV_NOT_OK;
     session->rxBuffer[1] = 2;
     session->rxBuffer[2] = TLV_CORRUPTED_DATA;
@@ -72,7 +73,7 @@ void test_tlvWriteTargetRegister_should_throw_invalid_command_if_type_is_unorgan
     uint32_t data = 0xDEADBEEF;
     
     session->DATA_ARRIVE_FLAG = true;
-    session->writeRegisterState = WAIT_RESPONSE;
+    session->writeRegisterState = TLV_WAIT_RESPONSE;
     session->rxBuffer[0] = 0xFF;
     session->rxBuffer[1] = 0;
   
@@ -96,7 +97,7 @@ void test_tlvWriteTargetRegister_should_throw_checksum_error(void)
     uint32_t data = 0xDEADBEEF;
     
     session->DATA_ARRIVE_FLAG = true;
-    session->writeRegisterState = WAIT_RESPONSE;
+    session->writeRegisterState = TLV_WAIT_RESPONSE;
     session->rxBuffer[0] = TLV_WRITE_REGISTER;
     session->rxBuffer[1] = 2;
     session->rxBuffer[2] = 0x12;
@@ -118,10 +119,10 @@ void test_tlvReadTargetRegister_should_wait_response_after_send_packet(void)
   uint32_t address = 0x12345678;
   uint32_t buffer[] = {0x12345678};
   Tlv *tlv = tlvCreatePacket(TLV_READ_REGISTER, 4, (uint8_t *)buffer);
-  session->readRegisterState = SEND_PACKET;
+  session->readRegisterState = TLV_SEND_PACKET;
   
   tlvReadTargetRegister(session, &address);
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, session->readRegisterState);
+  TEST_ASSERT_EQUAL(TLV_WAIT_RESPONSE, session->readRegisterState);
 }
 
 void test_tlvWriteDataChunk_should_send_data_in_chunk_with_specific_size(void)
@@ -163,14 +164,14 @@ void test_tlvWriteTargetRam_should_write_data_into_target_RAM_and_Update_dataAdd
   tlvWriteTargetRam(session, (uint8_t *)data, &address, &size);
   TEST_ASSERT_EQUAL_HEX32(0x100000F8, address);
   TEST_ASSERT_EQUAL(152, size);
-  TEST_ASSERT_EQUAL(WAIT_RESPONSE, session->writeRAMState);
+  TEST_ASSERT_EQUAL(TLV_WAIT_RESPONSE, session->writeRAMState);
   
   session->DATA_ARRIVE_FLAG = true;
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   tlvWriteTargetRam(session, (uint8_t *)data, &address, &size);
-  TEST_ASSERT_EQUAL(SEND_PACKET, session->writeRAMState);
+  TEST_ASSERT_EQUAL(TLV_SEND_PACKET, session->writeRAMState);
   
   tlvWriteTargetRam(session, (uint8_t *)data, &address, &size);
   TEST_ASSERT_EQUAL_HEX32(0x100001F0, address);

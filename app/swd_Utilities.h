@@ -15,10 +15,13 @@
 #define STOPBIT 0
 #define PARKBIT 1
 
-//Acknowledgement response
-#define OK_RESPONSE      0x1
-#define WAIT_RESPONSE    0x2
-#define FAULT_RESPONSE   0x4
+typedef enum {
+	OK_RESPONSE = 0x01,
+	WAIT_RESPONSE = 0x02,
+	FAULT_RESPONSE = 0x04
+} Swd_Response;
+//Acknowledgment response
+
 
 int calculateParity_SWDRequest(int Address_bit3,int Address_bit2,int APnDP, int ReadWrite);
 int calculateParity_32bitData(uint32_t data);

@@ -104,7 +104,7 @@ void readTargetRegister(Tlv_Session *session, uint32_t *registerAddress) {
   
   readCoreRegister(regAddress, &data);
   
-  Tlv *tlv = tlvCreatePacket(TLV_READ_REGISTER, 4, (uint8_t *)&data);
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&data);
   tlvSend(session, tlv);
 }
 
@@ -132,15 +132,14 @@ void performHardResetOnTarget(Tlv_Session *session)
   tlvSend(session, tlv);
 }
 
-/** selectInstruction is a function to select instruction 
+/** selectTask is a function to select instruction 
   * base on tlv->type
   *
   * Input   : tlv is pointer pointing to tlv packet
   *
   * Return  : NONE
   */
-void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
-  Tlv *error; uint8_t errorCode = 0;
+void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
     case TLV_WRITE_RAM      : break;
@@ -150,41 +149,35 @@ void selectInstruction(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HALT_TARGET    : break;
     case TLV_RUN_TARGET     : break;
     case TLV_STEP           : break;
-    
-    default :
-      errorCode = TLV_INVALID_COMMAND;
-      error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-      tlvSend(session, error);
-      break;
   }
 }
 
-/** programWorker
+/** probeTaskManager
   */
-// void programWorker(Tlv_Session *session)  {
-  // Tlv *packet, *error;
-  // uint8_t errorCode = 0;
+void probeTaskManager(Tlv_Session *session)  {
+  static Tlv *packet;
+  CEXCEPTION_T err;
   
-  // switch(session->state)  {
-    // case WAITING_PACKET :
-      // packet = tlvReceive(session);
-      // if(packet != NULL)
-        // session->state = INTERPRET_PACKET;
-      // break;
+  switch(session->taskManagerState)  {
+    case PROBE_RECEIVE_PACKET :
+      Try {
+        packet = tlvReceive(session);
+        if(verifyTlvPacket(packet)) {
+          session->taskManagerState = PROBE_INTERPRET_PACKET;
+        }
+      }
+      Catch(err)  {
+        printf("error occur\n");
+        tlvReportError(session, err);
+      }
+      break;
       
-    // case INTERPRET_PACKET :
-      // if(tlvVerifyData(packet) == DATA_VALID)  {
-        // selectInstruction(session, packet);
-      // }
-      // else  {
-        // errorCode = TLV_CORRUPTED_DATA;
-        // error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-        // tlvSend(session, error);
-      // }
-      // session->state = WAITING_PACKET;
-      // break;
-  // }
-// }
+    case PROBE_INTERPRET_PACKET :
+      selectTask(session, packet);
+      session->taskManagerState = PROBE_RECEIVE_PACKET;
+      break;
+  }
+}
 
 /** Halt the processor of the target device 
   *

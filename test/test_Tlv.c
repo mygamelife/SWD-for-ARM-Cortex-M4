@@ -102,8 +102,8 @@ void test_tlvSendService_should_change_state_after_tlvSend_and_do_nothing_after_
   Tlv_Session session;
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-  session.sendState = SEND_BEGIN;
-  
+  session.sendState = TLV_SEND_BEGIN;
+  uartReady = SET;
   tlvSend(&session, tlv);
   
   sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
@@ -118,7 +118,7 @@ void test_tlvSendService_should_not_send_when_uartReady_is_not_SET(void)
   Tlv_Session session;
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-  session.sendState = SEND_BEGIN;
+  session.sendState = TLV_SEND_BEGIN;
   
   tlvSend(&session, tlv);
   tlvSendService(&session);
@@ -130,15 +130,33 @@ void test_tlvReceive_should_return_NULL_if_no_data_is_arrive(void)  {
 	Tlv_Session session;
   
   session.DATA_ARRIVE_FLAG = false;
+  session.TIMEOUT_FLAG = false;
   
   Tlv *tlv = tlvReceive(&session);
   
   TEST_ASSERT_NULL(tlv);
 }
 
+void test_tlvReceive_should_throw_error_when_time_out_flag_is_set(void)  {
+  CEXCEPTION_T err;
+  Tlv_Session session;
+  
+  Try {
+    session.DATA_ARRIVE_FLAG = true;
+    session.TIMEOUT_FLAG = true;
+  
+    Tlv *tlv = tlvReceive(&session);
+    printf("Should Throw TLV_TIME_OUT Exception!");
+  }
+  Catch(err)  {
+    TEST_ASSERT_EQUAL(TLV_TIME_OUT, err);
+  }
+}
+
 void test_tlvReceive_should_receive_tlv_packet_send_by_others(void)  {
 	Tlv_Session session;
   
+  session.TIMEOUT_FLAG = false;
   session.DATA_ARRIVE_FLAG = true;
   session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 6;
@@ -158,7 +176,7 @@ void test_tlvReceiveService_rxBuffer_should_stored_tlv_packet(void)
 {
   Tlv_Session session;
   
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 5;
@@ -179,7 +197,7 @@ void test_tlvReceiveService_rxBuffer_should_stored_null_if_no_data_arrive(void)
 {
   Tlv_Session session;
   
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   session.DATA_ARRIVE_FLAG = false;
   
   getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 2, 0x01); //no data arrive
@@ -192,7 +210,7 @@ void test_tlvReceiveService_should_set_time_out_flag_when_data_didnt_arrive_afte
 {
   Tlv_Session session;
   
-  session.receiveState = RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 10;
@@ -212,8 +230,8 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   tlvSend(&session, tlv);
-  session.sendState = SEND_BEGIN;
-  session.receiveState = RECEIVE_BEGIN;
+  session.sendState = TLV_SEND_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   session.TIMEOUT_FLAG = false;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
@@ -243,8 +261,8 @@ void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
   
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   tlvSend(&session, tlv);
-  session.receiveState = RECEIVE_BEGIN;
-  session.sendState = SEND_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
+  session.sendState = TLV_SEND_BEGIN;
   session.TIMEOUT_FLAG = false;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
@@ -278,8 +296,8 @@ void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
   
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   tlvSend(&session, tlv);
-  session.sendState = SEND_BEGIN;
-  session.receiveState = RECEIVE_BEGIN;
+  session.sendState = TLV_SEND_BEGIN;
+  session.receiveState = TLV_RECEIVE_BEGIN;
   session.TIMEOUT_FLAG = false;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
@@ -315,38 +333,59 @@ void test_verifyTlvData_given_wrong_length_should_return_data_invalid(void)
   TEST_ASSERT_EQUAL(0, verifyTlvData(tlv));
 }
 
-void test_verifyTlvCommand_should_return_1_if_command_is_valid(void)
+void test_isTlvCommand_should_return_1_if_command_is_valid(void)
 { 
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_WRITE_RAM));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_READ_RAM));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_WRITE_REGISTER));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_READ_REGISTER));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_HALT_TARGET));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_RUN_TARGET));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_STEP));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_MULTI_STEP));
-  TEST_ASSERT_EQUAL(1, verifyTlvCommand(TLV_BREAKPOINT));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_WRITE_RAM));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_READ_RAM));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_WRITE_REGISTER));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_READ_REGISTER));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_HALT_TARGET));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_RUN_TARGET));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_STEP));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_MULTI_STEP));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_BREAKPOINT));
 }
 
-void test_verifyTlvCommand_should_return_0_if_command_is_invalid(void)
+void test_isTlvCommand_should_return_0_if_command_is_invalid(void)
 { 
-  TEST_ASSERT_EQUAL(0, verifyTlvCommand(0xFF));
+  TEST_ASSERT_EQUAL(0, isTlvCommand(0xFF));
 }
 
-void test_verifyTlvResponse_should_return_1_if_response_is_tlv_acknowledge_OK(void)
+void test_isTlvAck_if_the_type_is_acknowledgement_should_return_1(void)
+{ 
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  TEST_ASSERT_EQUAL(1, isTlvAck(tlv));
+}
+
+void test_isTlvAck_if_the_type_is_negative_acknowledgement_should_throw_the_error_code_inside_packet(void)
+{ 
+  uint8_t errorCode = TLV_TIME_OUT;
+  Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  CEXCEPTION_T err;
+  
+  Try {
+    isTlvAck(tlv);
+  }
+  Catch(err)  {
+    TEST_ASSERT_EQUAL(TLV_TIME_OUT, err);  
+  }
+}
+
+void test_verifyTlvPacket_should_return_1_if_response_is_tlv_acknowledge_OK(void)
 {
 	Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  TEST_ASSERT_EQUAL(1, verifyTlvResponse(tlv));
+  TEST_ASSERT_EQUAL(1, verifyTlvPacket(tlv));
 }
 
-void test_verifyTlvResponse_should_throw_error_if_nack(void)
+void test_verifyTlvPacket_should_throw_error_if_nack(void)
 {
   CEXCEPTION_T err;
   
   Try {
     uint8_t errorCode = TLV_TIME_OUT;
     Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-    verifyTlvResponse(tlv);
+    verifyTlvPacket(tlv);
     printf("Should Throw TLV_TIME_OUT Exception!");
   }
   Catch(err)  {
@@ -354,17 +393,23 @@ void test_verifyTlvResponse_should_throw_error_if_nack(void)
   }
 }
 
-void test_verifyTlvResponse_should_throw_error_if_invalid_command(void)
+void test_verifyTlvPacket_should_throw_error_if_invalid_command(void)
 {
   CEXCEPTION_T err;
   
   Try {
     uint8_t buffer[] = {0xAA, 0xBB, 0xCC, 0xDD};
     Tlv *tlv = tlvCreatePacket(0xFF, 12, buffer);
-    verifyTlvResponse(tlv);
+    verifyTlvPacket(tlv);
     printf("Should Throw TLV_INVALID_COMMAND Exception!");
   }
   Catch(err)  {
     TEST_ASSERT_EQUAL(TLV_INVALID_COMMAND, err);
   }
+}
+
+void test_tlvReportError_is_to_create_a_packet_contain_errorCode_to_report_the_error(void)
+{
+  Tlv_Session session;
+  tlvReportError(&session, TLV_TIME_OUT);
 }

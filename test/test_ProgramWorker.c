@@ -115,34 +115,105 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
   performHardResetOnTarget(session);
 }
 
-// void test_programWorker_given_initial_state_waiting_packet_when_packet_arrived_should_change_state(void)
-// {
-  // Tlv tlv;  
-  // Tlv_Session session;
-  // session.state = WAITING_PACKET;
+void test_probeTaskManager_given_initial_state_receive_packet_when_packet_arrived_should_change_state(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  session->DATA_ARRIVE_FLAG = true;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  probeTaskManager(session);
+  
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->taskManagerState);
+  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+}
 
-  // tlvReceive_ExpectAndReturn(&session, &tlv);
-  
-  // programWorker(&session);
-  
-  // TEST_ASSERT_EQUAL(INTERPRET_PACKET, session.state);
-// }
+void test_probeTaskManager_given_tlv_packet_with_invalid_data_should_send_tlv_error_code(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
 
-// void test_programWorker_given_tlv_packet_with_invalid_data_should_send_tlv_error_code(void)
-// {
-  // Tlv tlv, error;
-  // uint8_t errorCode = TLV_CORRUPTED_DATA;
-  // Tlv_Session session;
-  // session.state = INTERPRET_PACKET;
+  session->DATA_ARRIVE_FLAG = true;
+  session->rxBuffer[0] = 0xFF; //invalid command
+  
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->taskManagerState);
+  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+}
 
-  // tlvVerifyData_IgnoreAndReturn(DATA_INVALID);
-  // tlvCreatePacket_ExpectAndReturn(TLV_NOT_OK, 1, &errorCode, &error);
-  // tlvSend_Expect(&session, &error);
+void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_task(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+
+  session->DATA_ARRIVE_FLAG = true;
+  session->rxBuffer[0] = TLV_WRITE_REGISTER; //invalid command
+  session->rxBuffer[1] = 9;
+  session->rxBuffer[2] = 0x01;
+  session->rxBuffer[3] = 0x00;
+  session->rxBuffer[4] = 0x00;
+  session->rxBuffer[5] = 0x00;
+  session->rxBuffer[6] = 0xDD;
+  session->rxBuffer[7] = 0xCC;
+  session->rxBuffer[8] = 0xBB;
+  session->rxBuffer[9] = 0xAA;
+  session->rxBuffer[10] = 0xF1; //chksum
   
-  // programWorker(&session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->taskManagerState);
+  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
   
-  // TEST_ASSERT_EQUAL(WAITING_PACKET, session.state);
-// }
+  writeCoreRegister_Expect(0x01, 0xAABBCCDD);
+  
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->taskManagerState);
+  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
+}
+
+void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  uint32_t readData = 0;
+
+  session->rxBuffer[0] = TLV_READ_REGISTER; //invalid command
+  session->rxBuffer[1] = 5;
+  session->rxBuffer[2] = 0x44;
+  session->rxBuffer[3] = 0x33;
+  session->rxBuffer[4] = 0x22;
+  session->rxBuffer[5] = 0x11;
+  session->rxBuffer[6] = 0x56; //chksum
+  
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x00); //no data arrive
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->taskManagerState);
+  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
+  TEST_ASSERT_EQUAL(false, session->TIMEOUT_FLAG);
+
+  session->rxBuffer[0] = TLV_READ_REGISTER; //invalid command
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x01); //no data arrive
+  
+  tlvService(session);
+  
+  readCoreRegister_Expect(0x11223344, &readData);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->taskManagerState);
+  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
+}
 
 /*--------------haltTarget--------------------*/
 void test_haltTarget_should_return_ACK_if_successful()

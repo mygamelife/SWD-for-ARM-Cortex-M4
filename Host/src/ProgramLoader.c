@@ -12,7 +12,8 @@ void tlvWriteTargetRegister(Tlv_Session *session, uint32_t *registerAddress, uin
   Tlv *tlv, *response;
   
   switch(session->writeRegisterState) {
-    case SEND_PACKET :
+    case TLV_SEND_PACKET :
+      printf("Send Write Register Packet\n");
       /* create tlv packet with register address */
       tlv = tlvCreatePacket(TLV_WRITE_REGISTER, 4, (uint8_t *)registerAddress);
       /* Insert data into tlv packet value */
@@ -20,17 +21,15 @@ void tlvWriteTargetRegister(Tlv_Session *session, uint32_t *registerAddress, uin
       tlv->length += 4;
       
       tlvSend(session, tlv);
-      session->writeRegisterState = WAIT_RESPONSE;
+      session->writeRegisterState = TLV_WAIT_RESPONSE;
       break;
       
-    case WAIT_RESPONSE :
+    case TLV_WAIT_RESPONSE :
+      // printf("Write Register Wait Response\n");
       response = tlvReceive(session);
-      if(verifyTlvResponse(response)) {
-        if(verifyTlvData(response)) {
-          session->writeRegisterState = SEND_PACKET;
-        }
-        else
-          Throw(TLV_CHECKSUM_ERROR);
+      if(verifyTlvPacket(response)) {
+        // printf("OK Reply\n");
+        session->writeRegisterState = TLV_SEND_PACKET;
       }
       break;
   }
@@ -47,21 +46,20 @@ void tlvReadTargetRegister(Tlv_Session *session, uint32_t *registerAddress)  {
   Tlv *tlv, *response;
   
   switch(session->readRegisterState) {
-    case SEND_PACKET :
+    case TLV_SEND_PACKET :
+      // printf("Send Read Register Packet\n");
       /* create tlv packet with register address */
       tlv = tlvCreatePacket(TLV_READ_REGISTER, 4, (uint8_t *)registerAddress);
       tlvSend(session, tlv);
-      session->readRegisterState = WAIT_RESPONSE;
+      session->readRegisterState = TLV_WAIT_RESPONSE;
       break;
       
-    case WAIT_RESPONSE :
+    case TLV_WAIT_RESPONSE :
+      // printf("Write Register Wait Response\n");
       response = tlvReceive(session);
-      if(verifyTlvResponse(response)) {
-        if(verifyTlvData(response)) {
-          session->readRegisterState = SEND_PACKET;
-        }
-        else
-          Throw(TLV_CHECKSUM_ERROR);
+      if(verifyTlvPacket(response)) {
+        // printf("OK Reply\n");
+        session->readRegisterState = TLV_SEND_PACKET;
       }
       break;
   }
@@ -100,9 +98,10 @@ void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t dest
   */
 void tlvWriteTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t *destAddress, int *size)  {
   Tlv *response;
+  session->ONGOING_PROCESS_FLAG = true;
   
   switch(session->writeRAMState) {
-    case SEND_PACKET :
+    case TLV_SEND_PACKET :
       if(*size > 0) {
         if(*size > TLV_DATA_SIZE)
           tlvWriteDataChunk(session, dataAddress, *destAddress, TLV_DATA_SIZE);
@@ -113,72 +112,77 @@ void tlvWriteTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t *des
         *destAddress += TLV_DATA_SIZE;
         *size -= TLV_DATA_SIZE;
       }
-      session->writeRAMState = WAIT_RESPONSE;
+      session->writeRAMState = TLV_WAIT_RESPONSE;
       break;
       
-    case WAIT_RESPONSE :
+    case TLV_WAIT_RESPONSE :
+      // printf("Write Register Wait Response\n");
       response = tlvReceive(session);
-      if(verifyTlvResponse(response)) {
-        if(verifyTlvData(response)) {
-          session->writeRAMState = SEND_PACKET;
-        }
-        else
-          Throw(TLV_CHECKSUM_ERROR);
+      if(verifyTlvPacket(response)) {
+        // printf("OK Reply\n");
+        session->writeRAMState = TLV_SEND_PACKET;
       }
       break;
   }
 }
 
-/** InterpretUserCommand is a function to select instruction 
+/** selectCommand is a function to select instruction 
   * base on tlv->type
   *
   * Input   : tlv is pointer pointing to tlv packet
   *
   * Return  : NONE
   */
-// void InterpretUserCommand(Tlv_Session *session, Tlv *tlv)  {
-  // Tlv *error; uint8_t errorCode = 0;
+void selectCommand(Tlv_Session *session, Tlv *tlv)  {
+  static uint8_t dataAddress;
+  switch(tlv->type) {
+    case TLV_WRITE_RAM      : break;
+    case TLV_READ_RAM       : break;
+    case TLV_WRITE_REGISTER : tlvWriteTargetRegister(session, &get4Byte(&tlv->value[0]), &get4Byte(&tlv->value[4])); break;
+    case TLV_READ_REGISTER  : tlvReadTargetRegister(session, &get4Byte(&tlv->value[0])); break;
+    case TLV_HALT_TARGET    : break;
+    case TLV_RUN_TARGET     : break;
+    case TLV_STEP           : break;
+  }
+}
+
+/** commandInterpreter
+  */
+// void commandInterpreter(Tlv_Session *session)  {
+  // static Tlv *userCommand = NULL;
+  // static Tlv *userCommand = NULL;
+  // CEXCEPTION_T err;
   
-  // switch(tlv->type) {
-    // case TLV_WRITE_RAM      : break;
-    // case TLV_READ_RAM       : break;
-    // case TLV_WRITE_REGISTER : writeTargetRegister(session, &get4Byte(&tlv->value[0]), &get4Byte(&tlv->value[4])); break;
-    // case TLV_READ_REGISTER  : readTargetRegister(session, &get4Byte(&tlv->value[0])); break;
-    // case TLV_HALT_TARGET    : break;
-    // case TLV_RUN_TARGET     : break;
-    // case TLV_STEP           : break;
-    
-    // default :
-      // errorCode = TLV_INVALID_COMMAND;
-      // error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-      // tlvSend(session, error);
+  // switch(session->InterpreterState)  {
+    // case HOST_RECEIVE_COMMAND :
+       // session->userCommand = waitUserCommand();
+       // if(userCommand != NULL)
+         // session->InterpreterState = HOST_INTERPRET_COMMAND;
       // break;
   // }
 // }
 
-/** programWorker
+/** hostProgrammer
   */
-// void programWorker(Tlv_Session *session)  {
-  // Tlv *packet, *error;
-  // uint8_t errorCode = 0;
+void hostProgrammer(Tlv_Session *session)  {
+  static Tlv *response;
+  CEXCEPTION_T err;
   
-  // switch(session->state)  {
-    // case WAITING_PACKET :
-      // packet = tlvReceive(session);
-      // if(packet != NULL)
-        // session->state = INTERPRET_PACKET;
-      // break;
+  switch(session->programmerState)  {
+    case HOST_INTERPRET_COMMAND :
+      if(session->userCommand != NULL) {
+        selectCommand(session, session->userCommand);
+        // session->programmerState = HOST_WAITING_RESPONSE;
+      }
+      break;
       
-    // case INTERPRET_PACKET :
-      // if(tlvVerifyData(packet) == DATA_VALID)  {
-        // selectInstruction(session, packet);
+    // case HOST_WAITING_RESPONSE :
+      // printf("Write Register Wait Response\n");
+      // response = tlvReceive(session);
+      // if(verifyTlvPacket(response)) {
+        // printf("OK Reply\n");
+        // session->programmerState = HOST_INTERPRET_COMMAND;
       // }
-      // else  {
-        // errorCode = TLV_CORRUPTED_DATA;
-        // error = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-        // tlvSend(session, error);
-      // }
-      // session->state = WAITING_PACKET;
       // break;
-  // }
-// }
+  }
+}

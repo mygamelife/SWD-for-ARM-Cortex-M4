@@ -5,6 +5,7 @@
 #include "CoreDebug.h"
 #include "swdStub.h"
 #include "Tlv_ErrorCode.h"
+#include "CException.h"
 
 /* swdStub instruction */
 void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector);
@@ -17,8 +18,8 @@ void readTargetRegister(Tlv_Session *session, uint32_t *registerAddress);
 void performSoftResetOnTarget(Tlv_Session *session);
 void performHardResetOnTarget(Tlv_Session *session);
 
-void selectInstruction(Tlv_Session *session, Tlv *tlv);
-void programWorker(Tlv_Session *session);
+void selectTask(Tlv_Session *session, Tlv *tlv);
+void probeTaskManager(Tlv_Session *session);
 
 void haltTarget(Tlv_Session *session);
 void runTarget(Tlv_Session *session);
