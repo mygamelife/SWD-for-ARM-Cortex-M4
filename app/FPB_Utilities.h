@@ -2,27 +2,46 @@
 #define FPB_Utilities_H
 
 #include <stdint.h>
+#include "Register_ReadWrite.h"
+#include "core_cm4.h"
 
-#define FP_CTRL 	0xE0002000
-#define FP_REMAP	0xE0002004
-#define FP_COMP0	0xE0002008
-#define FP_COMP1	0xE000200C
-#define FP_COMP2	0xE0002010
-#define FP_COMP3	0xE0002014
-#define FP_COMP4	0xE0002018
-#define FP_COMP5	0xE000201C
-#define FP_COMP6	0xE0002020
-#define FP_COMP7	0xE0002024
+typedef struct
+{
+  __IO uint32_t  FP_CTRL;
+  __IO uint32_t  FP_REMAP;
+  __IO uint32_t  FP_COMP0;
+  __IO uint32_t  FP_COMP1;
+  __IO uint32_t  FP_COMP2;
+  __IO uint32_t  FP_COMP3;
+  __IO uint32_t  FP_COMP4;
+  __IO uint32_t  FP_COMP5;
+  __IO uint32_t  FP_COMP6;
+  __IO uint32_t  FP_COMP7;
+}FPB_Type;
 
-#define INSTRUCTION_COMP0	FP_COMP0
-#define INSTRUCTION_COMP1	FP_COMP1
-#define INSTRUCTION_COMP2	FP_COMP2
-#define INSTRUCTION_COMP3	FP_COMP3
-#define INSTRUCTION_COMP4	FP_COMP4
-#define INSTRUCTION_COMP5	FP_COMP5
+typedef struct
+{
+  __IO uint32_t COMP ;
+}FP_COMP_Type;
 
-#define LITERAL_COMP0	FP_COMP6
-#define LITERAL_COMP1	FP_COMP7
+#define FPB_BASE      (0xE0002000UL)
+#define FPB           ((FPB_Type*)FPB_BASE)
+
+#define INSTRUCTION_COMP            ((FP_COMP_Type*)&(FPB->FP_COMP0))
+#define LITERAL_COMP                ((FP_COMP_Type*)&(FPB->FP_COMP6))
+
+#define INSTRUCTION_COMP_NUM    6
+#define LITERAL_COMP_NUM        2
+
+#define INSTRUCTION_COMP0	0
+#define INSTRUCTION_COMP1	1
+#define INSTRUCTION_COMP2	2
+#define INSTRUCTION_COMP3	3
+#define INSTRUCTION_COMP4	4
+#define INSTRUCTION_COMP5	5
+
+#define LITERAL_COMP0	0
+#define LITERAL_COMP1	1
 
 #define MATCH_REMAP					  0x00000000
 #define MATCH_LOWERHALFWORD	 	0x40000000
@@ -36,14 +55,24 @@
 #define FP_COMP_MATCH_MASK			0xC0000000
 #define FP_REMAP_ADDRESS_MASK		0x1FFFFFE0
 
-
 #define FPB_ENABLED_MASK 			0x1
 
 #define DISABLE_FPB 0x2
 #define ENABLE_FPB 	0x3
 
-int checkForValidInstructionComparator(uint32_t instructionCOMPno);
-int checkForValidLiteralComparator(uint32_t literalCOMPno);
+#define COMP_READY  0
+#define COMP_BUSY   1
+
+#define LITERAL_TYPE      0
+#define INSTRUCTION_TYPE  1
+
+
+extern int instructionComparatorReady[INSTRUCTION_COMP_NUM];
+extern int literalComparatorReady[LITERAL_COMP_NUM];
+
+int checkForValidInstructionComparator(int instructionCOMPno);
+int checkForValidLiteralComparator(int literalCOMPno);
 int checkForValidFPComparator(uint32_t compNo);
 
+uint32_t selectNextFreeComparator(int comparatorType);
 #endif // FPB_Utilities_H

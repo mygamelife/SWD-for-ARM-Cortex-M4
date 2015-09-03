@@ -191,11 +191,11 @@ int setDataWatchpoint_MatchingTwoComparator(int matchingCompNumber1,uint32_t add
   valid1 = checkForValidDWTComparator(matchingCompNumber1);
   valid2 = checkForValidDWTComparator(matchingCompNumber2);
 
-  if(matchingCompNumber1 == 1 || matchingCompNumber1 == 1 || valid1 == -1 || valid2 == -1)
+  if(matchingCompNumber1 == 1 || matchingCompNumber2 == 1 || valid1 == -1 || valid2 == -1)
     return -1 ;
-  
+
   configData = (matchingCompNumber2 << 16) + (matchingCompNumber1 << 12) + (dataSize << 10) + (DATA_COMPARISON << 8) + accessMode ;
- 
+
   setAddressWatchpoint(matchingCompNumber1,address1,addressMask1,DISABLE_DWTCOMPARATOR);
   setAddressWatchpoint(matchingCompNumber2,address2,addressMask2,DISABLE_DWTCOMPARATOR);
   

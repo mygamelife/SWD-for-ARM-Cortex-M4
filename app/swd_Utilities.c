@@ -55,21 +55,21 @@ int calculateParity_32bitData(uint32_t data)
  * Compare whether the input parity is the same as the calculated parity of the data received
  *
  * Input : data contains the data to be calculated for parity 
- *		   Parity contains the input parity to be compared
+ *		     parity contains the input parity to be compared
  *
- * Output : return ERR_NOERROR if both of the parity are match
- *			return ERR_INVALID_PARITY_RECEIVED if both of the parity does not match
+ * Output : return NO_ERROR if both of the parity are match
+ *			    return ERR_INVALID_PARITY_RECEIVED if both of the parity does not match
  *			
  */
-int compare_ParityWithData(uint32_t data,int Parity)
+int compare_ParityWithData(uint32_t data,int parity)
 {
 	int calculatedParity = 0 ;
 	
 	calculatedParity = calculateParity_32bitData(data);
-	if(calculatedParity != Parity)
+	if(calculatedParity != parity)
 		return ERR_INVALID_PARITY_RECEIVED ;
 	else
-		return ERR_NOERROR ;
+		return NO_ERROR ;
 }
 
 /**

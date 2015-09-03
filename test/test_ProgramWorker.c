@@ -6,9 +6,9 @@
 #include "mock_IoOperations.h"
 #include "mock_uart.h"
 #include "mock_CoreDebug.h"
+#include "mock_FPB_Unit.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
-#include "Tlv_ErrorCode.h"
 
 uint32_t readDummy = 0xFFFFFFFF;
 
@@ -89,7 +89,6 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
  
   readTargetRegister(session, &address);
 }
-
 
 /*--------------performSoftResetOnTarget--------------------*/
 void test_performSoftResetOnTarget_should_call_softResetTarget_and_send_TLV_ack()
@@ -228,7 +227,7 @@ void test_haltTarget_should_return_ACK_if_successful()
   haltTarget(session);
 }
 
-void test_haltTarget_should_return_NACK_if_not_successful()
+void test_haltTarget_should_return_NACK_and_ERR_NOT_HALTED_if_not_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -253,7 +252,7 @@ void test_runTarget_should_return_ACK_if_successful()
   runTarget(session);
 }
 
-void test_runTarget_should_return_NACK_if_unsuccessful()
+void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -266,29 +265,84 @@ void test_runTarget_should_return_NACK_if_unsuccessful()
 }
 
 /*---------singleStepTarget----------------------*/
-void test_singleStepTarget_should_step_readPC_run_and_return_PC()
+void test_singleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_SINGLE_STEP);
+  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
   readCoreRegister_Ignore();
-  setCoreMode_Expect(CORE_DEBUG_MODE);
   
   singleStepTarget(session);    
 }
 
+void test_singleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  setCoreMode_Expect(CORE_SINGLE_STEP);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  
+  singleStepTarget(session);    
+}
 /*---------multipleStepTarget----------------------*/
-void test_multipleStepTarget_should_step_readPC_run_and_return_PC()
+void test_multipleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
   stepOnly_Expect(5);
+  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
   readCoreRegister_Ignore();
-  setCoreMode_Expect(CORE_DEBUG_MODE);
   
   multipleStepTarget(session, 5);    
+}
+
+void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  stepOnly_Expect(5);
+  getCoreMode_ExpectAndReturn(CORE_NORMAL_MODE);
+  
+  multipleStepTarget(session, 5);    
+}
+
+/*---------setBreakpoint----------------------*/
+void xtest_setBreakpoint_should_set_breakpoint_and_return_PC_if_breakpoint_occurs()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  // selectNextFreeComparator_ExpectAndReturn(INSTRUCTION_TYPE,INSINSTRUCTION_COMP1);
+
+  readCoreRegister_Ignore();
+  
+  setBreakpoint(0x12345678,MATCH_WORD);
+}
+
+void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_NOTHIT_if_breakpoint_doesnt_occur()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  setBreakpoint(0x12345678,MATCH_UPPERHALFWORD);
+}
+
+void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparators_are_in_use()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  setBreakpoint(0x12345678,MATCH_LOWERHALFWORD);
 }

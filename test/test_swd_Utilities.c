@@ -2,7 +2,6 @@
 #include "unity.h"
 #include "Delay.h"
 #include "Emulator.h"
-#include "Misc_Utilities.h"
 #include "swd_Utilities.h"
 #include "IoOperations.h"
 #include "Register_ReadWrite.h"
@@ -141,12 +140,12 @@ void test_compare_ParityWithData_given_0xFFFFFFFF_parity_0_should_return_ERR_NO_
 {
 	ErrorCode error;
 	
-	TEST_ASSERT_EQUAL(ERR_NOERROR,compare_ParityWithData(0xFFFFFFFF,0));
+	TEST_ASSERT_EQUAL(NO_ERROR,compare_ParityWithData(0xFFFFFFFF,0));
 }
 
 void test_compare_ParityWithData_given_0x0_parity_0_should_return_ERR_NO_ERR()
 {
-	TEST_ASSERT_EQUAL(ERR_NOERROR,compare_ParityWithData(0,0));
+	TEST_ASSERT_EQUAL(NO_ERROR,compare_ParityWithData(0,0));
 }
 
 void test_compare_ParityWithData_given_0xFFFFFFFF_parity_1_should_return_ERR_INVALID_PARITY_RECEIVED()

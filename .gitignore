@@ -2,8 +2,6 @@ build/*
 !build/README.txt
 Host/build/*
 !Host/build/README.txt
-Probe/build/*
-!Probe/build/README.txt
 SerialWireDebug/Debug/bin/*
 SerialWireDebug/Debug/obj/*
 !SerialWireDebug/Debug/bin/README.txt

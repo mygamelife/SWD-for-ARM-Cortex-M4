@@ -26,4 +26,6 @@ void runTarget(Tlv_Session *session);
 
 void singleStepTarget(Tlv_Session *session);
 void multipleStepTarget(Tlv_Session *session, int nInstructions);
+
+void setBreakpoint(uint32_t instructionAddress,int matchingMode);
 #endif // ProgramWorker_H
