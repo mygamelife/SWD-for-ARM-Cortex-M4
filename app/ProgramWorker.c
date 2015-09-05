@@ -35,6 +35,7 @@ void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector)  {
   */
 void loadMassEraseInstruction(uint32_t bankSelect)  {
   uint32_t targetStatus = 0;
+  
   /* Continues wait for target to release */
   do  {
     targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
@@ -57,6 +58,7 @@ void loadMassEraseInstruction(uint32_t bankSelect)  {
   */
 void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAddress, int size) {
   uint32_t targetStatus = 0;
+  
   /* Continues wait for target to release */
   do  {
     targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
