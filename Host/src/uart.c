@@ -41,11 +41,11 @@ HANDLE uartInit(LPCSTR portname, DWORD baudrate) {
   }
   
   // The interval 
-  timeouts.ReadIntervalTimeout = 500;
-  timeouts.ReadTotalTimeoutConstant = 500;
-  timeouts.ReadTotalTimeoutMultiplier = 500;
-  timeouts.WriteTotalTimeoutConstant = 100;
-  timeouts.WriteTotalTimeoutMultiplier = 100;
+  timeouts.ReadIntervalTimeout = 30;
+  timeouts.ReadTotalTimeoutConstant = 30;
+  timeouts.ReadTotalTimeoutMultiplier = 30;
+  timeouts.WriteTotalTimeoutConstant = 30;
+  timeouts.WriteTotalTimeoutMultiplier = 30;
   if(!SetCommTimeouts(hSerial, &timeouts)){
     //handle error
      DWORD errId = GetLastError();

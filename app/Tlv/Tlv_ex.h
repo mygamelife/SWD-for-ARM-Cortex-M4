@@ -26,9 +26,11 @@ typedef enum
 
 typedef enum
 {
+  HOST_WAIT_USER_COMMAND,
   HOST_RECEIVE_COMMAND,
   HOST_INTERPRET_COMMAND,
-  HOST_WAITING_RESPONSE
+  HOST_WAITING_RESPONSE,
+  HOST_EXIT
 } Host_State;
 
 typedef enum
@@ -45,25 +47,28 @@ typedef enum
 
 typedef struct
 {
+  int size;
+  uint8_t *dataAddress;
+  uint32_t destAddress;
+} Tlv_DataInfo;
+
+typedef struct
+{
   void *handler;
   uint8_t txBuffer[255];
   uint8_t rxBuffer[255];
   Tlv *userCommand;
+  /* Send and Receive state */
   Tlv_State sendState;
   Tlv_State receiveState;
-  Tlv_State writeRegisterState;
-  Tlv_State readRegisterState;
-  Tlv_State writeRAMState;
-  Tlv_State readRAMState;
-  Host_State programmerState;
-  Probe_State taskManagerState;
+  /* Host and Probe state */
+  Host_State hostState;
+  Probe_State probeState;
   bool TIMEOUT_FLAG;
-  bool DATA_ARRIVE_FLAG;
+  bool DATA_RECEIVE_FLAG;
   bool DATA_SEND_FLAG;
   bool ONGOING_PROCESS_FLAG;
-  uint8_t dataAddress;
-  uint32_t destAddress;
-  uint8_t size;
+  Tlv_DataInfo *dataInfo;
 } Tlv_Session;
 
 /* Tlv Command */
@@ -77,7 +82,8 @@ typedef enum
   TLV_RUN_TARGET,
   TLV_STEP,
   TLV_MULTI_STEP,
-  TLV_BREAKPOINT
+  TLV_BREAKPOINT,
+  TLV_EXIT
 } Tlv_Command;
 
 /* Tlv acknowledge */

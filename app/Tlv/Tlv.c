@@ -22,16 +22,12 @@ Tlv_Session *tlvCreateSession(void) {
   /* Initialize all the required flag */
   session.TIMEOUT_FLAG = false;
   session.DATA_SEND_FLAG = false;
-  session.DATA_ARRIVE_FLAG = false;
-  
-  session.readRegisterState = TLV_SEND_PACKET;
-  session.writeRegisterState = TLV_SEND_PACKET;
-  session.writeRAMState = TLV_SEND_PACKET;
-  session.readRAMState = TLV_SEND_PACKET;
+  session.DATA_RECEIVE_FLAG = false;
+  session.ONGOING_PROCESS_FLAG = false;
   
   session.userCommand = NULL;
-  session.ONGOING_PROCESS_FLAG = false;
-  session.taskManagerState = PROBE_RECEIVE_PACKET;
+  session.hostState = HOST_WAIT_USER_COMMAND;
+  session.probeState = PROBE_RECEIVE_PACKET;
   
   return &session;
 }
@@ -136,12 +132,12 @@ Tlv *tlvReceive(Tlv_Session *session) {
     session->TIMEOUT_FLAG == false;
     Throw(TLV_TIME_OUT);
   }
-  else if(session->DATA_ARRIVE_FLAG == false)  return NULL;
+  else if(session->DATA_RECEIVE_FLAG == false)  return NULL;
 
   tlv.type = session->rxBuffer[0];
   tlv.length = session->rxBuffer[1];
   tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
-  session->DATA_ARRIVE_FLAG = false;
+  session->DATA_RECEIVE_FLAG = false;
   
   return &tlv;
 }
@@ -158,12 +154,9 @@ void tlvReceiveService(Tlv_Session *session) {
   switch(session->receiveState)  {
     case TLV_RECEIVE_BEGIN :
       if(!getBytes(session->handler, session->rxBuffer, 2))  {
-        /* set DATA_ARRIVE_FLAG when packet is arrived */
-        // printf("!!!!!!!!!!!!!!!!DATa ARRIVED!!!!!!!!!!!!!!!!\n");
-        session->DATA_ARRIVE_FLAG = true;
+        /* set DATA_RECEIVE_FLAG when packet is arrived */
+        session->DATA_RECEIVE_FLAG = true;
         length = session->rxBuffer[1];
-        // printf("type %x\n", session->rxBuffer[0]);
-        // printf("length %x\n", session->rxBuffer[1]);
         if(getBytes(session->handler, &session->rxBuffer[2], length))	{
           /* set TIMEOUT_FLAG when timeout occur */
         	session->TIMEOUT_FLAG = true;

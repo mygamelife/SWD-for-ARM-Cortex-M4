@@ -28,7 +28,7 @@ extern __IO ITStatus uartReady;
 #define USARTx_RELEASE_RESET()           __HAL_RCC_USART2_RELEASE_RESET()
 
 /* USARTx Baud Rate */
-#define USART_BAUD_RATE                  9600//115200
+#define USART_BAUD_RATE                  115200//9600
 
 /* Definition for USARTx Pins */
 #define USARTx_TX_PIN                    GPIO_PIN_9

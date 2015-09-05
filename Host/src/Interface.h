@@ -1,6 +1,15 @@
-#ifndef Tlv_H
-#define Tlv_H
+#ifndef Interface_H
+#define Interface_H
 
-int waitUserCommand();
+#include <windows.h>
+#include <stdio.h>
+#include <stdint.h>
+#include <string.h>
+#include "Token.h"
+#include "Tlv.h"
 
-#endif // Tlv_H
+void displayOptionMenu(void);
+Tlv *waitUserCommand(void);
+void displayTlvData(Tlv *tlv);
+
+#endif // Interface_H

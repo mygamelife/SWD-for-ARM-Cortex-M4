@@ -158,12 +158,12 @@ void probeTaskManager(Tlv_Session *session)  {
   static Tlv *packet;
   CEXCEPTION_T err;
   
-  switch(session->taskManagerState)  {
+  switch(session->probeState)  {
     case PROBE_RECEIVE_PACKET :
       Try {
         packet = tlvReceive(session);
         if(verifyTlvPacket(packet)) {
-          session->taskManagerState = PROBE_INTERPRET_PACKET;
+          session->probeState = PROBE_INTERPRET_PACKET;
         }
       }
       Catch(err)  {
@@ -174,7 +174,7 @@ void probeTaskManager(Tlv_Session *session)  {
       
     case PROBE_INTERPRET_PACKET :
       selectTask(session, packet);
-      session->taskManagerState = PROBE_RECEIVE_PACKET;
+      session->probeState = PROBE_RECEIVE_PACKET;
       break;
   }
 }

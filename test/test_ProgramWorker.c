@@ -120,15 +120,15 @@ void test_probeTaskManager_given_initial_state_receive_packet_when_packet_arrive
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  session->DATA_ARRIVE_FLAG = true;
+  session->DATA_RECEIVE_FLAG = true;
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
   probeTaskManager(session);
   
-  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->taskManagerState);
-  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
 }
 
 void test_probeTaskManager_given_tlv_packet_with_invalid_data_should_send_tlv_error_code(void)
@@ -137,12 +137,12 @@ void test_probeTaskManager_given_tlv_packet_with_invalid_data_should_send_tlv_er
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
 
-  session->DATA_ARRIVE_FLAG = true;
+  session->DATA_RECEIVE_FLAG = true;
   session->rxBuffer[0] = 0xFF; //invalid command
   
   probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->taskManagerState);
-  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
 }
 
 void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_task(void)
@@ -151,7 +151,7 @@ void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_tas
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
 
-  session->DATA_ARRIVE_FLAG = true;
+  session->DATA_RECEIVE_FLAG = true;
   session->rxBuffer[0] = TLV_WRITE_REGISTER; //invalid command
   session->rxBuffer[1] = 9;
   session->rxBuffer[2] = 0x01;
@@ -165,15 +165,15 @@ void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_tas
   session->rxBuffer[10] = 0xF1; //chksum
   
   probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->taskManagerState);
-  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
   TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
   
   writeCoreRegister_Expect(0x01, 0xAABBCCDD);
   
   probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->taskManagerState);
-  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
   TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
 }
 
@@ -197,8 +197,8 @@ void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task
   
   tlvService(session);
   probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->taskManagerState);
-  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
   TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
   TEST_ASSERT_EQUAL(false, session->TIMEOUT_FLAG);
 
@@ -209,8 +209,8 @@ void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task
   
   readCoreRegister_Expect(0x11223344, &readData);
   probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->taskManagerState);
-  TEST_ASSERT_EQUAL(false, session->DATA_ARRIVE_FLAG);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
   TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
 }
 
