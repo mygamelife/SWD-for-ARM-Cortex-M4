@@ -13,6 +13,23 @@ extern int uartReady;
 #include "CException.h"
 #include "Tlv_ErrorCode.h"
 
+typedef struct
+{
+  void *handler;
+  uint8_t txBuffer[255];
+  uint8_t rxBuffer[255];
+  /* Send and Receive state */
+  Tlv_State sendState;
+  Tlv_State receiveState;
+  /* Host and Probe state */
+  Host_State hostState;
+  Probe_State probeState;
+  bool TIMEOUT_FLAG;
+  bool DATA_RECEIVE_FLAG;
+  bool DATA_SEND_FLAG;
+  bool ONGOING_PROCESS_FLAG;
+} Tlv_Session;
+
 Tlv_Session *tlvCreateSession(void);
 
 Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data);

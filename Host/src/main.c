@@ -20,6 +20,6 @@ int main(void) {
   printf("Closing port\n");
   HANDLE hSerial = (HANDLE)session->handler;
   closeSerialPort(hSerial);
-  
+
   return 0;
 }

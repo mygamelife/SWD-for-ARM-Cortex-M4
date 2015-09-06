@@ -1,6 +1,6 @@
 #include "StringObject.h"
 
-char *numSet = "0x123456789ABCDEF";
+char *numSet = "0x123456789abcdefABCDEF";
 char *opSet = "~!@#$%^&*()_-+={}|;:\'<,.>/?";
 char *alphaNumericSet = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 char *alphaSet = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";

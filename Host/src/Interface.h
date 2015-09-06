@@ -8,8 +8,19 @@
 #include "Token.h"
 #include "Tlv.h"
 
+typedef struct
+{
+  int size;
+  uint32_t *data;
+  uint32_t address;
+  char fileName[1024];
+  Tlv_Command tlvCommand;
+} User_Session;
+
 void displayOptionMenu(void);
-Tlv *waitUserCommand(void);
+User_Session *waitUserCommand(void);
+User_Session *userInputInterpreter(int option, String *str);
+int getRegisterAddress(char *name);
 void displayTlvData(Tlv *tlv);
 
 #endif // Interface_H

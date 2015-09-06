@@ -10,16 +10,19 @@
 
 /* Read/Write target register */
 void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
-void tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
+void tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
 
 /* Read/Write target RAM */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
+// void tlvWriteTargetRam(Tlv_Session *session, User_Session *userSession);
 void tlvWriteTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t *destAddress, int *size);
-void tlvReadTargetRam(Tlv_Session *session, uint32_t destAddress, int size);
+
+void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
+void tlvReadTargetRam(Tlv_Session *session, uint32_t *destAddress, int *size);
 
 void commandInterpreter(Tlv_Session *session);
 
-void selectCommand(Tlv_Session *session, Tlv *tlv);
+void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
 #endif // ProgramLoader_H
 

@@ -25,7 +25,6 @@ Tlv_Session *tlvCreateSession(void) {
   session.DATA_RECEIVE_FLAG = false;
   session.ONGOING_PROCESS_FLAG = false;
   
-  session.userCommand = NULL;
   session.hostState = HOST_WAIT_USER_COMMAND;
   session.probeState = PROBE_RECEIVE_PACKET;
   
@@ -192,7 +191,7 @@ int verifyTlvData(Tlv *tlv) {
   int i; uint8_t result = 0;
   
   for(i = 0; i < tlv->length; i++)  {
-    result += tlv->value[i];
+    result += (uint8_t)tlv->value[i];
   }
   
   if(result == 0)
