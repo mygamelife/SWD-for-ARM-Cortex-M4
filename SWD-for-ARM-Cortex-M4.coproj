@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project version="2G - 2.0.2" name="SWD-for-ARM-Cortex-M4">
   <Target name="SerialWireDebug" isCurrent="1">
-    <Device manufacturerId="9" manufacturerName="ST" chipId="287" chipName="STM32F429ZI" boardId="" boardName="" coreId="4" coreName="Cortex M4"/>
+    <Device manufacturerId="9" manufacturerName="ST" chipId="287" chipName="STM32F429ZI" boardId="" boardName="" boardUrl="" coreId="4" coreName="Cortex M4"/>
     <BuildOption>
       <Compile>
         <Option name="OptimizationLevel" value="0"/>
@@ -63,7 +63,7 @@
       <Option name="org.coocox.codebugger.gdbjtag.core.autoDownload" value="1"/>
       <Option name="org.coocox.codebugger.gdbjtag.core.verify" value="1"/>
       <Option name="org.coocox.codebugger.gdbjtag.core.downloadFuction" value="Erase Effected"/>
-      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:\Users\D203C-01\AppData\Roaming\CooCox\CoIDE\config\flash\CooCox-Flash\CoIDE_STM32F4xx_2048K\STM32F4xx_2048.elf"/>
+      <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:\Users\user06D\AppData\Roaming\CooCox\CoIDE\config\flash\CooCox-Flash\CoIDE_STM32F4xx_2048K\STM32F4xx_2048.elf"/>
       <Option name="org.coocox.codebugger.gdbjtag.core.defaultAlgorithm" value="C:\Users\D203C-01\AppData\Roaming\CooCox\CoIDE\config\flash\CooCox-Flash\CoIDE_STM32F4xx_2048K\STM32F4xx_2048.elf"/>
     </DebugOption>
     <ExcludeFile/>
@@ -72,24 +72,24 @@
   <LocalComponents/>
   <Files>
     <File name="Code/Tlv_ex.h" path="app/Tlv/Tlv_ex.h" type="1"/>
-    <File name="Code/Misc_Utilities.h" path="app/Misc_Utilities.h" type="1"/>
     <File name="Code/IoOperations.h" path="app/IoOperations.h" type="1"/>
+    <File name="Code/Misc_Utilities.h" path="app/Misc_Utilities.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.h" path="app/Hardware/stm32f4xx_hal_flash.h" type="1"/>
     <File name="Code/DWT_Utilities.h" path="app/DWT_Utilities.h" type="1"/>
     <File name="Hardware/stm32f429i_discovery.c" path="app/Hardware/stm32f429i_discovery.c" type="1"/>
     <File name="Code/CException.c" path="vendor/ceedling/vendor/c_exception/lib/CException.c" type="1"/>
     <File name="Code/swd.c" path="app/swd.c" type="1"/>
-    <File name="Code/DWT_Unit.c" path="app/DWT_Unit.c" type="1"/>
     <File name="Code/CoreDebug.c" path="app/CoreDebug.c" type="1"/>
+    <File name="Code/DWT_Unit.c" path="app/DWT_Unit.c" type="1"/>
     <File name="Code/FPB_Utilities.h" path="app/FPB_Utilities.h" type="1"/>
-    <File name="STM32F4" path="" type="2"/>
     <File name="Core/core_cmSimd.h" path="app/Hardware/core_cmSimd.h" type="1"/>
+    <File name="STM32F4" path="" type="2"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.c" path="app/Hardware/stm32f4xx_hal_pwr_ex.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_spi.c" path="app/Hardware/stm32f4xx_hal_spi.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.h" path="app/Hardware/stm32f4xx_hal_pwr_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.c" path="app/Hardware/stm32f4xx_hal_gpio.c" type="1"/>
-    <File name="Hardware/stm32f429i_discovery.h" path="app/Hardware/stm32f429i_discovery.h" type="1"/>
     <File name="Hardware/stm32f429xx.h" path="app/Hardware/stm32f429xx.h" type="1"/>
+    <File name="Hardware/stm32f429i_discovery.h" path="app/Hardware/stm32f429i_discovery.h" type="1"/>
     <File name="Code/DWT_Unit.h" path="app/DWT_Unit.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_def.h" path="app/Hardware/stm32f4xx_hal_def.h" type="1"/>
     <File name="Code/Clock.c" path="app/Clock.c" type="1"/>
@@ -108,8 +108,8 @@
     <File name="Code/CoreDebug.h" path="app/CoreDebug.h" type="1"/>
     <File name="Code/Delay.h" path="app/Delay.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_usart.c" path="app/Hardware/stm32f4xx_hal_usart.c" type="1"/>
-    <File name="Core/core_cmFunc.h" path="app/Hardware/core_cmFunc.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.c" path="app/Hardware/stm32f4xx_hal_pwr.c" type="1"/>
+    <File name="Core/core_cmFunc.h" path="app/Hardware/core_cmFunc.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="app/Hardware/stm32f4xx_hal_cortex.c" type="1"/>
     <File name="STM32F4/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
     <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
@@ -118,12 +118,12 @@
     <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
     <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
     <File name="STM32F4/stm32f429xx.h" path="app/stm32f429xx.h" type="1"/>
-    <File name="Hardware/stm32f4xx_it.c" path="app/Hardware/stm32f4xx_it.c" type="1"/>
     <File name="Code/Read_File.h" path="app/Read_File.h" type="1"/>
+    <File name="Hardware/stm32f4xx_it.c" path="app/Hardware/stm32f4xx_it.c" type="1"/>
     <File name="Code/swdStub.c" path="app/swdStub.c" type="1"/>
     <File name="Code/Misc_Utilities.c" path="app/Misc_Utilities.c" type="1"/>
-    <File name="Code/uart.c" path="app/uart.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="app/Hardware/stm32f4xx_hal_flash.c" type="1"/>
+    <File name="Code/uart.c" path="app/uart.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="app/Hardware/stm32f4xx_hal_rcc_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_usart.h" path="app/Hardware/stm32f4xx_hal_usart.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_i2c.c" path="app/Hardware/stm32f4xx_hal_i2c.c" type="1"/>
@@ -147,11 +147,11 @@
     <File name="Code/ProgramWorker.c" path="app/ProgramWorker.c" type="1"/>
     <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
     <File name="Code/FPB_Unit.c" path="app/FPB_Unit.c" type="1"/>
+    <File name="Core/core_cm4.h" path="app/Hardware/core_cm4.h" type="1"/>
     <File name="Code/Tlv_ErrorCode.h" path="app/Tlv/Tlv_ErrorCode.h" type="1"/>
     <File name="Code/IO_Operations.h" path="app/IO_Operations.h" type="1"/>
-    <File name="Core/core_cm4.h" path="app/Hardware/core_cm4.h" type="1"/>
-    <File name="Code/LED.c" path="app/LED.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.h" path="app/Hardware/stm32f4xx_hal_pwr.h" type="1"/>
+    <File name="Code/LED.c" path="app/LED.c" type="1"/>
     <File name="Code/configurePort.h" path="app/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.c" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.c" type="1"/>
     <File name="Code/Tlv.h" path="app/Tlv/Tlv.h" type="1"/>
@@ -166,8 +166,8 @@
     <File name="Code/DWT_Utilities.c" path="app/DWT_Utilities.c" type="1"/>
     <File name="STM32F4/startup_stm32f429xx.s" path="app/Hardware/startup_stm32f429xx.s" type="1"/>
     <File name="Hardware/stm32f4xx_hal_dma.c" path="app/Hardware/stm32f4xx_hal_dma.c" type="1"/>
-    <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
     <File name="Code/CException.h" path="vendor/ceedling/vendor/c_exception/lib/CException.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
     <File name="Code/main.h" path="app/main.h" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Code/CoreDebug_Utilities.h" path="app/CoreDebug_Utilities.h" type="1"/>

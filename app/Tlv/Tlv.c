@@ -96,6 +96,7 @@ void tlvSendService(Tlv_Session *session) {
     length = session->txBuffer[1] + 2;
     sendBytes(session->handler, session->txBuffer, length);
     session->DATA_SEND_FLAG = false;
+    printf("Finish sending TLV\n");
   }
 }
 #else
@@ -111,7 +112,11 @@ void tlvSendService(Tlv_Session *session)	{
           sendBytes(session->handler, session->txBuffer, length);
           uartReady = RESET;
           session->DATA_SEND_FLAG = false;
-        }    
+        }
+        /*
+          if user call transmit when txBuffer is busy should
+          issue error
+        */
       }
       break;
   }

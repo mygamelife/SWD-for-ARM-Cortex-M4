@@ -1,7 +1,7 @@
 #include "ProgramLoader.h"
 #include <stdlib.h>
 
-#define HOST
+// #define HOST
 
 int main(void) {
   Tlv_Session *session = tlvCreateSession();

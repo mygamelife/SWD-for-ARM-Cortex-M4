@@ -22,6 +22,18 @@
 :extension:
   :executable: .exe
 
+:tools:
+  :release_compiler:
+    :executable: gcc #exists in system search path
+    :arguments:
+      - -Isrc/ -Isrc/StringObject
+      - -Ivendor/ceedling/vendor/c_exception/lib 
+      - -I../app/ -I../app/Tlv
+      - -DHOST
+      - -g
+      - -c ${1} #source code input file (Ruby method call param list sub)
+      - -o ${2} #object file output (Ruby method call param list sub)  
+  
 :paths:
   :test:
     - +:test/**
