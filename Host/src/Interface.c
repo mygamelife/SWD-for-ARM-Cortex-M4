@@ -1,6 +1,6 @@
 #include "Interface.h"
 
-#define BUFFER_SIZE 100
+#define BUFFER_SIZE 1024
 
 void displayOptionMenu(void)  {
   printf("1. Write RAM\n");
@@ -14,21 +14,22 @@ void displayTlvData(Tlv *tlv)  {
   int i, length = 0, counter = 0;
   length = tlv->length;
   
-  printf("length %d\n", length);
-  if(length > 1)  {
-    printf("%x\n", get4Byte(&tlv->value[0]));
+  if(length == 5) {
+    printf("Value : %x\n\n", get4Byte(&tlv->value[0]));
+  } else if(length > 5)  {
+    printf("Address %x\n", get4Byte(&tlv->value[0]));
     for(i = 4; i < length - 1; i += 4)  {
 
-    if(counter == 4) {
+      if(counter == 4) {
         counter = 0;
         printf("\n");
       }
       printf("%x ", get4Byte(&tlv->value[i]));
       counter++;
     }
-    printf("\n");
+    printf("\n\n");
   }
-  else printf("OK\n");
+  else printf("OK\n\n");
 }
 
 int getRegisterAddress(char *name)  {
@@ -52,7 +53,6 @@ User_Session *userInputInterpreter(int option, String *str)  {
     
     while(str->length != 1) {
       data = (Number*)getToken(str);
-      printf("%x\n", data->value);
       buffer[i] = data->value;
       i++;
     }

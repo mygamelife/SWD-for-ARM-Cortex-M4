@@ -44,7 +44,7 @@ dataSection = dataInfo(fileName, ".data");
 textSection = dataInfo(fileName, ".text");
 
 void tlvWriteTargetRam(Tlv_Session *session, Tlv_DataInfo *dataInfo) {
-  session->ONGOING_PROCESS_FLAG = true;
+  session->ongoingProcessFlag = true;
 
   if(dataInfo->size > TLV_DATA_SIZE) {
       tlvWriteDataChunk(session, dataInfo->dataAddress, dataInfo->destAddress, TLV_DATA_SIZE);

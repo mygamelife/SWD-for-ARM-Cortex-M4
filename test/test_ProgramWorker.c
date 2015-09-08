@@ -118,7 +118,7 @@ void test_probeTaskManager_given_initial_state_receive_packet_when_packet_arrive
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  session->DATA_RECEIVE_FLAG = true;
+  session->dataReceiveFlag = true;
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
@@ -126,7 +126,7 @@ void test_probeTaskManager_given_initial_state_receive_packet_when_packet_arrive
   probeTaskManager(session);
   
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
 }
 
 void test_probeTaskManager_given_tlv_packet_with_invalid_data_should_send_tlv_error_code(void)
@@ -135,12 +135,12 @@ void test_probeTaskManager_given_tlv_packet_with_invalid_data_should_send_tlv_er
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
 
-  session->DATA_RECEIVE_FLAG = true;
+  session->dataReceiveFlag = true;
   session->rxBuffer[0] = 0xFF; //invalid command
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
 }
 
 void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_task(void)
@@ -149,7 +149,7 @@ void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_tas
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
 
-  session->DATA_RECEIVE_FLAG = true;
+  session->dataReceiveFlag = true;
   session->rxBuffer[0] = TLV_WRITE_REGISTER; //invalid command
   session->rxBuffer[1] = 9;
   session->rxBuffer[2] = 0x01;
@@ -164,15 +164,15 @@ void test_probeTaskManager_should_receive_TLV_WRITE_REGISTER_and_perform_the_tas
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(false, session->dataSendFlag);
   
   writeCoreRegister_Expect(0x01, 0xAABBCCDD);
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }
 
 void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task(void)
@@ -190,26 +190,62 @@ void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task
   session->rxBuffer[5] = 0x11;
   session->rxBuffer[6] = 0x56; //chksum
   
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x00); //no data arrive
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00); //no data arrive
+  /*** Received Type ***/
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0); //no data arrive
   
   tlvService(session);
   probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
-  TEST_ASSERT_EQUAL(false, session->TIMEOUT_FLAG);
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->probeState);
 
-  session->rxBuffer[0] = TLV_READ_REGISTER; //invalid command
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x01); //no data arrive
+  /*** Received Length ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[1], 1, 0); //no data arrive
   
   tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 1, 0); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[3], 1, 0); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[4], 1, 0); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[5], 1, 0); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[6], 1, 0); //no data arrive
+  
+  tlvService(session);
+  TEST_ASSERT_EQUAL(true, session->dataReceiveFlag);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
   
   readCoreRegister_Expect(0x11223344, &readData);
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }
 
 /*--------------haltTarget--------------------*/
@@ -394,24 +430,91 @@ void test_probeTaskManager_should_receive_TLV_WRITE_RAM_and_perform_the_task(voi
   session->rxBuffer[9] = 0x10;
   session->rxBuffer[10] = 0x40; //chksum
   
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x00); //no data arrive
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 9, 0x00); //no data arrive
+  /*** Received Type ***/
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Length ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[1], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[3], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[4], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[5], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[6], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[7], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[8], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Value ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[9], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  /*** Received Last Byte ***/
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[10], 1, 0x00); //no data arrive
   
   tlvService(session);
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
-  TEST_ASSERT_EQUAL(false, session->TIMEOUT_FLAG);
-
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x01); //no data arrive  
-  tlvService(session);
   
+  /*** Received Last Byte ***/
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x01); //no data arrive
+  tlvService(session);
   memoryWriteWord_ExpectAndReturn(0x20000000, 0x10203040, NO_ERROR);
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }
 
 void test_probeTaskManager_should_receive_TLV_READ_RAM_and_perform_the_task(void)
@@ -433,25 +536,81 @@ void test_probeTaskManager_should_receive_TLV_READ_RAM_and_perform_the_task(void
   session->rxBuffer[9] = 0x00;
   session->rxBuffer[10] = 0xD4; //chksum
   
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x00); //no data arrive
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 9, 0x00); //no data arrive
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[1], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[3], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[4], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[5], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[6], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[7], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[8], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[9], 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[10], 1, 0x00); //no data arrive
   
   tlvService(session);
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(false, session->DATA_SEND_FLAG);
-  TEST_ASSERT_EQUAL(false, session->TIMEOUT_FLAG);
-
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 2, 0x01); //no data arrive  
-  tlvService(session);
   
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x01); //no data arrive
+  
+  tlvService(session);
   memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xDEADBEEF);
   memoryReadAndReturnWord_ExpectAndReturn(0x20000004, 0xABCDABCD);
   memoryReadAndReturnWord_ExpectAndReturn(0x20000008, 0xABCDABCD);
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->DATA_RECEIVE_FLAG);
-  TEST_ASSERT_EQUAL(true, session->DATA_SEND_FLAG);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }

@@ -16,7 +16,7 @@ void tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint
   tlvSend(session, tlv);
   
   /* clear userCommand after the task is done*/
-  session->ONGOING_PROCESS_FLAG = false;
+  session->ongoingProcessFlag = false;
 }
 
 /** tlvReadTargetRegister is a function to read target register
@@ -33,7 +33,7 @@ void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress)  {
   tlvSend(session, tlv);
   
   /* clear userCommand after the task is done*/
-  session->ONGOING_PROCESS_FLAG = false;
+  session->ongoingProcessFlag = false;
 }
 
 /** tlvWriteDataChunk is a function used to send data in chunk
@@ -53,9 +53,11 @@ void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t dest
   /* create tlv packet with register address */
   tlv = tlvCreatePacket(TLV_WRITE_RAM, 4, (uint8_t *)&destAddress);
   chksum = tlv->value[4];
+  
   tlvPackIntoBuffer(&tlv->value[4], dataAddress, size);
   tlv->length += size;
 
+  /* Update checksum with destAddress */
   tlv->value[tlv->length - 1] = tlv->value[tlv->length - 1] + chksum;
 
   tlvSend(session, tlv);
@@ -72,14 +74,14 @@ void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t dest
   * return  : NONE
   */
 void tlvWriteTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t *destAddress, int *size)  {
-  session->ONGOING_PROCESS_FLAG = true;
+  session->ongoingProcessFlag = true;
 
   if(*size > TLV_DATA_SIZE) {
     tlvWriteDataChunk(session, (uint8_t *)dataAddress, *destAddress, TLV_DATA_SIZE);
   }
   else  {
     tlvWriteDataChunk(session, (uint8_t *)dataAddress, *destAddress, *size);
-    session->ONGOING_PROCESS_FLAG = false;
+    session->ongoingProcessFlag = false;
   }
   
   dataAddress += TLV_DATA_SIZE;
@@ -117,14 +119,16 @@ void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size) {
   */
 void tlvReadTargetRam(Tlv_Session *session, uint32_t *destAddress, int *size) {
   Tlv *tlv; 
-  session->ONGOING_PROCESS_FLAG = true;
+  session->ongoingProcessFlag = true;
 
+  printf("destAddress %x\n", *destAddress);
+  printf("size %d\n", *size);
   if(*size > TLV_DATA_SIZE) {
-    tlvReadDataChunk(session, *destAddress, *size);
+    tlvReadDataChunk(session, *destAddress, TLV_DATA_SIZE);
   }
   else  {
     tlvReadDataChunk(session, *destAddress, *size);
-    session->ONGOING_PROCESS_FLAG = false;
+    session->ongoingProcessFlag = false;
   }
   
   *destAddress += TLV_DATA_SIZE;
@@ -161,7 +165,7 @@ void hostInterpreter(Tlv_Session *session) {
   switch(session->hostState)  {
     case HOST_WAIT_USER_COMMAND :
       userSession = waitUserCommand();
-      printf("HOST_INTERPRET_COMMAND\n");
+      // printf("HOST_INTERPRET_COMMAND\n");
       if(userSession->tlvCommand == TLV_EXIT)
         session->hostState = HOST_EXIT;
       else  
@@ -170,18 +174,18 @@ void hostInterpreter(Tlv_Session *session) {
       
     case HOST_INTERPRET_COMMAND :
       selectCommand(session, userSession);
-      printf("HOST_WAITING_RESPONSE\n");
+      // printf("HOST_WAITING_RESPONSE\n");
       session->hostState = HOST_WAITING_RESPONSE;
       break;
       
     case HOST_WAITING_RESPONSE :
       response = tlvReceive(session);
-      
+
       if(verifyTlvPacket(response)) {
         #if !defined (TEST)
         displayTlvData(response);
         #endif
-        if(session->ONGOING_PROCESS_FLAG == false)  {
+        if(session->ongoingProcessFlag == false)  {
           session->hostState = HOST_WAIT_USER_COMMAND;
         }
         else  session->hostState = HOST_INTERPRET_COMMAND;

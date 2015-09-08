@@ -4,6 +4,8 @@
 // #define HOST
 
 int main(void) {
+  CEXCEPTION_T err;
+  
   Tlv_Session *session = tlvCreateSession();
   printf("Opening port\n");
   
@@ -13,8 +15,14 @@ int main(void) {
   printf("Example : 1 R0 0xDEADBEFF\n\n");
   
   while(session->hostState != HOST_EXIT) {
-    tlvService(session);
-    hostInterpreter(session);
+    Try {
+      tlvService(session);
+      hostInterpreter(session);
+    }
+    Catch(err) {
+      printf("Error Code %d\n", err);
+      break;
+    }
   }
   
   printf("Closing port\n");

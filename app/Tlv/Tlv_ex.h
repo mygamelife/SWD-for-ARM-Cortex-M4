@@ -3,8 +3,8 @@
 
 #define TLV_DATA_SIZE   248
 
-#define getInt(x)      (*(int *)(x))
-#define getByte(x)      (*(uint8_t *)(x))
+// #define getInt(x)      (*(int *)(x))
+// #define getByte(x)      (*(uint8_t *)(x))
 #define get4Byte(x)     (*(uint32_t *)(x))
 
 typedef struct
@@ -33,7 +33,10 @@ typedef enum
 {
   TLV_SEND_BEGIN,
   TLV_SEND_END,
-  TLV_RECEIVE_BEGIN,
+  TLV_RECEIVE_TYPE,
+  TLV_RECEIVE_LENGTH,
+  TLV_RECEIVE_VALUE,
+  TLV_RECEIVE_CHECKSUM,
   TLV_RECEIVE_END,
   TLV_SEND_PACKET,
   TLV_RECEIVE_PACKET,

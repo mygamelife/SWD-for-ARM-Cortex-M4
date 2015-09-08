@@ -1,7 +1,7 @@
 #include "Tlv.h"
 
-#if defined TEST
-int uartReady = 0;
+#if defined (TEST) || defined (HOST)
+int uartReady = 1;
 #endif
 
 /** tlvCreateSession is a function to create necessary element needed by TLV protocol */
@@ -9,21 +9,17 @@ Tlv_Session *tlvCreateSession(void) {
   static Tlv_Session session;
   
   /* get uart handler */
-  #ifdef HOST//__GNUC__
-  session.handler = uartInit(UART_PORT, UART_BAUD_RATE);
-  #else
   session.handler = uartInit();
-  #endif
   
   /* Initialize begining state for send and receive */
   session.sendState = TLV_SEND_BEGIN;
-  session.receiveState = TLV_RECEIVE_BEGIN;
+  session.receiveState = TLV_RECEIVE_TYPE;
   
   /* Initialize all the required flag */
-  session.TIMEOUT_FLAG = false;
-  session.DATA_SEND_FLAG = false;
-  session.DATA_RECEIVE_FLAG = false;
-  session.ONGOING_PROCESS_FLAG = false;
+  session.timeOutFlag = false;
+  session.dataSendFlag = false;
+  session.dataReceiveFlag = false;
+  session.ongoingProcessFlag = false;
   
   session.hostState = HOST_WAIT_USER_COMMAND;
   session.probeState = PROBE_RECEIVE_PACKET;
@@ -75,7 +71,7 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   * return  : NONE
   */
 void tlvSend(Tlv_Session *session, Tlv *tlv)  {  
-  session->DATA_SEND_FLAG = true;
+  session->dataSendFlag = true;
   
   session->txBuffer[0] = tlv->type;
   session->txBuffer[1] = tlv->length;
@@ -83,35 +79,26 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
 }
 
 /** tlvSendService is a state machine to handle the tlvSend
+  * uartReady is varibale used by the uart callback service routine
   *
   * input   : session contain all the information needed by the function
   *
   * return  : NONE
   */
-#ifdef HOST//__GNUC__
-void tlvSendService(Tlv_Session *session) {
-  int length = 0;
-  
-  if(session->DATA_SEND_FLAG == true) {
-    length = session->txBuffer[1] + 2;
-    sendBytes(session->handler, session->txBuffer, length);
-    session->DATA_SEND_FLAG = false;
-    printf("Finish sending TLV\n");
-  }
-}
-#else
-/* uartReady is varibale used by the uart callback service routine */
 void tlvSendService(Tlv_Session *session)	{
   int length = 0;
   
   switch(session->sendState)  {
     case TLV_SEND_BEGIN :
-      if(session->DATA_SEND_FLAG == true) {
-        if(uartReady == SET)  {
+      if(session->dataSendFlag == true) {
+        if(uartReady)  {
           length = session->txBuffer[1] + 2;
           sendBytes(session->handler, session->txBuffer, length);
-          uartReady = RESET;
-          session->DATA_SEND_FLAG = false;
+          session->dataSendFlag = false;
+          
+          #if !defined (HOST)
+          uartReady = 0;
+          #endif
         }
         /*
           if user call transmit when txBuffer is busy should
@@ -121,7 +108,7 @@ void tlvSendService(Tlv_Session *session)	{
       break;
   }
 }
-#endif
+// #endif
 
 /** tlvReceive is a function to receive tlv packet
   *
@@ -132,16 +119,16 @@ void tlvSendService(Tlv_Session *session)	{
 Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv;
   
-  if(session->TIMEOUT_FLAG == true) {
-    session->TIMEOUT_FLAG == false;
+  if(session->timeOutFlag == true) {
+    session->timeOutFlag == false;
     Throw(TLV_TIME_OUT);
   }
-  else if(session->DATA_RECEIVE_FLAG == false)  return NULL;
+  if(session->dataReceiveFlag == false)  return NULL;
 
   tlv.type = session->rxBuffer[0];
   tlv.length = session->rxBuffer[1];
   tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
-  session->DATA_RECEIVE_FLAG = false;
+  session->dataReceiveFlag = false;
   
   return &tlv;
 }
@@ -153,20 +140,42 @@ Tlv *tlvReceive(Tlv_Session *session) {
   * return  : NONE
   */
 void tlvReceiveService(Tlv_Session *session) {
-  int length = 0;
+  static int length = 0, counter = 0;
 
   switch(session->receiveState)  {
-    case TLV_RECEIVE_BEGIN :
-      if(!getBytes(session->handler, session->rxBuffer, 2))  {
-        /* set DATA_RECEIVE_FLAG when packet is arrived */
-        session->DATA_RECEIVE_FLAG = true;
-        length = session->rxBuffer[1];
-        if(getBytes(session->handler, &session->rxBuffer[2], length))	{
-          /* set TIMEOUT_FLAG when timeout occur */
-        	session->TIMEOUT_FLAG = true;
-        }
+    case TLV_RECEIVE_TYPE :
+      if(!getByte(session->handler, session->rxBuffer)) {
+        // printf("receive type %d\n", session->rxBuffer[0]);
+        session->receiveState = TLV_RECEIVE_LENGTH;
       }
       break;
+    
+    case TLV_RECEIVE_LENGTH :
+      if(!getByte(session->handler, &session->rxBuffer[1]))  {
+        length = session->rxBuffer[1];
+        // printf("receive length %d\n", length);
+        session->receiveState = TLV_RECEIVE_VALUE;
+      }
+      break;
+      
+    case TLV_RECEIVE_VALUE :
+      if(!getByte(session->handler, &session->rxBuffer[2 + counter]))  {
+        // printf("counter %d\n", counter);
+        if(++counter == length) {
+          // printf("Last byte\n");
+          length = 0;
+          counter = 0;
+          session->receiveState = TLV_RECEIVE_TYPE;
+          session->dataReceiveFlag = true;
+        }
+      } else  {
+        /* set timeOutFlag when timeout occur */
+        // printf("counter %x\n", counter);
+        // printf("length %x\n", length);
+        session->timeOutFlag = true;
+        session->receiveState = TLV_RECEIVE_TYPE;
+      }
+      break;  
   }
 }
 
@@ -179,9 +188,9 @@ void tlvService(Tlv_Session *session) {
 }
 
 /**
-  * ==============================================================================
+  ==============================================================================
                             ##### Tlv Helper function #####
-    ==============================================================================  
+  ==============================================================================  
   */
   
 /** verifyTlvData is a function to verify the data inside 
@@ -193,10 +202,12 @@ void tlvService(Tlv_Session *session) {
   *           0 data is corrupted
   */
 int verifyTlvData(Tlv *tlv) {
-  int i; uint8_t result = 0;
+  int i = 0; 
+  uint8_t result = 0;
   
   for(i = 0; i < tlv->length; i++)  {
-    result += (uint8_t)tlv->value[i];
+    result += tlv->value[i];
+    // printf("i %d %x\n", i, tlv->value[i]);
   }
   
   if(result == 0)
@@ -218,6 +229,7 @@ int isTlvAck(Tlv *tlv) {
       return 1;
     }
     else if(tlv->type == TLV_NOT_OK)  {
+      // printf("Probe throw error\n");
       Throw(tlv->value[0]);
     }
     else return 0;
@@ -270,8 +282,10 @@ int verifyTlvPacket(Tlv *tlv) {
       if(!isTlvCommand(tlv->type))  
         Throw(TLV_INVALID_COMMAND);
     }
-    if(!verifyTlvData(tlv))
+    if(!verifyTlvData(tlv)) {
+      // printf("Probe throw error\n");
       Throw(TLV_CHECKSUM_ERROR);
+    }
     
     return 1;
   }

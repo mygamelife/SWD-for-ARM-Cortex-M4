@@ -17,9 +17,9 @@ UART_HandleTypeDef *uartInit(void) {
       - Parity = None
       - BaudRate = 9600 baud
       - Hardware flow control disabled (RTS and CTS signals) */
-  uartHandle.Instance          = USARTx;
+  uartHandle.Instance          = UART_PORT;
   
-  uartHandle.Init.BaudRate     = USART_BAUD_RATE;
+  uartHandle.Init.BaudRate     = UART_BAUD_RATE;
   uartHandle.Init.WordLength   = UART_WORDLENGTH_8B;
   uartHandle.Init.StopBits     = UART_STOPBITS_1;
   uartHandle.Init.Parity       = UART_PARITY_NONE;
@@ -47,7 +47,7 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
   UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
   
-  return HAL_UART_Receive(uartHandle, rxBuffer, length, TEN_SEC);
+  return HAL_UART_Receive(uartHandle, rxBuffer, length, 400);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)

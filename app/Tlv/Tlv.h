@@ -24,10 +24,10 @@ typedef struct
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
-  bool TIMEOUT_FLAG;
-  bool DATA_RECEIVE_FLAG;
-  bool DATA_SEND_FLAG;
-  bool ONGOING_PROCESS_FLAG;
+  bool timeOutFlag;
+  bool dataReceiveFlag;
+  bool dataSendFlag;
+  bool ongoingProcessFlag;
 } Tlv_Session;
 
 Tlv_Session *tlvCreateSession(void);

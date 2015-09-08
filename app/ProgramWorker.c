@@ -256,21 +256,23 @@ void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAd
   * return  : NONE
   */
 void readTargetRam(Tlv_Session *session, uint32_t destAddress, int size) {
-  int i; char chksum = 0;
+  int i, j; char chksum = 0;
   uint32_t readData = 0;
   
   Tlv *tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&destAddress);
+  /* store destAddress checksum */
   chksum = tlv->value[4];
   
-  /* Write to RAM using swd */
+  /* Read from RAM using swd */
   for(i = 0; i < size; i += 4)  {
     /* Data start at position 4 */
     readData = memoryReadAndReturnWord(destAddress);
     tlvPackIntoBuffer(&tlv->value[4 + i], (uint8_t *)&readData, 4);
+    chksum += tlv->value[8 + i];
     destAddress += 4;
   }
   tlv->length += size;
-  tlv->value[tlv->length - 1] = tlv->value[tlv->length - 1] + chksum;
+  tlv->value[tlv->length - 1] = chksum;
   
   tlvSend(session, tlv);
 }
