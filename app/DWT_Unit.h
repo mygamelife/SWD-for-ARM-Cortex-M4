@@ -18,8 +18,8 @@ int setDataWatchpoint_MatchingTwoComparator(int dwtCompNumber1,uint32_t address1
                                             int dwtCompNumber2,uint32_t address2,Watchpoint_AddressMask addressMask2,
                                             uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
 
-int isDataWatchpointOccurred();
-int isAddressWatchpointOccurred(int dwtCompNumber);
+int hasDataWatchpointOccurred();
+int hasAddressWatchpointOccurred(int dwtCompNumber);
                              
 int disableDWTComparator(int dwtCompNumber);
 

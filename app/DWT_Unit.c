@@ -15,10 +15,10 @@
  *          addressMask is the mask going to be applied to the address 
  *          Possible value :
  *              WATCHPOINT_MASK_NOTHING  		  Compare all 32 bits of address set in DWT_COMPn 
- *							WATCHPOINTMASK_BIT0 			    Ignore Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT1_BIT0		  Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT2_BIT0		  Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT3_BIT0		  Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT0  			  Ignore Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT1_BIT0,		Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT2_BIT0,		Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT3_BIT0,		Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
  *							WATCHPOINT_MASK_BIT4_BIT0     Ignore Bit4 to Bit 0 of address set in DWT_COMPn during comparison
  *                        ""                                              ""
  *							WATCHPOINT_MASK_BIT12_BIT0		Ignore Bit12 to Bit 0 of address set in DWT_COMPn during comparison
@@ -70,10 +70,10 @@ int setAddressWatchpoint(int dwtCompNumber,uint32_t address,Watchpoint_AddressMa
  *          addressMask is the mask going to be applied to the address 
  *          Possible value :
  *              WATCHPOINT_MASK_NOTHING  		  Compare all 32 bits of address set in DWT_COMPn 
- *							WATCHPOINTMASK_BIT0 			    Ignore Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT1_BIT0		  Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT2_BIT0		  Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT3_BIT0		  Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT0  			  Ignore Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT1_BIT0,		Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT2_BIT0,		Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT3_BIT0,		Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
  *							WATCHPOINT_MASK_BIT4_BIT0     Ignore Bit4 to Bit 0 of address set in DWT_COMPn during comparison
  *                        ""                                              ""
  *							WATCHPOINT_MASK_BIT12_BIT0		Ignore Bit12 to Bit 0 of address set in DWT_COMPn during comparison
@@ -154,10 +154,10 @@ int setDataWatchpoint_MatchingOneComparator(int matchingCompNumber,uint32_t addr
  *          addressMask2 is the mask going to be applied to the second address 
  *          Possible value :
  *              WATCHPOINT_MASK_NOTHING  		  Compare all 32 bits of address set in DWT_COMPn 
- *							WATCHPOINTMASK_BIT0 			    Ignore Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT1_BIT0		  Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT2_BIT0		  Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
- *							WATCHPOINTMASK_BIT3_BIT0		  Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT0  			  Ignore Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT1_BIT0,		Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT2_BIT0,		Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT3_BIT0,		Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
  *							WATCHPOINT_MASK_BIT4_BIT0     Ignore Bit4 to Bit 0 of address set in DWT_COMPn during comparison
  *                        ""                                              ""
  *							WATCHPOINT_MASK_BIT12_BIT0		Ignore Bit12 to Bit 0 of address set in DWT_COMPn during comparison
@@ -214,7 +214,7 @@ int setDataWatchpoint_MatchingTwoComparator(int matchingCompNumber1,uint32_t add
  *  Output :  return 1 for true
  *            return 0 for false
  */
-int isDataWatchpointOccurred()
+int hasDataWatchpointOccurred()
 {
   uint32_t dataRead = 0 ;
   
@@ -238,7 +238,7 @@ int isDataWatchpointOccurred()
  *            return 0 for false
  *            return -1 if invalid comparator is selected 
  */
-int isAddressWatchpointOccurred(int dwtCompNumber)
+int hasAddressWatchpointOccurred(int dwtCompNumber)
 {
   uint32_t dataRead = 0 ;
   int valid = 0 ;

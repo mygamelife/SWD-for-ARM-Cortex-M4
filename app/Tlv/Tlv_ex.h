@@ -77,7 +77,8 @@ typedef enum
   TLV_RUN_TARGET,
   TLV_STEP,
   TLV_MULTI_STEP,
-  TLV_BREAKPOINT
+  TLV_BREAKPOINT,
+  TLV_WATCHPOINT
 } Tlv_Command;
 
 /* Tlv acknowledge */

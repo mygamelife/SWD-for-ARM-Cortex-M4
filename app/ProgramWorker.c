@@ -240,11 +240,11 @@ void singleStepTarget(Tlv_Session *session)
 }
 
 /** Step the processor of target device multiple times and send the current PC to host
-  *
-  * Input     : session contain a element/handler used by tlv protocol
-  *           : nInstructions is the number of instructions to step
-  *
-  */
+ *
+ * Input     : session contain a element/handler used by tlv protocol
+ *           : nInstructions is the number of instructions to step
+ *
+ */
 void multipleStepTarget(Tlv_Session *session,int nInstructions)
 {
   Tlv *tlv ;
@@ -264,7 +264,109 @@ void multipleStepTarget(Tlv_Session *session,int nInstructions)
   tlvSend(session, tlv);
 }
 
-void setBreakpoint(uint32_t instructionAddress,int matchingMode)
+/** Set instruction breakpoint
+ *
+ * Input : session contain a element/handler used by tlv protocol
+ *         instructionAddress is the address that will be breakpointed
+ *         matchingMode defines the behaviour when the comparator is matched
+ *         Possible value :
+ *					  MATCH_LOWERHALFWORD	    Set breakpoint on lower halfword 	
+ *					  MATCH_UPPERHALFWORD	    Set breakpoint on upper halfword 	
+ *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword			
+ *
+ */
+void setBreakpoint(Tlv_Session *session,uint32_t instructionAddress,int matchingMode)
 {
+  Tlv *tlv ;
+  int comparatorUsed = 0 ;
+  uint8_t errorCode = TLV_BKPT_MAXSET ;
   
+  comparatorUsed = autoSetInstructionBreakpoint(instructionAddress,matchingMode);
+  
+  if( comparatorUsed == -1)
+    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  else
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  tlvSend(session, tlv);
+}
+
+/** Set data watchpoint 
+ *
+ * Input     : session contain a element/handler used by tlv protocol
+ *             address is the address to be compared
+ *             addressMask is the mask going to be applied to the address 
+ *             Possible value :
+ *              WATCHPOINT_MASK_NOTHING  		  Compare all 32 bits of address set in DWT_COMPn 
+ *							WATCHPOINT_MASK_BIT0  			  Ignore Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT1_BIT0,		Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT2_BIT0,		Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT3_BIT0,		Ignore Bit3 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT4_BIT0     Ignore Bit4 to Bit 0 of address set in DWT_COMPn during comparison
+ *                        ""                                              ""
+ *							WATCHPOINT_MASK_BIT12_BIT0		Ignore Bit12 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT13_BIT0		Ignore Bit13 to Bit 0 of address set in DWT_COMPn during comparison
+ *							WATCHPOINT_MASK_BIT14_BIT0	  Ignore Bit14 to Bit 0 of address set in DWT_COMPn during comparison
+ *
+ *          accessMode is the access mode for the watchpoint
+ *          Possible value :
+ *              WATCHPOINT_READ         Watchpoint on read access
+ *              WATCHPOINT_WRITE        Watchpoint on write access
+ *              WATCHPOINT_READWRITE    Watchpoint on read/write access
+ */
+void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
+                   uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode)
+{
+  Tlv *tlv ;
+  
+  setDataWatchpoint_MatchingOneComparator(COMPARATOR_3,address,addressMask,matchedData,dataSize,accessMode); 
+
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session, tlv);  
+}                   
+
+/**
+ * Check for breakpoint event and return the PC if breakpoint occurs
+ *
+ * Input  : session contain a element/handler used by tlv protocol
+ */
+void checkBreakpointEvent(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  uint32_t pc =0 ;
+  
+  if(!(hasBreakpointDebugEventOccured()))
+    return ;
+  else 
+  {
+    readCoreRegister(CORE_REG_PC, &pc);
+    disableInstructionComparator(getEnabledComparatorLoadedWithAddress(pc));
+    clearBreakpointDebugEvent();
+  }
+  
+  tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&pc);
+  tlvSend(session, tlv);  
+}
+
+/**
+ * Check for watchpoint event and return the PC if watchpoint occurs
+ *
+ * Input  : session contain a element/handler used by tlv protocol
+ */
+void checkWatchpointEvent(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  uint32_t pc =0 ;
+  
+  if(!(hasDataWatchpointOccurred()))
+    return  ;
+  else
+  {
+    readCoreRegister(CORE_REG_PC, &pc);
+    disableDWTComparator(COMPARATOR_1);
+    clearDWTTrapDebugEvent() ;
+  }
+  
+  tlv = tlvCreatePacket(TLV_WATCHPOINT, 4, (uint8_t *)&pc);
+  tlvSend(session, tlv);  
 }

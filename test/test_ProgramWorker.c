@@ -7,6 +7,7 @@
 #include "mock_uart.h"
 #include "mock_CoreDebug.h"
 #include "mock_FPB_Unit.h"
+#include "mock_DWT_Unit.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
 
@@ -316,33 +317,92 @@ void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccess
 }
 
 /*---------setBreakpoint----------------------*/
-void xtest_setBreakpoint_should_set_breakpoint_and_return_PC_if_breakpoint_occurs()
+void test_setBreakpoint_should_set_breakpoint_and_return_ACK()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  // selectNextFreeComparator_ExpectAndReturn(INSTRUCTION_TYPE,INSINSTRUCTION_COMP1);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,MATCH_WORD,INSTRUCTION_COMP0);
 
+  setBreakpoint(session,0x12345678,MATCH_WORD);
+}
+
+void test_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparators_are_in_use()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,MATCH_LOWERHALFWORD,-1);
+
+  setBreakpoint(session,0x12345678,MATCH_LOWERHALFWORD);
+}
+
+/*---------setBreakpoint----------------------*/
+void test_setWatchpoint_should_set_watchpoint_and_return_ACK()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  setDataWatchpoint_MatchingOneComparator_ExpectAndReturn(COMPARATOR_3,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ,0);
+  
+  setWatchpoint(session,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ);
+}
+
+/*---------checkBreakpointEvent----------------------*/
+void test_checkBreakpointEvent_should_force_quit_if_breakpoint_not_occur()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  readDebugEventRegister_ExpectAndReturn(0);
+  
+  checkBreakpointEvent(session);
+}
+
+void test_checkBreakpointEvent_should_read_PC_and_disable_comparator_if_breakpoint_occur()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  readDebugEventRegister_ExpectAndReturn(0x2);
+  
   readCoreRegister_Ignore();
+  getEnabledComparatorLoadedWithAddress_IgnoreAndReturn(3);
+  disableInstructionComparator_ExpectAndReturn(3,0);
+  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
   
-  setBreakpoint(0x12345678,MATCH_WORD);
+  checkBreakpointEvent(session);
 }
 
-void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_NOTHIT_if_breakpoint_doesnt_occur()
+
+/*---------checkWatchpointEvent----------------------*/
+void test_checkWatchpointEvent_should_force_quit_if_watchpoint_not_occur()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  setBreakpoint(0x12345678,MATCH_UPPERHALFWORD);
+  hasDataWatchpointOccurred_ExpectAndReturn(0);
+  
+  checkWatchpointEvent(session);
 }
 
-void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparators_are_in_use()
+void test_checkWatchpointEvent_should_read_PC_and_disable_comparator_if_watchpoint_occur()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  setBreakpoint(0x12345678,MATCH_LOWERHALFWORD);
+  hasDataWatchpointOccurred_ExpectAndReturn(1);
+  
+  readCoreRegister_Ignore();
+  disableDWTComparator_ExpectAndReturn(COMPARATOR_1,0);
+  clearDebugEvent_Expect((DWTTRAP_DEBUGEVENT));
+  
+  checkWatchpointEvent(session);
 }

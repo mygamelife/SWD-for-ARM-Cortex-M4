@@ -12,6 +12,7 @@ typedef enum
   TLV_NOT_STEPPED,
   TLV_BKPT_NOTHIT,
   TLV_BKPT_MAXSET,
+  TLV_WATCHPOINT_NOTHIT,
 } Tlv_ErrorCode;
 
 #endif // Tlv_ErrorCode_H

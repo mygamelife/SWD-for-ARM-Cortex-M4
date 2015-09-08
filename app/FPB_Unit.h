@@ -19,4 +19,5 @@ int disableInstructionComparator(int instructionCOMPno);
 int disableLiteralComparator(int literalCOMPno);
 
 void readAndUpdateComparatorReadyFlag(int comparatorType);
+int getEnabledComparatorLoadedWithAddress(uint32_t data);
 #endif // FPB_Unit_H
