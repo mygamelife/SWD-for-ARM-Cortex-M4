@@ -253,7 +253,7 @@ void tlvRunTarget(Tlv_Session *session) {
 void tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   printf("nInstructions %d\n", nInstructions);
   /* create tlv packet with register address */
-  Tlv *tlv = tlvCreatePacket(TLV_RUN_TARGET, 4, (uint8_t *)&nInstructions);
+  Tlv *tlv = tlvCreatePacket(TLV_STEP, 4, (uint8_t *)&nInstructions);
 
   tlvSend(session, tlv);
 }
