@@ -28,6 +28,7 @@ typedef enum
   TLV_STEP,
   TLV_MULTI_STEP,
   TLV_BREAKPOINT,
+  TLV_WATCHPOINT,
   TLV_LOAD_PROGRAM_RAM,
   TLV_LOAD_PROGRAM_FLASH,
   TLV_EXIT
@@ -65,12 +66,6 @@ typedef enum
   PROBE_RECEIVE_PACKET,
   PROBE_INTERPRET_PACKET
 } Probe_State;
-
-typedef enum
-{
-  TRANSMISSION_BUSY,
-  TRANSMISSION_FREE
-} Tlv_Transmission_State;
 
 /* Tlv acknowledge */
 typedef enum

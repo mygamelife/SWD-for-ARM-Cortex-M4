@@ -129,12 +129,20 @@ int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_
  *					  MATCH_UPPERHALFWORD	    Set breakpoint on upper halfword (Bits[1:0] are 0b10)			
  *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword						
  *
- *  Output :  return 0 if instruction breakpoint is set
+ *  Output :  return INSTRUCTION_COMP0 - INSTRUCTION_COMP5 for valid comparator used
  *            return -1 if invalid comparator is chosen
  */
 int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode)
 {
-  return manualSetInstructionBreakpoint(selectNextFreeComparator(INSTRUCTION_TYPE),instructionAddress,matchingMode);
+  int comparatorToUse = 0 ;
+  
+  comparatorToUse = selectNextFreeComparator(INSTRUCTION_TYPE);
+  if(comparatorToUse == -1)
+    return -1 ;
+
+  manualSetInstructionBreakpoint(comparatorToUse,instructionAddress,matchingMode);
+  
+  return comparatorToUse;
 }
 
 /**
@@ -223,3 +231,30 @@ void readAndUpdateComparatorReadyFlag(int comparatorType)
 }
 
 
+/**
+ *  Get the instruction comparator loaded with the selected address
+ *   
+ *  Input   : address is the address going to be checked inside the instruction comparator
+ *  Output  : return the number of instruction comparator if found
+ *            return -1 if not found           
+ */
+int getEnabledComparatorLoadedWithAddress(uint32_t address)
+{
+  uint32_t mask = 0x1FFFFFFC ;
+  uint32_t dataRead = 0 ;
+  int i = 0 ;
+  
+  address = address & mask ;//mask off bit [31:29] and [1:0]
+  
+  for(i = 0 ; i < INSTRUCTION_COMP_NUM ; i ++ )
+  {
+    if(instructionComparatorReady[i] == COMP_BUSY)
+    { 
+      memoryReadWord((uint32_t)&(INSTRUCTION_COMP[i]),&dataRead);
+      if((dataRead & mask) == address)
+        return i ;
+    }
+  }
+  
+  return -1 ;
+}

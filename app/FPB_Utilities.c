@@ -1,6 +1,6 @@
 #include "FPB_Utilities.h"
-int instructionComparatorReady[6] = {};
-int literalComparatorReady[2] = {};
+int instructionComparatorReady[INSTRUCTION_COMP_NUM] = {};
+int literalComparatorReady[LITERAL_COMP_NUM] = {};
 
 int checkForValidInstructionComparator(int instructionCOMPno)
 {

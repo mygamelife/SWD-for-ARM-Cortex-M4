@@ -195,8 +195,8 @@ void test_setDataWatchpoint_MatchingTwoComparator()
                                                               0xABCDEF12,WATCHPOINT_BYTE,WATCHPOINT_READWRITE));
 }
 
-/*------------------isDataWatchpointOccurred--------------*/
-void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_MATCHED_should_return_1()
+/*------------------hasDataWatchpointOccurred--------------*/
+void test_hasDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_MATCHED_should_return_1()
 {
   //Faking CSW to Byte Size
   cswDataSize = CSW_WORD_SIZE ;
@@ -211,10 +211,10 @@ void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_MATCHED_should_ret
   emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
   emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x1000000));
   
-  TEST_ASSERT_EQUAL(1,isDataWatchpointOccurred());
+  TEST_ASSERT_EQUAL(1,hasDataWatchpointOccurred());
 }
 
-void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_NOT_MATCHED_should_return_0()
+void test_hasDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_NOT_MATCHED_should_return_0()
 {
   //DWTTRAP_DEBUGEVENT = 1
   emulateSwdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
@@ -226,21 +226,21 @@ void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_1_NOT_MATCHED_should
   emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
   emulateSwdRegisterRead(DRW_REG,AP,4,0,interconvertMSBandLSB(0xA));
   
-  TEST_ASSERT_EQUAL(0,isDataWatchpointOccurred());
+  TEST_ASSERT_EQUAL(0,hasDataWatchpointOccurred());
 }
 
-void test_isDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_0_should_return_0()
+void test_hasDataWatchpointOccurred_given_DWTTRAP_DEBUGEVENT_0_should_return_0()
 {
   //DWTTRAP_DEBUGEVENT = 0
   emulateSwdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
   emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
   emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x0));
   
-  TEST_ASSERT_EQUAL(0,isDataWatchpointOccurred());
+  TEST_ASSERT_EQUAL(0,hasDataWatchpointOccurred());
 }
 
-/*------------------isAddressWatchpointOccurred--------------*/
-void test_isAddressWatchpointOccurred_given_DWT_COMP3__DWTTRAP_DEBUGEVENT_1_MATCHED_should_return_1()
+/*------------------hasAddressWatchpointOccurred--------------*/
+void test_hasAddressWatchpointOccurred_given_DWT_COMP3__DWTTRAP_DEBUGEVENT_1_MATCHED_should_return_1()
 {
   //DWTTRAP_DEBUGEVENT = 1
   emulateSwdRegisterWrite(TAR_REG,AP,4,DFSR_REG);
@@ -252,7 +252,7 @@ void test_isAddressWatchpointOccurred_given_DWT_COMP3__DWTTRAP_DEBUGEVENT_1_MATC
   emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
   emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x1000000));
   
-  TEST_ASSERT_EQUAL(1,isAddressWatchpointOccurred(COMPARATOR_3));
+  TEST_ASSERT_EQUAL(1,hasAddressWatchpointOccurred(COMPARATOR_3));
 }
 
 

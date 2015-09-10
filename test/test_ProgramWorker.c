@@ -7,6 +7,7 @@
 #include "mock_uart.h"
 #include "mock_CoreDebug.h"
 #include "mock_FPB_Unit.h"
+#include "mock_DWT_Unit.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
 
@@ -88,28 +89,54 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
   readTargetRegister(session, 0xBEEFBEEF);
 }
 
-/*--------------performSoftResetOnTarget--------------------*/
-void test_performSoftResetOnTarget_should_call_softResetTarget_and_send_TLV_ack()
+void test_writeTargetRam_should_write_data_to_specified_RAM_address()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_SYSTEM_RESET,NO_ERROR);
+  uint32_t buffer[] = {0x20000000, 0x12345678, 0xABCDABCD};
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 12, (uint8_t *)buffer);
   
-  performSoftResetOnTarget(session);
+  memoryWriteWord_ExpectAndReturn(0x20000000, 0x12345678, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000004, 0xABCDABCD, NO_ERROR);
+  
+  writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 4);
 }
 
-/*--------------performHardResetOnTarget--------------------*/
-void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack()
+void test_readTargetRam_should_reply_back_with_the_correct_chksum()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  hardResetTarget_Expect();
+  uint32_t buffer[] = {0x20000000, 4};
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
   
-  performHardResetOnTarget(session);
+  memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xABCDABCD);
+  
+  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
+  
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xABCDABCD, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xF0, session->txBuffer[10]); //chksum
+}
+
+void test_readTargetRam_should_read_data_from_specified_RAM_address()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t buffer[] = {0x20000000, 8};
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
+  
+  memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xDEADBEEF);
+  memoryReadAndReturnWord_ExpectAndReturn(0x20000004, 0xABCDABCD);
+  
+  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
 }
 
 void test_probeTaskManager_given_initial_state_receive_packet_when_packet_arrived_should_change_state(void)
@@ -248,189 +275,103 @@ void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task
   TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }
 
-/*--------------haltTarget--------------------*/
-void test_haltTarget_should_return_ACK_if_successful()
+void test_probeTaskManager_should_receive_TLV_READ_RAM_and_perform_the_task(void)
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
+  uint32_t readData = 0;
   
-  setCoreMode_Expect(CORE_DEBUG_HALT);
-  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  session->rxBuffer[0] = TLV_READ_RAM; //invalid command
+  session->rxBuffer[1] = 9;
+  session->rxBuffer[2] = 0x00;
+  session->rxBuffer[3] = 0x00;
+  session->rxBuffer[4] = 0x00;
+  session->rxBuffer[5] = 0x20;
+  session->rxBuffer[6] = 12;
+  session->rxBuffer[7] = 0x00;
+  session->rxBuffer[8] = 0x00;
+  session->rxBuffer[9] = 0x00;
+  session->rxBuffer[10] = 0xD4; //chksum
   
-  haltTarget(session);
-}
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x00); //no data arrive
+  
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
 
-void test_haltTarget_should_return_NACK_and_ERR_NOT_HALTED_if_not_successful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[1], 1, 0x00); //no data arrive
   
-  setCoreMode_Expect(CORE_DEBUG_HALT);
-  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  haltTarget(session);
-}
-
-/*--------------runTarget--------------------*/
-void test_runTarget_should_return_ACK_if_successful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
-
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 1, 0x00); //no data arrive
   
-  runTarget(session);
-}
-
-void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[3], 1, 0x00); //no data arrive
   
-  runTarget(session);  
-}
-
-/*---------singleStepTarget----------------------*/
-void test_singleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  setCoreMode_Expect(CORE_SINGLE_STEP);
-  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
-  readCoreRegister_Ignore();
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[4], 1, 0x00); //no data arrive
   
-  singleStepTarget(session);    
-}
-
-void test_singleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  setCoreMode_Expect(CORE_SINGLE_STEP);
-  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[5], 1, 0x00); //no data arrive
   
-  singleStepTarget(session);    
-}
-/*---------multipleStepTarget----------------------*/
-void test_multipleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  stepOnly_Expect(5);
-  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
-  readCoreRegister_Ignore();
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[6], 1, 0x00); //no data arrive
   
-  multipleStepTarget(session, 5);    
-}
-
-void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  stepOnly_Expect(5);
-  getCoreMode_ExpectAndReturn(CORE_NORMAL_MODE);
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[7], 1, 0x00); //no data arrive
   
-  multipleStepTarget(session, 5);    
-}
-
-/*---------setBreakpoint----------------------*/
-void xtest_setBreakpoint_should_set_breakpoint_and_return_PC_if_breakpoint_occurs()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  // selectNextFreeComparator_ExpectAndReturn(INSTRUCTION_TYPE,INSINSTRUCTION_COMP1);
-
-  readCoreRegister_Ignore();
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[8], 1, 0x00); //no data arrive
   
-  setBreakpoint(0x12345678,MATCH_WORD);
-}
-
-void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_NOTHIT_if_breakpoint_doesnt_occur()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  setBreakpoint(0x12345678,MATCH_UPPERHALFWORD);
-}
-
-void xtest_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparators_are_in_use()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[9], 1, 0x00); //no data arrive
   
-  setBreakpoint(0x12345678,MATCH_LOWERHALFWORD);
-}
-
-void test_writeTargetRam_should_write_data_to_specified_RAM_address()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   
-  uint32_t buffer[] = {0x20000000, 0x12345678, 0xABCDABCD};
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 12, (uint8_t *)buffer);
+  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[10], 1, 0x00); //no data arrive
   
-  memoryWriteWord_ExpectAndReturn(0x20000000, 0x12345678, NO_ERROR);
-  memoryWriteWord_ExpectAndReturn(0x20000004, 0xABCDABCD, NO_ERROR);
+  tlvService(session);
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
   
-  writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 4);
-}
-
-void test_readTargetRam_should_reply_back_with_the_correct_chksum()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
+  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x01); //no data arrive
   
-  uint32_t buffer[] = {0x20000000, 4};
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
-  
-  memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xABCDABCD);
-  
-  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
-  
-  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
-  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
-  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
-  TEST_ASSERT_EQUAL_HEX32(0xABCDABCD, get4Byte(&session->txBuffer[6]));
-  TEST_ASSERT_EQUAL_HEX8(0xF0, session->txBuffer[10]); //chksum
-}
-
-void test_readTargetRam_should_read_data_from_specified_RAM_address()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t buffer[] = {0x20000000, 8};
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
-  
+  tlvService(session);
   memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xDEADBEEF);
   memoryReadAndReturnWord_ExpectAndReturn(0x20000004, 0xABCDABCD);
+  memoryReadAndReturnWord_ExpectAndReturn(0x20000008, 0xABCDABCD);
   
-  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }
-
 
 void test_probeTaskManager_should_receive_TLV_WRITE_RAM_and_perform_the_task(void)
 {
@@ -538,100 +479,222 @@ void test_probeTaskManager_should_receive_TLV_WRITE_RAM_and_perform_the_task(voi
   TEST_ASSERT_EQUAL(true, session->dataSendFlag);
 }
 
-void test_probeTaskManager_should_receive_TLV_READ_RAM_and_perform_the_task(void)
+/*=======================================================================================
+                                    Debug Features
+  =======================================================================================*/
+  
+  
+/*--------------performSoftResetOnTarget--------------------*/
+void test_performSoftResetOnTarget_should_call_softResetTarget_and_send_TLV_ack()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
-  uint32_t readData = 0;
   
-  session->rxBuffer[0] = TLV_READ_RAM; //invalid command
-  session->rxBuffer[1] = 9;
-  session->rxBuffer[2] = 0x00;
-  session->rxBuffer[3] = 0x00;
-  session->rxBuffer[4] = 0x00;
-  session->rxBuffer[5] = 0x20;
-  session->rxBuffer[6] = 12;
-  session->rxBuffer[7] = 0x00;
-  session->rxBuffer[8] = 0x00;
-  session->rxBuffer[9] = 0x00;
-  session->rxBuffer[10] = 0xD4; //chksum
+  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_SYSTEM_RESET,NO_ERROR);
   
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x00); //no data arrive
-  
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  performSoftResetOnTarget(session);
+}
 
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[1], 1, 0x00); //no data arrive
+/*--------------performHardResetOnTarget--------------------*/
+void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  hardResetTarget_Expect();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 1, 0x00); //no data arrive
+  performHardResetOnTarget(session);
+}
+
+/*--------------haltTarget--------------------*/
+void test_haltTarget_should_return_ACK_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  setCoreMode_Expect(CORE_DEBUG_HALT);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[3], 1, 0x00); //no data arrive
+  haltTarget(session);
+}
+
+void test_haltTarget_should_return_NACK_and_ERR_NOT_HALTED_if_not_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  setCoreMode_Expect(CORE_DEBUG_HALT);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[4], 1, 0x00); //no data arrive
+  haltTarget(session);
+}
+
+/*--------------runTarget--------------------*/
+void test_runTarget_should_return_ACK_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  runTarget(session);
+}
+
+void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[5], 1, 0x00); //no data arrive
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  runTarget(session);  
+}
+
+/*---------singleStepTarget----------------------*/
+void test_singleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[6], 1, 0x00); //no data arrive
+  setCoreMode_Expect(CORE_SINGLE_STEP);
+  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
+  readCoreRegister_Ignore();
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  singleStepTarget(session);    
+}
+
+void test_singleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[7], 1, 0x00); //no data arrive
+  setCoreMode_Expect(CORE_SINGLE_STEP);
+  getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  singleStepTarget(session);    
+}
+/*---------multipleStepTarget----------------------*/
+void test_multipleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[8], 1, 0x00); //no data arrive
+  stepOnly_Expect(5);
+  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
+  readCoreRegister_Ignore();
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  multipleStepTarget(session, 5);    
+}
+
+void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[9], 1, 0x00); //no data arrive
+  stepOnly_Expect(5);
+  getCoreMode_ExpectAndReturn(CORE_NORMAL_MODE);
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  multipleStepTarget(session, 5);    
+}
+
+/*---------setBreakpoint----------------------*/
+void test_setBreakpoint_should_set_breakpoint_and_return_ACK()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[10], 1, 0x00); //no data arrive
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,MATCH_WORD,INSTRUCTION_COMP0);
+
+  setBreakpoint(session,0x12345678,MATCH_WORD);
+}
+
+void test_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparators_are_in_use()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  tlvService(session);
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,MATCH_LOWERHALFWORD,-1);
+
+  setBreakpoint(session,0x12345678,MATCH_LOWERHALFWORD);
+}
+
+/*---------setBreakpoint----------------------*/
+void test_setWatchpoint_should_set_watchpoint_and_return_ACK()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  getBytes_ExpectAndReturn(session->handler, session->rxBuffer, 1, 0x01); //no data arrive
+  setDataWatchpoint_MatchingOneComparator_ExpectAndReturn(COMPARATOR_3,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ,0);
   
-  tlvService(session);
-  memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xDEADBEEF);
-  memoryReadAndReturnWord_ExpectAndReturn(0x20000004, 0xABCDABCD);
-  memoryReadAndReturnWord_ExpectAndReturn(0x20000008, 0xABCDABCD);
+  setWatchpoint(session,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ);
+}
+
+/*---------checkBreakpointEvent----------------------*/
+void test_checkBreakpointEvent_should_force_quit_if_breakpoint_not_occur()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
   
-  probeTaskManager(session);
-  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(false, session->dataReceiveFlag);
-  TEST_ASSERT_EQUAL(true, session->dataSendFlag);
+  readDebugEventRegister_ExpectAndReturn(0);
+  
+  checkBreakpointEvent(session);
+}
+
+void test_checkBreakpointEvent_should_read_PC_and_disable_comparator_if_breakpoint_occur(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  readDebugEventRegister_ExpectAndReturn(0x2);
+  
+  readCoreRegister_Ignore();
+  getEnabledComparatorLoadedWithAddress_IgnoreAndReturn(3);
+  disableInstructionComparator_ExpectAndReturn(3,0);
+  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
+  
+  checkBreakpointEvent(session);
+}
+
+/*---------checkWatchpointEvent----------------------*/
+void test_checkWatchpointEvent_should_force_quit_if_watchpoint_not_occur()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  hasDataWatchpointOccurred_ExpectAndReturn(0);
+  
+  checkWatchpointEvent(session);
+}
+
+void test_checkWatchpointEvent_should_read_PC_and_disable_comparator_if_watchpoint_occur()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  hasDataWatchpointOccurred_ExpectAndReturn(1);
+  
+  readCoreRegister_Ignore();
+  disableDWTComparator_ExpectAndReturn(COMPARATOR_1,0);
+  clearDebugEvent_Expect((DWTTRAP_DEBUGEVENT));
+  
+  checkWatchpointEvent(session);
 }
