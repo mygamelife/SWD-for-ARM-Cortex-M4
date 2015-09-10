@@ -47,19 +47,17 @@ void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress)  {
   * return  : NONE
   */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-  Tlv *tlv;
-  char chksum = 0;
+  Tlv *tlv; uint8_t chksum = 0;
   
   /* create tlv packet with register address */
-  tlv = tlvCreatePacket(TLV_WRITE_RAM, 4, (uint8_t *)&destAddress);
-  chksum = tlv->value[4];
+  tlv = tlvCreatePacket(TLV_WRITE_RAM, size + 4, NULL);
   
-  tlvPackIntoBuffer(&tlv->value[4], dataAddress, size);
-  tlv->length += size;
+  chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&destAddress, 4);
+  chksum += tlvPackIntoBuffer(&tlv->value[4], dataAddress, size);
 
   /* Update checksum with destAddress */
-  tlv->value[tlv->length - 1] = tlv->value[tlv->length - 1] + chksum;
-
+  tlv->value[tlv->length - 1] = chksum;
+  
   tlvSend(session, tlv);
 }
 
@@ -73,18 +71,20 @@ void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t dest
   *
   * return  : NONE
   */
-void tlvWriteTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t *destAddress, int *size)  {
+void tlvWriteTargetRam(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size)  {
   session->ongoingProcessFlag = true;
 
   if(*size > TLV_DATA_SIZE) {
-    tlvWriteDataChunk(session, (uint8_t *)dataAddress, *destAddress, TLV_DATA_SIZE);
+    printf("here 1\n");
+    tlvWriteDataChunk(session, *dataAddress, *destAddress, TLV_DATA_SIZE);
   }
   else  {
-    tlvWriteDataChunk(session, (uint8_t *)dataAddress, *destAddress, *size);
+    printf("here 2\n");
+    tlvWriteDataChunk(session, *dataAddress, *destAddress, *size);
     session->ongoingProcessFlag = false;
   }
   
-  dataAddress += TLV_DATA_SIZE;
+  *dataAddress += TLV_DATA_SIZE;
   *destAddress += TLV_DATA_SIZE;
   *size -= TLV_DATA_SIZE;
 }
@@ -121,8 +121,6 @@ void tlvReadTargetRam(Tlv_Session *session, uint32_t *destAddress, int *size) {
   Tlv *tlv; 
   session->ongoingProcessFlag = true;
 
-  printf("destAddress %x\n", *destAddress);
-  printf("size %d\n", *size);
   if(*size > TLV_DATA_SIZE) {
     tlvReadDataChunk(session, *destAddress, TLV_DATA_SIZE);
   }
@@ -135,6 +133,131 @@ void tlvReadTargetRam(Tlv_Session *session, uint32_t *destAddress, int *size) {
   *size -= TLV_DATA_SIZE;
 }
 
+/** extractElfFile is a function to extract the file info
+  * by using elf reader function
+  *
+  * Input   : NONE
+  *
+  * Return  : NONE
+  */
+FileInfo *extractElfFile(ElfData *elfData, char *section)  {
+  FileInfo *file = malloc(sizeof(FileInfo));
+  
+  file->index = getIndexOfSectionByName(elfData, section);
+  file->dataAddress = (uint8_t *)getSectionAddress(elfData, file->index);
+  file->destAddress = getSectionHeaderAddrUsingIndex(elfData, file->index);
+  file->size = (int)getSectionSize(elfData, file->index);
+
+  return file;
+}
+
+/** tlvLoadProgramToRam
+  *
+  * Input   : NONE
+  *
+  * Return  : NONE
+  */
+void tlvLoadProgramToRam(Tlv_Session *session, char *fileName) {
+  static FileInfo *file;
+  static int fileStatus = 0;
+  static ElfData *elfData;
+  
+  switch(session->loadProgramState) {
+    case TLV_LOAD_ISR_VECTOR :
+      if(fileStatus != 1) {
+        fileStatus = 1;
+        elfData = openElfFile(fileName);
+        file = extractElfFile(elfData, ".isr_vector");
+      }
+    
+      printf("load TLV_LOAD_ISR_VECTOR\n");
+      tlvWriteTargetRam(session, &file->dataAddress, &file->destAddress, &file->size);
+      session->ongoingProcessFlag = true;
+      
+      if(file->size <= 0) {
+        printf("finish load TLV_LOAD_ISR_VECTOR\n");
+        // free(file);
+        fileStatus = 0;
+        session->loadProgramState = TLV_LOAD_RO_DATA;
+      }
+      break;
+      
+    case TLV_LOAD_RO_DATA :
+      if(fileStatus != 1) {
+        fileStatus = 1;
+        file = extractElfFile(elfData, ".rodata");
+      }
+      printf("TLV_LOAD_RO_DATA\n");
+      tlvWriteTargetRam(session, &file->dataAddress, &file->destAddress, &file->size);
+      session->ongoingProcessFlag = true;
+        
+      if(file->size <= 0) {
+        printf("finish load TLV_LOAD_RO_DATA\n");
+        // free(file);
+        fileStatus = 0;
+        session->loadProgramState = TLV_LOAD_DATA;
+      }
+      break;
+      
+    case TLV_LOAD_DATA :
+      if(fileStatus != 1) {
+        fileStatus = 1;
+        file = extractElfFile(elfData, ".data");
+      }
+      
+      tlvWriteTargetRam(session, &file->dataAddress, &file->destAddress, &file->size);
+      session->ongoingProcessFlag = true;
+        
+      if(file->size <= 0) {
+        printf("finish load TLV_LOAD_DATA\n");
+        // free(file);
+        fileStatus = 0;
+        session->loadProgramState = TLV_LOAD_TEXT;
+      }
+      break;
+      
+    case TLV_LOAD_TEXT :
+      if(fileStatus != 1) {
+        fileStatus = 1;
+        file = extractElfFile(elfData, ".text");
+      }
+      
+      tlvWriteTargetRam(session, &file->dataAddress, &file->destAddress, &file->size);
+      session->ongoingProcessFlag = true;
+        
+      if(file->size <= 0) {
+        printf("finish load TLV_LOAD_TEXT\n");
+        // free(file);
+        fileStatus = 0;
+        session->ongoingProcessFlag = false;
+        session->loadProgramState = TLV_LOAD_ISR_VECTOR;
+      }
+      break;
+  }
+}
+
+void tlvHaltTarget(Tlv_Session *session)  {
+  /* create tlv packet with register address */
+  Tlv *tlv = tlvCreatePacket(TLV_HALT_TARGET, 0, 0);
+
+  tlvSend(session, tlv);
+}
+
+void tlvRunTarget(Tlv_Session *session) {
+  /* create tlv packet with register address */
+  Tlv *tlv = tlvCreatePacket(TLV_RUN_TARGET, 0, 0);
+
+  tlvSend(session, tlv);
+}
+
+void tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
+  printf("nInstructions %d\n", nInstructions);
+  /* create tlv packet with register address */
+  Tlv *tlv = tlvCreatePacket(TLV_RUN_TARGET, 4, (uint8_t *)&nInstructions);
+
+  tlvSend(session, tlv);
+}
+
 /** selectCommand is a function to select instruction 
   * base on tlv->type
   *
@@ -145,13 +268,17 @@ void tlvReadTargetRam(Tlv_Session *session, uint32_t *destAddress, int *size) {
 void selectCommand(Tlv_Session *session, User_Session *userSession) {
 
   switch(userSession->tlvCommand) {
-    case TLV_WRITE_RAM      : tlvWriteTargetRam(session, userSession->data, &userSession->address, &userSession->size); break;
-    case TLV_READ_RAM       : tlvReadTargetRam(session, &userSession->address, &userSession->size); break;
-    case TLV_WRITE_REGISTER : tlvWriteTargetRegister(session, userSession->address, userSession->data); break;
-    case TLV_READ_REGISTER  : tlvReadTargetRegister(session, userSession->address); break;
-    case TLV_HALT_TARGET    : break;
-    case TLV_RUN_TARGET     : break;
-    case TLV_STEP           : break;
+    case TLV_WRITE_RAM        : {
+      uint8_t *pData = (uint8_t *)userSession->data;
+      tlvWriteTargetRam(session, &pData, &userSession->address, &userSession->size); break;
+    }
+    case TLV_READ_RAM         : tlvReadTargetRam(session, &userSession->address, &userSession->size); break;
+    case TLV_WRITE_REGISTER   : tlvWriteTargetRegister(session, userSession->address, userSession->data); break;
+    case TLV_READ_REGISTER    : tlvReadTargetRegister(session, userSession->address); break;
+    case TLV_LOAD_PROGRAM_RAM : tlvLoadProgramToRam(session, userSession->fileName); break;
+    case TLV_HALT_TARGET      : tlvHaltTarget(session); break;
+    case TLV_RUN_TARGET       : tlvRunTarget(session); break;
+    case TLV_STEP             : tlvMultipleStepTarget(session, (int)(*userSession->data)); break;
   }
 }
 

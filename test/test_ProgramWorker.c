@@ -396,7 +396,27 @@ void test_writeTargetRam_should_write_data_to_specified_RAM_address()
   writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 4);
 }
 
-void test_readTargetRam_should_write_data_to_specified_RAM_address()
+void test_readTargetRam_should_reply_back_with_the_correct_chksum()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t buffer[] = {0x20000000, 4};
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
+  
+  memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xABCDABCD);
+  
+  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
+  
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xABCDABCD, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xF0, session->txBuffer[10]); //chksum
+}
+
+void test_readTargetRam_should_read_data_from_specified_RAM_address()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -410,6 +430,7 @@ void test_readTargetRam_should_write_data_to_specified_RAM_address()
   
   readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
 }
+
 
 void test_probeTaskManager_should_receive_TLV_WRITE_RAM_and_perform_the_task(void)
 {

@@ -14,6 +14,7 @@ Tlv_Session *tlvCreateSession(void) {
   /* Initialize begining state for send and receive */
   session.sendState = TLV_SEND_BEGIN;
   session.receiveState = TLV_RECEIVE_TYPE;
+  session.loadProgramState = TLV_LOAD_ISR_VECTOR;
   
   /* Initialize all the required flag */
   session.timeOutFlag = false;
@@ -29,16 +30,15 @@ Tlv_Session *tlvCreateSession(void) {
 
 /** tlvPackIntoBuffer is a function to pack currentBuffer into targetBuffer
   */
-void tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length) {
-  int index = 0;
-  uint8_t chksum = 0;
+uint8_t tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length) {
+  int index = 0;  uint8_t chksum = 0;
   
   for(index; index < length; index++) {
     chksum += targetBuffer[index] = currentBuffer[index];
   }
-  targetBuffer[index] = ~chksum + 1;
+  
+  return ~chksum + 1;
 }
-
 
 /** tlvCreatePacket create a packet contain all the information needed for tlv protocol
   *
@@ -58,7 +58,11 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   
   tlv.type = command;
   tlv.length = size + 1; //extra length for chksum
-  tlvPackIntoBuffer(tlv.value, data, size);
+  
+  /* Insert checksum at the last position of tlv value */
+  if(data != NULL)
+    tlv.value[tlv.length - 1] = tlvPackIntoBuffer(tlv.value, data, size);
+  else tlv.value[tlv.length - 1] = 0;
   
   return &tlv;
 }
@@ -75,7 +79,7 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   
   session->txBuffer[0] = tlv->type;
   session->txBuffer[1] = tlv->length;
-  tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length);
+  session->txBuffer[tlv->length + 1] = tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length - 1);
 }
 
 /** tlvSendService is a state machine to handle the tlvSend
@@ -100,10 +104,6 @@ void tlvSendService(Tlv_Session *session)	{
           uartReady = 0;
           #endif
         }
-        /*
-          if user call transmit when txBuffer is busy should
-          issue error
-        */
       }
       break;
   }

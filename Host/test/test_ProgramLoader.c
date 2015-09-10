@@ -44,6 +44,23 @@ void test_tlvReadTargetRegister_should_wait_response_after_send_packet(void)
   TEST_ASSERT_EQUAL_HEX32(0x88888888, get4Byte(&session->txBuffer[2]));
 }
 
+void test_tlvWriteDataChunk_should_send_data_in_chunk_with_correct_chksum(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t address = 0x11111111;
+  uint32_t data[] = {0xDEADBEEF};
+  tlvWriteDataChunk(session, (uint8_t *)data, address, 4);
+  
+  TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_RAM, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0x84, session->txBuffer[10]); //chksum
+}
+
 void test_tlvWriteDataChunk_should_send_data_in_chunk_with_specific_size(void)
 {
   HANDLE hSerial;
@@ -69,13 +86,32 @@ void test_tlvWriteTargetRam_should_request_and_write_data_into_target_RAM(void)
   userSession.address = 0x20000000;
   userSession.size = 20;
 
-  tlvWriteTargetRam(session, userSession.data, &userSession.address, &userSession.size);
+  uint8_t *pData = (uint8_t *)userSession.data;
+  tlvWriteTargetRam(session, &pData, &userSession.address, &userSession.size);
   
   TEST_ASSERT_EQUAL_HEX32(0x200000F8, userSession.address);
   TEST_ASSERT_EQUAL(-228, userSession.size);
   TEST_ASSERT_EQUAL(false, session->ongoingProcessFlag);
 }
 
+void test_tlvWriteTargetRam_write_isr_vector_section_into_RAM(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  ElfData *elfData = openElfFile("test/ELF_File/blinkLed.elf");
+  int index = getIndexOfSectionByName(elfData, ".isr_vector");
+  uint8_t *dataAddress = (uint8_t *)getSectionAddress(elfData, index);
+  uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
+  int size = getSectionSize(elfData, index);
+
+  tlvWriteTargetRam(session, &dataAddress, &destAddress, &size);
+  TEST_ASSERT_EQUAL_HEX32(0x200000F8, destAddress);
+  TEST_ASSERT_EQUAL(180, size);
+  TEST_ASSERT_EQUAL(true, session->ongoingProcessFlag);
+}
+  
 void test_tlvWriteTargetRam_should_stop_request_when_size_is_0(void)
 {
   HANDLE hSerial;
@@ -88,19 +124,20 @@ void test_tlvWriteTargetRam_should_stop_request_when_size_is_0(void)
   userSession.address = 0x20000000;
   userSession.size = 500;
 
-  tlvWriteTargetRam(session, userSession.data, &userSession.address, &userSession.size);
+  uint8_t *pData = (uint8_t *)userSession.data;
+  tlvWriteTargetRam(session, &pData, &userSession.address, &userSession.size);
   
   TEST_ASSERT_EQUAL_HEX32(0x200000F8, userSession.address);
   TEST_ASSERT_EQUAL(252, userSession.size);
   TEST_ASSERT_EQUAL(true, session->ongoingProcessFlag);
   
-  tlvWriteTargetRam(session, userSession.data, &userSession.address, &userSession.size);
+  tlvWriteTargetRam(session, &pData, &userSession.address, &userSession.size);
   
   TEST_ASSERT_EQUAL_HEX32(0x200001F0, userSession.address);
   TEST_ASSERT_EQUAL(4, userSession.size);
   TEST_ASSERT_EQUAL(true, session->ongoingProcessFlag);
   
-  tlvWriteTargetRam(session, userSession.data, &userSession.address, &userSession.size);
+  tlvWriteTargetRam(session, &pData, &userSession.address, &userSession.size);
   
   TEST_ASSERT_EQUAL_HEX32(0x200002E8, userSession.address);
   TEST_ASSERT_EQUAL(-244, userSession.size);
@@ -139,6 +176,18 @@ void test_tlvReadTargetRam_should_stop_request_tlv_read_register_when_size_is_0(
   TEST_ASSERT_EQUAL(false, session->ongoingProcessFlag);
   TEST_ASSERT_EQUAL_HEX32(0x200001F0, address);
   TEST_ASSERT_EQUAL(-96, size);
+}
+
+void test_tlvLoadProgramToRam_should_open_file_and_load_isr_vector(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  tlvLoadProgramToRam(session, "test/ELF_File/blinkLed.elf");
+  tlvLoadProgramToRam(session, "test/ELF_File/blinkLed.elf");
+  TEST_ASSERT_EQUAL(TLV_LOAD_RO_DATA, session->loadProgramState);
+  TEST_ASSERT_EQUAL(true, session->ongoingProcessFlag);
 }
 
 void test_hostInterpreter_by_requesting_tlv_write_register(void)

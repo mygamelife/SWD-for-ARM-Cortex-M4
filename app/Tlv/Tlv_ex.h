@@ -5,8 +5,10 @@
 
 // #define getInt(x)      (*(int *)(x))
 // #define getByte(x)      (*(uint8_t *)(x))
-#define get4Byte(x)     (*(uint32_t *)(x))
-
+#define get4Byte(x)                     (*(uint32_t *)(x))
+#define convertToBigEndian(x)           ((*(uint32_t *)(x)) >> 24 ) | (((*(uint32_t *)(x)) << 8) & 0x00ff0000) |  \
+                                        (((*(uint32_t *)(x)) >> 8) & 0x0000ff00) | ((*(uint32_t *)(x)) << 24)
+                        
 typedef struct
 {
   uint8_t type;
@@ -26,6 +28,8 @@ typedef enum
   TLV_STEP,
   TLV_MULTI_STEP,
   TLV_BREAKPOINT,
+  TLV_LOAD_PROGRAM_RAM,
+  TLV_LOAD_PROGRAM_FLASH,
   TLV_EXIT
 } Tlv_Command;
 
@@ -37,10 +41,14 @@ typedef enum
   TLV_RECEIVE_LENGTH,
   TLV_RECEIVE_VALUE,
   TLV_RECEIVE_CHECKSUM,
-  TLV_RECEIVE_END,
   TLV_SEND_PACKET,
   TLV_RECEIVE_PACKET,
-  TLV_WAIT_RESPONSE
+  TLV_WAIT_RESPONSE,
+  TLV_OPEN_FILE,
+  TLV_LOAD_ISR_VECTOR,
+  TLV_LOAD_RO_DATA,
+  TLV_LOAD_DATA,
+  TLV_LOAD_TEXT
 } Tlv_State;
 
 typedef enum

@@ -14,13 +14,7 @@ void test_tlvPackIntoBuffer_given_target_and_current_buffer_and_length(void)
   uint8_t target[0];
   uint8_t current[] = {0xDE, 0xAD, 0xBE, 0xEF};
   
-	tlvPackIntoBuffer(target, current, 4);
-  
-  TEST_ASSERT_EQUAL_HEX8(0xDE, target[0]);
-  TEST_ASSERT_EQUAL_HEX8(0xAD, target[1]);
-  TEST_ASSERT_EQUAL_HEX8(0xBE, target[2]);
-  TEST_ASSERT_EQUAL_HEX8(0xEF, target[3]);
-  TEST_ASSERT_EQUAL_HEX8(0xC8, target[4]);
+  TEST_ASSERT_EQUAL_HEX8(0xC8, tlvPackIntoBuffer(target, current, 4));
 }
 
 void test_tlvCreatePacket_given_command_size_and_data(void)
@@ -88,7 +82,7 @@ void test_tlvSend_given_tlv_with_command_and_length_1_and_data_is_null(void)
 { 
   Tlv_Session session;
   
-	Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+	Tlv *tlv = tlvCreatePacket(TLV_OK, 0, NULL);
   
   tlvSend(&session, tlv);
   
@@ -456,7 +450,7 @@ void test_isTlvAck_if_the_type_is_negative_acknowledgement_should_throw_the_erro
 
 void test_verifyTlvPacket_should_return_1_if_response_is_tlv_acknowledge_OK(void)
 {
-	Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+	Tlv *tlv = tlvCreatePacket(TLV_OK, 0, NULL);
   TEST_ASSERT_EQUAL(1, verifyTlvPacket(tlv));
 }
 

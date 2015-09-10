@@ -41,9 +41,9 @@ HANDLE uartInit(void) {
   }
   
   // The interval 
-  timeouts.ReadIntervalTimeout = 400;
-  timeouts.ReadTotalTimeoutConstant = 400;
-  timeouts.ReadTotalTimeoutMultiplier = 400;
+  timeouts.ReadIntervalTimeout = 100;
+  timeouts.ReadTotalTimeoutConstant = 100;
+  timeouts.ReadTotalTimeoutMultiplier = 100;
   timeouts.WriteTotalTimeoutConstant = 30;
   timeouts.WriteTotalTimeoutMultiplier = 30;
   if(!SetCommTimeouts(hSerial, &timeouts)){

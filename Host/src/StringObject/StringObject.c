@@ -1,8 +1,10 @@
 #include "StringObject.h"
 
-char *numSet = "0x123456789abcdefABCDEF";
+char *numSet = "0123456789";
+char *hexNumSet = "0x123456789abcdefABCDEF";
 char *opSet = "~!@#$%^&*()_-+={}|;:\'<,.>/?";
 char *alphaNumericSet = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+char *folderNameSet = "a:\\.b&c_d-efghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 char *alphaSet = "_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 /* Create a new String

@@ -23,20 +23,19 @@ Token *getToken(String *expression)
 	//if character start with numbers it is number token
 	if(stringCharAtInSet(expression , charAtThisPos , numSet))
 	{	
-		String *removedWord = stringRemoveWordContaining (expression , numSet);	//Remove numbers in string
+		String *removedWord = stringRemoveWordContaining (expression , hexNumSet);	//Remove numbers in string
 		tempStart = removedWord->startindex;
 		tempLength = removedWord->length;
 		char *numSubString = stringSubStringInChars(removedWord , removedWord->length); //Removed numbers become substring
 		charAtThisPos = expression->startindex;
-		
-		if(stringCharAtInSet(expression , charAtThisPos , alphaSet))  {
-			Throw(ERR_NOT_NUMBER_TOKEN);
-    }
     
     if(numSubString[0] == '0' && (numSubString[1] == 'x' || numSubString[1] == 'X'))  {
       sscanf(numSubString, "%x", &hex);
       num = numberNew(hex); //get integer from subStringToInteger and create a new Number Token
       num->line = stringSubString(expression , tempStart , tempLength);
+    }
+    else if(stringCharAtInSet(expression , charAtThisPos , alphaSet))  {
+			Throw(ERR_NOT_NUMBER_TOKEN);
     }
     else {
       int integer = subStringToInteger(numSubString); //Convert substring to integer
@@ -47,6 +46,18 @@ Token *getToken(String *expression)
 		return (Token*)num;
 	}
 	
+  else if(stringCharAtInSet(expression , charAtThisPos, alphaNumericSet) && stringCharAtInSet(expression , charAtThisPos + 1, ":")) 
+	{
+		String *removedWord = stringRemoveWordContaining (expression , folderNameSet); //Remove identifier from string
+		tempStart = removedWord->startindex;
+		tempLength = removedWord->length;
+		char *idenSubString = stringSubStringInChars(removedWord , removedWord->length); //Removed identifier become substring
+		iden = identifierNew(idenSubString); //create a new identifier token
+		iden->line = stringSubString(expression , tempStart , tempLength);
+		
+		return (Token*)iden;
+	}
+  
 	//if character start with A~Z/a~z or '_' it is identifier token
 	else if(stringCharAtInSet(expression , charAtThisPos , alphaNumericSet)) 
 	{

@@ -1,6 +1,7 @@
 #ifndef ProgramLoader_H
 #define ProgramLoader_H
 
+#include <malloc.h>
 #include "Tlv.h"
 #include "GetHeaders.h"
 #include "Tlv_ErrorCode.h"
@@ -8,22 +9,35 @@
 #include "Interface.h"
 #include "Message.h"
 
+typedef struct {
+  int index;
+  int size;
+  uint8_t *dataAddress;
+  uint32_t destAddress;
+} FileInfo;
+
 /* Read/Write target register */
 void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 void tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
 
 /* Read/Write target RAM */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
-// void tlvWriteTargetRam(Tlv_Session *session, User_Session *userSession);
-void tlvWriteTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t *destAddress, int *size);
+void tlvWriteTargetRam(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size);
 
 void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
 void tlvReadTargetRam(Tlv_Session *session, uint32_t *destAddress, int *size);
 
-void commandInterpreter(Tlv_Session *session);
+void tlvHaltTarget(Tlv_Session *session);
+void tlvRunTarget(Tlv_Session *session);
+void tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
+
+FileInfo *extractElfFile(ElfData *elfData, char *section);
+// void tlvLoadProgramToRam(Tlv_Session *session, ElfFile elfFile);
+void tlvLoadProgramToRam(Tlv_Session *session, char *fileName);
+
 #endif // ProgramLoader_H
 
 /*
@@ -38,7 +52,7 @@ DataInfo dataInfo(fileName, section) {
   return &dataInfo;
 }
 
-isrVecotrSection = dataInfo(fileName, ".isr_vector");
+isrVectorSection = dataInfo(fileName, ".isr_vector");
 roDataSection = dataInfo(fileName, ".rodata");
 dataSection = dataInfo(fileName, ".data");
 textSection = dataInfo(fileName, ".text");
@@ -54,33 +68,5 @@ void tlvWriteTargetRam(Tlv_Session *session, Tlv_DataInfo *dataInfo) {
     dataInfo->dataAddress += TLV_DATA_SIZE;
     dataInfo->destAddress += TLV_DATA_SIZE;
     dataInfo->size -= TLV_DATA_SIZE;    
-}
-
-void tlvLoadProgramToRam(Tlv_Session *session, Tlv_DataInfo *dataInfo) {
-  switch(state)
-    case LOAD_ISR_VECTOR :
-      if(isrVecotrSection->size > 0)
-        tlvWriteTargetRam(session, isrVecotrSection);
-      else state = LOAD_RO_DATA;
-      break;
-      
-    case LOAD_RO_DATA :
-      if(roDataSection->size > 0)
-        tlvWriteTargetRam(session, roDataSection);
-      else state = LOAD_DATA;
-      break;
-      
-    case LOAD_DATA :
-      if(roDataSection->size > 0)
-        tlvWriteTargetRam(session, roDataSection);
-      else state = LOAD_TEXT;
-      break;
-      
-    case LOAD_TEXT :
-      if(roDataSection->size > 0)
-        tlvWriteTargetRam(session, roDataSection);
-      else state = LOAD_ISR_VECTOR;
-      break;  
-    
 }
 */

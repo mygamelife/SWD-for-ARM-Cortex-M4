@@ -6,10 +6,12 @@
 #include <string.h>
 #include <malloc.h>
 
-extern char *numSet;
 extern char *opSet;
-extern char *alphaNumericSet;
+extern char *numSet;
 extern char *alphaSet;
+extern char *hexNumSet;
+extern char *folderNameSet;
+extern char *alphaNumericSet;
 
 typedef struct
 {
