@@ -19,6 +19,13 @@ typedef struct {
   uint32_t *targetAddr;
 } ElfData;
 
+typedef struct {
+  int index;
+  int size;
+  uint8_t *dataAddress;
+  uint32_t destAddress;
+} ElfSection;
+
 // File Header
 Elf32_Ehdr *getElfHeader(ElfData *elfData);
 
@@ -66,5 +73,8 @@ uint32_t getSymbolTableAddressUsingName(ElfData *elfData, char *name);
 //  Name of Symbol Table
 char *getSymbolTableNameUsingIndex(ElfData *elfData, int index);
 
+ElfSection *getElfSectionInfo(ElfData *elfData, char *section);
+
+void closeElfFile(ElfData *elfData);
 #endif // Get_File_Header_H
 

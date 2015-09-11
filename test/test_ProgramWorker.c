@@ -115,7 +115,7 @@ void test_readTargetRam_should_reply_back_with_the_correct_chksum()
   
   memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xABCDABCD);
   
-  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
+  readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
   
   TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
   TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
@@ -136,7 +136,7 @@ void test_readTargetRam_should_read_data_from_specified_RAM_address()
   memoryReadAndReturnWord_ExpectAndReturn(0x20000000, 0xDEADBEEF);
   memoryReadAndReturnWord_ExpectAndReturn(0x20000004, 0xABCDABCD);
   
-  readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
+  readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
 }
 
 void test_probeTaskManager_given_initial_state_receive_packet_when_packet_arrived_should_change_state(void)
@@ -282,7 +282,7 @@ void test_probeTaskManager_should_receive_TLV_READ_RAM_and_perform_the_task(void
   Tlv_Session *session = tlvCreateSession();
   uint32_t readData = 0;
   
-  session->rxBuffer[0] = TLV_READ_RAM; //invalid command
+  session->rxBuffer[0] = TLV_READ_MEMORY; //invalid command
   session->rxBuffer[1] = 9;
   session->rxBuffer[2] = 0x00;
   session->rxBuffer[3] = 0x00;

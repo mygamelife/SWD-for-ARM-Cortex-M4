@@ -26,6 +26,7 @@ typedef struct
   Probe_State probeState;
   /* Load Program state */
   Tlv_State loadProgramState;
+  
   bool timeOutFlag;
   bool dataReceiveFlag;
   bool dataSendFlag;

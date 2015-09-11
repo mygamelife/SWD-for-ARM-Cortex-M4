@@ -1,2 +1,0 @@
-gcc Tlv_Loader.c Serial.c GetHeaders.c Read_File.c main.c -o main.exe
-./main.exe

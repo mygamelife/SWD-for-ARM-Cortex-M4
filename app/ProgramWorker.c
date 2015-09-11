@@ -355,7 +355,7 @@ void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAd
   tlvSend(session, tlv);
 }
 
-/** readTargetRam is a function to read target RAM using swd
+/** readTargetMemory is a function to read target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
   *           destAddress is the address of the data need to be read
@@ -363,7 +363,7 @@ void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAd
   *
   * return  : NONE
   */
-void readTargetRam(Tlv_Session *session, uint32_t destAddress, int size) {
+void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   int i; uint8_t chksum = 0;
   uint32_t readData = 0;
   
@@ -396,7 +396,8 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
     case TLV_WRITE_RAM      : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 4); break;
-    case TLV_READ_RAM       : readTargetRam(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
+    case TLV_WRITE_FLASH    : break;
+    case TLV_READ_MEMORY    : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
     case TLV_WRITE_REGISTER : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
     case TLV_READ_REGISTER  : readTargetRegister(session, get4Byte(&tlv->value[0])); break;
     case TLV_HALT_TARGET    : haltTarget(session); break;

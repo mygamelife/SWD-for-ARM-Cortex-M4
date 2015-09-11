@@ -160,14 +160,17 @@ void flashProgrammer(void) {
   /* Initialize hardware and configure system clock */
   #if !defined(TEST)
 	FlashSystemConfig();
+	configureLED();
   #endif
-  
+
 	/* Initialize target status */
 	sramWrite(SWD_TARGET_STATUS, TARGET_OK);
 
   while(1)
   {
+	turnOnLED3();
     swdInstruction = (__IO uint32_t)sramRead(SWD_INSTRUCTION);
     swdStub(swdInstruction);
+    turnOffLED3();
   }
 }

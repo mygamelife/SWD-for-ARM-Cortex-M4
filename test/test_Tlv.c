@@ -34,18 +34,18 @@ void test_tlvCreatePacket_given_command_size_and_data(void)
 
 void test_tlvCreatePacket_given_command_but_0_size_and_0_data(void)
 { 
-	Tlv *tlv = tlvCreatePacket(TLV_READ_RAM, 0, 0);
+	Tlv *tlv = tlvCreatePacket(TLV_READ_MEMORY, 0, 0);
   
-  TEST_ASSERT_EQUAL(TLV_READ_RAM, tlv->type);
+  TEST_ASSERT_EQUAL(TLV_READ_MEMORY, tlv->type);
   TEST_ASSERT_EQUAL(1, tlv->length);
 }
 
 void test_tlvCreatePacket_given_32bit_address_should_convert_to_byte(void)
 { 
   uint32_t address = 0x12345678;
-	Tlv *tlv = tlvCreatePacket(TLV_READ_RAM, 4, (uint8_t *)&address);
+	Tlv *tlv = tlvCreatePacket(TLV_READ_MEMORY, 4, (uint8_t *)&address);
   
-  TEST_ASSERT_EQUAL(TLV_READ_RAM, tlv->type);
+  TEST_ASSERT_EQUAL(TLV_READ_MEMORY, tlv->type);
   TEST_ASSERT_EQUAL(5, tlv->length);
   TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&tlv->value[0]));
 }
@@ -53,9 +53,9 @@ void test_tlvCreatePacket_given_32bit_address_should_convert_to_byte(void)
 void test_tlvCreatePacket_given_32bit_data_should_convert_to_byte(void)
 { 
   uint32_t data[] = {0x12345678, 0xDEADBEEF, 0xBEEFCAFE};
-	Tlv *tlv = tlvCreatePacket(TLV_READ_RAM, 12, (uint8_t *)data);
+	Tlv *tlv = tlvCreatePacket(TLV_READ_MEMORY, 12, (uint8_t *)data);
   
-  TEST_ASSERT_EQUAL(TLV_READ_RAM, tlv->type);
+  TEST_ASSERT_EQUAL(TLV_READ_MEMORY, tlv->type);
   TEST_ASSERT_EQUAL(13, tlv->length);
   TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&tlv->value[0]));
   TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&tlv->value[4]));
@@ -412,7 +412,7 @@ void test_verifyTlvData_given_wrong_length_should_return_data_invalid(void)
 void test_isTlvCommand_should_return_1_if_command_is_valid(void)
 { 
   TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_WRITE_RAM));
-  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_READ_RAM));
+  TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_READ_MEMORY));
   TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_WRITE_REGISTER));
   TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_READ_REGISTER));
   TEST_ASSERT_EQUAL(1, isTlvCommand(TLV_HALT_TARGET));

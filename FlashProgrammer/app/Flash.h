@@ -12,7 +12,6 @@
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"
 #include "stm32f4xx_hal_flash_ramfunc.h"
-#include "stm32f429i_discovery.h"
 
 typedef uint32_t FLASH_ErrorTypeDef;
 

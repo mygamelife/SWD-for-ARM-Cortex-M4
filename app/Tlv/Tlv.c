@@ -14,7 +14,7 @@ Tlv_Session *tlvCreateSession(void) {
   /* Initialize begining state for send and receive */
   session.sendState = TLV_SEND_BEGIN;
   session.receiveState = TLV_RECEIVE_TYPE;
-  session.loadProgramState = TLV_LOAD_ISR_VECTOR;
+  session.loadProgramState = TLV_OPEN_FILE;
   
   /* Initialize all the required flag */
   session.timeOutFlag = false;
@@ -241,7 +241,7 @@ int isTlvAck(Tlv *tlv) {
   *
   * input   : command can be one of the following value :
   *               TLV_WRITE_RAM = 10,
-  *               TLV_READ_RAM,
+  *               TLV_READ_MEMORY,
   *               TLV_WRITE_REGISTER,
   *               TLV_READ_REGISTER,
   *               TLV_HALT_TARGET,
@@ -255,7 +255,7 @@ int isTlvAck(Tlv *tlv) {
   */
 int isTlvCommand(uint8_t command) {
   if(command == TLV_WRITE_RAM)              return 1;
-  else if(command == TLV_READ_RAM)          return 1;
+  else if(command == TLV_READ_MEMORY)          return 1;
   else if(command == TLV_WRITE_REGISTER)    return 1;
   else if(command == TLV_READ_REGISTER)     return 1;
   else if(command == TLV_HALT_TARGET)       return 1;

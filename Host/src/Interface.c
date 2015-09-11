@@ -3,16 +3,15 @@
 #define BUFFER_SIZE 1024
 
 void displayOptionMenu(void)  {
-  printf("1. Write RAM\n");
-  printf("2. Read RAM\n");
-  printf("3. Write Register\n");
-  printf("4. Read Register\n");
-  printf("5. Load Program To RAM\n");
-  printf("6. Load Program To Flash\n");
-  printf("7. Halt target\n");
-  printf("8. run target\n");
-  printf("9. Step target\n");
-  printf("10. Exit\n");
+  printf("1. Load Program To RAM\n");
+  printf("2. Load Program To Flash\n");
+  printf("3. Read Memory\n");
+  printf("4. Write Register\n");
+  printf("5. Read Register\n");
+  printf("6. Halt target\n");
+  printf("7. Run target\n");
+  printf("8. Step target\n");
+  printf("9. Exit\n");
 }
 
 void displayTlvData(Tlv *tlv)  {
@@ -51,6 +50,18 @@ int getRegisterAddress(char *name)  {
   else if(strcmp(name, "SR") == 0)    return 19;
 }
 
+// User_Session *userLoadRam(String *userInput)  {
+  
+// }
+// User_Session *userLoadFlash(String *userInput);
+// User_Session *userReadMemory(String *userInput);
+// User_Session *userWriteRegister(String *userInput);
+// User_Session *userReadRegister(String *userInput);
+// User_Session *userHaltTarget(String *userInput);
+// User_Session *userRunTarget(String *userInput);
+// User_Session *userStepTarget(String *userInput);
+// User_Session *userExit(String *userInput);
+
 /** userInputInterpreter
   *
   * Input   : NONE
@@ -65,31 +76,24 @@ User_Session *userInputInterpreter(int option, String *str)  {
   uint32_t buffer[255] = {0};
   
   if(option == 1) {
-    address = (Number*)getToken(str);
-    size = (Number*)getToken(str);
-    
-    while(str->length != 1) {
-      data = (Number*)getToken(str);
-      buffer[i] = data->value;
-      i++;
-    }
-    
+    iden = (Identifier*)getToken(str);
     userSession.tlvCommand = TLV_WRITE_RAM;
-    userSession.data = buffer;
-    userSession.address = address->value;
-    userSession.size = size->value * 4;
+    userSession.fileName = iden->name;
     return &userSession;
   }
   else if(option == 2) {
+      //something here
+  }
+  else if(option == 3) {
     address = (Number*)getToken(str);
     size = (Number*)getToken(str);
     
-    userSession.tlvCommand = TLV_READ_RAM;
+    userSession.tlvCommand = TLV_READ_MEMORY;
     userSession.address = address->value;
     userSession.size = size->value * 4;
     return &userSession;
   }
-  else if(option == 3) {
+  else if(option == 4) {
     iden = (Identifier*)getToken(str);
     data = (Number*)getToken(str);
     regAddress = getRegisterAddress(iden->name);
@@ -99,7 +103,7 @@ User_Session *userInputInterpreter(int option, String *str)  {
     userSession.address = regAddress;
     return &userSession;
   }
-  else if(option == 4) {
+  else if(option == 5) {
     iden = (Identifier*)getToken(str);
     regAddress = getRegisterAddress(iden->name);
     
@@ -107,39 +111,32 @@ User_Session *userInputInterpreter(int option, String *str)  {
     userSession.address = regAddress;
     return &userSession;
   }
-  else if(option == 5) {
-    iden = (Identifier*)getToken(str);
-    userSession.tlvCommand = TLV_LOAD_PROGRAM_RAM;
-    userSession.fileName = iden->name;
-    return &userSession;
-  }
   else if(option == 6) {
-    //do something
-  }
-  else if(option == 7) {
     userSession.tlvCommand = TLV_HALT_TARGET;
     return &userSession;
   }
-  else if(option == 8) {
+  else if(option == 7) {
     userSession.tlvCommand = TLV_RUN_TARGET;
     return &userSession;
   }
-  else if(option == 9) {
+  else if(option == 8) {
     data = (Number*)getToken(str);
     
     userSession.tlvCommand = TLV_STEP;
     userSession.data = &data->value;
     return &userSession;
   }
-  else if(option == 10) {
+  else if(option == 9) {
     userSession.tlvCommand = TLV_EXIT;
     return &userSession;
   }
 }
 
+/** waitUserCommand
+  *
+  */
 User_Session *waitUserCommand(void) {
   Number *num;  String *str;
-  
   char InputBuffer[BUFFER_SIZE] = {0};
 
   while(1) {
