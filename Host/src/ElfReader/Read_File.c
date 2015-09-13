@@ -24,8 +24,8 @@ InStream *openFile(char *fileDirectory, char *mode){
   myFile->file = fopen(fileDirectory, mode);
   
   if(myFile->file == NULL){
-    printf("File doesn't exists!\n");
     // Throw(ERR_FILE_NOT_EXIST);
+    printf("File not exist");
   }
   
   myFile->filename = fileDirectory;
@@ -74,7 +74,7 @@ uint32_t inStreamMoveFilePtr(InStream *myFile, long int offset){
   startPos = fseek(myFile->file, offset, SEEK_SET);
   
   if(startPos == 1){
-    // Throw(ERR_RANGE_OFFSET);
+    Throw(ERR_RANGE_OFFSET);
   }else{
     return startPos;
   }
@@ -100,6 +100,11 @@ uint32_t posPtr(InStream *myFile){
   return ptrPosition;
 }
 
+/******************************************************************************
+ *
+ *                  Here is the code for exploring the fread
+ *
+ ******************************************************************************/
 /*
 uint32_t readBit(InStream *getBit){
   int returnBit = 0;

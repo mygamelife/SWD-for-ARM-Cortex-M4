@@ -35,6 +35,7 @@ void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector)  {
   */
 void loadMassEraseInstruction(uint32_t bankSelect)  {
   uint32_t targetStatus = 0;
+  
   /* Continues wait for target to release */
   do  {
     targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
@@ -57,6 +58,7 @@ void loadMassEraseInstruction(uint32_t bankSelect)  {
   */
 void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAddress, int size) {
   uint32_t targetStatus = 0;
+  
   /* Continues wait for target to release */
   do  {
     targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
@@ -83,12 +85,12 @@ void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAdd
   *
   * return    : NONE
   */
-void writeTargetRegister(Tlv_Session *session, uint32_t *registerAddress, uint32_t *data) {
-  uint32_t regAddress = *registerAddress, regData = *data;
+void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data) {
   
-  writeCoreRegister(regAddress, regData);
+  writeCoreRegister(registerAddress, data);
   
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
   tlvSend(session, tlv);
 }
 
@@ -99,12 +101,13 @@ void writeTargetRegister(Tlv_Session *session, uint32_t *registerAddress, uint32
   *
   * return    : NONE
   */
-void readTargetRegister(Tlv_Session *session, uint32_t *registerAddress) {
-  uint32_t regAddress = *registerAddress, data = 0;
+void readTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
+  uint32_t data = 0;
   
-  readCoreRegister(regAddress, &data);
+  readCoreRegister(registerAddress, &data);
   
   Tlv *tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&data);
+  
   tlvSend(session, tlv);
 }
 
@@ -117,6 +120,7 @@ void performSoftResetOnTarget(Tlv_Session *session)
 {
   softResetTarget();
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
   tlvSend(session, tlv);
 }
 
@@ -129,55 +133,10 @@ void performHardResetOnTarget(Tlv_Session *session)
 {
   hardResetTarget();
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
   tlvSend(session, tlv);
 }
 
-/** selectTask is a function to select instruction 
-  * base on tlv->type
-  *
-  * Input   : tlv is pointer pointing to tlv packet
-  *
-  * Return  : NONE
-  */
-void selectTask(Tlv_Session *session, Tlv *tlv)  {
-  
-  switch(tlv->type) {
-    case TLV_WRITE_RAM      : break;
-    case TLV_READ_RAM       : break;
-    case TLV_WRITE_REGISTER : writeTargetRegister(session, &get4Byte(&tlv->value[0]), &get4Byte(&tlv->value[4])); break;
-    case TLV_READ_REGISTER  : readTargetRegister(session, &get4Byte(&tlv->value[0])); break;
-    case TLV_HALT_TARGET    : break;
-    case TLV_RUN_TARGET     : break;
-    case TLV_STEP           : break;
-  }
-}
-
-/** probeTaskManager
-  */
-void probeTaskManager(Tlv_Session *session)  {
-  static Tlv *packet;
-  CEXCEPTION_T err;
-  
-  switch(session->taskManagerState)  {
-    case PROBE_RECEIVE_PACKET :
-      Try {
-        packet = tlvReceive(session);
-        if(verifyTlvPacket(packet)) {
-          session->taskManagerState = PROBE_INTERPRET_PACKET;
-        }
-      }
-      Catch(err)  {
-        //printf("error occur\n");
-        tlvReportError(session, err);
-      }
-      break;
-      
-    case PROBE_INTERPRET_PACKET :
-      selectTask(session, packet);
-      session->taskManagerState = PROBE_RECEIVE_PACKET;
-      break;
-  }
-}
 
 /** Halt the processor of the target device 
   *
@@ -194,6 +153,7 @@ void haltTarget(Tlv_Session *session)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
     tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  
   tlvSend(session, tlv);
 }
 
@@ -212,6 +172,7 @@ void runTarget(Tlv_Session *session)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
     tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  
   tlvSend(session, tlv);
 }
 
@@ -240,12 +201,12 @@ void singleStepTarget(Tlv_Session *session)
 }
 
 /** Step the processor of target device multiple times and send the current PC to host
- *
- * Input     : session contain a element/handler used by tlv protocol
- *           : nInstructions is the number of instructions to step
- *
- */
-void multipleStepTarget(Tlv_Session *session,int nInstructions)
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *           : nInstructions is the number of instructions to step
+  *
+  */
+void multipleStepTarget(Tlv_Session *session, int nInstructions)
 {
   Tlv *tlv ;
   uint8_t errorCode = TLV_NOT_STEPPED ;
@@ -369,4 +330,104 @@ void checkWatchpointEvent(Tlv_Session *session)
   
   tlv = tlvCreatePacket(TLV_WATCHPOINT, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);  
+}
+
+/** writeTargetRam is a function to write target RAM using swd
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size)  {
+  int i;
+  
+  /* Write to RAM using swd */
+  for(i = 0; i < size - 1; i += 4)  {
+    /* Data start at position 4 */
+    memoryWriteWord(destAddress, *dataAddress++);
+    destAddress += 4;
+  }
+  
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session, tlv);
+}
+
+/** readTargetMemory is a function to read target RAM using swd
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           destAddress is the address of the data need to be read
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
+  int i; uint8_t chksum = 0;
+  uint32_t readData = 0;
+  
+  Tlv *tlv = tlvCreatePacket(TLV_OK, size + 4, NULL);
+  
+  /* store destAddress checksum */
+  chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&destAddress, 4);
+  
+  /* Read from RAM using swd */
+  for(i = 0; i < size; i += 4)  {
+    readData = memoryReadAndReturnWord(destAddress);
+    /* Data start at position 4 */
+    chksum += tlvPackIntoBuffer(&tlv->value[4 + i], (uint8_t *)&readData, 4);
+    destAddress += 4;
+  }
+
+  tlv->value[tlv->length - 1] = chksum;
+  
+  tlvSend(session, tlv);
+}
+
+/** selectTask is a function to select instruction 
+  * base on tlv->type
+  *
+  * Input   : tlv is pointer pointing to tlv packet
+  *
+  * Return  : NONE
+  */
+void selectTask(Tlv_Session *session, Tlv *tlv)  {
+  
+  switch(tlv->type) {
+    case TLV_WRITE_RAM      : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 4); break;
+    case TLV_WRITE_FLASH    : break;
+    case TLV_READ_MEMORY    : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
+    case TLV_WRITE_REGISTER : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
+    case TLV_READ_REGISTER  : readTargetRegister(session, get4Byte(&tlv->value[0])); break;
+    case TLV_HALT_TARGET    : haltTarget(session); break;
+    case TLV_RUN_TARGET     : runTarget(session); break;
+    case TLV_STEP           : multipleStepTarget(session, get4Byte(&tlv->value[0])); break;
+  }
+}
+
+/** probeTaskManager
+  */
+void probeTaskManager(Tlv_Session *session)  {
+  static Tlv *packet;
+  CEXCEPTION_T err;
+  
+  switch(session->probeState)  {
+    case PROBE_RECEIVE_PACKET :
+      Try {
+        packet = tlvReceive(session);
+        if(verifyTlvPacket(packet)) {
+          session->probeState = PROBE_INTERPRET_PACKET;
+        }
+      }
+      Catch(err)  {
+        tlvReportError(session, err);
+      }
+      break;
+      
+    case PROBE_INTERPRET_PACKET :
+      selectTask(session, packet);
+      session->probeState = PROBE_RECEIVE_PACKET;
+      break;
+  }
 }

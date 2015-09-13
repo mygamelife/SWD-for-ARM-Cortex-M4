@@ -1,11 +1,11 @@
 #include "ProgramElf.h"
 #include "GetHeaders.h"
-// #include "Relocator.h"
+#include "Relocator.h"
 #include "Read_File.h"
 #include "elf.h"
 #include <stdio.h>
 #include <malloc.h>
-// #include "CException.h"
+#include "CException.h"
 #include "ErrorCode.h"
 
 /******************************************************************************
@@ -615,6 +615,25 @@ char *getSymbolTableNameUsingIndex(ElfData *elfData, int index){
   return symbolName;
 }
 
+ElfSection *getElfSectionInfo(ElfData *elfData, char *section){
+  ElfSection *elfSection = malloc(sizeof(ElfSection)); 
+  
+  elfSection->index = getIndexOfSectionByName(elfData, section);
+  elfSection->dataAddress = (uint8_t *)getSectionAddress(elfData, elfSection->index);
+  elfSection->destAddress = getSectionHeaderAddrUsingIndex(elfData, elfSection->index);
+  elfSection->size = (int)getSectionSize(elfData, elfSection->index);
 
+  return elfSection;
+}
 
-
+void closeElfFile(ElfData *elfData) {
+  if(elfData != NULL) {
+    if(elfData->myFile)     free(elfData->myFile);
+    if(elfData->eh)         free(elfData->eh);
+    if(elfData->sh)         free(elfData->sh);
+    if(elfData->ph)         free(elfData->ph);  
+    if(elfData->programElf) free(elfData->programElf);
+    if(elfData->st)         free(elfData->st);
+    free(elfData);
+  }
+}

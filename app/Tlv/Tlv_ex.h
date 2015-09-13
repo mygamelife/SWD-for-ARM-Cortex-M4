@@ -3,8 +3,9 @@
 
 #define TLV_DATA_SIZE   248
 
-#define getByte(x)      (*(uint8_t *)(x))
-#define get4Byte(x)     (*(uint32_t *)(x))
+#define get4Byte(x)               (*(uint32_t *)(x))
+#define convertToBigEndian(x)     ((*(uint32_t *)(x)) >> 24 ) | (((*(uint32_t *)(x)) << 8) & 0x00ff0000) |  \
+                                  (((*(uint32_t *)(x)) >> 8) & 0x0000ff00) | ((*(uint32_t *)(x)) << 24)
 
 typedef struct
 {
@@ -13,64 +14,12 @@ typedef struct
   uint8_t value[255];
 } Tlv;
 
-typedef enum
-{
-  TLV_SEND_BEGIN,
-  TLV_SEND_END,
-  TLV_RECEIVE_BEGIN,
-  TLV_RECEIVE_END,
-  TLV_SEND_PACKET,
-  TLV_RECEIVE_PACKET,
-  TLV_WAIT_RESPONSE
-} Tlv_State;
-
-typedef enum
-{
-  HOST_RECEIVE_COMMAND,
-  HOST_INTERPRET_COMMAND,
-  HOST_WAITING_RESPONSE
-} Host_State;
-
-typedef enum
-{
-  PROBE_RECEIVE_PACKET,
-  PROBE_INTERPRET_PACKET
-} Probe_State;
-
-typedef enum
-{
-  TRANSMISSION_BUSY,
-  TRANSMISSION_FREE
-} Tlv_Transmission_State;
-
-typedef struct
-{
-  void *handler;
-  uint8_t txBuffer[255];
-  uint8_t rxBuffer[255];
-  Tlv *userCommand;
-  Tlv_State sendState;
-  Tlv_State receiveState;
-  Tlv_State writeRegisterState;
-  Tlv_State readRegisterState;
-  Tlv_State writeRAMState;
-  Tlv_State readRAMState;
-  Host_State programmerState;
-  Probe_State taskManagerState;
-  bool TIMEOUT_FLAG;
-  bool DATA_ARRIVE_FLAG;
-  bool DATA_SEND_FLAG;
-  bool ONGOING_PROCESS_FLAG;
-  uint8_t dataAddress;
-  uint32_t destAddress;
-  uint8_t size;
-} Tlv_Session;
-
 /* Tlv Command */
 typedef enum
 {
   TLV_WRITE_RAM = 10,
-  TLV_READ_RAM,
+  TLV_WRITE_FLASH,
+  TLV_READ_MEMORY,
   TLV_WRITE_REGISTER,
   TLV_READ_REGISTER,
   TLV_HALT_TARGET,
@@ -78,8 +27,44 @@ typedef enum
   TLV_STEP,
   TLV_MULTI_STEP,
   TLV_BREAKPOINT,
-  TLV_WATCHPOINT
+  TLV_WATCHPOINT,
+  TLV_EXIT
 } Tlv_Command;
+
+typedef enum
+{
+  TLV_SEND_BEGIN,
+  TLV_SEND_END,
+  TLV_RECEIVE_TYPE,
+  TLV_RECEIVE_LENGTH,
+  TLV_RECEIVE_VALUE,
+  TLV_RECEIVE_CHECKSUM,
+  TLV_SEND_PACKET,
+  TLV_RECEIVE_PACKET,
+  TLV_WAIT_RESPONSE,
+  TLV_OPEN_FILE,
+  TLV_LOAD_ISR_VECTOR,
+  TLV_LOAD_RO_DATA,
+  TLV_LOAD_DATA,
+  TLV_LOAD_TEXT,
+  TLV_LOAD_FLASH_PROGRAMMER,
+  TLV_LOAD_ACTUAL_PROGRAM
+} Tlv_State;
+
+typedef enum
+{
+  HOST_WAIT_USER_COMMAND,
+  HOST_RECEIVE_COMMAND,
+  HOST_INTERPRET_COMMAND,
+  HOST_WAITING_RESPONSE,
+  HOST_EXIT
+} Host_State;
+
+typedef enum
+{
+  PROBE_RECEIVE_PACKET,
+  PROBE_INTERPRET_PACKET
+} Probe_State;
 
 /* Tlv acknowledge */
 typedef enum

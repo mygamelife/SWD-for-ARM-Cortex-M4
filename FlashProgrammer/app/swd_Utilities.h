@@ -2,9 +2,7 @@
 #define swd_Utilities_H
 
 #include <stdint.h>
-#include "Misc_Utilities.h"
 #include "Register_ReadWrite.h"
-
 
 //SWD Protocol bit sequence
 #define DP 0
