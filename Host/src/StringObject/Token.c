@@ -10,18 +10,18 @@
  */
 Token *getToken(String *expression)
 {	
-	Number *num;
-	Identifier *iden;
-	Operator *op;
-	int tempStart = 0 , tempLength = 0, hex = 0;
-	char *tempIden; //temporary store idendifier name
+	Number *num;  Identifier *iden; Operator *op;
+	int tempStart = 0 , tempLength = 0, hex = 0;  char *tempIden; //temporary store idendifier name
 	stringTrim(expression);	//Remove all the spaces in string
 
 	/*Character at first position*/
 	int charAtThisPos = expression->startindex;
+  
+  if(expression->length == 0)
+    Throw(ERR_EMPTY_STRING);
 
 	//if character start with numbers it is number token
-	if(stringCharAtInSet(expression , charAtThisPos , numSet))
+	else if(stringCharAtInSet(expression , charAtThisPos , numSet))
 	{	
 		String *removedWord = stringRemoveWordContaining (expression , hexNumSet);	//Remove numbers in string
 		tempStart = removedWord->startindex;

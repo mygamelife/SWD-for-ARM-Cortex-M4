@@ -14,7 +14,10 @@ Tlv_Session *tlvCreateSession(void) {
   /* Initialize begining state for send and receive */
   session.sendState = TLV_SEND_BEGIN;
   session.receiveState = TLV_RECEIVE_TYPE;
+  
+  /* Initialize load program state */
   session.loadProgramState = TLV_OPEN_FILE;
+  session.flashState = TLV_OPEN_FILE;
   
   /* Initialize all the required flag */
   session.timeOutFlag = false;
@@ -145,7 +148,6 @@ void tlvReceiveService(Tlv_Session *session) {
   switch(session->receiveState)  {
     case TLV_RECEIVE_TYPE :
       if(!getByte(session->handler, session->rxBuffer)) {
-        // printf("receive type %d\n", session->rxBuffer[0]);
         session->receiveState = TLV_RECEIVE_LENGTH;
       }
       break;
@@ -153,25 +155,19 @@ void tlvReceiveService(Tlv_Session *session) {
     case TLV_RECEIVE_LENGTH :
       if(!getByte(session->handler, &session->rxBuffer[1]))  {
         length = session->rxBuffer[1];
-        // printf("receive length %d\n", length);
         session->receiveState = TLV_RECEIVE_VALUE;
       }
       break;
       
     case TLV_RECEIVE_VALUE :
       if(!getByte(session->handler, &session->rxBuffer[2 + counter]))  {
-        // printf("counter %d\n", counter);
         if(++counter == length) {
-          // printf("Last byte\n");
           length = 0;
           counter = 0;
           session->receiveState = TLV_RECEIVE_TYPE;
           session->dataReceiveFlag = true;
         }
       } else  {
-        /* set timeOutFlag when timeout occur */
-        // printf("counter %x\n", counter);
-        // printf("length %x\n", length);
         session->timeOutFlag = true;
         session->receiveState = TLV_RECEIVE_TYPE;
       }
@@ -207,11 +203,9 @@ int verifyTlvData(Tlv *tlv) {
   
   for(i = 0; i < tlv->length; i++)  {
     result += tlv->value[i];
-    // printf("i %d %x\n", i, tlv->value[i]);
   }
   
-  if(result == 0)
-    return 1;
+  if(result == 0) return 1;
   
   else return 0;
 }
@@ -229,7 +223,6 @@ int isTlvAck(Tlv *tlv) {
       return 1;
     }
     else if(tlv->type == TLV_NOT_OK)  {
-      // printf("Probe throw error\n");
       Throw(tlv->value[0]);
     }
     else return 0;
@@ -255,7 +248,7 @@ int isTlvAck(Tlv *tlv) {
   */
 int isTlvCommand(uint8_t command) {
   if(command == TLV_WRITE_RAM)              return 1;
-  else if(command == TLV_READ_MEMORY)          return 1;
+  else if(command == TLV_READ_MEMORY)       return 1;
   else if(command == TLV_WRITE_REGISTER)    return 1;
   else if(command == TLV_READ_REGISTER)     return 1;
   else if(command == TLV_HALT_TARGET)       return 1;
@@ -277,29 +270,31 @@ int isTlvCommand(uint8_t command) {
   *           0 if response is NULL
   */
 int verifyTlvPacket(Tlv *tlv) {
+  
   if(tlv != NULL) {
     if(!isTlvAck(tlv)) {
       if(!isTlvCommand(tlv->type))  
         Throw(TLV_INVALID_COMMAND);
-    }
-    if(!verifyTlvData(tlv)) {
-      // printf("Probe throw error\n");
+    } if(!verifyTlvData(tlv)) {
       Throw(TLV_CHECKSUM_ERROR);
-    }
-    
+    }  
     return 1;
   }
   else return 0;
 }
 
-/** tlvReportError is a function to create a packet
+/** probeErrorReporter is a function to create a packet
   * contain error code
   *
   * input   : errorCode is a error to represent the tlv error
   *           can be one of the TLV_ERROR_CODE value
   *
   */
-void tlvReportError(Tlv_Session *session, uint8_t errorCode)  {
+void probeErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
+  /* add 100 to indicate that is an erroCode return from probe */
+  if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR)  
+    errorCode + 100;
+  
   Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
 
   tlvSend(session, tlv);

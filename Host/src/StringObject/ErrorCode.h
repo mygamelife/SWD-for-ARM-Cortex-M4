@@ -4,6 +4,7 @@
 typedef enum
 {			
 	ERR_NO_ERROR,
+	ERR_EMPTY_STRING,
 	ERR_INCOMPLETE_NUMBER, 
 	ERR_NOT_NUMBER_TOKEN,
 	ERR_NOT_PREFIX_OPERATOR,
@@ -12,6 +13,6 @@ typedef enum
 	ERR_IDENTIFIER_NOT_SUPPORT,
 	ERR_EXPECTING_NUMBER,
 	ERR_UNKNOWN_OPERATOR
-} ErrorCode;
+} Token_ErrorCode;
 
 #endif //ErrorCode_H

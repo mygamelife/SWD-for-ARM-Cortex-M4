@@ -1,0 +1,44 @@
+#ifndef ErrorCode_H
+#define ErrorCode_H
+
+#include <stdio.h>
+#include "CException.h"
+
+typedef enum
+{
+  TLV_TIME_OUT = 1,
+  TLV_CORRUPTED_DATA,
+  TLV_INVALID_COMMAND,
+  TLV_CHECKSUM_ERROR,
+  TLV_NOT_HALTED,
+  TLV_NOT_RUNNING,
+  TLV_NOT_STEPPED,
+  TLV_BKPT_NOTHIT,
+  TLV_BKPT_MAXSET,
+  TLV_WATCHPOINT_NOTHIT
+} Tlv_ErrorCode;
+
+typedef enum
+{
+  PROBE_TLV_TIME_OUT = 101,
+  PROBE_TLV_CORRUPTED_DATA,
+  PROBE_TLV_INVALID_COMMAND,
+  PROBE_TLV_CHECKSUM_ERROR,
+} Probe_ErrorCode;
+
+typedef enum
+{			
+	ERR_NO_ERROR = 20,
+	ERR_EMPTY_STRING,
+	ERR_INCOMPLETE_NUMBER, 
+	ERR_NOT_NUMBER_TOKEN,
+	ERR_NOT_PREFIX_OPERATOR,
+	ERR_STACK_EMPTY,
+	ERR_STACK_FULL,
+	ERR_IDENTIFIER_NOT_SUPPORT,
+	ERR_EXPECTING_NUMBER,
+	ERR_UNKNOWN_OPERATOR
+} Token_ErrorCode;
+
+void displayErrorMessage(CEXCEPTION_T err);
+#endif // ErrorCode_H

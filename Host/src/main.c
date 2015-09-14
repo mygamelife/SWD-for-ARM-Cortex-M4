@@ -1,8 +1,6 @@
 #include "ProgramLoader.h"
 #include <stdlib.h>
 
-// #define HOST
-
 int main(void) {
   CEXCEPTION_T err;
   
@@ -20,8 +18,7 @@ int main(void) {
       hostInterpreter(session);
     }
     Catch(err) {
-      printf("Error Code %d\n", err);
-      break;
+      displayErrorMessage(err);
     }
   }
   

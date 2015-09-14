@@ -204,7 +204,26 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
   * Return  : NONE
   */
 void tlvLoadToFlash(Tlv_Session *session, char *file)  {
-  tlvLoadToRam(session, file); //Load FlashProgrammer into target RAM
+  
+  switch(session->flashState) {
+    case TLV_LOAD_FLASH_PROGRAMMER :
+      /* Load FlashProgrammer into target RAM */
+      tlvLoadToRam(session, file);
+      
+      if(session->ongoingProcessFlag == false) {
+        session->ongoingProcessFlag = true;
+        session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
+      }
+      break;
+    
+    case TLV_LOAD_ACTUAL_PROGRAM :
+      tlvLoadToRam(session, file);
+      
+      if(session->ongoingProcessFlag == false)
+        session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
+
+      break;
+  }
   // tlvLoadProgram(session, file, TLV_WRITE_RAM);
   // tlvLoadProgram(session, file, TLV_WRITE_RAM);
   //1. Load Flash Prgrammger tlvLoadProgramToRam(Tlv_Session *session, char *fileName);

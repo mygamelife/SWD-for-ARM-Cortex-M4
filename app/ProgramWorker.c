@@ -421,7 +421,7 @@ void probeTaskManager(Tlv_Session *session)  {
         }
       }
       Catch(err)  {
-        tlvReportError(session, err);
+        probeErrorReporter(session, err);
       }
       break;
       
