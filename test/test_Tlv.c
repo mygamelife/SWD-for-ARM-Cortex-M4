@@ -487,5 +487,5 @@ void test_verifyTlvPacket_should_throw_error_if_invalid_command(void)
 void test_tlvReportError_is_to_create_a_packet_contain_errorCode_to_report_the_error(void)
 {
   Tlv_Session session;
-  probeErrorReporter(&session, PROBE_TLV_CHECKSUM_ERROR);
+  tlvErrorReporter(&session, PROBE_TLV_CHECKSUM_ERROR);
 }

@@ -53,6 +53,6 @@ int verifyTlvData(Tlv *tlv);
 int isTlvCommand(uint8_t command);
 int isTlvAck(Tlv *tlv);
 int verifyTlvPacket(Tlv *tlv);
-void probeErrorReporter(Tlv_Session *session, uint8_t errorCode);
+void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode);
 
 #endif // Tlv_H

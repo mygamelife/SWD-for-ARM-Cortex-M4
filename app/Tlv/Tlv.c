@@ -283,14 +283,14 @@ int verifyTlvPacket(Tlv *tlv) {
   else return 0;
 }
 
-/** probeErrorReporter is a function to create a packet
+/** tlvErrorReporter is a function to create a packet
   * contain error code
   *
   * input   : errorCode is a error to represent the tlv error
   *           can be one of the TLV_ERROR_CODE value
   *
   */
-void probeErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
+void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
   /* add 100 to indicate that is an erroCode return from probe */
   if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR)  
     errorCode + 100;
