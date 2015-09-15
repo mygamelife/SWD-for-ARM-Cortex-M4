@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include "Token.h"
 #include "Tlv.h"
+#include "ErrorCode.h"
 
 typedef struct
 {
@@ -79,14 +80,13 @@ int getRegisterAddress(char *name);
 void displayTlvData(Tlv *tlv);
 
 /* User Instruction */
-User_Session *userLoadRam(String *userInput);
-User_Session *userLoadFlash(String *userInput);
+User_Session *userLoadProgram(String *userInput);
 User_Session *userReadMemory(String *userInput);
 User_Session *userWriteRegister(String *userInput);
 User_Session *userReadRegister(String *userInput);
-User_Session *userHaltTarget(String *userInput);
-User_Session *userRunTarget(String *userInput);
 User_Session *userStepTarget(String *userInput);
-User_Session *userExit(String *userInput);
+User_Session *userHaltTarget(void);
+User_Session *userRunTarget(void);
+User_Session *userExit(void);
 
 #endif // Interface_H
