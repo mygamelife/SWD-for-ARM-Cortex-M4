@@ -37,6 +37,17 @@ void blinkLED3(State *state, int *counter)	{
 	}
 }
 
+void blinkingLED(int delayMs) {
+  int delay;
+
+  while(getCurrentTime() < delayMs/2) {
+    turnOnLED3();
+    for(delay = 0; delay < 500000; delay++);
+    turnOffLED3();
+    for(delay = 0; delay < 500000; delay++);
+  }
+}
+
 int oneHundredMiliSecHasNotExpired()	{
 	static int previousTime = 0;
 

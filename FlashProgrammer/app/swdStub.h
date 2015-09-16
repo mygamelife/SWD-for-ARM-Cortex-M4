@@ -3,7 +3,6 @@
 
 #include <stdint.h>
 #include "Flash.h"
-#include "SRAM.h"
 
 #if !defined(TEST)
 #include "SystemConfigure.h"
@@ -38,9 +37,7 @@
 #define TARGET_BUSY                       ((uint32_t)0x00000001)
 
 void swdStub(uint32_t swdInstruction);
-void stubCopyFromSRAMToFlash(void);
-void stubEraseSector(void);
+void stubCopy(void);
+void stubErase(void);
 void stubMassErase(void);
-void stubVerify(void);
-void flashProgrammer(void);
 #endif // swdStub_H

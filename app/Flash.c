@@ -35,10 +35,7 @@ void flashMassErase(uint32_t banks)  {
   { 
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
-    
-    #if !defined(TEST)
-      flashErrorHandler();
-    #endif
+    flashErrorHandler();
   }
   
   /** Lock the Flash to disable the flash control register access (recommended
@@ -46,26 +43,24 @@ void flashMassErase(uint32_t banks)  {
   HAL_FLASH_Lock();
 }
 
-/**
-  * eraseFlashMemory is used to erase memory in flash can either sector or mass erase
-  * stm32f4xx default is using dual-bank memory organization which means user can choose sector 0 - 23
+/** flashErase is used to erase memory in flash
   *
-  * input :  typeErase
-  *            + FLASH_TYPEERASE_SECTORS      
-  *            + FLASH_TYPEERASE_MASSERASE
-  * output :   NONE
+  * input   : startSector is the starting address to erase
+  *           size is the the size of flash memory need to erase
+  *
+  * output  : NONE
   */
 
-void flashEraseSector(uint32_t startSector, uint32_t endSector)  {
+void flashErase(uint32_t flashAddress, int size)  {
   uint32_t firstSector = 0, numOfSectors = 0;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
 
   /* Get the 1st sector to erase */
-  firstSector = flashGetSector(startSector);
+  firstSector = flashGetSector(flashAddress);
   /* Get the number of sector to erase from 1st sector*/
-  numOfSectors = flashGetSector(endSector) - firstSector + 1;
+  numOfSectors = flashGetSector(flashAddress + size) - firstSector + 1;
 
   /* Fill EraseInit structure */
   EraseInitStruct.TypeErase     = FLASH_TYPEERASE_SECTORS;
@@ -90,8 +85,27 @@ void flashEraseSector(uint32_t startSector, uint32_t endSector)  {
   HAL_FLASH_Lock();  
 }
 
-/**
-  * writeToFlash is a function write data is user define address
+/** flashWriteByte is a function to write data to flash in byte
+  *
+  * input   : typeProgram can be one of the following value :
+  *            + FLASH_TYPEPROGRAM_BYTE
+  *            + FLASH_TYPEPROGRAM_HALFWORD
+  *            + FLASH_TYPEPROGRAM_WORD
+  *            + FLASH_TYPEPROGRAM_DOUBLEWORD
+  *
+  *           address is the flash address want to write to 
+  *           data is the data need to write to flash
+  *
+  * return :   NONE
+  */
+void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data) {
+  if(HAL_FLASH_Program(typeProgram, address, data) != HAL_OK)  {
+    FLASH_ERROR_CODE = HAL_FLASH_GetError();
+    flashErrorHandler();
+  }
+}
+
+/** flashWrite is a function write data is user define address
   * !* Recommend erase flash memory first before write *!
   *
   * input : typeProgram 
@@ -104,104 +118,20 @@ void flashEraseSector(uint32_t startSector, uint32_t endSector)  {
   *
   * output :   NONE
   */
-void flashWrite(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data) {
-  uint32_t address = 0;
-  
-  address = startAddr;
+void flashWrite(uint32_t *data, uint32_t address, int size) {
+  uint32_t index, startAddress = address, endAddress = address + size;
   
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
   
   /* Write data into user selected area here */
-  while (address < endAddr)
-  {
-    if (HAL_FLASH_Program(typeProgram, address, data) == HAL_OK)
-    {
-      address = address + 4;
-    }
-    else
-    {
-      /* While error occur during erase process error will be handle here */
-      FLASH_ERROR_CODE = HAL_FLASH_GetError();
-      flashErrorHandler();
-      break;
-    }
+  for(index = startAddress; index < endAddress; index += 4) {
+    flashWriteWord(index, *data++);
   }
-
+  
   /* Lock the Flash to disable the flash control register access (recommended
      to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
-  
-  #if !defined(TEST)
-    flashVerify(startAddr, endAddr, data);
-  #endif
-}
-
-/**
-  * verifyWriteData is a function to verify the flashed data is program correctly as expected
-  * If data programmed correctly LED3 will turn on
-  * Else LED4 will turn on to indicate data is not programmed correctly
-  *
-  * input : startAddress is the starting address to program it is define by user
-  *         dataToVerify is a 32-bit data use to verify the flashed data
-  *
-  * output :   NONE
-  */
-void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify)  {
-	State state = START; int counter = 10;
-  __IO uint32_t data32 = 0, MemoryProgramStatus = 0;
-	uint32_t address = 0;
-	__IO uint32_t tick = 0;
-  
-  /* Check if the programmed data is OK
-      MemoryProgramStatus = 0: data programmed correctly
-      MemoryProgramStatus != 0: number of words not programmed correctly ******/
-  address = startAddr;
-
-  MemoryProgramStatus = 0x0;
-  
-  while (address < endAddr)
-  {
-    data32 = (__IO uint32_t)flashRead(address);
-
-    /* Check if they are the same */
-    if (data32 != dataToVerify)
-    {
-      MemoryProgramStatus++;
-    }
-
-    address = address + 4;
-  }
-
-  /* Check if there is an issue to program data */
-  if (MemoryProgramStatus == 0)
-  {
-    /* No error detected. Switch on LED3 */
-    #if !defined(TEST)
-      while(state != HALT)	{
-        blinkLED3(&state, &counter);
-      }
-    #endif
-  }
-  else
-  {
-    /* Error detected. Switch on LED4 */
-    flashErrorHandler();
-  }
-}
-
-/**
-  * flashRead is a function to read the data from the corresponding address and return the value
-  *
-  * input : address is the starting address to program it is define by user
-  *
-  * output :  data32 is the value store inside the address
-  */
-uint32_t flashRead(uint32_t address)  {
-	__IO uint32_t data32 = 0;
-  
-  data32 = *(__IO uint32_t*)address;
-  return data32;
 }
 
 /** 2 Mbyte dual bank organization can choose between sector 0 - sector 23
@@ -328,62 +258,42 @@ uint32_t flashGetSector(uint32_t Address)
   */
 void flashErrorHandler(void)
 {
-  uint32_t ERROR_CODE = 0;
-
-  ERROR_CODE = HAL_FLASH_GetError();
-
   /* Turn LED4 on */
   turnOnLED4();
-
-  #if !defined(TEST)
-    while(1)  {}
-  #endif
+  while(1)  {}
 }
 
-/**
-  * flashCopyFromSramToFlash is a function copy data from SRAM to FLASH
+/** flashCopyFromSramToFlash is a function copy data from SRAM to FLASH
   *
   * input : *src is a source address of SRAM
   *         *dest is the destination address of FLASH
-  *         length use to determine how large is the data
+  *         size use to determine how large is the data
   *
   * output :   NONE
   */
-void flashCopyFromSRAMToFlash(uint32_t src, uint32_t dest, int length) {
+void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size) {
   int i;
-  __IO uint32_t data32 = 0;
-  uint32_t sramAddress, flashAddress;
+  __IO uint32_t data = 0;
+  uint32_t sram = src, flash = dest;
 
-  /* Assign src and dest to a template variable */
-  sramAddress = src;
-  flashAddress = dest;
+  /* Erase the destination address before writing */
+  flashErase(flash, size);
 
-  /* Flash Erase Sector at specified address */
-  flashEraseSector(dest, dest + length);
-
-  /* Unlock the Flash to enable the flash control register access */
+  /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
-
+  
   /* Copy data to flash */
-  for(i = 0; i < length; i += (1 << FLASH_TYPEPROGRAM_WORD))	{
-	  data32 = *(__IO uint32_t *)sramAddress;
-	  flashWriteWord(flashAddress, data32);
-
-	  flashAddress += (1 << FLASH_TYPEPROGRAM_WORD);
-	  sramAddress += (1 << FLASH_TYPEPROGRAM_WORD);
+  for(i = 0; i < size; i += 4, sram += 4, flash += 4) {
+	  data = readMemoryData(sram);
+	  flashWriteWord(flash, data);
   }
-
+  
   /* Lock the Flash to disable the flash control register access (recommended
-     to protect the FLASH memory against possible unwanted operation) */
+   to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
-
-  #if !defined(TEST)
-    flashVerifyDataFromSRAMToFlash(src, dest, length);
-  #endif
 }
 
-/**
-  * verifyDataFromRamToFlash is a function to verify the data is correctly copy
+/** flashVerify is a function to verify the data is correctly copy
   * to flash from SRAM
   *
   * If data programmed correctly LED3 will turn on
@@ -395,99 +305,39 @@ void flashCopyFromSRAMToFlash(uint32_t src, uint32_t dest, int length) {
   *
   * output :   NONE
   */
-void flashVerifyDataFromSRAMToFlash(uint32_t src, uint32_t dest, int length)	{
-  State state = START;  int i = 0, counter = 10;
-  __IO uint32_t dataFlash = 0, dataSRAM = 0, memoryProgramStatus = 0;
-  uint32_t sramAddress, flashAddress;
+void flashVerify(uint32_t src, uint32_t dest, int size)	{
+  int i = 0;
+  uint32_t sram = src, flash = dest;
+  __IO uint32_t flashData = 0, sramData = 0, memoryProgramStatus;
 
   /* Check if the programmed data is OK
-      MemoryProgramStatus = 0: data programmed correctly
-      MemoryProgramStatus != 0: number of words not programmed correctly ******/
+     MemoryProgramStatus = 0: data programmed correctly
+     MemoryProgramStatus != 0: number of words not programmed correctly ******/
   memoryProgramStatus = 0x0;
 
-  sramAddress = src;
-  flashAddress = dest;
-
   /* Compare data in flash with sram  */
-  for(i; i < length; i += (1 << FLASH_TYPEPROGRAM_WORD))	{
+  for(i; i < size; i += 4, sram += 4, flash += 4)	{
     
     /* get data from Flash & SRAM  */
-	  dataFlash = *(__IO uint32_t *)sramAddress;
-	  dataSRAM 	= *(__IO uint32_t *)flashAddress;
+	  sramData 	= readMemoryData(sram);
+	  flashData = readMemoryData(flash);
 
-	  if (dataFlash != dataSRAM)	{
+	  if(flashData != sramData) {
 		  memoryProgramStatus++;
 	  }
-    
-	  flashAddress += (1 << FLASH_TYPEPROGRAM_WORD);
-	  sramAddress  += (1 << FLASH_TYPEPROGRAM_WORD);
   }
 
   /* Check if there is an issue to program data */
-  if (memoryProgramStatus == 0)
+  if(memoryProgramStatus == 0)
   {
     /* No error detected. Switch on LED3 */
     #if !defined(TEST)
-      while(state != HALT)	{
-        blinkLED3(&state, &counter);
-      }
+    blinkingLED(ONE_SEC);
     #endif
   }
   else
   {
     /* Error detected. Switch on LED4 */
-    flashErrorHandler();
-  }
-}
-
-/** flashWriteByte is a function to write data to flash in byte
-  *
-  * input   : address is the flash address want to write to 
-  *           data is the data need to write to flash
-  *
-  * return :   NONE
-  */
-void flashWriteByte(uint32_t address, uint8_t data) {
-  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_BYTE, address, data) != HAL_OK)  {
-    flashErrorHandler();
-  }
-}
-
-/** flashWriteByte is a function to write data to flash in halfword
-  *
-  * input   : address is the flash address want to write to 
-  *           data is the data need to write to flash
-  *
-  * return :   NONE
-  */
-void flashWriteHalfWord(uint32_t address, uint16_t data) {
-  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, address, data) != HAL_OK)  {
-    flashErrorHandler();
-  }
-}
-
-/** flashWriteByte is a function to write data to flash in word
-  *
-  * input   : address is the flash address want to write to 
-  *           data is the data need to write to flash
-  *
-  * return :   NONE
-  */
-void flashWriteWord(uint32_t address, uint32_t data) {
-  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, data) != HAL_OK)  {
-    flashErrorHandler();
-  }
-}
-
-/** flashWriteByte is a function to write data to flash in doubleword
-  *
-  * input   : address is the flash address want to write to 
-  *           data is the data need to write to flash
-  *
-  * return :   NONE
-  */
-void flashWriteDoubleWord(uint32_t address, uint64_t data) {
-  if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_DOUBLEWORD, address, data) != HAL_OK)  {
     flashErrorHandler();
   }
 }

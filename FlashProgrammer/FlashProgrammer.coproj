@@ -70,66 +70,66 @@
   <Components path="./"/>
   <LocalComponents/>
   <Files>
+    <File name="Code/IoOperations.h" path="app/IoOperations.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.h" path="app/Hardware/stm32f4xx_hal_flash.h" type="1"/>
     <File name="configuration/LED.c" path="app/LED.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal.h" path="app/Hardware/stm32f4xx_hal.h" type="1"/>
+    <File name="Code/LowLevelIO.h" path="app/LowLevelIO.h" type="1"/>
     <File name="Code/SystemConfigure.c" path="app/SystemConfigure.c" type="1"/>
-    <File name="Code/Bit_Operations.c" path="app/Bit_Operations.c" type="1"/>
     <File name="Code/swdStub.h" path="app/swdStub.h" type="1"/>
     <File name="configuration/configurePort.h" path="app/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ex.c" path="app/Hardware/stm32f4xx_hal_flash_ex.c" type="1"/>
     <File name="startup/system_stm32f4xx.h" path="app/Hardware/system_stm32f4xx.h" type="1"/>
     <File name="Core/core_cmSimd.h" path="app/core_cmSimd.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_pwr_ex.c" path="app/Hardware/stm32f4xx_hal_pwr_ex.c" type="1"/>
     <File name="configuration" path="" type="2"/>
+    <File name="Hardware/stm32f4xx_hal_pwr_ex.c" path="app/Hardware/stm32f4xx_hal_pwr_ex.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_conf.h" path="app/Hardware/stm32f4xx_hal_conf.h" type="1"/>
-    <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.h" path="app/Hardware/stm32f4xx_hal_pwr_ex.h" type="1"/>
+    <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.c" path="app/Hardware/stm32f4xx_hal_gpio.c" type="1"/>
     <File name="Core/core_cm4.h" path="app/core_cm4.h" type="1"/>
-    <File name="Code/IO_Operations.h" path="app/IO_Operations.h" type="1"/>
     <File name="Hardware/stm32f429xx.h" path="app/Hardware/stm32f429xx.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.h" path="app/Hardware/stm32f4xx_hal_pwr.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_def.h" path="app/Hardware/stm32f4xx_hal_def.h" type="1"/>
-    <File name="Code/Clock.c" path="app/Clock.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.c" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.c" path="app/Hardware/stm32f4xx_hal_rcc.c" type="1"/>
     <File name="Hardware/stm32f4xx_it.h" path="app/Hardware/stm32f4xx_it.h" type="1"/>
     <File name="Code/Flash.h" path="app/Flash.h" type="1"/>
     <File name="startup" path="" type="2"/>
+    <File name="Code/IoOperations.c" path="app/IoOperations.c" type="1"/>
     <File name="Code" path="" type="2"/>
     <File name="startup/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ex.h" path="app/Hardware/stm32f4xx_hal_flash_ex.h" type="1"/>
     <File name="Hardware" path="" type="2"/>
+    <File name="Code/swd_Utilities.c" path="app/swd_Utilities.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc_ex.c" path="app/Hardware/stm32f4xx_hal_rcc_ex.c" type="1"/>
-    <File name="Code/IO_Operations.c" path="app/IO_Operations.c" type="1"/>
-    <File name="Code/Clock.h" path="app/Clock.h" type="1"/>
     <File name="Code/Register_ReadWrite.c" path="app/Register_ReadWrite.c" type="1"/>
+    <File name="Code/Delay.h" path="app/Delay.h" type="1"/>
     <File name="Code/main.c" path="app/main.c" type="1"/>
-    <File name="Core/core_cmFunc.h" path="app/core_cmFunc.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.c" path="app/Hardware/stm32f4xx_hal_pwr.c" type="1"/>
+    <File name="Core/core_cmFunc.h" path="app/core_cmFunc.h" type="1"/>
     <File name="configuration/configurePort.c" path="app/configurePort.c" type="1"/>
     <File name="Hardware/stm32f4xx.h" path="app/Hardware/stm32f4xx.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_gpio_ex.h" path="app/Hardware/stm32f4xx_hal_gpio_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="app/Hardware/stm32f4xx_hal_cortex.c" type="1"/>
-    <File name="Code/SRAM.c" path="app/SRAM.c" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_gpio_ex.h" path="app/Hardware/stm32f4xx_hal_gpio_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.h" path="app/Hardware/stm32f4xx_hal_rcc.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
     <File name="configuration/LED.h" path="app/LED.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
     <File name="startup/startup_stm32f429xx.s" path="app/Hardware/startup_stm32f429xx.s" type="1"/>
     <File name="Core/core_cmInstr.h" path="app/core_cmInstr.h" type="1"/>
+    <File name="Code/Delay.c" path="app/Delay.c" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="app/Hardware/stm32f4xx_it.c" type="1"/>
     <File name="Code/swdStub.c" path="app/swdStub.c" type="1"/>
-    <File name="Code/Bit_Operations.h" path="app/Bit_Operations.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
+    <File name="Code/swd_Utilities.h" path="app/swd_Utilities.h" type="1"/>
     <File name="Code/Flash.c" path="app/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="app/Hardware/stm32f4xx_hal_flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="app/Hardware/stm32f4xx_hal_rcc_ex.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_cortex.h" path="app/Hardware/stm32f4xx_hal_cortex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.h" path="app/Hardware/stm32f4xx_hal_gpio.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_cortex.h" path="app/Hardware/stm32f4xx_hal_cortex.h" type="1"/>
+    <File name="Code/LowLevelIO.c" path="app/LowLevelIO.c" type="1"/>
     <File name="Core" path="" type="2"/>
-    <File name="Code/SRAM.h" path="app/SRAM.h" type="1"/>
   </Files>
   <Bookmarks/>
 </Project>

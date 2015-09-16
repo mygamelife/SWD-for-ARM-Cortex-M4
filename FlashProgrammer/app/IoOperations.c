@@ -1,4 +1,93 @@
-#include "Bit_Operations.h"
+#include "IoOperations.h"
+
+/**
+ * Generate 1 clock cycle at SWDCLK pin by clocking low followed by clocking high
+ *
+ */
+void generateOneClockCycle()
+{
+	setLowSWCLK();
+	setHighSWCLK();
+}
+
+/**
+ * Generate idle clock cycle by setting SWDIO pin low and clock
+ * before starting a new transaction 
+ *
+ * Note : After line reset there should be at least 2 idle clock cyle
+ *
+ * Input : numberOfClocks is the amount of idle clock to be generated
+ */
+void extraIdleClock(int numberOfClocks)
+{
+	int i;
+
+	setLowSWDIO();
+	for(i = 0 ; i < numberOfClocks ; i ++)
+		generateOneClockCycle();
+}
+
+/**
+ * Generate 0.5 clock cycle of turn around period 
+ *
+ * Host : change from output mode to input mode
+ * Target : change from input mode to output mode
+ * 
+ */
+void turnAroundRead()
+{
+	setLowSWCLK(); // z impedance on both line starts here
+}
+
+/**
+ * Generate 1.5 clock cycle of turn around period 
+ *
+ * Host : change from input mode to output mode
+ * Target : change output mode to input mode
+ * 
+ */
+void turnAroundWrite()
+{
+	setHighSWCLK(); // z impedance on both line starts here
+	setLowSWCLK();
+	setHighSWCLK();
+}
+
+/**
+ * Perform a line reset by clocking at least 50 cycles of SWDIO high to 
+ * ensure that JTAG/SWD interface is at reset state
+ *
+ * Input : numberOfClock is the number of clock with SWDIO high to be generated
+ */
+void lineReset(int numberOfClock)
+{
+	int i  = 0 ;
+	
+	if (numberOfClock < 50 )
+		numberOfClock = 50 ;
+	
+	setHighSWDIO();
+	
+	for ( i = 0 ; i < numberOfClock ; i ++)
+	{
+		generateOneClockCycle();
+	}
+}
+
+/**
+ * Perform a hard reset on the target device by setting low and high 
+ * on the nRST pin of the target
+ *
+ * Note : It is recommended to perform a hard reset as the target device might not respond
+ */
+void hardResetTarget()
+{
+	setLowNRST();
+	delay(500,1,1);
+	setHighNRST();
+	delay(2500,1,1);
+}
+
 
 /**
  * Send 1 bit of data through SWDIO pin by setting the SWDIO pin first
@@ -11,12 +100,12 @@
 void sendBit(int data)
 {
 	if (data != 0 )
-		SWDIO_High();
+		setHighSWDIO();
 	else
-		SWDIO_Low();
+		setLowSWDIO();
 	
-	SWCLK_OFF();
-	SWCLK_ON();
+	setLowSWCLK();
+	setHighSWCLK();
 }
 
 /**
@@ -51,9 +140,9 @@ int readBit()
 {
 	int bitRead= 0 ;
 
-	SWCLK_ON();
-	SWCLK_OFF();
-	bitRead = readSWDIO_Pin();
+	setHighSWCLK();
+	setLowSWCLK();
+	bitRead = readSWDIO();
 	
 	return bitRead;
 }

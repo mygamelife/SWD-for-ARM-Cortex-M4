@@ -1,77 +1,77 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="arm-none-eabi-gcc 4.8.1 mingw32 -mcpu=cortex-m4 -mthumb -g2 -Wall -O0 -c -DSTM32F429ZI -DSTM32F429XX -I..\..\..\..\..\..\..\Projects\SWD-for-ARM-Cortex-M4\FlashProgrammer\app\Hardware -I..\..\..\..\..\..\..\Projects\SWD-for-ARM-Cortex-M4\FlashProgrammer -I..\..\..\..\..\..\..\Projects\SWD-for-ARM-Cortex-M4\FlashProgrammer\app -I..\..\..\..\..\..\..\Projects\SWD-for-ARM-Cortex-M4">
-      <target file="Flash.o" lastModified="14fbda39a5d">
-         <source file="..\..\..\app\Flash.c" lastModified="14fabc82e78"/>
+      <target file="Flash.o" lastModified="14fd6c49ad7">
+         <source file="..\..\..\app\Flash.c" lastModified="14fd69c4d74"/>
       </target>
-      <target file="LED.o" lastModified="14fbda39f20">
-         <source file="..\..\..\app\LED.c" lastModified="14fabc82e98"/>
+      <target file="LED.o" lastModified="14fd6c49f6e">
+         <source file="..\..\..\app\LED.c" lastModified="14fd695b893"/>
       </target>
-      <target file="Bit_Operations.o" lastModified="14fbda396b4">
-         <source file="..\..\..\app\Bit_Operations.c" lastModified="14fabc82e78"/>
-      </target>
-      <target file="stm32f4xx_hal.o" lastModified="14fbda39b42">
+      <target file="stm32f4xx_hal.o" lastModified="14fd6c49b45">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="stm32f4xx_hal_rcc.o" lastModified="14fbda39c3c">
+      <target file="stm32f4xx_hal_rcc.o" lastModified="14fd6c49c4e">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_rcc.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="stm32f4xx_hal_pwr.o" lastModified="14fbda3990c">
+      <target file="swd_Utilities.o" lastModified="14fd6c4974b">
+         <source file="..\..\..\app\swd_Utilities.c" lastModified="14fabc82fa1"/>
+      </target>
+      <target file="stm32f4xx_hal_pwr.o" lastModified="14fd6c499ae">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_pwr.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="IO_Operations.o" lastModified="14fbda39ac9">
-         <source file="..\..\..\app\IO_Operations.c" lastModified="14fabc82e98"/>
-      </target>
-      <target file="SRAM.o" lastModified="14fbda39981">
-         <source file="..\..\..\app\SRAM.c" lastModified="14fabc82e98"/>
-      </target>
-      <target file="stm32f4xx_hal_rcc_ex.o" lastModified="14fbda39bb8">
+      <target file="stm32f4xx_hal_rcc_ex.o" lastModified="14fd6c49bb2">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_rcc_ex.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="system_stm32f4xx.o" lastModified="14fbda39d7d">
+      <target file="IoOperations.o" lastModified="14fd6c497b8">
+         <source file="..\..\..\app\IoOperations.c" lastModified="14fabc82fa1"/>
+      </target>
+      <target file="Delay.o" lastModified="14fd6c499ed">
+         <source file="..\..\..\app\Delay.c" lastModified="14fabc82f24"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="14fd6c49d87">
          <source file="..\..\..\app\Hardware\system_stm32f4xx.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="stm32f4xx_hal_pwr_ex.o" lastModified="14fbda39ec1">
+      <target file="stm32f4xx_hal_pwr_ex.o" lastModified="14fd6c49f10">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_pwr_ex.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="swdStub.o" lastModified="14fbda39717">
-         <source file="..\..\..\app\swdStub.c" lastModified="14fbda370d6"/>
+      <target file="swdStub.o" lastModified="14fd6c49828">
+         <source file="..\..\..\app\swdStub.c" lastModified="14fd6b1fc5c"/>
       </target>
-      <target file="stm32f4xx_hal_flash_ramfunc.o" lastModified="14fbda395f2">
+      <target file="stm32f4xx_hal_flash_ramfunc.o" lastModified="14fd6c49680">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_flash_ramfunc.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="stm32f4xx_hal_flash.o" lastModified="14fbda39890">
+      <target file="LowLevelIO.o" lastModified="14fd6c49ea3">
+         <source file="..\..\..\app\LowLevelIO.c" lastModified="14fabc82fa1"/>
+      </target>
+      <target file="stm32f4xx_hal_flash.o" lastModified="14fd6c49941">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_flash.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="stm32f4xx_it.o" lastModified="14fbda3981d">
+      <target file="stm32f4xx_it.o" lastModified="14fd6c498c4">
          <source file="..\..\..\app\Hardware\stm32f4xx_it.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="Register_ReadWrite.o" lastModified="14fbda399e8">
-         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14fabc82e98"/>
+      <target file="Register_ReadWrite.o" lastModified="14fd6c49a6a">
+         <source file="..\..\..\app\Register_ReadWrite.c" lastModified="14fd6a4aa96"/>
       </target>
-      <target file="startup_stm32f429xx.o" lastModified="14fbda39924">
+      <target file="startup_stm32f429xx.o" lastModified="14fd6c499fd">
          <source file="..\..\..\app\Hardware\startup_stm32f429xx.s" lastModified="14fabc82e78"/>
       </target>
-      <target file="Clock.o" lastModified="14fbda397da">
-         <source file="..\..\..\app\Clock.c" lastModified="14fabc82e78"/>
-      </target>
-      <target file="configurePort.o" lastModified="14fbda39de3">
+      <target file="configurePort.o" lastModified="14fd6c49de7">
          <source file="..\..\..\app\configurePort.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="stm32f4xx_hal_flash_ex.o" lastModified="14fbda39cb8">
+      <target file="stm32f4xx_hal_flash_ex.o" lastModified="14fd6c49ccb">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_flash_ex.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="SystemConfigure.o" lastModified="14fbda39650">
+      <target file="SystemConfigure.o" lastModified="14fd6c496dd">
          <source file="..\..\..\app\SystemConfigure.c" lastModified="14fabc82e98"/>
       </target>
-      <target file="stm32f4xx_hal_cortex.o" lastModified="14fbda39d2c">
+      <target file="stm32f4xx_hal_cortex.o" lastModified="14fd6c49d39">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_cortex.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="stm32f4xx_hal_gpio.o" lastModified="14fbda39e51">
+      <target file="stm32f4xx_hal_gpio.o" lastModified="14fd6c49e55">
          <source file="..\..\..\app\Hardware\stm32f4xx_hal_gpio.c" lastModified="14fabc82e88"/>
       </target>
-      <target file="main.o" lastModified="14fbda39775">
-         <source file="..\..\..\app\main.c" lastModified="14fbda1aedb"/>
+      <target file="main.o" lastModified="14fd6c49886">
+         <source file="..\..\..\app\main.c" lastModified="14fd6c3ef43"/>
       </target>
    </processor>
 </history>
