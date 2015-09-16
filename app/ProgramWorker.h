@@ -6,7 +6,7 @@
 #include "FPB_Unit.h"
 #include "DWT_Unit.h"
 #include "swdStub.h"
-#include "Tlv_ErrorCode.h"
+#include "ErrorCode.h"
 #include "CException.h"
 
 /* swdStub instruction */

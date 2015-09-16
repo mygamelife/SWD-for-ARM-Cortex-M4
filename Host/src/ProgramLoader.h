@@ -4,7 +4,7 @@
 #include <malloc.h>
 #include "Tlv.h"
 #include "GetHeaders.h"
-#include "Tlv_ErrorCode.h"
+#include "ErrorCode.h"
 #include "CException.h"
 #include "Interface.h"
 

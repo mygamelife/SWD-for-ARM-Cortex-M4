@@ -10,18 +10,18 @@
  */
 Token *getToken(String *expression)
 {	
-	Number *num;
-	Identifier *iden;
-	Operator *op;
-	int tempStart = 0 , tempLength = 0, hex = 0;
-	char *tempIden; //temporary store idendifier name
+	Number *num; Identifier *iden; Operator *op; File *file;
+	int tempStart = 0 , tempLength = 0, hex = 0;  char *tempIden; //temporary store idendifier name
 	stringTrim(expression);	//Remove all the spaces in string
-
+  
 	/*Character at first position*/
 	int charAtThisPos = expression->startindex;
+  
+  if(expression->length == 0 || expression->length < 0)
+    Throw(ERR_EMPTY_STRING);
 
 	//if character start with numbers it is number token
-	if(stringCharAtInSet(expression , charAtThisPos , numSet))
+	else if(stringCharAtInSet(expression , charAtThisPos , numSet))
 	{	
 		String *removedWord = stringRemoveWordContaining (expression , hexNumSet);	//Remove numbers in string
 		tempStart = removedWord->startindex;
@@ -51,11 +51,11 @@ Token *getToken(String *expression)
 		String *removedWord = stringRemoveWordContaining (expression , folderNameSet); //Remove identifier from string
 		tempStart = removedWord->startindex;
 		tempLength = removedWord->length;
-		char *idenSubString = stringSubStringInChars(removedWord , removedWord->length); //Removed identifier become substring
-		iden = identifierNew(idenSubString); //create a new identifier token
-		iden->line = stringSubString(expression , tempStart , tempLength);
+		char *fileSubString = stringSubStringInChars(removedWord , removedWord->length); //Removed identifier become substring
+		file = fileNew(fileSubString); //create a new identifier token
+		file->line = stringSubString(expression , tempStart , tempLength);
 		
-		return (Token*)iden;
+		return (Token*)file;
 	}
   
 	//if character start with A~Z/a~z or '_' it is identifier token

@@ -6,16 +6,22 @@ extern int isr_vector_table;
 
 int main(void)
 {
-	int counter = 10;
-	State state = START;
+  __IO uint32_t swdInstruction = 0;
 
-	SCB->VTOR = &isr_vector_table;
+  /* Reallocate vector table to RAM */
+  SCB->VTOR = &isr_vector_table;
+  
+  /* Initialize hardware and configure system clock */
+  FlashSystemConfig();
 
-	//while(counter != 0)	{
-		//blinkLED3(&state, &counter);
-	//}
-	flashProgrammer();
-
-	while(1)
-	{}
+  blinkingLED(ONE_SEC);
+  
+  /* Initialize target status */
+  writeMemoryData(SWD_TARGET_STATUS, TARGET_OK);
+  
+  while(1)
+  {
+    swdInstruction = (__IO uint32_t)readMemoryData(SWD_INSTRUCTION);
+    swdStub(swdInstruction);
+  }
 }

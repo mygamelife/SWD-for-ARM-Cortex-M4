@@ -11,7 +11,7 @@ extern int uartReady;
 #include "Tlv_ex.h"
 #include "uart.h"
 #include "CException.h"
-#include "Tlv_ErrorCode.h"
+#include "ErrorCode.h"
 
 typedef struct
 {
@@ -26,7 +26,8 @@ typedef struct
   Probe_State probeState;
   /* Load Program state */
   Tlv_State loadProgramState;
-  
+  Tlv_State flashState;
+  /* Flags */
   bool timeOutFlag;
   bool dataReceiveFlag;
   bool dataSendFlag;
@@ -52,6 +53,6 @@ int verifyTlvData(Tlv *tlv);
 int isTlvCommand(uint8_t command);
 int isTlvAck(Tlv *tlv);
 int verifyTlvPacket(Tlv *tlv);
-void tlvReportError(Tlv_Session *session, uint8_t errorCode);
+void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode);
 
 #endif // Tlv_H

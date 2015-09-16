@@ -421,13 +421,13 @@ void probeTaskManager(Tlv_Session *session)  {
         }
       }
       Catch(err)  {
-        tlvReportError(session, err);
+        tlvErrorReporter(session, err);
       }
-      break;
+    break;
       
     case PROBE_INTERPRET_PACKET :
       selectTask(session, packet);
       session->probeState = PROBE_RECEIVE_PACKET;
-      break;
+    break;
   }
 }

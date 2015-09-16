@@ -2,19 +2,11 @@
 #define Register_ReadWrite_H
 
 #include <stdint.h>
-#include "Clock.h"
-#include "Bit_Operations.h"
+#include "IoOperations.h"
 #include "configurePort.h"
 #include "swd_Utilities.h"
-#include "IO_Operations.h"
 
-/** Debug Core Register
-  */
-#define DHCSR             ((uint32_t)0xE000EDF0)    //Debug Halting Control Status Register
-#define DCRSR             ((uint32_t)0xE000EDF4)    //Debug Core Register Selector Register
-#define DCRDR             ((uint32_t)0xE000EDF8)    //Debug Core Register Data Register
-#define DEMCR             ((uint32_t)0xE000EDFC)    //Debug Exception and Monitor Control Register
-
+typedef int SwdError;
 /** AHB-AP register
   */
 #define CSW_REG           0x00
@@ -63,9 +55,9 @@
 
 /** SELECT Register bank select bit
   */
-#define BANK_0                        ((uint32_t)0x00000000)
-#define BANK_1                        ((uint32_t)0x00000010)
-#define BANK_F                        ((uint32_t)0x000000F0)
+#define SELECT_BANK0                  ((uint32_t)0x00000000)
+#define SELECT_BANK1                  ((uint32_t)0x00000010)
+#define SELECT_BANKF                  ((uint32_t)0x000000F0)
 
 /** SELECT Register bit set
   */
@@ -81,30 +73,35 @@ extern int cswDataSize ;
 
 /**-------------------------------- SWD-DP Register Function-----------------------------------
   */
-#define swdWriteDP(address, ack, data)              swdRegisterWrite(address, DP, ack, data);
-#define swdWriteSelect(ack, writeData)              swdRegisterWrite(SELECT_REG, DP, ack, writeData);
-#define swdWriteAbort(ack, writeData)               swdRegisterWrite(ABORT_REG, DP, ack, writeData);
-#define swdWriteCtrlStatus(ack, writeData)          swdRegisterWrite(CTRLSTAT_REG, DP, ack, writeData);
-#define swdReadDP(address, ack, parity, data)       swdRegisterRead(address, DP, ack, parity, data);
-#define swdReadCtrlStatus(ack, parity, readData)    swdRegisterRead(CTRLSTAT_REG, DP, ack, parity, readData);
+#define swdWriteDP(address, data)               swdRegisterWrite(address, DP, data);
+#define swdReadDP(address, data)                swdRegisterRead(address, DP, data);
+#define swdWriteAP(address, data)               swdRegisterWrite(address, AP, data);
+// #define swdWriteSelect(ack, writeData)              swdRegisterWrite(SELECT_REG, DP, ack, writeData);
+// #define swdWriteAbort(ack, writeData)               swdRegisterWrite(ABORT_REG, DP, ack, writeData);
+// #define swdWriteCtrlStatus(ack, writeData)          swdRegisterWrite(CTRLSTAT_REG, DP, ack, writeData);
+// #define swdReadCtrlStatus(ack, parity, readData)    swdRegisterRead(CTRLSTAT_REG, DP, ack, parity, readData);
 
-void powerUpSystemAndDebug();
-void swdRegisterRead(int Address,int APnDP,int *ACK,int *Parity, uint32_t *data);
-void swdRegisterWrite(int Address,int APnDP,int *ACK, uint32_t data);
+void powerUpSystemAndDebug(void);
+SwdError swdRegisterRead(int address, int pointType, uint32_t *data);
+SwdError swdRegisterWrite(int address, int pointType, uint32_t data);
+SwdError swdReadAP(int address, uint32_t *data);
 
 /**-------------------------------- AHB-AP Register Function-----------------------------------
   */
-#define swdWriteAP(address, ack, data)              swdRegisterWrite(address, AP, ack, data);
+SwdError readAhbIDR(uint32_t *data_IDR);
+SwdError swdSelectMemorySize(uint32_t memorySize);
 
 /* Used for mocking */
 uint32_t memoryReadAndReturnWord(uint32_t address);
 
-int memoryReadWord(uint32_t Address,uint32_t *dataRead);
-void memoryWriteByte(uint32_t address, uint32_t writeData);
-void memoryWriteHalfword(uint32_t address, uint32_t writeData);
-void memoryWriteWord(uint32_t Address,uint32_t WriteData);
+int memoryReadWord(uint32_t address,uint32_t *dataRead);
+SwdError memoryWriteByte(uint32_t address, uint8_t writeData);
+SwdError memoryWriteHalfword(uint32_t address, uint16_t writeData);
+SwdError memoryWriteWord(uint32_t address, uint32_t writeData);
 
-int swdReadAP(int Address,int *ACK,int *Parity, uint32_t *data);
-void readAhbIDR(uint32_t *data_IDR);
-void swdWriteCSW(int *ack, uint32_t cswBitSet);
+uint32_t memoryWriteDataAlignment(uint32_t address, uint16_t writeData);
+
+uint32_t readMemoryData(uint32_t address);
+void writeMemoryData(uint32_t address, uint32_t data);
+
 #endif // Register_ReadWrite_H

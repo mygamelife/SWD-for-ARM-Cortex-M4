@@ -17,7 +17,6 @@ typedef uint32_t FLASH_ErrorTypeDef;
 
 #define __IO volatile
 
-#define DELAY	3000
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
 /* Base address of the Flash sectors Bank 1 */
@@ -49,19 +48,19 @@ typedef uint32_t FLASH_ErrorTypeDef;
 #define ADDR_FLASH_SECTOR_23     ((uint32_t)0x081E0000) /* Base @ of Sector 11, 128 Kbytes */
 
 uint32_t flashGetSector(uint32_t Address);
-uint32_t flashRead(uint32_t startAddress);
 
 void flashErrorHandler(void);
 void flashMassErase(uint32_t banks);
-void flashEraseSector(uint32_t startSector, uint32_t endSector);
-void flashWrite(uint32_t startAddr, uint32_t endAddr, uint32_t typeProgram, uint32_t data);
-void flashVerify(uint32_t startAddr, uint32_t endAddr, uint32_t dataToVerify);
-void flashCopyFromSRAMToFlash(uint32_t src, uint32_t dest, int length);
-void flashVerifyDataFromSRAMToFlash(uint32_t src, uint32_t dest, int length);
+void flashErase(uint32_t flashAddress, int size);
+void flashWrite(uint32_t *data, uint32_t address, int size);
+void flashVerify(uint32_t src, uint32_t dest, int size);
+void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size);
 
-void flashWriteByte(uint32_t address, uint8_t data);
-void flashWriteHalfWord(uint32_t address, uint16_t data);
-void flashWriteWord(uint32_t address, uint32_t data);
-void flashWriteDoubleWord(uint32_t address, uint64_t data);
-  
+void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data);
+
+#define flashWriteByte(address, data)         flashWriteProgram(FLASH_TYPEPROGRAM_BYTE, address, data)
+#define flashWriteHalfWord(address, data)     flashWriteProgram(FLASH_TYPEPROGRAM_HALFWORD, address, data)
+#define flashWriteWord(address, data)         flashWriteProgram(FLASH_TYPEPROGRAM_WORD, address, data)
+#define flashWriteDobuleWord(address, data)   flashWriteProgram(FLASH_TYPEPROGRAM_DOUBLEWORD, address, data)
+
 #endif // Flash_H

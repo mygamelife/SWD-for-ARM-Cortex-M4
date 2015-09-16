@@ -7,7 +7,7 @@
 #include "ProgramElf.h"
 #include "mock_uart.h"
 #include "ProgramLoader.h"
-#include "Tlv_ErrorCode.h"
+#include "ErrorCode.h"
 #include "CException.h"
 #include "CustomAssertion.h"
 #include "mock_Interface.h"
