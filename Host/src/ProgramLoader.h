@@ -29,6 +29,8 @@ void tlvHaltTarget(Tlv_Session *session);
 void tlvRunTarget(Tlv_Session *session);
 void tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 
+void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
+
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
 
