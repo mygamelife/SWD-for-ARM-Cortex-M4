@@ -146,13 +146,12 @@ void performHardResetOnTarget(Tlv_Session *session)
 void haltTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t errorCode = TLV_NOT_HALTED ;
   setCoreMode(CORE_DEBUG_HALT);
   
   if(getCoreMode() == CORE_DEBUG_HALT)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+    Throw(TLV_NOT_HALTED);
   
   tlvSend(session, tlv);
 }
@@ -165,15 +164,19 @@ void haltTarget(Tlv_Session *session)
 void runTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t errorCode = TLV_NOT_RUNNING ;
-  setCoreMode(CORE_DEBUG_MODE);
   
-  if(getCoreMode() == CORE_DEBUG_MODE)
-    tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-  
-  tlvSend(session, tlv);
+  if(session->breakPointFlag != FLAG_SET) {
+    setCoreMode(CORE_DEBUG_MODE);
+    if(getCoreMode() == CORE_DEBUG_MODE) {
+      tlv = tlvCreatePacket(TLV_OK, 0, 0);
+    }
+    else Throw(TLV_NOT_RUNNING);
+    tlvSend(session, tlv);
+  }
+  else {
+    session->ongoingProcessFlag = FLAG_SET;
+    checkBreakpointEvent(session);
+  }
 }
 
 /** Step the processor of target device once and send the current PC to host
@@ -184,7 +187,6 @@ void runTarget(Tlv_Session *session)
 void singleStepTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint8_t errorCode = TLV_NOT_STEPPED ;
   uint32_t data = 0 ;
   
   setCoreMode(CORE_SINGLE_STEP);
@@ -194,8 +196,7 @@ void singleStepTarget(Tlv_Session *session)
     readCoreRegister(CORE_REG_PC, &data);
     tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
   } 
-  else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  else Throw(TLV_NOT_STEPPED);
   
   tlvSend(session, tlv);
 }
@@ -209,7 +210,6 @@ void singleStepTarget(Tlv_Session *session)
 void multipleStepTarget(Tlv_Session *session, int nInstructions)
 {
   Tlv *tlv ;
-  uint8_t errorCode = TLV_NOT_STEPPED ;
   uint32_t data = 0 ;
   
   stepOnly(nInstructions);
@@ -219,8 +219,7 @@ void multipleStepTarget(Tlv_Session *session, int nInstructions)
     readCoreRegister(CORE_REG_PC, &data);
     tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
   } 
-  else
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
+  else Throw(TLV_NOT_STEPPED);
   
   tlvSend(session, tlv);
 }
@@ -236,18 +235,19 @@ void multipleStepTarget(Tlv_Session *session, int nInstructions)
  *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword			
  *
  */
-void setBreakpoint(Tlv_Session *session,uint32_t instructionAddress,int matchingMode)
+void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchingMode)
 {
   Tlv *tlv ;
-  int comparatorUsed = 0 ;
-  uint8_t errorCode = TLV_BKPT_MAXSET ;
+  int comparatorUsed = 0;
   
   comparatorUsed = autoSetInstructionBreakpoint(instructionAddress,matchingMode);
   
   if( comparatorUsed == -1)
-    tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
-  else
+    Throw(TLV_BKPT_MAXSET);
+  else  {
+    session->breakPointFlag = FLAG_SET;
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  }
   
   tlvSend(session, tlv);
 }
@@ -304,6 +304,10 @@ void checkBreakpointEvent(Tlv_Session *session)
     disableInstructionComparator(getEnabledComparatorLoadedWithAddress(pc));
     clearBreakpointDebugEvent();
   }
+  
+  /* Clear ongoingProcess and breakPoint flag to indicate the breakpoint event is over*/
+  session->breakPointFlag = FLAG_CLEAR;
+  session->ongoingProcessFlag = FLAG_CLEAR;
   
   tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);  
@@ -403,6 +407,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HALT_TARGET    : haltTarget(session); break;
     case TLV_RUN_TARGET     : runTarget(session); break;
     case TLV_STEP           : multipleStepTarget(session, get4Byte(&tlv->value[0])); break;
+    case TLV_BREAKPOINT     : setBreakpoint(session, get4Byte(&tlv->value[0]), MATCH_WORD); break;
   }
 }
 
@@ -419,15 +424,15 @@ void probeTaskManager(Tlv_Session *session)  {
         if(verifyTlvPacket(packet)) {
           session->probeState = PROBE_INTERPRET_PACKET;
         }
-      }
-      Catch(err)  {
+      } Catch(err) {
         tlvErrorReporter(session, err);
       }
     break;
       
     case PROBE_INTERPRET_PACKET :
       selectTask(session, packet);
-      session->probeState = PROBE_RECEIVE_PACKET;
+      if(session->ongoingProcessFlag == FLAG_CLEAR)
+        session->probeState = PROBE_RECEIVE_PACKET;
     break;
   }
 }

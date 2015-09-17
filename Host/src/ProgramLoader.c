@@ -113,14 +113,14 @@ void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size) {
   */
 void tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size) {
   Tlv *tlv; 
-  session->ongoingProcessFlag = true;
+  session->ongoingProcessFlag = FLAG_SET;
 
   if(*size > TLV_DATA_SIZE) {
     tlvReadDataChunk(session, *destAddress, TLV_DATA_SIZE);
   }
   else  {
     tlvReadDataChunk(session, *destAddress, *size);
-    session->ongoingProcessFlag = false;
+    session->ongoingProcessFlag = FLAG_CLEAR;
   }
   
   *destAddress += TLV_DATA_SIZE;
@@ -140,7 +140,7 @@ void tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size)
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) {
   static ElfData *elfData;
   static ElfSection *isr, *rodata, *data, *text;
-  session->ongoingProcessFlag = true;
+  session->ongoingProcessFlag = FLAG_SET;
   
   switch(session->loadProgramState) {
     case TLV_OPEN_FILE :
@@ -150,7 +150,7 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
       data    = getElfSectionInfo(elfData, ".data");
       text    = getElfSectionInfo(elfData, ".text");
 
-      tlvWriteTargetRegister(session, PROGRAM_COUNTER, &get4Byte(&isr->dataAddress[4]));
+      tlvWriteTargetRegister(session, PC, &get4Byte(&isr->dataAddress[4]));
       session->loadProgramState = TLV_LOAD_ISR_VECTOR;
       break;
     
@@ -190,7 +190,7 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
       if(text->size <= 0) {
         printf("finish load TLV_LOAD_TEXT\n");
         free(text);   closeElfFile(elfData);
-        session->ongoingProcessFlag = false;
+        session->ongoingProcessFlag = FLAG_CLEAR;
         session->loadProgramState = TLV_OPEN_FILE;
       }
       break;
@@ -210,8 +210,8 @@ void tlvLoadToFlash(Tlv_Session *session, char *file)  {
       /* Load FlashProgrammer into target RAM */
       tlvLoadToRam(session, file);
       
-      if(session->ongoingProcessFlag == false) {
-        session->ongoingProcessFlag = true;
+      if(session->ongoingProcessFlag == FLAG_CLEAR) {
+        session->ongoingProcessFlag = FLAG_SET;
         session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
       }
       break;
@@ -219,9 +219,9 @@ void tlvLoadToFlash(Tlv_Session *session, char *file)  {
     case TLV_LOAD_ACTUAL_PROGRAM :
       tlvLoadToRam(session, file);
       
-      if(session->ongoingProcessFlag == false)
+      /* Change state when the program is finish transmit */
+      if(session->ongoingProcessFlag == FLAG_CLEAR)
         session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
-
       break;
   }
   // tlvLoadProgram(session, file, TLV_WRITE_RAM);
@@ -251,8 +251,22 @@ void tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   tlvSend(session, tlv);
 }
 
+/** tlvSetBreakpoint is a function to to set breakpoint
+  * at specified address
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           address is the address want to be stop at
+  *
+  * Return  : NONE
+  */
+void tlvSetBreakpoint(Tlv_Session *session, uint32_t address) {
+  Tlv *tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&address);
+
+  tlvSend(session, tlv);
+}
+
 /** selectCommand is a function to select instruction 
-  * base on tlv->type
+  * base on userSession
   *
   * Input   : tlv is pointer pointing to tlv packet
   *
@@ -269,6 +283,7 @@ void selectCommand(Tlv_Session *session, User_Session *userSession) {
     case TLV_HALT_TARGET      : tlvHaltTarget(session); break;
     case TLV_RUN_TARGET       : tlvRunTarget(session); break;
     case TLV_STEP             : tlvMultipleStepTarget(session, (int)(*userSession->data)); break;
+    case TLV_BREAKPOINT       : tlvSetBreakpoint(session, userSession->address); break;
   }
 }
 
@@ -299,7 +314,7 @@ void hostInterpreter(Tlv_Session *session) {
           displayTlvData(response); 
         #endif
         
-        if(session->ongoingProcessFlag == false)
+        if(session->ongoingProcessFlag == FLAG_CLEAR)
           session->hostState = HOST_WAIT_USER_COMMAND;
         else  session->hostState = HOST_INTERPRET_COMMAND;
       }

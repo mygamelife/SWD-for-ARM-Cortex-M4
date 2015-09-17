@@ -32,7 +32,14 @@ typedef struct
   bool dataReceiveFlag;
   bool dataSendFlag;
   bool ongoingProcessFlag;
+  bool breakPointFlag;
+  bool watchPointFlag;
 } Tlv_Session;
+
+typedef enum {
+  FLAG_CLEAR = false,
+  FLAG_SET = true
+} Flag_Status;
 
 Tlv_Session *tlvCreateSession(void);
 

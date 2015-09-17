@@ -11,7 +11,8 @@ void displayOptionMenu(void)  {
   printf("6. Halt target\n");
   printf("7. Run target\n");
   printf("8. Step target\n");
-  printf("9. Exit\n");
+  printf("9. Set breakpoint\n");
+  printf("10. Exit\n");
 }
 
 void displayTlvData(Tlv *tlv)  {
@@ -235,6 +236,31 @@ User_Session *userStepTarget(String *userInput) {
   return &userSession;
 }
 
+/** userSetBreakpoint is a function to get address need
+  * to set breakpoint from user
+  *
+  * Input   : userInput is the string enter by user
+  *
+  * return  : userSession contain all the information from the user input
+  */
+User_Session *userSetBreakpoint(String *userInput) {
+  static User_Session userSession;
+  CEXCEPTION_T err; Number *address;
+  
+  Try {
+    address = (Number*)getToken(userInput);
+  } Catch(err)  {
+    Throw(ERR_INCOMPLETE_COMMAND);
+  }
+
+  if(address->type != NUMBER_TOKEN)     Throw(ERR_EXPECT_NUMBER);
+  
+  userSession.tlvCommand = TLV_BREAKPOINT;
+  userSession.address = address->value;
+
+  return &userSession;
+}
+
 /** userExit is a function to exit instruction
   *
   * Input   : userInput is the string enter by userExit
@@ -267,6 +293,7 @@ User_Session *userInputInterpreter(String *userInput)  {
   else if(strcmp(command->name, "halt") == 0)     return userHaltTarget();
   else if(strcmp(command->name, "run") == 0)      return userRunTarget();
   else if(strcmp(command->name, "step") == 0)     return userStepTarget(userInput);
+  else if(strcmp(command->name, "brkpt") == 0)    return userSetBreakpoint(userInput);
   else if(strcmp(command->name, "exit") == 0)     return userExit();
   
   else Throw(ERR_INVALID_USER_COMMAND);

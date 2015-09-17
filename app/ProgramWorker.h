@@ -32,7 +32,7 @@ void runTarget(Tlv_Session *session);
 void singleStepTarget(Tlv_Session *session);
 void multipleStepTarget(Tlv_Session *session, int nInstructions);
 
-void setBreakpoint(Tlv_Session *session,uint32_t instructionAddress,int matchingMode);
+void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchingMode);
 void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
                    
