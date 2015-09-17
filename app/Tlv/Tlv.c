@@ -20,10 +20,12 @@ Tlv_Session *tlvCreateSession(void) {
   session.flashState = TLV_OPEN_FILE;
   
   /* Initialize all the required flag */
-  session.timeOutFlag = false;
-  session.dataSendFlag = false;
-  session.dataReceiveFlag = false;
-  session.ongoingProcessFlag = false;
+  session.timeOutFlag = FLAG_CLEAR;
+  session.dataSendFlag = FLAG_CLEAR;
+  session.dataReceiveFlag = FLAG_CLEAR;
+  session.ongoingProcessFlag = FLAG_CLEAR;
+  session.breakPointFlag = FLAG_CLEAR;
+  session.watchPointFlag = FLAG_CLEAR;
   
   session.hostState = HOST_WAIT_USER_COMMAND;
   session.probeState = PROBE_RECEIVE_PACKET;

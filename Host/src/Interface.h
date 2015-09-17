@@ -87,6 +87,7 @@ User_Session *userReadRegister(String *userInput);
 User_Session *userStepTarget(String *userInput);
 User_Session *userHaltTarget(void);
 User_Session *userRunTarget(void);
+User_Session *userSetBreakpoint(String *userInput);
 User_Session *userExit(void);
 
 #endif // Interface_H

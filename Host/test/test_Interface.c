@@ -131,3 +131,12 @@ void test_userLoadProgram_should_throw_an_error_if_path_name_is_invalid(void)
     TEST_ASSERT_EQUAL(ERR_EXPECT_FILE_PATH, err);
   }
 }
+
+void test_userSetBreakpoint_should_get_address_need_to_be_set_break_point(void)
+{
+  String *str = stringNew("brkpt 0x20000000");
+  User_Session *session = userInputInterpreter(str);
+  
+  TEST_ASSERT_EQUAL(TLV_BREAKPOINT, session->tlvCommand);
+  TEST_ASSERT_EQUAL(0x20000000, session->address);
+}
