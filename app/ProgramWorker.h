@@ -38,4 +38,5 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
                    
 void checkBreakpointEvent(Tlv_Session *session);
 void checkWatchpointEvent(Tlv_Session *session);   
+void checkIsSVCActive(Tlv_Session *session);
 #endif // ProgramWorker_H

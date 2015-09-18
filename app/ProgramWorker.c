@@ -436,3 +436,25 @@ void probeTaskManager(Tlv_Session *session)  {
     break;
   }
 }
+
+/**
+ * Check whether is SVCall is active
+ *
+ * Input  : session contain a element/handler used by tlv protocol
+ */
+void checkIsSVCActive(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  uint32_t dataRead = 0 ;
+  uint8_t svcActive = 1 ;
+  
+  memoryReadWord(&(SCB->SHCSR),&dataRead);
+  
+  if((dataRead & SCB_SHCSR_SVCALLACT_Msk) == 0)
+    return ;
+  else
+  {
+    tlv = tlvCreatePacket(TLV_SVC, 1, &svcActive);
+    tlvSend(session, tlv);
+  }
+}

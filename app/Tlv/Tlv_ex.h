@@ -28,7 +28,8 @@ typedef enum
   TLV_MULTI_STEP,
   TLV_BREAKPOINT,
   TLV_WATCHPOINT,
-  TLV_EXIT
+  TLV_EXIT,
+  TLV_SVC,
 } Tlv_Command;
 
 typedef enum
