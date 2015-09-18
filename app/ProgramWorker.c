@@ -137,6 +137,18 @@ void performHardResetOnTarget(Tlv_Session *session)
   tlvSend(session, tlv);
 }
 
+/** Perform a hard reset on the target device
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void performVectorResetOnTarget(Tlv_Session *session)
+{
+  vectorResetTarget();
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  tlvSend(session, tlv);
+}
 
 /** Halt the processor of the target device 
   *
@@ -448,7 +460,7 @@ void checkIsSVCActive(Tlv_Session *session)
   uint32_t dataRead = 0 ;
   uint8_t svcActive = 1 ;
   
-  memoryReadWord(&(SCB->SHCSR),&dataRead);
+  memoryReadWord((uint32_t)&(SCB->SHCSR),&dataRead);
   
   if((dataRead & SCB_SHCSR_SVCALLACT_Msk) == 0)
     return ;

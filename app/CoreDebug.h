@@ -26,6 +26,7 @@
 #define clearDWTTrapDebugEvent()            clearDebugEvent(DWTTRAP_DEBUGEVENT)
 
 #define softResetTarget()                   {memoryWriteWord(AIRCR_REG,REQUEST_SYSTEM_RESET);}             
+#define vectorResetTarget()                 {memoryWriteWord(AIRCR_REG,REQUEST_VECTOR_RESET);}
 
 void setCoreMode(CoreMode mode);
 CoreMode getCoreMode();

@@ -22,6 +22,7 @@ void readTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 
 void performSoftResetOnTarget(Tlv_Session *session);
 void performHardResetOnTarget(Tlv_Session *session);
+void performVectorResetOnTarget(Tlv_Session *session);
 
 void selectTask(Tlv_Session *session, Tlv *tlv);
 void probeTaskManager(Tlv_Session *session);

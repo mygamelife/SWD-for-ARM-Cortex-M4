@@ -553,6 +553,19 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
   performHardResetOnTarget(session);
 }
 
+
+/*--------------performVectorResetOnTarget--------------------*/
+void test_performVectotrResetOnTarget_should_call_vectorResetTarget_and_send_TLV_ack()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_VECTOR_RESET,NO_ERROR);
+  
+  performVectorResetOnTarget(session);
+}
+
 /*--------------haltTarget--------------------*/
 void test_haltTarget_should_return_ACK_if_successful()
 {
