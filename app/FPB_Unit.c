@@ -59,7 +59,7 @@ int manualSetInstructionBreakpoint(int instructionCOMPno,uint32_t instructionAdd
  *          remap address is the base address for remapping
  *
  *  Output :  return 0 if instruction remapping is set
- *            retunr -1 if invalid comparator is chosen
+ *            return -1 if invalid comparator is chosen
  */
 int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddress, uint32_t remapAddress)
 {
@@ -83,6 +83,22 @@ int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddr
   return 0 ;
 }
 
+int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode)
+{
+  int comparatorToUse = 0 ;
+  
+  comparatorToUse = selectNextFreeComparator(INSTRUCTION_TYPE);
+  if(comparatorToUse == -1)
+    return -1 ;
+  
+  memoryWriteWord((REMAP_BASE + 4(comparatorToUse)),machineCode);
+  
+  manualSetInstructionRemapping(comparatorToUse,instructionAddress,REMAP_BASE);
+  
+  return comparatorToUse;
+}
+
+
 /**
  *  Use to set for literal address remapping
  *
@@ -95,7 +111,7 @@ int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddr
  *          remap address is the base address for remapping
  *
  *  Output :  return 0 if literal remapping is set
- *            retunr -1 if invalid comparator is chosen
+ *            return -1 if invalid comparator is chosen
  */
 int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_t remapAddress)
 {
