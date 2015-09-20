@@ -62,6 +62,7 @@ typedef struct
 
 #define COMP_READY  0
 #define COMP_BUSY   1
+#define COMP_REMAP  2
 
 #define LITERAL_TYPE      0
 #define INSTRUCTION_TYPE  1

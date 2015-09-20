@@ -36,6 +36,12 @@ void multipleStepTarget(Tlv_Session *session, int nInstructions);
 void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchingMode);
 void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
+ 
+void removeInstructionBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
+void removeAllInstructionBreakpoint(Tlv_Session *session);
+
+void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
+void stopAllFlashPatchRemapping(Tlv_Session *session);
                    
 void checkBreakpointEvent(Tlv_Session *session);
 void checkWatchpointEvent(Tlv_Session *session);   
