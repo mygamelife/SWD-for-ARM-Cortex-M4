@@ -7,8 +7,7 @@
 #include "ErrorCode.h"
 #include "CException.h"
 #include "Interface.h"
-
-#define PROGRAM_COUNTER    15
+#include "GetTime.h"
 
 /* Read/Write target register */
 void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
@@ -33,6 +32,7 @@ void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
+void isLastOperationDone(Tlv_Session *session);
 
 #define tlvLoadToRam(session, file)   tlvLoadProgram(session, file, TLV_WRITE_RAM)
 

@@ -11,6 +11,7 @@
 #include "CException.h"
 #include "CustomAssertion.h"
 #include "mock_Interface.h"
+#include "GetTime.h"
 
 void setUp(void)  {}
 

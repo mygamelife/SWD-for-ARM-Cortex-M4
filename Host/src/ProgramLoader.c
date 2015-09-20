@@ -287,37 +287,56 @@ void selectCommand(Tlv_Session *session, User_Session *userSession) {
   }
 }
 
+/** isLastOperationDone is a function to check last operation
+  * state if still ongoing it will continue intepret
+  *
+  * input   : session contain a element/handler used by tlv protocol
+  *
+  * return  : NONE
+  */
+void isLastOperationDone(Tlv_Session *session) {
+  if(session->ongoingProcessFlag == FLAG_CLEAR)
+    session->hostState = HOST_WAIT_USER_COMMAND;
+  else
+    session->hostState = HOST_INTERPRET_COMMAND;
+}
+
 /** hostInterpreter
   */
 void hostInterpreter(Tlv_Session *session) {
   static Tlv *response;
   static User_Session *userSession;
+  CEXCEPTION_T err;
   
   switch(session->hostState)  {
     case HOST_WAIT_USER_COMMAND :
       userSession = waitUserCommand();
       if(userSession->tlvCommand == TLV_EXIT) 
         session->hostState = HOST_EXIT;
-      else  session->hostState = HOST_INTERPRET_COMMAND;
-      break;
+      else session->hostState = HOST_INTERPRET_COMMAND;
+    break;
       
     case HOST_INTERPRET_COMMAND :
       selectCommand(session, userSession);
       session->hostState = HOST_WAITING_RESPONSE;
-      break;
+    break;
       
     case HOST_WAITING_RESPONSE :
+      startTimer();
       response = tlvReceive(session);
-
-      if(verifyTlvPacket(response)) {
-        #if !defined (TEST)
-          displayTlvData(response); 
-        #endif
-        
-        if(session->ongoingProcessFlag == FLAG_CLEAR)
-          session->hostState = HOST_WAIT_USER_COMMAND;
-        else  session->hostState = HOST_INTERPRET_COMMAND;
+      
+      if(response == NULL) {
+        if(getElapsedTime())
+          Throw(PROBE_NOT_RESPONDING);
       }
-      break;
+      else {
+        elapsedTime = 0;
+        verifyTlvPacket(response);
+        #if !defined (TEST)
+        displayTlvData(response); 
+        #endif
+        isLastOperationDone(session);
+      }
+    break;
   }
 }

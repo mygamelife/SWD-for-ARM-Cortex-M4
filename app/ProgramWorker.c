@@ -247,9 +247,8 @@ void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchi
   else  {
     session->breakPointFlag = FLAG_SET;
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
+    tlvSend(session, tlv);
   }
-  
-  tlvSend(session, tlv);
 }
 
 /** Set data watchpoint 
@@ -296,7 +295,7 @@ void checkBreakpointEvent(Tlv_Session *session)
   Tlv *tlv ;
   uint32_t pc =0 ;
   
-  if(!(hasBreakpointDebugEventOccured()))
+  if(!hasBreakpointDebugEventOccured())
     return ;
   else 
   {
@@ -430,9 +429,14 @@ void probeTaskManager(Tlv_Session *session)  {
     break;
       
     case PROBE_INTERPRET_PACKET :
-      selectTask(session, packet);
-      if(session->ongoingProcessFlag == FLAG_CLEAR)
+      Try {
+        selectTask(session, packet);
+        if(session->ongoingProcessFlag == FLAG_CLEAR)
+          session->probeState = PROBE_RECEIVE_PACKET;
+      } Catch(err) {
+        tlvErrorReporter(session, err);
         session->probeState = PROBE_RECEIVE_PACKET;
+      }
     break;
   }
 }

@@ -8,6 +8,7 @@ extern int uartReady;
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <time.h>
 #include "Tlv_ex.h"
 #include "uart.h"
 #include "CException.h"
@@ -34,6 +35,8 @@ typedef struct
   bool ongoingProcessFlag;
   bool breakPointFlag;
   bool watchPointFlag;
+  clock_t currentTime;
+  clock_t previousTime;
 } Tlv_Session;
 
 typedef enum {

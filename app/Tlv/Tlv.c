@@ -30,6 +30,8 @@ Tlv_Session *tlvCreateSession(void) {
   session.hostState = HOST_WAIT_USER_COMMAND;
   session.probeState = PROBE_RECEIVE_PACKET;
   
+  session.previousTime = 0;
+  
   return &session;
 }
 

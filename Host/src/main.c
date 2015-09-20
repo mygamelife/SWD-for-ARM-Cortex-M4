@@ -18,6 +18,7 @@ int main(void) {
       hostInterpreter(session);
     }
     Catch(err) {
+      session->hostState = HOST_WAIT_USER_COMMAND;
       displayErrorMessage(err);
     }
   }

@@ -47,7 +47,7 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
   UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
   
-  return HAL_UART_Receive(uartHandle, rxBuffer, length, 100);
+  return HAL_UART_Receive(uartHandle, rxBuffer, length, 40);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
