@@ -541,7 +541,9 @@ void checkIsSVCActive(Tlv_Session *session)
     return ;
   else
   {
-    tlv = tlvCreatePacket(TLV_SVC, 1, &svcActive);
+    readCoreRegister(CORE_REG_R0,&dataRead);
+    setCoreMode(CORE_DEBUG_MODE);
+    tlv = tlvCreatePacket(TLV_SVC, 4, (uint8_t *)dataRead);
     tlvSend(session, tlv);
   }
 }
