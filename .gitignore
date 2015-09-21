@@ -7,3 +7,4 @@ SerialWireDebug/Debug/obj/*
 !SerialWireDebug/Debug/bin/README.txt
 !SerialWireDebug/Debug/obj/README.txt
 /output/
+debug.log

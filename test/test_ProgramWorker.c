@@ -514,8 +514,7 @@ void test_probeTaskManager_should_run_checkPointEvent_if_set_breakPoint_is_calle
   readDebugEventRegister_ExpectAndReturn(0x2);
   
   readCoreRegister_Ignore();
-  getEnabledComparatorLoadedWithAddress_IgnoreAndReturn(3);
-  disableInstructionComparator_ExpectAndReturn(3,0);
+  disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
   clearDebugEvent_Expect((BKPT_DEBUGEVENT));
   
   probeTaskManager(session);
@@ -551,6 +550,19 @@ void test_performHardResetOnTarget_should_call_hardResetTarget_and_send_TLV_ack(
   hardResetTarget_Expect();
   
   performHardResetOnTarget(session);
+}
+
+
+/*--------------performVectorResetOnTarget--------------------*/
+void test_performVectotrResetOnTarget_should_call_vectorResetTarget_and_send_TLV_ack()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_VECTOR_RESET,NO_ERROR);
+  
+  performVectorResetOnTarget(session);
 }
 
 /*--------------haltTarget--------------------*/
@@ -626,8 +638,7 @@ void test_runTarget_should_run_chekcBreakPointEvent_if_breakPointFlag_is_set()
   readDebugEventRegister_ExpectAndReturn(0x2);
   
   readCoreRegister_Ignore();
-  getEnabledComparatorLoadedWithAddress_IgnoreAndReturn(3);
-  disableInstructionComparator_ExpectAndReturn(3,0);
+  disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
   clearDebugEvent_Expect((BKPT_DEBUGEVENT));
   
   runTarget(session);
@@ -738,6 +749,78 @@ void test_setWatchpoint_should_set_watchpoint_and_return_ACK()
   setWatchpoint(session,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ);
 }
 
+/*---------removeInstructionBreakpoint----------------------*/
+void test_removeInstructionBreakpoint_should_remove_breakpoint_and_return_ACK()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,1);
+  
+  removeInstructionBreakpoint(session,0x10203040);
+}
+
+void test_removeInstructionBreakpoint_should_return_NACK_if_not_found()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,-1);
+  
+  removeInstructionBreakpoint(session,0x10203040);
+}
+
+/*---------removeAllInstructionBreakpoint----------------------*/
+void test_removeAllInstructionBreakpoint_should_remove_all_breakpoint_and_return_ACK()
+{  
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  removeAllBreakpoint_Expect();
+  
+  removeAllInstructionBreakpoint(session);
+}
+
+/*---------stopFlashPatchRemapping----------------------*/
+void test_stopFlashPatchRemapping_should_stop_remapping_and_return_ACK()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+
+  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,INSTRUCTION_TYPE,1);
+  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,LITERAL_TYPE,1);
+  
+  stopFlashPatchRemapping(session,0x12345678);
+}
+
+void test_stopFlashPatchRemapping_should_return_NACK_if_not_found()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+
+  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,INSTRUCTION_TYPE,-1);
+  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,LITERAL_TYPE,-1);
+  
+  stopFlashPatchRemapping(session,0x12345678);
+}
+
+/*---------stopAllFlashPatchRemapping----------------------*/
+void test_stopAllFlashPatchRemapping_should_stop_all_remapping_and_return_ACK()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+
+  stopAllFPRemapping_Expect();
+  
+  stopAllFlashPatchRemapping(session);
+}
+
 /*---------checkBreakpointEvent----------------------*/
 void test_checkBreakpointEvent_should_force_quit_if_breakpoint_not_occur()
 {
@@ -759,8 +842,7 @@ void test_checkBreakpointEvent_should_read_PC_and_disable_comparator_if_breakpoi
   readDebugEventRegister_ExpectAndReturn(0x2);
   
   readCoreRegister_Ignore();
-  getEnabledComparatorLoadedWithAddress_IgnoreAndReturn(3);
-  disableInstructionComparator_ExpectAndReturn(3,0);
+  disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
   clearDebugEvent_Expect((BKPT_DEBUGEVENT));
   
   checkBreakpointEvent(session);

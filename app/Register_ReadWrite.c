@@ -98,7 +98,6 @@ SwdError swdReadAP(int address, uint32_t *data)
  */
 SwdError readAhbIDR(uint32_t *data_IDR)	{
   int error = 0;
-  uint32_t data = 0;
 
   /**Power up/wake up debug system before using */
   swdWriteDP(CTRLSTAT_REG, POWERUP_SYSTEM);
@@ -164,7 +163,7 @@ int memoryReadWord(uint32_t address, uint32_t *dataRead)
 
 SwdError memoryWriteByte(uint32_t address, uint8_t writeData)
 {
-  int ack = 0, error = 0;
+  int error = 0;
   uint32_t alignedData = 0;
   
   if(cswDataSize != CSW_BYTE_SIZE) // used to prevent setting same size again and again
@@ -183,7 +182,7 @@ SwdError memoryWriteByte(uint32_t address, uint8_t writeData)
 
 SwdError memoryWriteHalfword(uint32_t address, uint16_t writeData)
 {
-  int ack = 0, error = 0;
+  int error = 0;
   uint32_t alignedData = 0;
   
   if(cswDataSize != CSW_HALFWORD_SIZE) // used to prevent setting same size again and again
@@ -203,7 +202,7 @@ SwdError memoryWriteHalfword(uint32_t address, uint16_t writeData)
 
 SwdError memoryWriteWord(uint32_t address, uint32_t writeData)
 {
-	int ack = 0, error = 0;
+  int error = 0;
   
   if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
   {  

@@ -31,14 +31,9 @@ int manualSetInstructionBreakpoint(int instructionCOMPno,uint32_t instructionAdd
     return -1 ;
   
   configData = (instructionAddress & FP_COMP_ADDRESS_MASK) +matchingMode + FP_COMP_ENABLE ;
-  
-  disableFPBUnit();
-  
+   
   memoryWriteWord((uint32_t)&(INSTRUCTION_COMP[instructionCOMPno]),configData);
   
-  setCoreMode(CORE_DEBUG_MODE);
-  enableFPBUnit();
-
   instructionComparatorReady[instructionCOMPno] = COMP_BUSY;
   return 0 ;
 }
@@ -59,7 +54,7 @@ int manualSetInstructionBreakpoint(int instructionCOMPno,uint32_t instructionAdd
  *          remap address is the base address for remapping
  *
  *  Output :  return 0 if instruction remapping is set
- *            retunr -1 if invalid comparator is chosen
+ *            return -1 if invalid comparator is chosen
  */
 int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddress, uint32_t remapAddress)
 {
@@ -70,15 +65,10 @@ int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddr
   
   configData = (instructionAddress & FP_COMP_ADDRESS_MASK) + FP_COMP_ENABLE ;
   
-  disableFPBUnit();
-  
   memoryWriteWord((uint32_t)&(FPB->FP_REMAP),(remapAddress & FP_REMAP_ADDRESS_MASK));
   memoryWriteWord((uint32_t)&(INSTRUCTION_COMP[instructionCOMPno]),configData);
-  
-  setCoreMode(CORE_DEBUG_MODE);
-  enableFPBUnit();
-  
-  instructionComparatorReady[instructionCOMPno] = COMP_BUSY;
+
+  instructionComparatorReady[instructionCOMPno] = COMP_REMAP;
   
   return 0 ;
 }
@@ -95,7 +85,7 @@ int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddr
  *          remap address is the base address for remapping
  *
  *  Output :  return 0 if literal remapping is set
- *            retunr -1 if invalid comparator is chosen
+ *            return -1 if invalid comparator is chosen
  */
 int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_t remapAddress)
 {
@@ -106,15 +96,10 @@ int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_
   
   configData = (literalAddress & FP_COMP_ADDRESS_MASK) + FP_COMP_ENABLE ;
   
-  disableFPBUnit();
-  
   memoryWriteWord((uint32_t)&(FPB->FP_REMAP),(remapAddress & FP_REMAP_ADDRESS_MASK));
   memoryWriteWord((uint32_t)&(LITERAL_COMP[literalCOMPno]),configData);
   
-  setCoreMode(CORE_DEBUG_MODE);
-  enableFPBUnit();
-  
-  literalComparatorReady[literalCOMPno] = COMP_BUSY ;
+  literalComparatorReady[literalCOMPno] = COMP_REMAP ;
   
   return 0 ;
 }
@@ -141,6 +126,30 @@ int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode)
     return -1 ;
 
   manualSetInstructionBreakpoint(comparatorToUse,instructionAddress,matchingMode);
+  
+  return comparatorToUse;
+}
+
+/**
+ *  Use to set for instruction address remapping
+ *
+ *  Input :  instructionAddress is the address that will be remapped
+ *           machineCode is the machine code that will remapped from the instructionAddress
+ *
+ *  Output :  return INSTRUCTION_COMP0 - INSTRUCTION_COMP5 for valid comparator used
+ *            return -1 if invalid comparator is chosen
+ */
+int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode)
+{
+  int comparatorToUse = 0 ;
+  
+  comparatorToUse = selectNextFreeComparator(INSTRUCTION_TYPE);
+  if(comparatorToUse == -1)
+    return -1 ;
+  
+  memoryWriteWord((REMAP_BASE + (4*comparatorToUse)),machineCode);
+  
+  manualSetInstructionRemapping(comparatorToUse,instructionAddress,REMAP_BASE);
   
   return comparatorToUse;
 }
@@ -196,15 +205,70 @@ int disableLiteralComparator(int literalCOMPno)
 }
 
 /**
+ *  Disable the instruction/literal comparator loaded with the selected address
+ *   
+ *  Input   : address is the address going to be checked inside the instruction/literal comparator
+ *            comparatorType is used to select between instruction and literal comparator
+ *				    Possible values : 
+ *					    INSTRUCTION_TYPE			Instruction Comparator
+ *					    LITERAL_TYPE			    Literal Comparator    
+ *
+ * Output  : return 1 if found
+ *           return -1 if not found
+ */
+int disableFPComparatorLoadedWithAddress(uint32_t address,int comparatorType)
+{
+  uint32_t mask = 0x1FFFFFFC ;
+  uint32_t dataRead = 0 ;
+  uint32_t *compPtr ;
+  int *compFlagPtr ;
+  int i = 0 , max = 0 ;
+  int (*funcPtr)(int) ;
+  int found  =  -1;
+  
+  address = address & mask ;//mask off bit [31:29] and [1:0]
+  
+  if(comparatorType == INSTRUCTION_TYPE)
+  {
+    max = INSTRUCTION_COMP_NUM ;
+    compPtr = (uint32_t *)&(INSTRUCTION_COMP[0]);
+    compFlagPtr = &(instructionComparatorReady[0]);
+    funcPtr = &(disableInstructionComparator);
+  }
+  else
+  {
+    max = LITERAL_COMP_NUM;
+    compPtr = (uint32_t *)&(LITERAL_COMP[0]);
+    compFlagPtr = &(literalComparatorReady[0]);
+    funcPtr = &(disableLiteralComparator);
+  }
+  
+  for(i = 0 ; i < max ; i ++ )
+  {
+    if(compFlagPtr[i] != COMP_READY)
+    { 
+      memoryReadWord((uint32_t)&(compPtr[i]),&dataRead);
+      if((dataRead & mask) == address)
+      {
+        funcPtr(i);
+        found = 1 ;
+      }
+    }
+  }
+  return found ;
+}
+
+/**
  *  Read all instruction/literal comparator and update their respective ready flag
  *   
- *  Input : comparatorType is the to differentiate between instruction and literal comparator
+ *  Input : comparatorType is used to select between instruction and literal comparator
  *				  Possible values : 
  *					  INSTRUCTION_TYPE			Instruction Comparator
  *					  LITERAL_TYPE			    Literal Comparator   
  */
 void readAndUpdateComparatorReadyFlag(int comparatorType)
 {
+  uint32_t remapMask = 0xF0000000;
   uint32_t data = 0 ;
   uint32_t *compPtr ;
   int *compFlagPtr  ;
@@ -226,35 +290,79 @@ void readAndUpdateComparatorReadyFlag(int comparatorType)
   for(i = 0 ; i < max ; i ++)
   { 
       memoryReadWord((uint32_t)&(compPtr[i]),&data);
-      compFlagPtr[i] = (int)(data & FPB_ENABLED_MASK);
+      if((data & FPB_ENABLED_MASK))
+      {
+        if((data & remapMask))
+          compFlagPtr[i] = COMP_BUSY ;
+        else
+          compFlagPtr[i] = COMP_REMAP ;
+      }
+      else
+        compFlagPtr[i] = COMP_READY ;
   }
 }
 
-
 /**
- *  Get the instruction comparator loaded with the selected address
- *   
- *  Input   : address is the address going to be checked inside the instruction comparator
- *  Output  : return the number of instruction comparator if found
- *            return -1 if not found           
+ *  Disable all instruction and literal comparator in FPB unit
+ *  
  */
-int getEnabledComparatorLoadedWithAddress(uint32_t address)
+void disableAllFPComparator()
 {
-  uint32_t mask = 0x1FFFFFFC ;
-  uint32_t dataRead = 0 ;
   int i = 0 ;
   
-  address = address & mask ;//mask off bit [31:29] and [1:0]
-  
-  for(i = 0 ; i < INSTRUCTION_COMP_NUM ; i ++ )
+  for (i=0 ; i < INSTRUCTION_COMP_NUM ; i++)
   {
-    if(instructionComparatorReady[i] == COMP_BUSY)
-    { 
-      memoryReadWord((uint32_t)&(INSTRUCTION_COMP[i]),&dataRead);
-      if((dataRead & mask) == address)
-        return i ;
-    }
+    disableInstructionComparator(i);
+    instructionComparatorReady[i] = COMP_READY;
   }
   
-  return -1 ;
+  for (i=0 ; i < LITERAL_COMP_NUM ; i++)
+  {
+    disableLiteralComparator(i);
+    literalComparatorReady[i] = COMP_READY ;
+  }
+}
+
+/**
+ *  Initialise FPB unit by enabling FPB unit and disable all FP Comparator
+ */
+void initialiseFPBUnit()
+{
+  disableAllFPComparator();
+  enableFPBUnit();
+}
+
+/**
+ *  Remove all breakpoint , flash patch remapping will not be affected
+ *
+ */
+void removeAllBreakpoint()
+{
+  int i = 0 ;
+  for (i = 0 ; i < INSTRUCTION_COMP_NUM ; i ++)
+  {
+    if(instructionComparatorReady[i] == COMP_BUSY)
+      disableInstructionComparator(i);
+  }
+}
+
+/**
+ * Stop all flash patch remapping , breakpoint will not be affected
+ *
+ */
+void stopAllFPRemapping()
+{
+  int i = 0 ;
+  
+  for(i=0 ; i < INSTRUCTION_COMP_NUM ; i ++)
+  {
+    if(instructionComparatorReady[i] == COMP_REMAP)
+      disableInstructionComparator(i);
+  }
+  
+  for (i=0 ; i < LITERAL_COMP_NUM ; i++)
+  {
+    if(literalComparatorReady[i] == COMP_REMAP)
+    disableLiteralComparator(i);
+  }
 }

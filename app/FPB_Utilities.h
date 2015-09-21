@@ -62,10 +62,12 @@ typedef struct
 
 #define COMP_READY  0
 #define COMP_BUSY   1
+#define COMP_REMAP  2
 
 #define LITERAL_TYPE      0
 #define INSTRUCTION_TYPE  1
 
+#define REMAP_BASE        0x30000000
 
 extern int instructionComparatorReady[INSTRUCTION_COMP_NUM];
 extern int literalComparatorReady[LITERAL_COMP_NUM];

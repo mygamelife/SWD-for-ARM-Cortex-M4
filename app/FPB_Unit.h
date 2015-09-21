@@ -14,10 +14,17 @@ int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddr
 int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_t remapAddress);
 
 int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode);
+int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode);
 
 int disableInstructionComparator(int instructionCOMPno);
 int disableLiteralComparator(int literalCOMPno);
+int disableFPComparatorLoadedWithAddress(uint32_t address,int comparatorType);
+void disableAllFPComparator();
 
 void readAndUpdateComparatorReadyFlag(int comparatorType);
-int getEnabledComparatorLoadedWithAddress(uint32_t data);
+
+void initialiseFPBUnit();
+
+void removeAllBreakpoint();
+void stopAllFPRemapping();
 #endif // FPB_Unit_H

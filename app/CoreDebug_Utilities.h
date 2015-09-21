@@ -14,6 +14,7 @@
 #define AIRCR_REG   (uint32_t)&(SCB->AIRCR)
 
 #define REQUEST_SYSTEM_RESET      0xFA050004
+#define REQUEST_VECTOR_RESET      0xFA050001
 
 #define CORE_REG_READ   0
 #define CORE_REG_WRITE  0x10000
