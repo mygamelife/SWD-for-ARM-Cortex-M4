@@ -1,80 +1,67 @@
 #include "ProgramWorker.h"
 
-/** load_SectorErase_Instruction is a function to load the sector erase
-  * instruction into SRAM to tell the swdStub
+uint32_t mspAddress;
+
+/** Check whether is SVCall is active
   *
-  * input   : startAddress is the address to begin erase
-  *           endAddress is the address to end erase
-  *
-  * output  : NONE
+  * Input  : session contain a element/handler used by tlv protocol
   */
-void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector)  {
-  uint32_t targetStatus = 0;
-  /* Continues wait for target to release */
-  do  {
-    targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
-  } while(targetStatus != TARGET_OK);
-  
-  /* load flash start and end address to sram */
-  memoryWriteWord(SWD_FLASH_START_ADDRESS, (uint32_t)startSector);
-  memoryWriteWord(SWD_FLASH_END_ADDRESS, (uint32_t)endSector);
-  
-  /* load instruction to sram */
-  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR);
+int IsSvcActive(void) {
+
+  if((SCB->SHCSR & SCB_SHCSR_SVCALLACT_Msk) != 0)
+    return 1;
+
+  else return 0;
 }
 
-/** loadMassEraseInstruction is a function to load the mass erase
-  * instruction into SRAM to tell the swdStub
+/** requestSramAddress is a function to send svc request
+  * to target to perform specific task
   *
-  * input   : bankSelect can be one of the following value
-  *            + FLASH_BANK_1: Bank1 to be erased
-  *            + FLASH_BANK_2: Bank2 to be erased
-  *            + FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
+  * input   : svcRequest is a request value to tell target to do
+  *           some specific task
   *
   * output  : NONE
   */
-void loadMassEraseInstruction(uint32_t bankSelect)  {
-  uint32_t targetStatus = 0;
+void requestSramAddress(void) {
   
-  /* Continues wait for target to release */
-  do  {
-    targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
-  } while(targetStatus != TARGET_OK);
+  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
   
-  /* load bank select to sram */
-  memoryWriteWord(SWD_BANK_SELECT, bankSelect);
+  memoryWriteWord(mspAddress, SVC_REQUEST_SRAM_ADDRESS); //R0
   
-  /* load instruction to sram */
-  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE);  
+  setCoreMode(CORE_DEBUG_MODE);
 }
 
-/** loadCopyInstruction is a function copy data from src (SRAM) to dest (Flash)
-  *
-  * input   : src is the beginning SRAM address contain all the information
-  *           dest is the flash address all the information need to copy over there
-  *           length is to determine how many words need to copy over
-  *
-  * output  : NONE
-  */
-void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAddress, int size) {
-  uint32_t targetStatus = 0;
+void requestCopy(uint32_t src, uint32_t dest, int size) {
   
-  /* Continues wait for target to release */
-  do  {
-    targetStatus = memoryReadAndReturnWord(SWD_TARGET_STATUS);
-  } while(targetStatus != TARGET_OK);
+  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
 
-  /* load SRAM start address into sram */
-  memoryWriteWord(SWD_SRAM_START_ADDRESS, (uint32_t)dataAddress);
+  memoryWriteWord(mspAddress, SVC_REQUEST_COPY);  //R0
+  memoryWriteWord(mspAddress + 4, src);           //R1
+  memoryWriteWord(mspAddress + 8, dest);          //R2
+  memoryWriteWord(mspAddress + 12, size);         //R3
   
-  /* load Flash start address into sram */
-  memoryWriteWord(SWD_FLASH_START_ADDRESS, (uint32_t)destAddress);
-  
-  /* load length into sram */
-  memoryWriteWord(SWD_DATA_SIZE, size);
+  setCoreMode(CORE_DEBUG_MODE);
+}
 
-	/* load copy instructoin into sram */
-  memoryWriteWord(SWD_INSTRUCTION, INSTRUCTION_COPY);
+void requestErase(uint32_t address, int size) {
+  
+  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
+  
+  memoryWriteWord(mspAddress, SVC_REQUEST_ERASE); //R0
+  memoryWriteWord(mspAddress + 4, address); //R1
+  memoryWriteWord(mspAddress + 8, size); //R2
+
+  setCoreMode(CORE_DEBUG_MODE);
+}
+
+void requestMassErase(uint32_t bankSelect) {
+  
+  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
+  
+  memoryWriteWord(mspAddress, SVC_REQUEST_MASS_ERASE); //R0
+  memoryWriteWord(mspAddress + 4, bankSelect); //R1
+
+  setCoreMode(CORE_DEBUG_MODE);
 }
 
 /** writeTargetRegister is a function to write value into target register using swd
@@ -471,6 +458,18 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   tlvSend(session, tlv);
 }
 
+/** writeTargetFlash is a function to write target RAM using swd
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size) {
+}
+
 /** selectTask is a function to select instruction 
   * base on tlv->type
   *
@@ -525,29 +524,5 @@ void probeTaskManager(Tlv_Session *session)  {
         session->probeState = PROBE_RECEIVE_PACKET;
       }
     break;
-  }
-}
-
-/**
- * Check whether is SVCall is active
- *
- * Input  : session contain a element/handler used by tlv protocol
- */
-void checkIsSVCActive(Tlv_Session *session)
-{
-  Tlv *tlv ;
-  uint32_t dataRead = 0 ;
-  uint8_t svcActive = 1 ;
-  
-  memoryReadWord((uint32_t)&(SCB->SHCSR),&dataRead);
-  
-  if((dataRead & SCB_SHCSR_SVCALLACT_Msk) == 0)
-    return ;
-  else
-  {
-    readCoreRegister(CORE_REG_R0,&dataRead);
-    setCoreMode(CORE_DEBUG_MODE);
-    tlv = tlvCreatePacket(TLV_SVC, 4, (uint8_t *)dataRead);
-    tlvSend(session, tlv);
   }
 }

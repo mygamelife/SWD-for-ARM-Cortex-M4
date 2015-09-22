@@ -2,9 +2,10 @@
 
 int main(void)
 {
-  uint32_t idr = 0, dataRead = 0, dataRead2 = 0, dataRead3;
+  uint32_t idr = 0, mainStack, dataRead = 0, dataRead2 = 0, dataRead3, dataRead4;
   int errorCode = 0, dummy = 0;
   CoreMode mode ;
+  uint32_t data1, data2, data3, data4;
 
   /* Hardware configuration */
   HAL_Init();
@@ -19,18 +20,25 @@ int main(void)
   /* Power Up AHB Port */
   errorCode = readAhbIDR(&idr);
 
-  readCoreRegister(CORE_REG_R0, &dataRead);
-  readCoreRegister(CORE_REG_R1, &dataRead2);
-
-  writeCoreRegister(CORE_REG_R0, 1);
-  memoryWriteWord((uint32_t)&(SCB->SHCSR),0x80);
-  memoryReadWord((uint32_t)&(SCB->SHCSR),&dataRead);
-
-  setCoreMode(CORE_DEBUG_MODE);
-  readCoreRegister(CORE_REG_R0, &dataRead);
-  readCoreRegister(CORE_REG_R1, &dataRead2);
-
   //Tlv_Session *session = tlvCreateSession();
+
+  //if(IsTargetSvcDone()) {
+	  //requestCopy(0x20000100, 0x081C0000, 16);
+  //}
+
+  memoryWriteWord(0x20000000, 0xdeadbeef);
+  memoryWriteWord(0x20000004, 0xbeefcafe);
+  memoryWriteWord(0x20000008, 0x12345678);
+  memoryWriteWord(0x2000000C, 0xabcdabcd);
+
+  memoryReadWord(0x20000000, &dataRead);
+  memoryReadWord(0x20000004, &dataRead);
+  memoryReadWord(0x20000008, &dataRead);
+  memoryReadWord(0x2000000C, &dataRead);
+
+ requestCopy(0x20000000, 0x081C0000, 16);
+
+ requestSramAddress();
 
   while(1)
   {

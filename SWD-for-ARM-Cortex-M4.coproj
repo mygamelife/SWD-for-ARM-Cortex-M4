@@ -147,9 +147,9 @@
     <File name="Code/ProgramWorker.c" path="app/ProgramWorker.c" type="1"/>
     <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
     <File name="Code/FPB_Unit.c" path="app/FPB_Unit.c" type="1"/>
-    <File name="Code/Tlv_ErrorCode.h" path="app/Tlv/Tlv_ErrorCode.h" type="1"/>
     <File name="Code/IO_Operations.h" path="app/IO_Operations.h" type="1"/>
     <File name="Core/core_cm4.h" path="app/Hardware/core_cm4.h" type="1"/>
+    <File name="Code/Tlv_ErrorCode.h" path="app/Tlv/Tlv_ErrorCode.h" type="1"/>
     <File name="Code/LED.c" path="app/LED.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.h" path="app/Hardware/stm32f4xx_hal_pwr.h" type="1"/>
     <File name="Code/configurePort.h" path="app/configurePort.h" type="1"/>

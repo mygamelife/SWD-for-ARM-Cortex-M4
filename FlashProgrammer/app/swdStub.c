@@ -1,113 +1,57 @@
 #include "swdStub.h"
 
-/**
-  * swdStub is small program routine take instruction from swd probe and response
+/** svcServiceHandler is a svc handler written using C language
+  * 
+  *     +------+
+  *     | xPSR |  svc_args[7]
+  *     +------+
+  *     |  PC  |  svc_args[6]
+  *     +------+
+  *     |  LR  |  svc_args[5]
+  *     +------+
+  *     |  R12 |  svc_args[4]
+  *     +------+
+  *     |  R3  |  svc_args[3]
+  *     +------+
+  *     |  R2  |  svc_args[2]
+  *     +------+
+  *     |  R1  |  svc_args[1]
+  *     +------+
+  *     |  R0  |  svc_args[0]
+  *     +------+  
+  *  Cortex-M4 stack frame
   *
-  * input   : swdInstruction is an instruction send by probe
-  * return  : NONE
   */
-void swdStub(uint32_t swdInstruction) {
-  switch(swdInstruction)  {
-    case INSTRUCTION_COPY :
-      stubCopy();
-      break;
-    
-    case INSTRUCTION_ERASE_SECTOR :
-      stubErase();
-      break;
-  
-    case INSTRUCTION_MASS_ERASE :
-      stubMassErase();
-      break;
+void svcServiceHandler(unsigned int *svc_args) {
+
+  while(svc_args[0] == 0) {}
+
+  if(svc_args[0] == SVC_REQUEST_SRAM_ADDRESS) {
+	  svc_args[1] = 0x20012800;
   }
+
+  else if(svc_args[0] == SVC_REQUEST_COPY) {
+	  flashCopyFromSramToFlash((uint32_t)svc_args[1], (uint32_t)svc_args[2], (int)svc_args[3]);
+  }
+  
+  else if(svc_args[0] == SVC_REQUEST_ERASE) {
+	  flashErase((uint32_t)svc_args[1], (int)svc_args[2]);
+  }
+  
+  else if(svc_args[0] == SVC_REQUEST_MASS_ERASE) {
+	  flashMassErase((uint32_t)svc_args[1]);
+  }
+  
+  svc_args[0] = 0;
 }
 
-/** stubCopy is small program routine to copy data in SRAM to Flash
-  *
-  * input   : NONE
-  * return  : NONE
-  */
-void stubCopy(void) {
-  __IO uint32_t flashAddress = 0, sramAddress = 0;
-  __IO int size = 0;
-  
-  /* Change target status to busy to prevent other function to interrupt */
-  writeMemoryData(SWD_TARGET_STATUS, TARGET_BUSY);
-  
-  /* Read SRAM source address from sram */
-  sramAddress  = (__IO uint32_t)readMemoryData(SWD_SRAM_START_ADDRESS);
-  /* Read flash destination address from sram */
-  flashAddress = (__IO uint32_t)readMemoryData(SWD_FLASH_START_ADDRESS);
-  /* Read Data Length from sram */
-  size = (__IO int)readMemoryData(SWD_DATA_SIZE);
-
-  flashCopyFromSramToFlash(sramAddress, flashAddress, size);
-  
-  /* Clear instruction prevent keep erase */
-  writeMemoryData(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
-  /* Tell probe now target is ready for next instruction */
-  writeMemoryData(SWD_TARGET_STATUS, TARGET_OK);
-}
-
-/**
-  * swdSectorErase is small program routine to erase specific 
-  * flash sector address given by user
-  *
-  * input   : NONE
-  * return  : NONE
-  */
-void stubErase(void)  {
-  __IO uint32_t flashAddress = 0;
-  __IO int flashSize = 0;
-
-  /* Change target status to busy to prevent other function to interrupt */
-  writeMemoryData(SWD_TARGET_STATUS, TARGET_BUSY);
-  
-  /* Read user start address from sram */
-  flashAddress = (__IO uint32_t)readMemoryData(SWD_FLASH_START_ADDRESS);
-  
-  /* Read user end address from sram */
-  flashSize = (__IO uint32_t)readMemoryData(SWD_DATA_SIZE);
-  
-  flashErase(flashAddress, flashSize);
-  
-  /* Clear instruction prevent keep erase */
-  writeMemoryData(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
-  
-  /* Tell probe now target is ready for next instruction */
-  writeMemoryData(SWD_TARGET_STATUS, TARGET_OK);
-}
-
-/** stubMassErase is small program routine to erase specific 
-  * bank according to the user selection
-  *
-  * input   : NONE
-  * return  : NONE
-  */
-void stubMassErase(void)  {
-  __IO uint32_t bankSelect = 0;
-
-  /* Change target status to busy to prevent other function to interrupt */
-  writeMemoryData(SWD_TARGET_STATUS, TARGET_BUSY);
-  
-  /** Check MASS_ERASE_BANK_SELECT it
-    * determine which bank need to be erase */
-  bankSelect = (__IO uint32_t)readMemoryData(SWD_BANK_SELECT);
-    
-  if(bankSelect == MASS_ERASE_BANK_1)
-    bankSelect = FLASH_BANK_1;
-  
-  else if(bankSelect == MASS_ERASE_BOTH_BANK)
-    bankSelect = FLASH_BANK_BOTH;
-  
-  else bankSelect = FLASH_BANK_2;
-  
-  /* Perform mass erase here */
-  flashMassErase(bankSelect);
-    
-  /* Clear instruction prevent keep erase */
-  writeMemoryData(SWD_INSTRUCTION, INSTRUCTION_CLEAR);
-
-  /* Tell probe now target is ready for next instruction */
-  writeMemoryData(SWD_TARGET_STATUS, TARGET_OK);
+/* Use a normal C function, the compiler will make sure that this is going
+ * to be called using the standard C ABI which ends in a correct stack
+ * frame for our SVC call
+ */
+void svcServiceCall(void)
+{
+  #if !defined (TEST)
+	svc(SVC_SERVICE_CALL);
+  #endif
 }

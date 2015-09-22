@@ -127,7 +127,7 @@ void UsageFault_Handler(void)
   * @param  None
   * @retval None
   */
-void __attribute__ (( naked )) SVC_Handler(void)
+__attribute__ (( naked )) void SVC_Handler(void)
 {
   /* Get the pointer to the stack frame which was saved before the SVC
    * call and use it as first parameter for the C-function (r0)
@@ -140,9 +140,9 @@ void __attribute__ (( naked )) SVC_Handler(void)
     "ITE    EQ          \t\n"
     "MRSEQ  R0, MSP     \t\n"
     "MRSNE  R0, PSP     \t\n"
-    "b %[C_SVC_Handler] \t\n" /* Branch to C_SVC_Handler C function */
+    "b %[svcServiceHandler] \t\n" /* Branch to C_SVC_Handler C function */
     : /* no output */
-    : [C_SVC_Handler] "i" (C_SVC_Handler) /* input */
+    : [svcServiceHandler] "i" (svcServiceHandler) /* input */
     : "r0" /* clobber */
   );
 }

@@ -9,17 +9,29 @@
 #include "ErrorCode.h"
 #include "CException.h"
 
-/* swdStub instruction */
-void loadEraseSectorInstruction(uint32_t *startSector, uint32_t *endSector);
-void loadMassEraseInstruction(uint32_t bankSelect);
-void loadCopyFromSRAMToFlashInstruction(uint32_t *dataAddress, uint32_t *destAddress, int size);
+#define ENABLE_SVC          0x80
 
+extern uint32_t mspAddress;
+
+/* swdStub instruction */
+int IsSvcActive(void);
+void requestSramAddress(void);
+void requestCopy(uint32_t src, uint32_t dest, int size);
+void requestErase(uint32_t address, int size);
+void requestMassErase(uint32_t bankSelect);
+
+/*############################################### FLASH ###############################################*/
+void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
+
+/*############################################### RAM ###############################################*/
 void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size);
 
+/*############################################### Register ###############################################*/
 void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
 void readTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 
+/*############################################### Reset ###############################################*/
 void performSoftResetOnTarget(Tlv_Session *session);
 void performHardResetOnTarget(Tlv_Session *session);
 void performVectorResetOnTarget(Tlv_Session *session);
@@ -45,5 +57,4 @@ void stopAllFlashPatchRemapping(Tlv_Session *session);
                    
 void checkBreakpointEvent(Tlv_Session *session);
 void checkWatchpointEvent(Tlv_Session *session);   
-void checkIsSVCActive(Tlv_Session *session);
 #endif // ProgramWorker_H

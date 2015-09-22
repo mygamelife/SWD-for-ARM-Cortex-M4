@@ -11,58 +11,57 @@
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_Register_ReadWrite.h"
 
-uint32_t readDummy = 0xFFFFFFFF;
+// uint32_t readDummy = 0xFFFFFFFF;
 
 void setUp(void)  {}
 
 void tearDown(void) {}
 
-void test_load_SectorErase_Instruction_should_wait_untill_target_response_OK_before_load_instruction(void)
+void test_requestSramAddress_should_send_SVC_REQUEST_SRAM_ADDRESS(void)
 {
-  uint32_t status = 0;
-  memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_OK);
+  mspAddress = 0xabcdabcd;
   
-  /* load flash start and end address to sram */
-  memoryWriteWord_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_20, NO_ERROR);
-  memoryWriteWord_ExpectAndReturn(SWD_FLASH_END_ADDRESS, ADDR_FLASH_SECTOR_22, NO_ERROR);
+  readCoreRegister_Ignore();
+  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_SRAM_ADDRESS, NO_ERROR); //R0
+  setCoreMode_Expect(CORE_DEBUG_MODE);
   
-  // /* load instruction to sram */
-  memoryWriteWord_ExpectAndReturn(SWD_INSTRUCTION, INSTRUCTION_ERASE_SECTOR, NO_ERROR);
-  
-  loadEraseSectorInstruction((uint32_t *)ADDR_FLASH_SECTOR_20, (uint32_t *)ADDR_FLASH_SECTOR_22);
+  requestSramAddress();
 }
 
-void test_loadMassEraseInstruction_should_wait_untill_target_response_OK_before_load_instruction(void)
+void test_requestSramAddress_should_send_SVC_REQUEST_COPY(void)
 {
-  memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_BUSY);
-  memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_OK);
+  mspAddress = 0xabcdabcd;
   
-  /* load bank select to sram */
-  memoryWriteWord_ExpectAndReturn(SWD_BANK_SELECT, FLASH_BANK_BOTH, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_COPY, NO_ERROR);  //R0
+  memoryWriteWord_ExpectAndReturn(mspAddress + 4, 0x20000008, NO_ERROR);    //R1
+  memoryWriteWord_ExpectAndReturn(mspAddress + 8, 0x08001000, NO_ERROR);    //R2
+  memoryWriteWord_ExpectAndReturn(mspAddress + 12, 2048, NO_ERROR);         //R3
+  setCoreMode_Expect(CORE_DEBUG_MODE);
   
-  /* load instruction to sram */
-  memoryWriteWord_ExpectAndReturn(SWD_INSTRUCTION, INSTRUCTION_MASS_ERASE, NO_ERROR);  
-  
-  loadMassEraseInstruction(FLASH_BANK_BOTH);
+  requestCopy(0x20000008, 0x08001000, 2048);
 }
 
-void test_loadCopyInstruction_should_load_src_address_dest_address_and_length_into_SRAM_instruction_address(void)
+void test_requestSramAddress_should_send_SVC_REQUEST_ERASE(void)
 {
-  memoryReadAndReturnWord_ExpectAndReturn(SWD_TARGET_STATUS, TARGET_OK);
+  mspAddress = 0xabcdabcd;
   
-  /* load SRAM start address into sram */
-  memoryWriteWord_ExpectAndReturn(SWD_SRAM_START_ADDRESS, 0x200001F0, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_ERASE, NO_ERROR); //R0
+  memoryWriteWord_ExpectAndReturn(mspAddress + 4, 0x08001000, NO_ERROR);    //R1
+  memoryWriteWord_ExpectAndReturn(mspAddress + 8, 2048, NO_ERROR);          //R2
+  setCoreMode_Expect(CORE_DEBUG_MODE);
   
-  /* load Flash start address into sram */
-  memoryWriteWord_ExpectAndReturn(SWD_FLASH_START_ADDRESS, ADDR_FLASH_SECTOR_18, NO_ERROR);
-  
-  /* load length into sram */
-  memoryWriteWord_ExpectAndReturn(SWD_DATA_SIZE, 2000, NO_ERROR);
+  requestErase(0x08001000, 2048);
+}
 
-	/* load copy instructoin into sram */
-  memoryWriteWord_ExpectAndReturn(SWD_INSTRUCTION, INSTRUCTION_COPY, NO_ERROR);
+void test_requestSramAddress_should_send_SVC_REQUEST_MASS_ERASE(void)
+{
+  mspAddress = 0xabcdabcd;
   
-  loadCopyFromSRAMToFlashInstruction((uint32_t *)0x200001F0, (uint32_t *)ADDR_FLASH_SECTOR_18, 2000);
+  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_MASS_ERASE, NO_ERROR);   //R0
+  memoryWriteWord_ExpectAndReturn(mspAddress + 4, FLASH_BANK_BOTH, NO_ERROR); //R1
+  setCoreMode_Expect(CORE_DEBUG_MODE);
+  
+  requestMassErase(FLASH_BANK_BOTH);
 }
 
 void test_writeTargetRegister_given_register_address_and_data(void)
