@@ -708,6 +708,47 @@ void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccess
   }
 }
 
+/*---------singleStepOver----------------------*/
+void test_singleStepOver_should_return_PC_after_successful_step()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  CEXCEPTION_T err;
+  
+  isNextInstructionCallingSubroutine_ExpectAndReturn(0x12345678);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x1234567C,MATCH_WORD,INSTRUCTION_COMP0);
+  
+  readDebugEventRegister_ExpectAndReturn(0x2);
+  disableInstructionComparator_ExpectAndReturn(INSTRUCTION_COMP0,0);
+  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
+  
+  readCoreRegister_Ignore();
+  
+  singleStepOver(session);
+}
+
+void test_singleStepOver_should_throw_TLV_NOT_STEPOVER_if_fail()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  CEXCEPTION_T err;
+  
+  Try
+  {
+    isNextInstructionCallingSubroutine_ExpectAndReturn(0x12345670);
+    autoSetInstructionBreakpoint_ExpectAndReturn(0x12345674,MATCH_WORD,-1);
+    
+    singleStepOver(session);
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL(TLV_NOT_STEPOVER,err);
+  }
+  
+  
+}
 /*---------setBreakpoint----------------------*/
 void test_setBreakpoint_should_set_breakpoint_and_return_ACK()
 {

@@ -55,6 +55,8 @@
 #define VC_INTERR       (1UL << CoreDebug_DEMCR_VC_INTERR_Pos) 
 #define VC_HARDERR      (1UL << CoreDebug_DEMCR_VC_HARDERR_Pos)
 
+#define BL_INSTRUCTION_MASK 0xF800D000
+#define BL_ENCODING         0xF000D000
 
 #define ENABLE_DWT_ITM	1
 #define DISABLE_DWT_ITM 0
