@@ -9,9 +9,10 @@ int main(void)
   
   /* Initialize hardware and configure system clock */
   FlashSystemConfig();
+  stubInit();
 
   while(1)
   {
-	  svc(SVC_SERVICE_CALL);
+	  swdStub(STUB->instruction);
   }
 }

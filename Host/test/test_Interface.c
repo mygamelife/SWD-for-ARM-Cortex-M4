@@ -140,3 +140,60 @@ void test_userSetBreakpoint_should_get_address_need_to_be_set_break_point(void)
   TEST_ASSERT_EQUAL(TLV_BREAKPOINT, session->tlvCommand);
   TEST_ASSERT_EQUAL(0x20000000, session->address);
 }
+
+void test_userErase_should_get_erase_section_option(void)
+{
+  String *str = stringNew("erase section 0x08000000 20");
+  User_Session *session = userInputInterpreter(str);
+  
+  TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->tlvCommand);
+  TEST_ASSERT_EQUAL(0x08000000, session->address);
+  TEST_ASSERT_EQUAL(80, session->size);
+}
+
+void test_userErase_should_get_erase_bank_1_option(void)
+{
+  String *str = stringNew("erase bank1");
+  User_Session *session = userInputInterpreter(str);
+  
+  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->tlvCommand);
+  TEST_ASSERT_EQUAL(BANK_1, *(session->data));
+}
+
+void test_userErase_should_get_erase_bank_2_option(void)
+{
+  String *str = stringNew("erase bank2");
+  User_Session *session = userInputInterpreter(str);
+  
+  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->tlvCommand);
+  TEST_ASSERT_EQUAL(BANK_2, *(session->data));
+}
+
+void test_userErase_should_get_erase_full_option(void)
+{
+  String *str = stringNew("erase full");
+  User_Session *session = userInputInterpreter(str);
+  
+  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->tlvCommand);
+  TEST_ASSERT_EQUAL(BOTH_BANK, *(session->data));
+}
+
+void test_userErase_should_throw_error(void)
+{
+  CEXCEPTION_T err;
+  
+  Try {
+    String *str = stringNew("erase aaxxx");
+    User_Session *session = userInputInterpreter(str);    
+  } Catch(err) {
+    TEST_ASSERT_EQUAL(ERR_INVALID_BANK_SELECTION, err);
+  }
+}
+
+void test_userReset_should_get_reset_option(void)
+{
+  String *str = stringNew("reset hard");
+  User_Session *session = userInputInterpreter(str);
+  
+  TEST_ASSERT_EQUAL(TLV_HARD_RESET, session->tlvCommand);
+}

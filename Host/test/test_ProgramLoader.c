@@ -169,28 +169,36 @@ void test_tlvSetBreakpoint_should_send_tlv_set_breakpoint_request(void)
   TEST_ASSERT_EQUAL_HEX8(0x10, session->txBuffer[6]);
 }
 
-void test_tlvLoadProgram_should_open_file_and_load_isr_vector(void)
-{
-  HANDLE hSerial;
-  uartInit_IgnoreAndReturn(hSerial);
-	Tlv_Session *session = tlvCreateSession();
-  
-  tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_RAM);
-  TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
-  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
-}
-
 void test_tlvLoadProgram_address_should_be_updated_after_call(void)
 {
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
 	Tlv_Session *session = tlvCreateSession();
   
+  fileStatus = FILE_CLOSED;
   tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
   tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
-  tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
+  
   TEST_ASSERT_EQUAL(TLV_LOAD_RO_DATA, session->loadProgramState);
   TEST_ASSERT_EQUAL_HEX32(0x200000F8, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+}
+
+void test_tlvLoadProgram_address_should_load_ro_data_after_isr_vector(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  fileStatus = FILE_CLOSED;
+  /* Load ISR VECTOR */
+  tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
+  tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
+  
+  /* Load Read Only Data */
+  tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
+  
+  TEST_ASSERT_EQUAL(TLV_LOAD_DATA, session->loadProgramState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
 }
 
@@ -234,13 +242,14 @@ void test_tlvLoadToRam_should_set_ongoing_process_flag_when_program_is_still_loa
   uartInit_IgnoreAndReturn(hSerial);
 	Tlv_Session *session = tlvCreateSession();
   
+  fileStatus = FILE_CLOSED;
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
 
-  TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
+  TEST_ASSERT_EQUAL(TLV_LOAD_PROGRAM, session->ramState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
 }
 
-void test_tlvLoadToRam_should_set_ongoing_process_flag_to_false_when_program_is_finish_loading(void)
+void test_tlvLoadToRam_should_update_PC_after_finish_loading_elf_file(void)
 {
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
@@ -269,10 +278,13 @@ void test_tlvLoadToRam_should_set_ongoing_process_flag_to_false_when_program_is_
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
 
-  TEST_ASSERT_EQUAL(TLV_OPEN_FILE, session->loadProgramState);
+  TEST_ASSERT_EQUAL(TLV_UPDATE_PC, session->ramState);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  
+  TEST_ASSERT_EQUAL(TLV_LOAD_PROGRAM, session->ramState);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
 }
 
@@ -368,6 +380,8 @@ void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(v
   uartInit_IgnoreAndReturn(hSerial);
 	Tlv_Session *session = tlvCreateSession();
   
+  fileStatus = FILE_CLOSED;
+  
   User_Session userSession;
   userSession.tlvCommand = TLV_WRITE_RAM;
   userSession.fileName = "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/blinkLedx.elf";
@@ -381,23 +395,9 @@ void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(v
   
   /* ################## Interpret Tlv Command ################## */
   hostInterpreter(session);
-  TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
+  TEST_ASSERT_EQUAL(TLV_LOAD_PROGRAM, session->ramState);
   
   /* ################## Sending first 248 bytes of ISR_VECTOR ################## */
-  hostInterpreter(session);
-  TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
-  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
-  
-  session->dataReceiveFlag = FLAG_SET;
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-  
-  hostInterpreter(session);
-  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  
-  /* ################## Sending second 248 bytes of ISR_VECTOR ################## */
   hostInterpreter(session);
   TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
   TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
@@ -426,15 +426,52 @@ void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(v
   TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
 }
 
-void test_hostInterpreter_should_stop_Interpret_read_ram_command_when_size_is_0(void) {
+void test_tlvFlashErase_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)
+{
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
 	Tlv_Session *session = tlvCreateSession();
   
+  fileStatus = FILE_CLOSED;
+  
+  session->fPFlag = RUNNING;
+  tlvFlashErase(session, 0x081C0000, 255);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
+  TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x081C0000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(255, get4Byte(&session->txBuffer[6]));
+}
+
+void test_tlvFlashMassErase_should_send_flash_mass_erase_request_if_flash_programmer_is_loaded(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  fileStatus = FILE_CLOSED;
+  
+  session->fPFlag = RUNNING;
+  tlvFlashMassErase(session, BANK_1);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
+  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(BANK_1, get4Byte(&session->txBuffer[2]));
+}
+
+void test_hostInterpreter_should_call_flash_mass_erase(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  int bankSelection = BOTH_BANK;
   User_Session userSession;
-  userSession.tlvCommand = TLV_READ_MEMORY;
-  userSession.address = 0x20000000;
-  userSession.size = 600;
+  userSession.tlvCommand = TLV_FLASH_MASS_ERASE;
+  userSession.data = &bankSelection;
 
   waitUserCommand_ExpectAndReturn(&userSession);
   hostInterpreter(session);
@@ -443,57 +480,8 @@ void test_hostInterpreter_should_stop_Interpret_read_ram_command_when_size_is_0(
   TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
   
-  /* ################## Send Tlv Write Register Request ################## */
+  session->fPFlag = RUNNING;
+  
+  /* ################## Run flash mass erase request ################## */
   hostInterpreter(session);
-  TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  
-  /* ################## Receive Tlv Acknowledgement ################## */
-  
-  session->dataSendFlag = FLAG_CLEAR;
-  session->dataReceiveFlag = FLAG_SET;
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-  
-  hostInterpreter(session);
-  
-  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
-  
-  /* ################## Send Tlv Write Register Request ################## */
-  hostInterpreter(session);
-  TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  
-  /* ################## Receive Tlv Acknowledgement ################## */
-  
-  session->dataSendFlag = FLAG_CLEAR;
-  session->dataReceiveFlag = FLAG_SET;
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-  
-  hostInterpreter(session);
-  
-  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
-  
-  /* ################## Send Tlv Write Register Request ################## */
-  hostInterpreter(session);
-  TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  
-  /* ################## Receive Tlv Acknowledgement ################## */
-  
-  session->dataSendFlag = FLAG_CLEAR;
-  session->dataReceiveFlag = FLAG_SET;
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-  
-  hostInterpreter(session);
-  
-  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
 }

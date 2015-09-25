@@ -73,10 +73,17 @@ typedef enum {
 	FPREGS31 = 95
 } Register_Address;
 
+typedef enum {
+  BANK_1 = 1,
+  BANK_2,
+  BOTH_BANK,
+} Flash_Bank;
+
 void displayOptionMenu(void);
 User_Session *waitUserCommand(void);
 User_Session *userInputInterpreter(String *str);
 int getRegisterAddress(char *name);
+int getFlashBank(char *name);
 void displayTlvData(Tlv *tlv);
 
 /* User Instruction */
@@ -88,6 +95,10 @@ User_Session *userStepTarget(String *userInput);
 User_Session *userHaltTarget(void);
 User_Session *userRunTarget(void);
 User_Session *userSetBreakpoint(String *userInput);
+User_Session *userErase(String *userInput);
+User_Session *userSectionErase(String *userInput);
+User_Session *userMassErase(String *userInput);
+User_Session *userReset(String *userInput);
 User_Session *userExit(void);
 
 #endif // Interface_H

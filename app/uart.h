@@ -21,7 +21,7 @@ extern __IO ITStatus uartReady;
 /* Definition for USARTx clock resources */
 #define UART_PORT                        USART1
 /* USARTx Baud Rate */
-#define UART_BAUD_RATE                   115200 //9600
+#define UART_BAUD_RATE                   115200
 
 #define USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE();
 #define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()

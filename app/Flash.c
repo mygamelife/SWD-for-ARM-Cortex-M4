@@ -276,9 +276,6 @@ void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size) {
   __IO uint32_t data = 0;
   uint32_t sram = src, flash = dest;
 
-  /* Erase the destination address before writing */
-  flashErase(flash, size);
-
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
   

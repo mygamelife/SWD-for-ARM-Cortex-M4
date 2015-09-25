@@ -8,7 +8,7 @@ int uartReady = 1;
 Tlv_Session *tlvCreateSession(void) {
   static Tlv_Session session;
   
-  /* get uart handler */
+  /* Get uart handler */
   session.handler = uartInit();
   
   /* Initialize begining state for send and receive */
@@ -16,8 +16,14 @@ Tlv_Session *tlvCreateSession(void) {
   session.receiveState = TLV_RECEIVE_TYPE;
   
   /* Initialize load program state */
-  session.loadProgramState = TLV_OPEN_FILE;
-  session.flashState = TLV_OPEN_FILE;
+  session.loadProgramState = TLV_LOAD_ISR_VECTOR;
+  session.fPState = TLV_LOAD_FLASH_PROGRAMMER;
+  session.ramState = TLV_LOAD_PROGRAM;
+  session.flashState = TLV_LOAD_PROGRAM;
+  
+  /* probe flash state */
+  session.pFlashState = WRITE_TO_RAM;
+  session.pSectionEraseState = ERASE_SECTION;
   
   /* Initialize all the required flag */
   session.timeOutFlag = FLAG_CLEAR;
@@ -26,11 +32,11 @@ Tlv_Session *tlvCreateSession(void) {
   session.ongoingProcessFlag = FLAG_CLEAR;
   session.breakPointFlag = FLAG_CLEAR;
   session.watchPointFlag = FLAG_CLEAR;
+  session.fPFlag = NOT_RUNNING;
   
+  /* Initialize host and probe state */
   session.hostState = HOST_WAIT_USER_COMMAND;
   session.probeState = PROBE_RECEIVE_PACKET;
-  
-  session.previousTime = 0;
   
   return &session;
 }
@@ -251,6 +257,7 @@ int isTlvAck(Tlv *tlv) {
   *           0 if command is invalid
   */
 int isTlvCommand(uint8_t command) {
+  
   if(command == TLV_WRITE_RAM)              return 1;
   else if(command == TLV_READ_MEMORY)       return 1;
   else if(command == TLV_WRITE_REGISTER)    return 1;
@@ -261,6 +268,11 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_MULTI_STEP)        return 1;
   else if(command == TLV_BREAKPOINT)        return 1;
   else if(command == TLV_WRITE_RAM)         return 1;
+  else if(command == TLV_WRITE_FLASH)       return 1;
+  else if(command == TLV_FLASH_ERASE)       return 1;
+  else if(command == TLV_FLASH_MASS_ERASE)  return 1;
+  else if(command == TLV_SOFT_RESET)        return 1;
+  else if(command == TLV_HARD_RESET)        return 1;
   
   else return 0;
 }
@@ -277,7 +289,7 @@ int verifyTlvPacket(Tlv *tlv) {
   
   if(tlv != NULL) {
     if(!isTlvAck(tlv)) {
-      if(!isTlvCommand(tlv->type))  
+      if(!isTlvCommand(tlv->type))
         Throw(TLV_INVALID_COMMAND);
     } if(!verifyTlvData(tlv)) {
       Throw(TLV_CHECKSUM_ERROR);

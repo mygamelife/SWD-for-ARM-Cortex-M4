@@ -29,6 +29,10 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case ERR_EXPECT_FILE_PATH           : printf("Err : Invalid file path format\n"); break;
     case ERR_EXPECT_MEMORY_SELECTION    : printf("Err : Expect memory selection ram/flash\n"); break;
     case ERR_INVALID_MEMORY_SELECTION   : printf("Err : Memory selection not found\n"); break;
+    case ERR_EXPECT_ERASE_SECTION       : printf("Err : Expect erase section\n"); break;
+    case ERR_INVALID_BANK_SELECTION     : printf("Err : Flash bank selection not found\n"); break;
+    case ERR_OPTION_NOT_FOUND           : printf("Err : Option not found\n"); break;
+    case ERR_INVALID_COMMAND            : printf("Err : Command not found\n"); break;
     
     default                             : printf("Err : Undefine error code %d\n", err); break;
   }

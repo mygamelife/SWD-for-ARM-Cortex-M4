@@ -5,8 +5,8 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#define UART_PORT               "COM5"
-#define UART_BAUD_RATE          115200 //9600
+#define UART_PORT               "\\\\.\\COM10"
+#define UART_BAUD_RATE          115200 
 
 typedef enum 
 {

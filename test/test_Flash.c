@@ -80,9 +80,6 @@ void test_flashWrite_given_data_and_size_5_should_write_into_Flash()  {
 }
 
 void test_flashCopyFromSramToFlash_given_0x20000000_sram_address_0x08000000_flash_address_and_size_8(void) {
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK); //Erase
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
   readMemoryData_ExpectAndReturn(0x20000000, 0xDEADBEEF);

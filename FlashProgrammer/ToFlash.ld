@@ -57,30 +57,6 @@ SECTIONS
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
   } >FLASH
-
-  /* The swd stub instruction goes into RAM */
-  .swd_stub : 
-  {
-    . = ALIGN(4);
-    _sswd_stub = .;        /* create a global symbol at data start */
-    
-    . = + 0x1b0;
-    SWD_INSTRUCTION = .;
-    . += 4;
-    SWD_DATA_SIZE = .;
-    . += 4;
-    SWD_BANK_SELECT = .;
-    . += 4;
-    SWD_FLASH_START = .;
-    . += 4;
-    SWD_SRAM_START = .;
-    . += 4;
-    SWD_TARGET_STATUS = .;
-    . += 4;
-    
-    . = ALIGN(4);
-    _eswd_stub = .;        /* define a global symbol at data end */
-  } >RAM
   
   /* The program code and other data goes into FLASH */
   .text :

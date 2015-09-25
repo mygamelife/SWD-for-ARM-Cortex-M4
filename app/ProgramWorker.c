@@ -1,14 +1,100 @@
 #include "ProgramWorker.h"
 
+/* SVC mspAddress contain R0, R1, R2, R3 */
 uint32_t mspAddress;
 
-/** Check whether is SVCall is active
+/* temp SRAM address 0x20005000 */
+uint32_t tempAddress = 0x20005000;
+
+/** IsStubBusy is a function to check if stub
+  * is busy with the last operation
+  *
+  * input   : NONE
+  *
+  * return  : 1 stub is free for next operation
+  *           0 stub is busy with the last operation
+  */
+int IsStubBusy(void)  {
+  unsigned int stubStatus = memoryReadAndReturnWord((uint32_t)&STUB->status);
+  
+  if(stubStatus == 0)
+    return 1;
+  
+  else return 0;
+}
+
+/** requestStubErase is a function to load the sector erase
+  * instruction into SRAM to tell the swdStub
+  *
+  * input   : startAddress is the address to begin erase
+  *           endAddress is the address to end erase
+  *
+  * output  : NONE
+  */
+void requestStubErase(uint32_t address, int size) {
+  
+  /* load flash start and end address to sram */
+  memoryWriteWord((uint32_t)&STUB->flashAddress, (uint32_t)address);
+  memoryWriteWord((uint32_t)&STUB->dataSize, (uint32_t)size);
+  
+  /* load instruction to sram */
+  memoryWriteWord((uint32_t)&STUB->instruction, STUB_ERASE);
+}
+
+/** requestMassErase is a function to load the mass erase
+  * instruction into SRAM to tell the swdStub
+  *
+  * input   : bankSelect can be one of the following value
+  *            + FLASH_BANK_1: Bank1 to be erased
+  *            + FLASH_BANK_2: Bank2 to be erased
+  *            + FLASH_BANK_BOTH: Bank1 and Bank2 to be erased
+  *
+  * output  : NONE
+  */
+void requestStubMassErase(uint32_t bankSelect)  {
+  
+  /* load bank select to sram */
+  memoryWriteWord((uint32_t)&STUB->banks, (uint32_t)bankSelect);
+  
+  /* load instruction to sram */
+  memoryWriteWord((uint32_t)&STUB->instruction, STUB_MASSERASE);
+}
+
+/** requestStubCopy is a function copy data from src (SRAM) to dest (Flash)
+  *
+  * input   : src is the beginning SRAM address contain all the information
+  *           dest is the flash address all the information need to copy over there
+  *           length is to determine how many words need to copy over
+  *
+  * output  : NONE
+  */
+void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size) {
+
+  /* load SRAM start address into sram */
+  memoryWriteWord((uint32_t)&STUB->sramAddress, (uint32_t)dataAddress);
+  
+  /* load Flash start address into sram */
+  memoryWriteWord((uint32_t)&STUB->flashAddress, (uint32_t)destAddress);
+  
+  /* load length into sram */
+  memoryWriteWord((uint32_t)&STUB->dataSize, (uint32_t)size);
+
+	/* load copy instructoin into sram */
+  memoryWriteWord((uint32_t)&STUB->instruction, STUB_COPY);
+}
+
+/** IsSvcBusy whether is svc is doing others work
   *
   * Input  : session contain a element/handler used by tlv protocol
   */
-int IsSvcActive(void) {
-
-  if((SCB->SHCSR & SCB_SHCSR_SVCALLACT_Msk) != 0)
+int IsSvcBusy(void) {
+  
+  if(mspAddress == 0) 
+    readCoreRegister(CORE_REG_R0, &mspAddress);
+  
+  /* Read svc R0 is 0 means svc is ready and waiting
+     instruction */
+  if(memoryReadAndReturnWord(mspAddress) == 0)  
     return 1;
 
   else return 0;
@@ -24,28 +110,26 @@ int IsSvcActive(void) {
   */
 void requestSramAddress(void) {
   
-  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
-  
   memoryWriteWord(mspAddress, SVC_REQUEST_SRAM_ADDRESS); //R0
   
   setCoreMode(CORE_DEBUG_MODE);
 }
 
-void requestCopy(uint32_t src, uint32_t dest, int size) {
+void requestCopy(Tlv_Session *session, uint32_t src, uint32_t dest, int size) {
   
-  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
-
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
   memoryWriteWord(mspAddress, SVC_REQUEST_COPY);  //R0
   memoryWriteWord(mspAddress + 4, src);           //R1
   memoryWriteWord(mspAddress + 8, dest);          //R2
   memoryWriteWord(mspAddress + 12, size);         //R3
-  
+
   setCoreMode(CORE_DEBUG_MODE);
+  
+  tlvSend(session, tlv);
 }
 
 void requestErase(uint32_t address, int size) {
-  
-  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
   
   memoryWriteWord(mspAddress, SVC_REQUEST_ERASE); //R0
   memoryWriteWord(mspAddress + 4, address); //R1
@@ -55,8 +139,6 @@ void requestErase(uint32_t address, int size) {
 }
 
 void requestMassErase(uint32_t bankSelect) {
-  
-  if(mspAddress == 0) readCoreRegister(CORE_REG_R0, &mspAddress);
   
   memoryWriteWord(mspAddress, SVC_REQUEST_MASS_ERASE); //R0
   memoryWriteWord(mspAddress + 4, bankSelect); //R1
@@ -405,6 +487,26 @@ void checkWatchpointEvent(Tlv_Session *session)
   tlvSend(session, tlv);  
 }
 
+/** writeDataToRamInChunk is a function to write data
+  * to Ram in specified size
+  *
+  * Input   : dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeDataToRamInChunk(uint32_t *dataAddress, uint32_t destAddress, int size) {
+  int i;
+  
+  /* Write to RAM using swd */
+  for(i = 0; i < size; i += 4)  {
+    /* Data start at position 4 */
+    memoryWriteWord(destAddress, *dataAddress++);
+    destAddress += 4;
+  }  
+}
+
 /** writeTargetRam is a function to write target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
@@ -415,16 +517,12 @@ void checkWatchpointEvent(Tlv_Session *session)
   * return  : NONE
   */
 void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size)  {
-  int i;
-  
-  /* Write to RAM using swd */
-  for(i = 0; i < size - 1; i += 4)  {
-    /* Data start at position 4 */
-    memoryWriteWord(destAddress, *dataAddress++);
-    destAddress += 4;
-  }
-  
+
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  /* Size minus 1 because of the checksum value */
+  writeDataToRamInChunk(dataAddress, destAddress, size);
+  
   tlvSend(session, tlv);
 }
 
@@ -468,6 +566,48 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   * return  : NONE
   */
 void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size) {
+  Tlv *tlv;
+  
+  switch(session->pFlashState) {
+    
+    case WRITE_TO_RAM :
+      writeDataToRamInChunk(dataAddress, tempAddress, size);
+      session->ongoingProcessFlag = FLAG_SET;
+      session->pFlashState = COPY_TO_FLASH;
+    break;
+    
+    case COPY_TO_FLASH :
+      if(IsStubBusy()) {
+        requestStubCopy(tempAddress, destAddress, size);
+        tlv = tlvCreatePacket(TLV_OK, 0, 0);
+        tlvSend(session, tlv);
+        session->ongoingProcessFlag = FLAG_CLEAR;
+        session->pFlashState = WRITE_TO_RAM;
+      }
+    break;
+  }
+}
+
+void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
+  Tlv *tlv;
+  
+  switch(session->pSectionEraseState) {
+    
+    case ERASE_SECTION :
+      requestStubMassErase(bankSelect);
+      session->ongoingProcessFlag = FLAG_SET;
+      session->pSectionEraseState = WAIT_OPERATION_COMPLETE;
+    break;
+    
+    case WAIT_OPERATION_COMPLETE :
+      if(IsStubBusy()) {
+        tlv = tlvCreatePacket(TLV_OK, 0, 0);
+        tlvSend(session, tlv);
+        session->ongoingProcessFlag = FLAG_CLEAR;
+        session->pSectionEraseState = ERASE_SECTION;
+      }
+    break;
+  }
 }
 
 /** selectTask is a function to select instruction 
@@ -480,8 +620,8 @@ void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t dest
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
-    case TLV_WRITE_RAM              : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 4); break;
-    case TLV_WRITE_FLASH            : break;
+    case TLV_WRITE_RAM              : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
+    case TLV_WRITE_FLASH            : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
     case TLV_READ_MEMORY            : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
     case TLV_WRITE_REGISTER         : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
     case TLV_READ_REGISTER          : readTargetRegister(session, get4Byte(&tlv->value[0])); break;
@@ -493,6 +633,10 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_REMOVE_ALL_BREAKPOINT  : removeAllInstructionBreakpoint(session); break;
     case TLV_STOP_REMAP             : break;
     case TLV_STOP_ALL_REMAP         : stopAllFlashPatchRemapping(session); break;
+    case TLV_FLASH_ERASE            : requestStubErase(get4Byte(&tlv->value[0]), (int)get4Byte(&tlv->value[4])); break;
+    case TLV_FLASH_MASS_ERASE       : massEraseTargetFlash(session, get4Byte(&tlv->value[0])); break;
+    case TLV_SOFT_RESET             : performSoftResetOnTarget(session); break;
+    case TLV_HARD_RESET             : performHardResetOnTarget(session); break;
   }
 }
 

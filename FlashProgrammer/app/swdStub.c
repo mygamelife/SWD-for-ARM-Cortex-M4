@@ -1,5 +1,100 @@
 #include "swdStub.h"
 
+/** stubInit is to initialize element in swd stub structure
+  *
+  * Input   : NONE
+  * return  : NONE
+  */
+void stubInit(void) {
+  STUB->instruction     = STUB_CLEAR;
+  STUB->status          = STUB_OK;
+  STUB->dataSize        = 0;
+  STUB->flashAddress    = 0;
+  STUB->sramAddress     = 0;
+  STUB->banks           = 0;
+}
+
+/** swdStub is small program routine take instruction from swd probe and response
+  *
+  * input   : swdInstruction is an instruction send by probe
+  * return  : NONE
+  */
+void swdStub(int stubInstruction) {
+  switch(stubInstruction)  {
+    case STUB_COPY :
+      stubCopy();
+      break;
+    
+    case STUB_ERASE :
+      stubErase();
+      break;
+  
+    case STUB_MASSERASE :
+      stubMassErase();
+      break;
+  }
+}
+
+/** stubCopy is small program routine to copy data in SRAM to Flash
+  *
+  * input   : NONE
+  * return  : NONE
+  */
+void stubCopy(void) {
+  
+  /* Change target status to busy to prevent other function to interrupt */
+  STUB->status = STUB_BUSY;
+
+  flashCopyFromSramToFlash(STUB->sramAddress, STUB->flashAddress, STUB->dataSize);
+  
+  /* Clear instruction prevent keep erase */
+  STUB->instruction = STUB_CLEAR;
+  
+  /* Tell probe now target is ready for next instruction */
+  STUB->status = STUB_OK;
+}
+
+/**
+  * swdSectorErase is small program routine to erase specific 
+  * flash sector address given by user
+  *
+  * input   : NONE
+  * return  : NONE
+  */
+void stubErase(void)  {
+  
+  /* Change target status to busy to prevent other function to interrupt */
+  STUB->status = STUB_BUSY;
+  
+  flashErase(STUB->flashAddress, STUB->dataSize);
+  
+  /* Clear instruction prevent keep erase */
+  STUB->instruction = STUB_CLEAR;
+  
+  /* Tell probe now target is ready for next instruction */
+  STUB->status = STUB_OK;
+}
+
+/** stubMassErase is small program routine to erase specific 
+  * bank according to the user selection
+  *
+  * input   : NONE
+  * return  : NONE
+  */
+void stubMassErase(void)  {
+
+  /* Change target status to busy to prevent other function to interrupt */
+  STUB->status = STUB_BUSY;
+  
+  flashMassErase(STUB->banks);
+    
+  /* Clear instruction prevent keep erase */
+  STUB->instruction = STUB_CLEAR;
+
+  /* Tell probe now target is ready for next instruction */
+  STUB->status = STUB_OK;
+}
+
 /** svcServiceHandler is a svc handler written using C language
   * 
   *     +------+
@@ -54,4 +149,19 @@ void svcServiceCall(void)
   #if !defined (TEST)
 	svc(SVC_SERVICE_CALL);
   #endif
+}
+
+/** Check whether is SVCall is active
+  *
+  * Input  : session contain a element/handler used by tlv protocol
+  */
+int IsSvcActive(void) {
+  unsigned int svcStatus = 0;
+
+  svcStatus = memoryReadAndReturnWord((uint32_t)&SCB->SHCSR);
+  if(svcStatus != 0) {
+    return 1;
+  }
+
+  else return 0;
 }
