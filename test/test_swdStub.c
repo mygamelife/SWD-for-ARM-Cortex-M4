@@ -1,13 +1,7 @@
 #include "unity.h"
-#include "Delay.h"
 #include "swdStub.h"
-#include "Emulator.h"
 #include "mock_Flash.h"
-#include "swd_Utilities.h"
-#include "IoOperations.h"
-#include "mock_Register_ReadWrite.h"
-#include "mock_configurePort.h"
-#include "mock_LowLevelIO.h"
+#include "mock_memoryRW.h"
 
 void setUp(void)  {}
 

@@ -1029,3 +1029,54 @@ void test_probeTaskManager_given_flash_command_should_run_writeTargetFlash(void)
   TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
   TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
 }
+
+void test_probeTaskManager_given_flash_erase_command_should_run_eraseFlashTarget(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  session->rxBuffer[0] = TLV_FLASH_ERASE; // command
+  session->rxBuffer[1] = 9;
+  
+  session->rxBuffer[2] = 0x00; //address
+  session->rxBuffer[3] = 0x00;
+  session->rxBuffer[4] = 0x00;
+  session->rxBuffer[5] = 0x08;
+  
+  session->rxBuffer[6] = 0x20; //20000
+  session->rxBuffer[7] = 0x4E;
+  session->rxBuffer[8] = 0x00;
+  session->rxBuffer[9] = 0x00;
+  session->rxBuffer[10] = 0x8A; //chksum
+  
+  session->dataReceiveFlag = FLAG_SET;
+  
+  /* Received packet */
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
+  
+  /* Mocking Request Erase */
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, (int)20000, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, NO_ERROR);
+  
+  /* Intepret packet and goes to eraseTargetFlash() */
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(WAIT_OPERATION_COMPLETE, session->pEraseState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  
+  /* Intepret packet and goes to writeTargetFlash() */
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
+  TEST_ASSERT_EQUAL(REQUEST_ERASE, session->pEraseState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
+}

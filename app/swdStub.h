@@ -45,7 +45,8 @@ typedef enum {
 
 /** Structure type to access the SwdStub.
   */
-typedef struct Stub_Type {
+typedef struct
+{
   volatile int instruction;                     /*!< Offset: 0x00 (R/W)  Swd Stub instruction       */
   volatile int status;                          /*!< Offset: 0x04 (R/W)  Swd Stub status            */
   volatile int dataSize;                        /*!< Offset: 0x08 (R/W)  Swd Stub data size         */

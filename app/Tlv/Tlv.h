@@ -28,11 +28,14 @@ typedef struct
   /* Load Program state */
   Tlv_State loadProgramState;
   Tlv_State ramState;
+  /* Host flash state */
   Tlv_State flashState;
-  Tlv_State fPState; // flash Programmer State
-  Tlv_State pFlashState; // probe Flash State
-  Tlv_State pSectionEraseState; // probe Flash Section Erase State
-  Tlv_State pMassEraseState; // probe Flash Mass Erase State
+  Tlv_State eraseState;
+  Tlv_State mEraseState;
+  /* Probe flash state */
+  Tlv_State pFlashState;
+  Tlv_State pEraseState;
+  Tlv_State pMEraseState;
   /* Flags */
   bool timeOutFlag;
   bool dataReceiveFlag;
@@ -40,18 +43,12 @@ typedef struct
   bool ongoingProcessFlag;
   bool breakPointFlag;
   bool watchPointFlag;
-  bool fPFlag; // flash Programmer Flag
 } Tlv_Session;
 
 typedef enum {
   FLAG_CLEAR = false,
   FLAG_SET = true
 } Flag_Status;
-
-typedef enum {
-  RUNNING = true,
-  NOT_RUNNING = false
-} Program_State;
 
 Tlv_Session *tlvCreateSession(void);
 

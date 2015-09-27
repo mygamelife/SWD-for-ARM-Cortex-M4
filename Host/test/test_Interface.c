@@ -148,7 +148,7 @@ void test_userErase_should_get_erase_section_option(void)
   
   TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->tlvCommand);
   TEST_ASSERT_EQUAL(0x08000000, session->address);
-  TEST_ASSERT_EQUAL(80, session->size);
+  TEST_ASSERT_EQUAL(20, session->size);
 }
 
 void test_userErase_should_get_erase_bank_1_option(void)

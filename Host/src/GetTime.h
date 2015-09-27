@@ -7,6 +7,8 @@
 #include <sys/time.h>
 #include "CException.h"
 
+#define TEN_SECOND    10
+
 extern double elapsedTime;
 
 void InitTimer(void);

@@ -32,7 +32,7 @@ void requestMassErase(uint32_t bankSelect);
 
 /*############################################### FLASH ###############################################*/
 void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
-void eraseTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
+void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
 void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
 
 /*############################################### RAM ###############################################*/

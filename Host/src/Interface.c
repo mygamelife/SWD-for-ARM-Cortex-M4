@@ -327,7 +327,7 @@ User_Session *userSectionErase(String *userInput) {
     
   userSession.tlvCommand = TLV_FLASH_ERASE;
   userSession.address = address->value;
-  userSession.size = size->value * 4;
+  userSession.size = size->value;
   
   return &userSession;
 }

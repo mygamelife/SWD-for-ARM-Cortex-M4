@@ -26,7 +26,6 @@ void tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t 
 
 /* Load Flash/RAM */
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
-void tlvLoadAndRunFlashProgrammer(Tlv_Session *session, char *file);
 void tlvLoadToRam(Tlv_Session *session, char *file);
 void tlvLoadToFlash(Tlv_Session *session, char *file);
 
@@ -56,7 +55,7 @@ void tlvHardReset(Tlv_Session *session);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
-void isLastOperationDone(Tlv_Session *session);
+int isLastOperationDone(Tlv_Session *session);
 
 // #define tlvLoadToRam(session, file)   tlvLoadProgram(session, file, TLV_WRITE_RAM)
 

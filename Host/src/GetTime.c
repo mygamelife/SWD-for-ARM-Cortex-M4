@@ -37,11 +37,11 @@ int getElapsedTime(void) {
   stopTimer();
   
   /* Compute and print the elapsed time in millisec */
-  elapsedTime += ((currentTime - previousTime) * 1000000 / pcFrequency);
+  elapsedTime += ((currentTime - previousTime) * 100000 / pcFrequency);
   
   // printf("elapsedTime %fms\n", elapsedTime);
   
-  if(elapsedTime > 50) {
+  if(elapsedTime > TEN_SECOND) {
     elapsedTime = 0;
     return 1;
   }

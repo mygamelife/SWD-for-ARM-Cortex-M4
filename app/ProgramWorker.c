@@ -17,7 +17,7 @@ uint32_t tempAddress = 0x20005000;
 int IsStubBusy(void)  {
   unsigned int stubStatus = memoryReadAndReturnWord((uint32_t)&STUB->status);
   
-  if(stubStatus == 0)
+  if(stubStatus == STUB_OK)
     return 1;
   
   else return 0;
@@ -588,15 +588,15 @@ void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t dest
   }
 }
 
-void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
+void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   Tlv *tlv;
   
-  switch(session->pSectionEraseState) {
+  switch(session->pEraseState) {
     
-    case ERASE_SECTION :
-      requestStubMassErase(bankSelect);
+    case REQUEST_ERASE :
+      requestStubErase(address, size);
       session->ongoingProcessFlag = FLAG_SET;
-      session->pSectionEraseState = WAIT_OPERATION_COMPLETE;
+      session->pEraseState = WAIT_OPERATION_COMPLETE;
     break;
     
     case WAIT_OPERATION_COMPLETE :
@@ -604,7 +604,29 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
         tlv = tlvCreatePacket(TLV_OK, 0, 0);
         tlvSend(session, tlv);
         session->ongoingProcessFlag = FLAG_CLEAR;
-        session->pSectionEraseState = ERASE_SECTION;
+        session->pEraseState = REQUEST_ERASE;
+      }
+    break;
+  }  
+}
+
+void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
+  Tlv *tlv;
+  
+  switch(session->pMEraseState) {
+    
+    case REQUEST_ERASE :
+      requestStubMassErase(bankSelect);
+      session->ongoingProcessFlag = FLAG_SET;
+      session->pMEraseState = WAIT_OPERATION_COMPLETE;
+    break;
+    
+    case WAIT_OPERATION_COMPLETE :
+      if(IsStubBusy()) {
+        tlv = tlvCreatePacket(TLV_OK, 0, 0);
+        tlvSend(session, tlv);
+        session->ongoingProcessFlag = FLAG_CLEAR;
+        session->pMEraseState = REQUEST_ERASE;
       }
     break;
   }
@@ -633,7 +655,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_REMOVE_ALL_BREAKPOINT  : removeAllInstructionBreakpoint(session); break;
     case TLV_STOP_REMAP             : break;
     case TLV_STOP_ALL_REMAP         : stopAllFlashPatchRemapping(session); break;
-    case TLV_FLASH_ERASE            : requestStubErase(get4Byte(&tlv->value[0]), (int)get4Byte(&tlv->value[4])); break;
+    case TLV_FLASH_ERASE            : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4])); break;
     case TLV_FLASH_MASS_ERASE       : massEraseTargetFlash(session, get4Byte(&tlv->value[0])); break;
     case TLV_SOFT_RESET             : performSoftResetOnTarget(session); break;
     case TLV_HARD_RESET             : performHardResetOnTarget(session); break;

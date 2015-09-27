@@ -17,13 +17,17 @@ Tlv_Session *tlvCreateSession(void) {
   
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;
-  session.fPState = TLV_LOAD_FLASH_PROGRAMMER;
   session.ramState = TLV_LOAD_PROGRAM;
-  session.flashState = TLV_LOAD_PROGRAM;
+  
+  /* host flash state */
+  session.flashState = TLV_REQUEST_ERASE;
+  session.eraseState = TLV_LOAD_FLASH_PROGRAMMER;
+  session.mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
   
   /* probe flash state */
   session.pFlashState = WRITE_TO_RAM;
-  session.pSectionEraseState = ERASE_SECTION;
+  session.pMEraseState = REQUEST_ERASE;
+  session.pEraseState = REQUEST_ERASE;
   
   /* Initialize all the required flag */
   session.timeOutFlag = FLAG_CLEAR;
@@ -32,7 +36,6 @@ Tlv_Session *tlvCreateSession(void) {
   session.ongoingProcessFlag = FLAG_CLEAR;
   session.breakPointFlag = FLAG_CLEAR;
   session.watchPointFlag = FLAG_CLEAR;
-  session.fPFlag = NOT_RUNNING;
   
   /* Initialize host and probe state */
   session.hostState = HOST_WAIT_USER_COMMAND;
@@ -133,7 +136,7 @@ Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv;
   
   if(session->timeOutFlag == true) {
-    session->timeOutFlag == false;
+    session->timeOutFlag = false;
     Throw(TLV_TIME_OUT);
   }
   if(session->dataReceiveFlag == false)  return NULL;
@@ -175,10 +178,12 @@ void tlvReceiveService(Tlv_Session *session) {
           length = 0;
           counter = 0;
           session->receiveState = TLV_RECEIVE_TYPE;
-          session->dataReceiveFlag = true;
+          session->dataReceiveFlag = FLAG_SET;
         }
       } else  {
+    	counter = 0;
         session->timeOutFlag = true;
+        session->dataReceiveFlag = FLAG_CLEAR;
         session->receiveState = TLV_RECEIVE_TYPE;
       }
       break;  

@@ -158,7 +158,7 @@ void svcServiceCall(void)
 int IsSvcActive(void) {
   unsigned int svcStatus = 0;
 
-  svcStatus = memoryReadAndReturnWord((uint32_t)&SCB->SHCSR);
+  svcStatus = readMemoryData((uint32_t)&SCB->SHCSR);
   if(svcStatus != 0) {
     return 1;
   }

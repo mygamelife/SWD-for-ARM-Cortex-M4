@@ -5,17 +5,13 @@
 	#include "stm32f4xx_hal.h"
 #endif
 
-#include <stdint.h>
 #include "swdStub.h"
-#include "LED.h"
-#include "Register_ReadWrite.h"
+#include "memoryRW.h"
+#include "configurePort.h"
 #include "stm32f4xx_hal_flash.h"
 #include "stm32f4xx_hal_flash_ex.h"
-#include "stm32f4xx_hal_flash_ramfunc.h"
 
 typedef uint32_t FLASH_ErrorTypeDef;
-
-#define __IO volatile
 
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
@@ -53,7 +49,6 @@ void flashErrorHandler(void);
 void flashMassErase(uint32_t banks);
 void flashErase(uint32_t flashAddress, int size);
 void flashWrite(uint32_t *data, uint32_t address, int size);
-void flashVerify(uint32_t src, uint32_t dest, int size);
 void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size);
 
 void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data);
