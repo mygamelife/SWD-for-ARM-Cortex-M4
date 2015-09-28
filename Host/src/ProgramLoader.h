@@ -9,12 +9,7 @@
 #include "Interface.h"
 #include "GetTime.h"
 
-typedef enum {
-  FILE_CLOSED = 0,
-  FILE_OPENED
-} File_Status;
-
-extern int fileStatus;
+extern int programSize;
 
 /* Read/Write target register */
 void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);

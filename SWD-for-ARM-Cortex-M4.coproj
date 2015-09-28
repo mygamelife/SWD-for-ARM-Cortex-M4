@@ -147,13 +147,13 @@
     <File name="Code/ProgramWorker.c" path="app/ProgramWorker.c" type="1"/>
     <File name="Code/Register_ReadWrite.h" path="app/Register_ReadWrite.h" type="1"/>
     <File name="Code/FPB_Unit.c" path="app/FPB_Unit.c" type="1"/>
-    <File name="Code/Tlv_ErrorCode.h" path="app/Tlv/Tlv_ErrorCode.h" type="1"/>
     <File name="Code/IO_Operations.h" path="app/IO_Operations.h" type="1"/>
     <File name="Core/core_cm4.h" path="app/Hardware/core_cm4.h" type="1"/>
-    <File name="Code/LED.c" path="app/LED.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.h" path="app/Hardware/stm32f4xx_hal_pwr.h" type="1"/>
+    <File name="Code/LED.c" path="app/LED.c" type="1"/>
     <File name="Code/configurePort.h" path="app/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.c" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.c" type="1"/>
+    <File name="Code/ErrorCode.c" path="app/Tlv/ErrorCode.c" type="1"/>
     <File name="Code/Tlv.h" path="app/Tlv/Tlv.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ex.h" path="app/Hardware/stm32f4xx_hal_flash_ex.h" type="1"/>
     <File name="Code/configurePort.c" path="app/configurePort.c" type="1"/>
@@ -168,11 +168,12 @@
     <File name="Hardware/stm32f4xx_hal_dma.c" path="app/Hardware/stm32f4xx_hal_dma.c" type="1"/>
     <File name="Code/CException.h" path="vendor/ceedling/vendor/c_exception/lib/CException.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
+    <File name="Code/ErrorCode.h" path="app/Tlv/ErrorCode.h" type="1"/>
     <File name="Code/main.h" path="app/main.h" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Code/CoreDebug_Utilities.h" path="app/CoreDebug_Utilities.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Code/swd_Utilities.h" path="app/swd_Utilities.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Code/Flash.c" path="app/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_uart.c" path="app/Hardware/stm32f4xx_hal_uart.c" type="1"/>
     <File name="Code/swd.h" path="app/swd.h" type="1"/>

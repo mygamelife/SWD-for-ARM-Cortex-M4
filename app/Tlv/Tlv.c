@@ -175,13 +175,12 @@ void tlvReceiveService(Tlv_Session *session) {
     case TLV_RECEIVE_VALUE :
       if(!getByte(session->handler, &session->rxBuffer[2 + counter]))  {
         if(++counter == length) {
-          length = 0;
-          counter = 0;
+          length = 0; counter = 0;
           session->receiveState = TLV_RECEIVE_TYPE;
           session->dataReceiveFlag = FLAG_SET;
         }
       } else  {
-    	counter = 0;
+        counter = 0;
         session->timeOutFlag = true;
         session->dataReceiveFlag = FLAG_CLEAR;
         session->receiveState = TLV_RECEIVE_TYPE;
@@ -278,6 +277,7 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_FLASH_MASS_ERASE)  return 1;
   else if(command == TLV_SOFT_RESET)        return 1;
   else if(command == TLV_HARD_RESET)        return 1;
+  else if(command == TLV_OK)                return 1;
   
   else return 0;
 }
@@ -313,8 +313,10 @@ int verifyTlvPacket(Tlv *tlv) {
   */
 void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
   /* add 100 to indicate that is an erroCode return from probe */
-  if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR)  
-    errorCode + 100;
+  if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR) {
+	  errorCode += 100;
+  }
+
   
   Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
 

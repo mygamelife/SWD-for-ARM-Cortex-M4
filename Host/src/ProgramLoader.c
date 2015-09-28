@@ -1,12 +1,8 @@
 #include "ProgramLoader.h"
 
-int fileStatus = FILE_CLOSED;
+int programSize = 0;
 static Tlv *response;
-static ElfData *elfData;
-static uint32_t entryAddress = 0;
 static User_Session *userSession;
-static ElfSection *isr, *text;
-static int programSize = 0;
   
 char *FLASH_PROGRAMMER_FILE_PATH = "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/FlashProgrammer/Debug/bin/FlashProgrammer.elf";
         
@@ -151,16 +147,10 @@ void tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size)
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) {
   
   switch(session->loadProgramState) {
-    
     case TLV_LOAD_ISR_VECTOR :
+    
       if(fileStatus == FILE_CLOSED) {
-        fileStatus = FILE_OPENED;
-        elfData = openElfFile(file);
-        isr     = getElfSectionInfo(elfData, ".isr_vector");
-        text    = getElfSectionInfo(elfData, ".text");
-        
-        entryAddress = get4Byte(&isr->dataAddress[4]);
-        programSize = isr->size + text->size;
+        getElfSection(file);
         session->ongoingProcessFlag = FLAG_SET;
       }
       
@@ -168,18 +158,17 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
       
       if(isr->size <= 0) {
         printf("finish load TLV_LOAD_ISR_VECTOR\n");
-        free(isr); session->loadProgramState = TLV_LOAD_TEXT;
+        session->loadProgramState = TLV_LOAD_TEXT;
       }
     break;
       
     case TLV_LOAD_TEXT :
-      printf("text->size %d\n", text->size);
       tlvWriteTargetMemory(session, &text->dataAddress, &text->destAddress, &text->size, memorySelect);
       
       if(text->size <= 0) {
         printf("finish load TLV_LOAD_TEXT\n");
         /* Close elf file */
-        free(text); closeElfFile(elfData); fileStatus = FILE_CLOSED;
+        closeElfFile();
         session->ongoingProcessFlag = FLAG_CLEAR;
         session->loadProgramState = TLV_LOAD_ISR_VECTOR;
       }
@@ -215,8 +204,6 @@ void tlvFlashErase(Tlv_Session *session, uint32_t address, int size) {
       buffer[0] = tempAddress; buffer[1] = tempSize;
       tlv = tlvCreatePacket(TLV_FLASH_ERASE, 8, (uint8_t *)buffer);
       tempAddress = 0; tempSize = 0;
-      printf("address %x\n", get4Byte(&tlv->value[0]));
-      printf("size %d\n", get4Byte(&tlv->value[4]));
       tlvSend(session, tlv);
       session->ongoingProcessFlag = FLAG_CLEAR;
       session->eraseState = TLV_LOAD_FLASH_PROGRAMMER;
@@ -266,7 +253,6 @@ void tlvFlashMassErase(Tlv_Session *session, uint32_t banks) {
 void tlvLoadToRam(Tlv_Session *session, char *file) {
   
   switch(session->ramState) {
-    
     case TLV_LOAD_PROGRAM :
       /* Load elf file isr_vector, ro_data, data
          and text section into target RAM */
@@ -281,7 +267,7 @@ void tlvLoadToRam(Tlv_Session *session, char *file) {
     case TLV_UPDATE_PC :        
       /* Update program counter to the entry address 
          of the loaded program */
-      printf("entryAddress %x\n", entryAddress);
+      // printf("entryAddress %x\n", entryAddress);
       tlvWriteTargetRegister(session, PC, &entryAddress);
       session->ramState = TLV_RUN_PROGRAM;
     break;
@@ -304,14 +290,16 @@ void tlvLoadToRam(Tlv_Session *session, char *file) {
   * Return  : NONE
   */
 void tlvLoadToFlash(Tlv_Session *session, char *file)  {
-      
+  
   switch(session->flashState) {
-    
     case TLV_REQUEST_ERASE :
+      if(programSize == 0) programSize = getProgramSize(file);
+
       /* Request Flash Programmer to erase flash according to program size */
       tlvFlashErase(session, 0x08000000, programSize);
       
       if(session->ongoingProcessFlag == FLAG_CLEAR) {
+        programSize = 0;
         session->ongoingProcessFlag = FLAG_SET;
         session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
       }
@@ -341,7 +329,7 @@ void tlvLoadToFlash(Tlv_Session *session, char *file)  {
       tlvRunTarget(session);
 
       session->ongoingProcessFlag = FLAG_CLEAR;
-      session->flashState = TLV_LOAD_FLASH_PROGRAMMER;
+      session->flashState = TLV_REQUEST_ERASE;
     break;
   }
 }
@@ -441,11 +429,9 @@ void selectCommand(Tlv_Session *session, User_Session *userSession) {
 int isLastOperationDone(Tlv_Session *session) {
   if(session->ongoingProcessFlag == FLAG_CLEAR) {
     session->hostState = HOST_WAIT_USER_COMMAND;
-    return 1;
   }
   else {
     session->hostState = HOST_INTERPRET_COMMAND;
-    return 0;
   }
 }
 
@@ -472,19 +458,18 @@ void hostInterpreter(Tlv_Session *session) {
       response = tlvReceive(session);
 
       if(response == NULL) {
-        if(getElapsedTime())
+        if(getElapsedTime()) {
           Throw(PROBE_NOT_RESPONDING);
-      }
-      
-      else {
-        elapsedTime = 0;
-        verifyTlvPacket(response);
-        
-        if(isLastOperationDone(session)) {
-          #if !defined (TEST)
-          displayTlvData(response); 
-          #endif
         }
+      }
+
+      if(verifyTlvPacket(response)) {
+        elapsedTime = 0;
+        #if !defined (TEST)
+        displayTlvData(response); 
+        #endif
+        
+        isLastOperationDone(session);
       }
     break;
   }

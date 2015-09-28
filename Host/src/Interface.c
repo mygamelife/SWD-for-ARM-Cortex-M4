@@ -3,16 +3,9 @@
 #define BUFFER_SIZE 1024
 
 void displayOptionMenu(void)  {
-  printf("1. Load Program To RAM\n");
-  printf("2. Load Program To Flash\n");
-  printf("3. Read Memory\n");
-  printf("4. Write Register\n");
-  printf("5. Read Register\n");
-  printf("6. Halt target\n");
-  printf("7. Run target\n");
-  printf("8. Step target\n");
-  printf("9. Set breakpoint\n");
-  printf("10. Exit\n");
+  printf("=============================================================\n");
+  printf("##        ARM CORTEX Serial Wire Debugger Interface        ##\n");
+  printf("=============================================================\n");
 }
 
 void displayTlvData(Tlv *tlv)  {
@@ -20,21 +13,26 @@ void displayTlvData(Tlv *tlv)  {
   length = tlv->length;
   
   if(length == 5) {
-    printf("Value : %x\n\n", get4Byte(&tlv->value[0]));
+    printf("> Value : %x\n\n", get4Byte(&tlv->value[0]));
   } else if(length > 5)  {
-    printf("Address %x\n", get4Byte(&tlv->value[0]));
+    printf("> Address %x\n", get4Byte(&tlv->value[0]));
     for(i = 4; i < length - 1; i += 4)  {
 
       if(counter == 4) {
         counter = 0;
         printf("\n");
       }
-      printf("%x ", get4Byte(&tlv->value[i]));
+      if(get4Byte(&tlv->value[i]) == 0) {
+        printf("  00000000 ", get4Byte(&tlv->value[i]));
+      }
+      else {
+        printf("  %x ", get4Byte(&tlv->value[i]));
+      }
       counter++;
     }
     printf("\n\n");
   }
-  else printf("OK\n\n");
+  else printf("> OK\n\n");
 }
 
 /** getRegisterAddress is a function to get user Input
@@ -439,6 +437,7 @@ User_Session *waitUserCommand(void) {
   char InputBuffer[BUFFER_SIZE] = {0};
 
   while(1) {
+    printf("> ");
     fgets(InputBuffer, BUFFER_SIZE, stdin);
     if(InputBuffer[strlen(InputBuffer) - 1] == '\n') break;
   }

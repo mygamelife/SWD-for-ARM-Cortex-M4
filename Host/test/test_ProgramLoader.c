@@ -182,9 +182,11 @@ void test_tlvLoadProgram_address_should_be_updated_after_call(void)
   TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
   TEST_ASSERT_EQUAL_HEX32(0x200000F8, get4Byte(&session->txBuffer[2]));
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  closeElfFile();
 }
 
-void test_tlvLoadProgram_address_should_load_ro_data_after_isr_vector(void)
+void test_tlvLoadProgram_address_should_load_text_after_isr_vector(void)
 {
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
@@ -200,6 +202,8 @@ void test_tlvLoadProgram_address_should_load_ro_data_after_isr_vector(void)
   
   TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  closeElfFile();
 }
 
 void test_tlvReadDataChunk_should_send_request_read_data_in_chunk(void)
@@ -247,6 +251,8 @@ void test_tlvLoadToRam_should_set_ongoing_process_flag_when_program_is_still_loa
 
   TEST_ASSERT_EQUAL(TLV_LOAD_PROGRAM, session->ramState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  closeElfFile();
 }
 
 void test_tlvLoadToRam_should_update_PC_and_run_the_program_after_finish_loading(void)
@@ -255,10 +261,8 @@ void test_tlvLoadToRam_should_update_PC_and_run_the_program_after_finish_loading
   uartInit_IgnoreAndReturn(hSerial);
 	Tlv_Session *session = tlvCreateSession();
   
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  fileStatus = FILE_CLOSED;
+  
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
@@ -428,6 +432,8 @@ void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(v
   
   hostInterpreter(session);
   TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  
+  closeElfFile();
 }
 
 void test_tlvFlashErase_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)

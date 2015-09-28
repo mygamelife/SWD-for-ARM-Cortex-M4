@@ -5,12 +5,8 @@ int main(void) {
   CEXCEPTION_T err;
   
   Tlv_Session *session = tlvCreateSession();
-  printf("Opening port\n");
-  
   
   displayOptionMenu();
-  printf("Please Enter [--Option--] [--Parameters--]\n");
-  printf("Example : 1 R0 0xDEADBEFF\n\n");
   
   while(session->hostState != HOST_EXIT) {
     Try {
