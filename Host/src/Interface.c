@@ -1,11 +1,15 @@
 #include "Interface.h"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2000
+char InputBuffer[BUFFER_SIZE];
 
 void displayOptionMenu(void)  {
+  printf("\n");
   printf("=============================================================\n");
   printf("##        ARM CORTEX Serial Wire Debugger Interface        ##\n");
   printf("=============================================================\n");
+  printf("\n");
+  printf("See 'help' or 'help <command>' to read about a specific user command\n\n");
 }
 
 void displayTlvData(Tlv *tlv)  {
@@ -403,28 +407,196 @@ User_Session *userExit(void) {
   return &userSession;
 }
 
-/** userInputInterpreter is a function to interpreter user input to 
+Command_Code getCommandCode(char *commandName) {
+
+  if(strcmp(commandName, "help") == 0)                return HELP;
+  else if(strcmp(commandName, "load") == 0)           return LOAD;
+  else if(strcmp(commandName, "rmem") == 0)           return READ_MEMORY;
+  else if(strcmp(commandName, "wreg") == 0)           return WRITE_REGISTER;
+  else if(strcmp(commandName, "reg") == 0)            return READ_REGISTER;
+  else if(strcmp(commandName, "halt") == 0)           return HALT;
+  else if(strcmp(commandName, "run") == 0)            return RUN;
+  else if(strcmp(commandName, "step") == 0)           return STEP;
+  else if(strcmp(commandName, "brkpt") == 0)          return BREAKPOINT;
+  else if(strcmp(commandName, "erase") == 0)          return ERASE;
+  else if(strcmp(commandName, "reset") == 0)          return RESET;
+  else if(strcmp(commandName, "exit") == 0)           return EXIT;
+  
+  else Throw(ERR_INVALID_USER_COMMAND);
+}
+
+/** helpMenu is a function to display useful information
+  * about the user command
+  *
+  * Input   : NONE
+  *
+  * return  : NONE
+  */
+void helpMenu(String *userInput) {
+  Identifier *command;
+  Command_Code ccode;
+  
+  if(userInput->length <= 1) {
+    printf("Available commands :\n\n");
+    printf(" load     load program into target memory can either ram/flash\n");
+    printf(" rmem     read data from target memory\n");
+    printf(" wreg     write data into target register\n");
+    printf(" reg      read data from target register\n");
+    printf(" halt     halt target\n");
+    printf(" run      run target\n");
+    printf(" step     executes code one statement at a time\n");
+    printf(" brkpt    stop or pause program at specific address\n");
+    printf(" erase    erase target flash memory\n");
+    printf(" reset    reset target process\n");
+    printf(" exit     exit current program\n");
+  }
+  else {
+    printf("\n");
+    command = (Identifier*)getToken(userInput);
+    ccode = getCommandCode(command->name);
+    helpCommand(ccode);
+  }
+}
+
+void helpCommand(Command_Code ccode) {
+  
+  switch(ccode) {
+    case LOAD                         : printf(" load <memory> <file_path>                                                \n\n");
+                                        printf(" <memory>     Target memory location that program will be                   \n");
+                                        printf("              load into (ram/flash)                                         \n");
+                                        printf(" <file_path>  Program elf file location                                     \n");
+                                        break;
+                                        
+    case READ_MEMORY                  : printf(" rmem <address> <size>                                                      \n\n");
+                                        printf(" <address>    Any valid memory address                                      \n");
+                                        printf(" <size>       Size of the memory want to read                               \n");
+                                        break;
+    
+    case WRITE_REGISTER               : printf(" wreg <reg_address> <value>                                               \n\n");                                       
+                                        printf(" <reg_address>    Register address can be one of the following value :      \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Core Register 0 - 12 |   R0 - R12   |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Stack Pointer        |      SP      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Link Register        |      LR      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Program Counter      |      PC      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Special-purpose      |              |               \n");
+                                        printf("                      | program status       |     xPSR     |               \n");
+                                        printf("                      | registers            |              |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Main Stack Pointer   |      MSP     |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Process Stack Pointer|      PSP     |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Special Register     |      SR      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Floating Point       |              |               \n");
+                                        printf("                      | Staus and            |     FPSCR    |               \n");
+                                        printf("                      | Control Register     |              |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Floating Point       |              |               \n");
+                                        printf("                      | Register 0 - 31      | FPSCR 0 - 31 |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf(" <value>          Data write into register in byte format                   \n");
+                                        break;
+                                        
+    case READ_REGISTER                : printf(" reg <reg_address>                                                        \n\n");    
+                                        printf(" <reg_address>    Register address can be one of the following value :      \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Core Register 0 - 12 |   R0 - R12   |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Stack Pointer        |      SP      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Link Register        |      LR      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Program Counter      |      PC      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Special-purpose      |              |               \n");
+                                        printf("                      | program status       |     xPSR     |               \n");
+                                        printf("                      | registers            |              |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Main Stack Pointer   |      MSP     |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Process Stack Pointer|      PSP     |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Special Register     |      SR      |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Floating Point       |              |               \n");
+                                        printf("                      | Staus and            |     FPSCR    |               \n");
+                                        printf("                      | Control Register     |              |               \n");
+                                        printf("                      =======================================               \n");
+                                        printf("                      | Floating Point       |              |               \n");
+                                        printf("                      | Register 0 - 31      | FPSCR 0 - 31 |               \n");
+                                        printf("                      =======================================               \n");
+                                        break;
+                                        
+    case HALT                         : printf(" halt <empty>                                                             \n\n");
+                                        break;
+    
+    case RUN                          : printf(" run <empty>                                                              \n\n");
+                                        break;
+    
+    case STEP                         : printf(" step <number_of_step>                                                    \n\n");
+                                        printf(" <number_of_step>   Number of statement can be executes at a time           \n");
+                                        break;
+                                        
+    case BREAKPOINT                   : printf(" brkpt <address>                                                          \n\n");
+                                        printf(" <address>   Any valid code region address 0x00000000 - 0x1FFFFFFF          \n");
+                                        break;
+                                        
+    case ERASE                        : printf(" Section Erase                                                              \n");
+                                        printf(" erase <section> <address> <size>                                         \n\n");
+                                        printf(" <address>        Any valid flash address 0x08000000 - 0x081FFFFF           \n");
+                                        printf(" <size>           Size of flash to erase can be any value                 \n\n");
+                                        printf(" Mass Erase                                                                 \n");
+                                        printf(" erase <bank_option>                                                      \n\n");
+                                        printf(" <bank_option>    Flash bank option can be one of the following value :     \n");
+                                        printf("                    bank1   :: Flash Bank 1 0x08000000 - 0x080E0000         \n");
+                                        printf("                    bank2   :: Flash Bank 2 0x08100000 - 0x081FFFFF         \n");
+                                        printf("                    full    :: Both Flash Bank 1 and 2                      \n");
+                                        break;
+    
+    case RESET                        : printf(" reset <reset_option>                                                     \n\n");
+                                        printf(" <reset_option>  Type of reset can be one of the following value :          \n");
+                                        printf("                    hard    :: hardware reset                               \n");
+                                        printf("                    soft    :: software reset                               \n");
+                                        printf("                    vector  :: vector reset                                 \n");
+                                        break;
+                                        
+    case EXIT                         : printf(" exit <empty>                                                             \n\n");
+                                        break;
+  }
+}
+
+/** InterpreteCommand is a function to interpreter user input to 
   * a meaningful information to machine
   *
-  * Input   : userInput is the string enter by userExit
+  * Input   : ccode is a Command code can be one of the following value
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userInputInterpreter(String *userInput)  {
+User_Session *InterpreteCommand(String *userInput) {
+  Identifier *command; Command_Code ccode;
   
-  Identifier *command = (Identifier*)getToken(userInput);
+  command = (Identifier*)getToken(userInput);
+  ccode = getCommandCode(command->name);
   
-  if(strcmp(command->name, "load") == 0)                return userLoadProgram(userInput);
-  if(strcmp(command->name, "rmem") == 0)                return userReadMemory(userInput);
-  else if(strcmp(command->name, "wreg") == 0)           return userWriteRegister(userInput);
-  else if(strcmp(command->name, "reg") == 0)            return userReadRegister(userInput);
-  else if(strcmp(command->name, "halt") == 0)           return userHaltTarget();
-  else if(strcmp(command->name, "run") == 0)            return userRunTarget();
-  else if(strcmp(command->name, "step") == 0)           return userStepTarget(userInput);
-  else if(strcmp(command->name, "brkpt") == 0)          return userSetBreakpoint(userInput);
-  else if(strcmp(command->name, "erase") == 0)          return userErase(userInput);
-  else if(strcmp(command->name, "reset") == 0)          return userReset(userInput);
-  else if(strcmp(command->name, "exit") == 0)           return userExit();
+  if(ccode == HELP) {                         helpMenu(userInput); 
+                                              return NULL;}
+  else if(ccode == LOAD)                      return userLoadProgram(userInput);
+  else if(ccode == READ_MEMORY)               return userReadMemory(userInput);
+  else if(ccode == WRITE_REGISTER)            return userWriteRegister(userInput);
+  else if(ccode == READ_REGISTER)             return userReadRegister(userInput);
+  else if(ccode == HALT)                      return userHaltTarget();
+  else if(ccode == RUN)                       return userRunTarget();
+  else if(ccode == STEP)                      return userStepTarget(userInput);
+  else if(ccode == BREAKPOINT)                return userSetBreakpoint(userInput);
+  else if(ccode == ERASE)                     return userErase(userInput);
+  else if(ccode == RESET)                     return userReset(userInput);
+  else if(ccode == EXIT)                      return userExit();
   
   else Throw(ERR_INVALID_USER_COMMAND);
 }
@@ -433,8 +605,7 @@ User_Session *userInputInterpreter(String *userInput)  {
   * enter by user
   */
 User_Session *waitUserCommand(void) {
-  Number *num;  String *str;
-  char InputBuffer[BUFFER_SIZE] = {0};
+  Number *num; String *str; 
 
   while(1) {
     printf("> ");
@@ -444,5 +615,5 @@ User_Session *waitUserCommand(void) {
   
   str = stringNew(InputBuffer);
   
-  return userInputInterpreter(str);
+  return InterpreteCommand(str);
 }

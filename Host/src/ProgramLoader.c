@@ -443,9 +443,11 @@ void hostInterpreter(Tlv_Session *session) {
   switch(session->hostState)  {
     case HOST_WAIT_USER_COMMAND :
       userSession = waitUserCommand();
-      if(userSession->tlvCommand == TLV_EXIT) 
-        session->hostState = HOST_EXIT;
-      else session->hostState = HOST_INTERPRET_COMMAND;
+      if(userSession != NULL) {
+        if(userSession->tlvCommand == TLV_EXIT) 
+          session->hostState = HOST_EXIT;
+        else session->hostState = HOST_INTERPRET_COMMAND;
+      }
     break;
       
     case HOST_INTERPRET_COMMAND :
