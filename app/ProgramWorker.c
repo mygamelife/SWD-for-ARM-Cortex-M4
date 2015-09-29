@@ -305,6 +305,39 @@ void multipleStepTarget(Tlv_Session *session, int nInstructions)
   tlvSend(session, tlv);
 }
 
+/** Step over single instruction 
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void singleStepOver(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  uint32_t data = 0 ;
+  uint32_t nextInstruction = 0 ;
+  uint32_t comparatorUsed = 0 ;
+  
+  nextInstruction = isNextInstructionCallingSubroutine();
+  
+  if(nextInstruction)
+  {
+    comparatorUsed = autoSetInstructionBreakpoint(nextInstruction + 4, MATCH_WORD);
+    if(comparatorUsed == -1)
+      Throw(TLV_NOT_STEPOVER);
+    
+    while(!(hasBreakpointDebugEventOccured()));
+    disableInstructionComparator(comparatorUsed);
+    clearBreakpointDebugEvent();
+  }
+  else
+    stepOnly(1);
+  
+  readCoreRegister(CORE_REG_PC, &data);
+  tlv = tlvCreatePacket(TLV_STEPOVER,4, (uint8_t *)&data);
+    
+  tlvSend(session, tlv);
+}
+
 /** Set instruction breakpoint
  *
  * Input : session contain a element/handler used by tlv protocol

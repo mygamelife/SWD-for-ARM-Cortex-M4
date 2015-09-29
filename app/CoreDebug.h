@@ -45,5 +45,6 @@ void enableVectorCatch(uint32_t vectorCatch);
 
 void performHaltOnReset();
 
+int isNextInstructionCallingSubroutine();
 
 #endif // CoreDebug_H

@@ -235,3 +235,24 @@ void performHaltOnReset()
   softResetTarget();
 }
 
+/**
+ *  Check whether the next instruction is calling subroutine (Branch With Link )
+ *
+ *  Output : return next instruction if true 
+ *           return 0 if false
+ */
+int isNextInstructionCallingSubroutine()
+{
+  uint32_t pc = 0 ;
+  uint32_t machineCode = 0 ;
+  
+  readCoreRegister(CORE_REG_PC,&pc);
+  memoryReadWord(pc,&machineCode);
+  
+  if((machineCode & BL_INSTRUCTION_MASK) == BL_ENCODING)
+    return pc ;
+  
+  return 0; 
+}
+
+

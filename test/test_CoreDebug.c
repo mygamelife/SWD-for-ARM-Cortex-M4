@@ -422,10 +422,101 @@ void test_enableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_1000000_t
 }
 
 /*------------------------------disableDWTandITM------------------------------------*/
-void xtest_disableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_0_to_DRW()
+void test_disableDWTandITM_should_writeByte_0xE000EDFF_to_TAR_and_write_0_to_DRW()
 {
   emulateSwdRegisterWrite(TAR_REG,AP,4,0xE000EDFF);
   emulateSwdRegisterWrite(DRW_REG,AP,4,0);
   
   disableDWTandITM();
+}
+
+
+/*------------------------------isNextInstructionCallingSubroutine------------------------------------*/
+void test_isNextInstructionCallingSubroutine_should_read_PC_and_machineCode_given_0_should_return_0()
+{
+  cswDataSize = CSW_WORD_SIZE;
+  
+  //Set to CORE_DEBUG_HALT
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xA05F0003);
+  
+  //Select CORE_REG_PC and read mode in DCRSR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DCRSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xF);
+  
+  //wait for transaction to complete
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x10000));
+  
+  //Read data from DCRDR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DCRDR_REG);
+	emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x1234560));
+  
+  //Read machineCode
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x1234560);
+	emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0));
+  
+  
+  TEST_ASSERT_EQUAL(0,isNextInstructionCallingSubroutine());
+}
+
+void test_isNextInstructionCallingSubroutine_should_read_PC_and_machineCode_given_0xF800D000_should_return_0()
+{
+  //Set to CORE_DEBUG_HALT
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xA05F0003);
+  
+  //Select CORE_REG_PC and read mode in DCRSR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DCRSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xF);
+  
+  //wait for transaction to complete
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x10000));
+  
+  //Read data from DCRDR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DCRDR_REG);
+	emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x1234560));
+  
+  //Read machineCode
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x1234560);
+	emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0xF800D000));
+  
+  
+  TEST_ASSERT_EQUAL(0,isNextInstructionCallingSubroutine());
+}
+
+void test_isNextInstructionCallingSubroutine_should_read_PC_and_machineCode_given_0xF000D000_should_return_PC()
+{
+  //Set to CORE_DEBUG_HALT
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xA05F0003);
+  
+  //Select CORE_REG_PC and read mode in DCRSR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DCRSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xF);
+  
+  //wait for transaction to complete
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DHCSR_REG);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x10000));
+  
+  //Read data from DCRDR_REG
+  emulateSwdRegisterWrite(TAR_REG,AP,4,DCRDR_REG);
+	emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0x1234560));
+  
+  //Read machineCode
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x1234560);
+	emulateSwdRegisterRead(DRW_REG,AP,4,1,0x1234);
+  emulateSwdRegisterRead(DRW_REG,AP,4,1,interconvertMSBandLSB(0xF000D000));
+  
+  
+  TEST_ASSERT_EQUAL(0x1234560,isNextInstructionCallingSubroutine());
 }
