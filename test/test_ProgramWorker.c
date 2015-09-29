@@ -89,6 +89,20 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
   readTargetRegister(session, 0xBEEFBEEF);
 }
 
+void test_readAllTargetRegister_should_read_all_target_register()
+{
+  int i = 0 ;
+  
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  for(i = 0 ; i < 52 ; i ++)
+    readCoreRegister_Ignore();
+  
+  readAllTargetRegister(session);
+}
+
 void test_writeTargetRam_should_write_data_to_specified_RAM_address()
 {
   UART_HandleTypeDef uartHandler;
