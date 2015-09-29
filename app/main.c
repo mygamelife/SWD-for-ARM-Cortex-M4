@@ -2,9 +2,8 @@
 
 int main(void)
 {
-  uint32_t idr = 0, dataRead = 0, dataRead2 = 0;
-  int errorCode = 0, dummy = 0;
-  CoreMode mode ;
+  uint32_t idr = 0;
+  int errorCode = 0; CoreMode mode ;
 
   /* Hardware configuration */
   HAL_Init();

@@ -8,6 +8,7 @@ extern int uartReady;
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
+#include <time.h>
 #include "Tlv_ex.h"
 #include "uart.h"
 #include "CException.h"
@@ -26,7 +27,15 @@ typedef struct
   Probe_State probeState;
   /* Load Program state */
   Tlv_State loadProgramState;
+  Tlv_State ramState;
+  /* Host flash state */
   Tlv_State flashState;
+  Tlv_State eraseState;
+  Tlv_State mEraseState;
+  /* Probe flash state */
+  Tlv_State pFlashState;
+  Tlv_State pEraseState;
+  Tlv_State pMEraseState;
   /* Flags */
   bool timeOutFlag;
   bool dataReceiveFlag;

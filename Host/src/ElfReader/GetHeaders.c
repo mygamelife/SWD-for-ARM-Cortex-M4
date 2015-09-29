@@ -8,6 +8,11 @@
 #include "CException.h"
 #include "ErrorCode.h"
 
+ElfData *elfData;
+ElfSection *isr, *text;
+uint32_t entryAddress = 0;
+int fileStatus = FILE_CLOSED;
+
 /******************************************************************************
  * ELF Header
  *
@@ -615,7 +620,7 @@ char *getSymbolTableNameUsingIndex(ElfData *elfData, int index){
   return symbolName;
 }
 
-ElfSection *getElfSectionInfo(ElfData *elfData, char *section){
+ElfSection *getElfSectionInfo(ElfData *elfData, char *section) {
   ElfSection *elfSection = malloc(sizeof(ElfSection)); 
   
   elfSection->index = getIndexOfSectionByName(elfData, section);
@@ -626,7 +631,31 @@ ElfSection *getElfSectionInfo(ElfData *elfData, char *section){
   return elfSection;
 }
 
-void closeElfFile(ElfData *elfData) {
+void getElfSection(char *elfFile) {
+  
+  fileStatus = FILE_OPENED;
+  
+  elfData = openElfFile(elfFile);
+  isr     = getElfSectionInfo(elfData, ".isr_vector");
+  text    = getElfSectionInfo(elfData, ".text");
+
+  entryAddress = (*(uint32_t *)(&isr->dataAddress[4]));
+  // programSize = isr->size + text->size;
+}
+
+int getProgramSize(char *elfFile) {
+  int programSize = 0;
+  
+  getElfSection(elfFile);
+  
+  programSize = isr->size + text->size;
+  
+  closeElfFile();
+  
+  return programSize;
+}
+
+void closeElfData(ElfData *elfData) {
   if(elfData != NULL) {
     if(elfData->myFile)     free(elfData->myFile);
     if(elfData->eh)         free(elfData->eh);
@@ -634,6 +663,22 @@ void closeElfFile(ElfData *elfData) {
     if(elfData->ph)         free(elfData->ph);  
     if(elfData->programElf) free(elfData->programElf);
     if(elfData->st)         free(elfData->st);
+    /* Free elf data */
     free(elfData);
+    elfData = NULL;
   }
+}
+
+void closeElfSection(ElfSection *elfSection) {
+  if(elfSection != NULL) {
+    free(elfSection);
+  }
+}
+
+void closeElfFile(void) {
+  closeElfSection(isr);
+  closeElfSection(text);
+  closeElfData(elfData);
+  
+  fileStatus = FILE_CLOSED;
 }

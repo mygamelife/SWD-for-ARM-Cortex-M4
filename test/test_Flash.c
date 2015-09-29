@@ -3,8 +3,7 @@
 #include "mock_configurePort.h"
 #include "mock_stm32f4xx_hal_flash.h"
 #include "mock_stm32f4xx_hal_flash_ex.h"
-#include "mock_stm32f4xx_hal_flash_ramfunc.h"
-#include "mock_Register_ReadWrite.h"
+#include "mock_memoryRW.h"
 
 void setUp(void){}
 
@@ -80,9 +79,6 @@ void test_flashWrite_given_data_and_size_5_should_write_into_Flash()  {
 }
 
 void test_flashCopyFromSramToFlash_given_0x20000000_sram_address_0x08000000_flash_address_and_size_8(void) {
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  HAL_FLASHEx_Erase_IgnoreAndReturn(HAL_OK); //Erase
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
   readMemoryData_ExpectAndReturn(0x20000000, 0xDEADBEEF);
@@ -93,21 +89,4 @@ void test_flashCopyFromSramToFlash_given_0x20000000_sram_address_0x08000000_flas
   HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
   flashCopyFromSramToFlash(0x20000000, 0x08000000, 8);
-}
-
-void test_flashVerify_given_0x20000000_sram_address_0x08000000_flash_address_and_size_16(void) {
-  
-  readMemoryData_ExpectAndReturn(0x20000000, 0x11111111);
-  readMemoryData_ExpectAndReturn(0x08000000, 0x11111111);
-  
-  readMemoryData_ExpectAndReturn(0x20000004, 0x22222222);
-  readMemoryData_ExpectAndReturn(0x08000004, 0x22222222);
-  
-  readMemoryData_ExpectAndReturn(0x20000008, 0x33333333);
-  readMemoryData_ExpectAndReturn(0x08000008, 0x33333333);
-  
-  readMemoryData_ExpectAndReturn(0x2000000C, 0x44444444);
-  readMemoryData_ExpectAndReturn(0x0800000C, 0x44444444);
-  
-  flashVerify(0x20000000, 0x08000000, 16);
 }
