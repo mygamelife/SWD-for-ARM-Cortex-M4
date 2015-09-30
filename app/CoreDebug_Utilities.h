@@ -72,7 +72,6 @@ typedef enum
 	CORE_SNAPSTALL = 0xA05F0023
 } CoreMode;
 
-
 typedef enum
 {
 	CORE_REG_R0 = 0,

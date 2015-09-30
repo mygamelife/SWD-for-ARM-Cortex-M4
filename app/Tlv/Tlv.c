@@ -8,7 +8,7 @@ int uartReady = 1;
 Tlv_Session *tlvCreateSession(void) {
   static Tlv_Session session;
   
-  /* get uart handler */
+  /* Get uart handler */
   session.handler = uartInit();
   
   /* Initialize begining state for send and receive */
@@ -16,8 +16,18 @@ Tlv_Session *tlvCreateSession(void) {
   session.receiveState = TLV_RECEIVE_TYPE;
   
   /* Initialize load program state */
-  session.loadProgramState = TLV_OPEN_FILE;
-  session.flashState = TLV_OPEN_FILE;
+  session.loadProgramState = TLV_LOAD_ISR_VECTOR;
+  session.ramState = TLV_LOAD_PROGRAM;
+  
+  /* host flash state */
+  session.flashState = TLV_REQUEST_ERASE;
+  session.eraseState = TLV_LOAD_FLASH_PROGRAMMER;
+  session.mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
+  
+  /* probe flash state */
+  session.pFlashState = WRITE_TO_RAM;
+  session.pMEraseState = REQUEST_ERASE;
+  session.pEraseState = REQUEST_ERASE;
   
   /* Initialize all the required flag */
   session.timeOutFlag = FLAG_CLEAR;
@@ -27,6 +37,7 @@ Tlv_Session *tlvCreateSession(void) {
   session.breakPointFlag = FLAG_CLEAR;
   session.watchPointFlag = FLAG_CLEAR;
   
+  /* Initialize host and probe state */
   session.hostState = HOST_WAIT_USER_COMMAND;
   session.probeState = PROBE_RECEIVE_PACKET;
   
@@ -125,7 +136,7 @@ Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv;
   
   if(session->timeOutFlag == true) {
-    session->timeOutFlag == false;
+    session->timeOutFlag = false;
     Throw(TLV_TIME_OUT);
   }
   if(session->dataReceiveFlag == false)  return NULL;
@@ -164,13 +175,14 @@ void tlvReceiveService(Tlv_Session *session) {
     case TLV_RECEIVE_VALUE :
       if(!getByte(session->handler, &session->rxBuffer[2 + counter]))  {
         if(++counter == length) {
-          length = 0;
-          counter = 0;
+          length = 0; counter = 0;
           session->receiveState = TLV_RECEIVE_TYPE;
-          session->dataReceiveFlag = true;
+          session->dataReceiveFlag = FLAG_SET;
         }
       } else  {
+        counter = 0;
         session->timeOutFlag = true;
+        session->dataReceiveFlag = FLAG_CLEAR;
         session->receiveState = TLV_RECEIVE_TYPE;
       }
       break;  
@@ -249,6 +261,7 @@ int isTlvAck(Tlv *tlv) {
   *           0 if command is invalid
   */
 int isTlvCommand(uint8_t command) {
+  
   if(command == TLV_WRITE_RAM)              return 1;
   else if(command == TLV_READ_MEMORY)       return 1;
   else if(command == TLV_WRITE_REGISTER)    return 1;
@@ -259,6 +272,12 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_MULTI_STEP)        return 1;
   else if(command == TLV_BREAKPOINT)        return 1;
   else if(command == TLV_WRITE_RAM)         return 1;
+  else if(command == TLV_WRITE_FLASH)       return 1;
+  else if(command == TLV_FLASH_ERASE)       return 1;
+  else if(command == TLV_FLASH_MASS_ERASE)  return 1;
+  else if(command == TLV_SOFT_RESET)        return 1;
+  else if(command == TLV_HARD_RESET)        return 1;
+  else if(command == TLV_OK)                return 1;
   
   else return 0;
 }
@@ -275,7 +294,7 @@ int verifyTlvPacket(Tlv *tlv) {
   
   if(tlv != NULL) {
     if(!isTlvAck(tlv)) {
-      if(!isTlvCommand(tlv->type))  
+      if(!isTlvCommand(tlv->type))
         Throw(TLV_INVALID_COMMAND);
     } if(!verifyTlvData(tlv)) {
       Throw(TLV_CHECKSUM_ERROR);
@@ -294,8 +313,10 @@ int verifyTlvPacket(Tlv *tlv) {
   */
 void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
   /* add 100 to indicate that is an erroCode return from probe */
-  if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR)  
-    errorCode + 100;
+  if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR) {
+	  errorCode += 100;
+  }
+
   
   Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
 

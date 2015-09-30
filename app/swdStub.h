@@ -2,6 +2,7 @@
 #define swdStub_H
 
 #include <stdint.h>
+#include <malloc.h>
 #include "Flash.h"
 
 #if !defined(TEST)
@@ -10,34 +11,66 @@
 
 /** SWD Instruction address 
   */
-#define TWO_KBYTES                        2048 //2k byte
-#define FOUR_KBYTES                       4096 //4k byte
-#define SWD_INSTRUCTION                   ((uint32_t)0x20012700)
-#define SWD_BANK_SELECT                   ((uint32_t)0x20012704)
-#define SWD_DATA_SIZE                     ((uint32_t)0x20012708)
-#define SWD_FLASH_START_ADDRESS           ((uint32_t)0x2001270C)
-#define SWD_FLASH_END_ADDRESS             ((uint32_t)0x20012710)
-#define SWD_SRAM_START_ADDRESS            ((uint32_t)0x20012714)
-#define SWD_TARGET_STATUS                 ((uint32_t)0x20012718)
-#define SWD_SRAM_DATA32_ADDRESS           ((uint32_t)0x20000800)
+#define TWO_KBYTES                    2048 //2k byte
+#define FOUR_KBYTES                   4096 //4k byte
 
-/** SWD Instruction 
+/* Inline assembler helper directive: call SVC with the given immediate */
+#if !defined (TEST)
+#define svc(code)                     __asm volatile ("svc %[immediate]"::[immediate] "I" (code))
+#endif
+
+/* SVC instruction code */
+#define SVC_SERVICE_CALL              0
+#define SVC_REQUEST_SRAM_ADDRESS      1
+#define SVC_REQUEST_COPY              2
+#define SVC_REQUEST_ERASE             3
+#define SVC_REQUEST_MASS_ERASE        4
+#define SVC_REQUEST_CONFIGURE         5
+
+/** Stub instruction number definition
   */
-#define INSTRUCTION_CLEAR                 ((uint32_t)0xFFFFFFFF)
-#define MASS_ERASE_BANK_1                 ((uint32_t)0x00000001)
-#define MASS_ERASE_BANK_2                 ((uint32_t)0x00000002)
-#define MASS_ERASE_BOTH_BANK              ((uint32_t)0x00000003)
-#define INSTRUCTION_COPY                  ((uint32_t)0x00000010)
-#define INSTRUCTION_ERASE_SECTOR          ((uint32_t)0x00000011)
-#define INSTRUCTION_MASS_ERASE            ((uint32_t)0x00000012)
+typedef enum {
+  STUB_CLEAR = 0,
+  STUB_COPY,
+  STUB_ERASE,
+  STUB_MASSERASE
+} Stub_Instruction;
 
-/** SWD target response
+/** Stub status number definition
   */
-#define TARGET_OK                         ((uint32_t)0x00000000)
-#define TARGET_BUSY                       ((uint32_t)0x00000001)
+typedef enum {
+  STUB_OK = 0,
+  STUB_BUSY,
+} Stub_Status;
 
-void swdStub(uint32_t swdInstruction);
+/** Structure type to access the SwdStub.
+  */
+typedef struct
+{
+  volatile int instruction;                     /*!< Offset: 0x00 (R/W)  Swd Stub instruction       */
+  volatile int status;                          /*!< Offset: 0x04 (R/W)  Swd Stub status            */
+  volatile int dataSize;                        /*!< Offset: 0x08 (R/W)  Swd Stub data size         */
+  volatile uint32_t flashAddress;               /*!< Offset: 0x0C (R/W)  Swd Stub flash address     */
+  volatile uint32_t sramAddress;                /*!< Offset: 0x10 (R/W)  Swd Stub sram address      */
+  volatile uint32_t banks;                      /*!< Offset: 0x14 (R/W)  Swd Stub bank selection    */
+} Stub_Type;
+
+#if defined (TEST)
+  Stub_Type *STUB;
+  extern Stub_Type *STUB;
+#else
+  #define STUB_BASE                         (0x20004E00UL)               /*!< Swd Stub Base Address       */
+  #define STUB                              ((Stub_Type *)  STUB_BASE)   /*!< STUB configuration struct   */
+#endif
+
+void stubInit(void);
+void swdStub(int stubInstruction);
 void stubCopy(void);
 void stubErase(void);
 void stubMassErase(void);
+
+/* SVC service */ 
+int IsSvcActive(void);
+void svcServiceCall(void);
+void svcServiceHandler(unsigned int *svc_args);
 #endif // swdStub_H

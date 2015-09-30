@@ -3,15 +3,11 @@
 #include "Emulator.h"
 #include "IoOperations.h"
 #include "Delay.h"
-#include "Flash.h"
 #include "swd_Utilities.h"
 #include "IoOperations.h"
 #include "Register_ReadWrite.h"
 #include "mock_LowLevelIO.h"
 #include "mock_configurePort.h"
-#include "mock_stm32f4xx_hal_flash.h"
-#include "mock_stm32f4xx_hal_flash_ex.h"
-#include "mock_stm32f4xx_hal_flash_ramfunc.h"
 
 void setUp(void)
 {

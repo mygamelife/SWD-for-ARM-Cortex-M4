@@ -41,11 +41,11 @@ HANDLE uartInit(void) {
   }
   
   // The interval 
-  timeouts.ReadIntervalTimeout = 100;
-  timeouts.ReadTotalTimeoutConstant = 100;
-  timeouts.ReadTotalTimeoutMultiplier = 100;
-  timeouts.WriteTotalTimeoutConstant = 30;
-  timeouts.WriteTotalTimeoutMultiplier = 30;
+  timeouts.ReadIntervalTimeout = 10;
+  timeouts.ReadTotalTimeoutConstant = 10;
+  timeouts.ReadTotalTimeoutMultiplier = 20;
+  timeouts.WriteTotalTimeoutConstant = 20;
+  timeouts.WriteTotalTimeoutMultiplier = 20;
   if(!SetCommTimeouts(hSerial, &timeouts)){
     //handle error
      DWORD errId = GetLastError();
@@ -65,8 +65,9 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
     // printLastError();
     return UART_ERROR;
 	}
-  if(dwBytesRead != 0) 
+  if(dwBytesRead != 0) {
     return UART_OK;
+  }
   else return UART_ERROR;
 }
 

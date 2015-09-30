@@ -39,6 +39,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f4xx_it.h"
+#include "main.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -126,8 +127,24 @@ void UsageFault_Handler(void)
   * @param  None
   * @retval None
   */
-void SVC_Handler(void)
+__attribute__ (( naked )) void SVC_Handler(void)
 {
+  /* Get the pointer to the stack frame which was saved before the SVC
+   * call and use it as first parameter for the C-function (r0)
+   * All relevant registers (r0 to r3, r12 (scratch register), r14 or lr
+   * (link register), r15 or pc (programm counter) and xPSR (program
+   * status register) are saved by hardware.
+   */
+  asm volatile(
+    "TST    LR, #4      \t\n" /* Check EXC_RETURN[2] */
+    "ITE    EQ          \t\n"
+    "MRSEQ  R0, MSP     \t\n"
+    "MRSNE  R0, PSP     \t\n"
+    "b %[svcServiceHandler] \t\n" /* Branch to C_SVC_Handler C function */
+    : /* no output */
+    : [svcServiceHandler] "i" (svcServiceHandler) /* input */
+    : "r0" /* clobber */
+  );
 }
 
 /**

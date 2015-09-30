@@ -26,9 +26,9 @@
   :release_compiler:
     :executable: gcc #exists in system search path
     :arguments:
+      - -I../app/Tlv
       - -Isrc/ -Isrc/StringObject -Isrc/ElfReader
       - -Ivendor/ceedling/vendor/c_exception/lib 
-      - -I../app/ -I../app/Tlv
       - -DHOST
       - -g
       - -c ${1} #source code input file (Ruby method call param list sub)

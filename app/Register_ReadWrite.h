@@ -101,7 +101,4 @@ SwdError memoryWriteWord(uint32_t address, uint32_t writeData);
 
 uint32_t memoryWriteDataAlignment(uint32_t address, uint16_t writeData);
 
-uint32_t readMemoryData(uint32_t address);
-void writeMemoryData(uint32_t address, uint32_t data);
-
 #endif // Register_ReadWrite_H

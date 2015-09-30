@@ -26,6 +26,16 @@ typedef struct {
   uint32_t destAddress;
 } ElfSection;
 
+typedef enum {
+  FILE_CLOSED = 0,
+  FILE_OPENED
+} File_Status;
+
+extern ElfData *elfData;
+extern ElfSection *isr, *text;
+extern uint32_t entryAddress;
+extern int fileStatus;
+
 // File Header
 Elf32_Ehdr *getElfHeader(ElfData *elfData);
 
@@ -74,7 +84,11 @@ uint32_t getSymbolTableAddressUsingName(ElfData *elfData, char *name);
 char *getSymbolTableNameUsingIndex(ElfData *elfData, int index);
 
 ElfSection *getElfSectionInfo(ElfData *elfData, char *section);
+void getElfSection(char *elfFile);
+int getProgramSize(char *elfFile);
 
-void closeElfFile(ElfData *elfData);
+void closeElfData(ElfData *elfData);
+void closeElfSection(ElfSection *elfSection);
+void closeElfFile(void);
 #endif // Get_File_Header_H
 

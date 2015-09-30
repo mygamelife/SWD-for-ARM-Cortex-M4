@@ -151,7 +151,6 @@ void readCoreRegister(CoreRegister coreRegister,uint32_t *dataRead)
   memoryWriteWord(DCRSR_REG,configData);
 	waitForCoreRegisterTransactionToComplete();
 	memoryReadWord(DCRDR_REG,dataRead);
-
 }
 
 /**
