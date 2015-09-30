@@ -360,8 +360,7 @@ User_Session *userErase(String *userInput) {
     }
     else {
       userSession.tlvCommand = TLV_FLASH_MASS_ERASE;
-      eraseSection = getFlashBank(iden->name);
-      userSession.data = &eraseSection;
+      userSession.address = (uint32_t)getFlashBank(iden->name);
     }
   }
 
