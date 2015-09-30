@@ -47,7 +47,7 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
   UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
   
-  return HAL_UART_Receive(uartHandle, rxBuffer, length, 10);
+  return HAL_UART_Receive(uartHandle, rxBuffer, length, 20);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
@@ -89,6 +89,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
   uartReady = SET;
 }
 
+void HAL_USART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
+	__HAL_UART_FLUSH_DRREGISTER(&uartHandle);
+}
 /**
   * @brief  This function is executed in case of error occurrence.
   * @param  None
