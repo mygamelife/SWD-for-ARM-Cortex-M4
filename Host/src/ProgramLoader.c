@@ -459,7 +459,7 @@ void hostInterpreter(Tlv_Session *session) {
         }
       }
 
-      else if(verifyTlvPacket(response)) {
+      if(verifyTlvPacket(response)) {
         elapsedTime = 0;
         #if !defined (TEST)
         displayTlvData(response); 

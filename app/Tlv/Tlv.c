@@ -180,10 +180,10 @@ void tlvReceiveService(Tlv_Session *session) {
           session->dataReceiveFlag = FLAG_SET;
         }
       } else  {
-        counter = 0;
-        session->timeOutFlag = true;
-        session->dataReceiveFlag = FLAG_CLEAR;
-        session->receiveState = TLV_RECEIVE_TYPE;
+        //counter = 0;
+        //session->timeOutFlag = true;
+        //session->dataReceiveFlag = FLAG_CLEAR;
+        //session->receiveState = TLV_RECEIVE_TYPE;
       }
       break;  
   }
