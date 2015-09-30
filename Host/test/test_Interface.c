@@ -157,7 +157,7 @@ void test_userErase_should_get_erase_bank_1_option(void)
   User_Session *session = InterpreteCommand(str);
   
   TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->tlvCommand);
-  TEST_ASSERT_EQUAL(BANK_1, *(session->data));
+  TEST_ASSERT_EQUAL(BANK_1, session->address);
 }
 
 void test_userErase_should_get_erase_bank_2_option(void)
@@ -166,7 +166,7 @@ void test_userErase_should_get_erase_bank_2_option(void)
   User_Session *session = InterpreteCommand(str);
   
   TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->tlvCommand);
-  TEST_ASSERT_EQUAL(BANK_2, *(session->data));
+  TEST_ASSERT_EQUAL(BANK_2, session->address);
 }
 
 void test_userErase_should_get_erase_full_option(void)
@@ -175,7 +175,7 @@ void test_userErase_should_get_erase_full_option(void)
   User_Session *session = InterpreteCommand(str);
   
   TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->tlvCommand);
-  TEST_ASSERT_EQUAL(BOTH_BANK, *(session->data));
+  TEST_ASSERT_EQUAL(BOTH_BANK, session->address);
 }
 
 void test_userErase_should_throw_error(void)

@@ -50,66 +50,6 @@ void test_requestStubCopy_should_write_into_STUB_flashAddress_sramAddress_and_si
   requestStubCopy(0x20000000, 0x08000000, 248); 
 }
 
-void test_IsSvcBusy_read_svc_R0_register_and_should_return_1(void)
-{
-  mspAddress = 0xabcdabcd;
-  
-  readCoreRegister_Ignore();
-  memoryReadAndReturnWord_ExpectAndReturn(mspAddress, 0x0); //R0
-  
-  TEST_ASSERT_EQUAL(1, IsSvcBusy());
-}
-
-void test_requestSramAddress_should_send_SVC_REQUEST_SRAM_ADDRESS(void)
-{
-  mspAddress = 0xabcdabcd;
-  
-  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_SRAM_ADDRESS, NO_ERROR); //R0
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  
-  requestSramAddress();
-}
-
-void test_requestCopy_should_send_SVC_REQUEST_COPY(void)
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
-  
-  mspAddress = 0xabcdabcd;
-  
-  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_COPY, NO_ERROR);  //R0
-  memoryWriteWord_ExpectAndReturn(mspAddress + 4, 0x20000008, NO_ERROR);    //R1
-  memoryWriteWord_ExpectAndReturn(mspAddress + 8, 0x08001000, NO_ERROR);    //R2
-  memoryWriteWord_ExpectAndReturn(mspAddress + 12, 2048, NO_ERROR);         //R3
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  
-  requestCopy(session, 0x20000008, 0x08001000, 2048);
-}
-
-void test_requestErase_should_send_SVC_REQUEST_ERASE(void)
-{
-  mspAddress = 0xabcdabcd;
-  
-  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_ERASE, NO_ERROR); //R0
-  memoryWriteWord_ExpectAndReturn(mspAddress + 4, 0x08001000, NO_ERROR);    //R1
-  memoryWriteWord_ExpectAndReturn(mspAddress + 8, 2048, NO_ERROR);          //R2
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  
-  requestErase(0x08001000, 2048);
-}
-
-void test_requestMassErase_should_send_SVC_REQUEST_MASS_ERASE(void)
-{
-  mspAddress = 0xabcdabcd;
-  
-  memoryWriteWord_ExpectAndReturn(mspAddress, SVC_REQUEST_MASS_ERASE, NO_ERROR);   //R0
-  memoryWriteWord_ExpectAndReturn(mspAddress + 4, FLASH_BANK_BOTH, NO_ERROR); //R1
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  
-  requestMassErase(FLASH_BANK_BOTH);
-}
-
 void test_writeTargetRegister_given_register_address_and_data(void)
 {
   UART_HandleTypeDef uartHandler;
@@ -986,11 +926,8 @@ void test_writeTargetFlash_should_copy_from_sram_to_flash_by_sending_request_cop
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  session->pFlashState = COPY_TO_FLASH;
-  mspAddress = 0xaaaaaaaa;
-  
   uint32_t dataAddress[] = {0x11111111, 0x22222222, 0x33333333, 0x44444444};
-  
+  session->pFlashState = COPY_TO_FLASH;
   /* Stub status is OK */
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
   
@@ -1008,6 +945,64 @@ void test_writeTargetFlash_should_copy_from_sram_to_flash_by_sending_request_cop
   TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
   TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
   TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
+}
+
+void test_writeTargetFlash_should_copy_data_into_sram_and_request_stub_copy(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t dataAddress[] = {0xaaaaaaaa, 0xbbbbbbbb, 0xcccccccc, 0xdddddddd};
+  
+  memoryWriteWord_ExpectAndReturn(0x20005000, 0xaaaaaaaa, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20005004, 0xbbbbbbbb, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20005008, 0xcccccccc, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x2000500C, 0xdddddddd, NO_ERROR);
+  
+  writeTargetFlash(session, dataAddress, 0x08001000, 16);
+  
+  TEST_ASSERT_EQUAL(COPY_TO_FLASH, session->pFlashState);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  
+  /* Request stub copy */
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08001000, NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 16, NO_ERROR);                   //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, NO_ERROR);         //Set Stub Instruction
+  
+  writeTargetFlash(session, dataAddress, 0x08001000, 16);
+  
+  TEST_ASSERT_EQUAL(WRITE_TO_RAM, session->pFlashState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
+
+void test_eraseTargetFlash_should_erase_target_flash_by_given_address_and_size(void)
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);     //Set flash Address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 20000, NO_ERROR);               //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, NO_ERROR);      //Set Stub Instruction
+  
+  eraseTargetFlash(session, 0x08000000, 20000);
+  
+  TEST_ASSERT_EQUAL(WAIT_OPERATION_COMPLETE, session->pEraseState);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  
+  eraseTargetFlash(session, 0x08000000, 20000);
+  
+  TEST_ASSERT_EQUAL(REQUEST_ERASE, session->pEraseState);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
 }
 
 void test_probeTaskManager_given_flash_command_should_run_writeTargetFlash(void)

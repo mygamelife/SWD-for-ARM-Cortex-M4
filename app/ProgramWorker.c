@@ -1,8 +1,5 @@
 #include "ProgramWorker.h"
 
-/* SVC mspAddress contain R0, R1, R2, R3 */
-uint32_t mspAddress;
-
 /* temp SRAM address 0x20005000 */
 uint32_t tempAddress = 0x20005000;
 
@@ -81,69 +78,6 @@ void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size) {
 
 	/* load copy instructoin into sram */
   memoryWriteWord((uint32_t)&STUB->instruction, STUB_COPY);
-}
-
-/** IsSvcBusy whether is svc is doing others work
-  *
-  * Input  : session contain a element/handler used by tlv protocol
-  */
-int IsSvcBusy(void) {
-  
-  if(mspAddress == 0) 
-    readCoreRegister(CORE_REG_R0, &mspAddress);
-  
-  /* Read svc R0 is 0 means svc is ready and waiting
-     instruction */
-  if(memoryReadAndReturnWord(mspAddress) == 0)  
-    return 1;
-
-  else return 0;
-}
-
-/** requestSramAddress is a function to send svc request
-  * to target to perform specific task
-  *
-  * input   : svcRequest is a request value to tell target to do
-  *           some specific task
-  *
-  * output  : NONE
-  */
-void requestSramAddress(void) {
-  
-  memoryWriteWord(mspAddress, SVC_REQUEST_SRAM_ADDRESS); //R0
-  
-  setCoreMode(CORE_DEBUG_MODE);
-}
-
-void requestCopy(Tlv_Session *session, uint32_t src, uint32_t dest, int size) {
-  
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  memoryWriteWord(mspAddress, SVC_REQUEST_COPY);  //R0
-  memoryWriteWord(mspAddress + 4, src);           //R1
-  memoryWriteWord(mspAddress + 8, dest);          //R2
-  memoryWriteWord(mspAddress + 12, size);         //R3
-
-  setCoreMode(CORE_DEBUG_MODE);
-  
-  tlvSend(session, tlv);
-}
-
-void requestErase(uint32_t address, int size) {
-  
-  memoryWriteWord(mspAddress, SVC_REQUEST_ERASE); //R0
-  memoryWriteWord(mspAddress + 4, address); //R1
-  memoryWriteWord(mspAddress + 8, size); //R2
-
-  setCoreMode(CORE_DEBUG_MODE);
-}
-
-void requestMassErase(uint32_t bankSelect) {
-  
-  memoryWriteWord(mspAddress, SVC_REQUEST_MASS_ERASE); //R0
-  memoryWriteWord(mspAddress + 4, bankSelect); //R1
-
-  setCoreMode(CORE_DEBUG_MODE);
 }
 
 /** writeTargetRegister is a function to write value into target register using swd

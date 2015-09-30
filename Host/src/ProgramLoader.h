@@ -25,8 +25,10 @@ void tlvLoadToRam(Tlv_Session *session, char *file);
 void tlvLoadToFlash(Tlv_Session *session, char *file);
 
 /* Flash Erase */
-void tlvFlashErase(Tlv_Session *session, uint32_t address, int size);
-void tlvFlashMassErase(Tlv_Session *session, uint32_t banks);
+void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
+void tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size);
+void tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks);
+void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 
 /* Read Memory */
 void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
@@ -50,8 +52,6 @@ void tlvHardReset(Tlv_Session *session);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
-int isLastOperationDone(Tlv_Session *session);
-
-// #define tlvLoadToRam(session, file)   tlvLoadProgram(session, file, TLV_WRITE_RAM)
+void isLastOperationDone(Tlv_Session *session);
 
 #endif // ProgramLoader_H
