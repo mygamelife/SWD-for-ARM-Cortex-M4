@@ -3,7 +3,7 @@
 
 int main(void) {
   CEXCEPTION_T err;
-  
+  HANDLE hSerial;
   Tlv_Session *session = tlvCreateSession();
   
   displayOptionMenu();
@@ -20,7 +20,7 @@ int main(void) {
   }
   
   printf("Closing port\n");
-  HANDLE hSerial = (HANDLE)session->handler;
+  hSerial = (HANDLE)session->handler;
   closeSerialPort(hSerial);
 
   return 0;

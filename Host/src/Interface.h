@@ -101,6 +101,8 @@ User_Session *InterpreteCommand(String *userInput);
 int getRegisterAddress(char *name);
 int getFlashBank(char *name);
 void displayTlvData(Tlv *tlv);
+void displayMemoryMap(uint8_t *data, int length);
+void displayFourByteInRow(uint8_t *data);
 void helpMenu(String *userInput);
 void helpCommand(Command_Code ccode);
 Command_Code getCommandCode(char *commandName);

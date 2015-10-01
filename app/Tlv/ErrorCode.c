@@ -7,10 +7,10 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case TLV_TIME_OUT                   : printf("Err : Host time out                               \n"); break;
     case TLV_CORRUPTED_DATA             : printf("Err : Host received data corrupted                \n"); break;
     case TLV_INVALID_COMMAND            : printf("Err : Host received invalid command               \n"); break;
+    case TLV_CHECKSUM_ERROR             : printf("Err : Host received checksum error                \n"); break;
     /* ################################### Debug features error ############################################*/
     case TLV_NOT_RUNNING                : printf("Err : Run command not responding                  \n"); break;
     case TLV_NOT_HALTED                 : printf("Err : Halt command not responding                 \n"); break;
-    case TLV_CHECKSUM_ERROR             : printf("Err : Host received checksum error                \n"); break;
     case TLV_NOT_STEPPED                : printf("Err : Step command not responding                 \n"); break;
     case TLV_NOT_STEPOVER               : printf("Err : Step over command cant be completed         \n"); break;
     case TLV_BKPT_NOTHIT                : printf("Err : None of the breakpoint hit                  \n"); break;

@@ -197,3 +197,20 @@ void test_userReset_should_get_reset_option(void)
   
   TEST_ASSERT_EQUAL(TLV_HARD_RESET, session->tlvCommand);
 }
+
+void test_displayMemoryMap_given_address_and_value(void)
+{
+  uint32_t data[] = {0x08000000, 
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd};
+  
+  displayMemoryMap((uint8_t *)data, 164);
+}

@@ -154,9 +154,15 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
       }
       
       tlvWriteTargetMemory(session, &isr->dataAddress, &isr->destAddress, &isr->size, memorySelect);
-      if(isr->size <= 0) session->loadProgramState = TLV_LOAD_TEXT;
+      if(isr->size <= 0) session->loadProgramState = TLV_LOAD_INIT_ARRAY;
     break;
-      
+    
+    case TLV_LOAD_INIT_ARRAY :
+      printf("TLV_LOAD_INIT_ARRAY size %d\n", initArray->size);
+      tlvWriteTargetMemory(session, &initArray->dataAddress, &initArray->destAddress, &initArray->size, memorySelect);
+      if(initArray->size <= 0) session->loadProgramState = TLV_LOAD_TEXT;
+    break;
+    
     case TLV_LOAD_TEXT :
       tlvWriteTargetMemory(session, &text->dataAddress, &text->destAddress, &text->size, memorySelect);
       

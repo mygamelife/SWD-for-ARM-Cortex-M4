@@ -41,7 +41,7 @@ int getElapsedTime(void) {
   
   // printf("elapsedTime %fms\n", elapsedTime);
   
-  if(elapsedTime > 50) {
+  if(elapsedTime > 10) {
     elapsedTime = 0;
     return 1;
   }

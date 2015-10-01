@@ -12,31 +12,39 @@ void displayOptionMenu(void)  {
   printf("See 'help' or 'help <command>' to read about a specific user command\n\n");
 }
 
+void displayFourByteInRow(uint8_t *data) {
+  int i;
+  
+  for(i = 0; i < 16; i += 4)
+    printf(" 0x%08x", get4Byte(&data[i]));
+}
+
+void displayMemoryMap(uint8_t *data, int length) {
+  int row, col, rowLength, index = 4;
+  uint32_t address = 0;
+  
+  rowLength = ((length / 4) - 1)/ 5 + 1;
+  address = get4Byte(&data[0]);
+  
+  for(row = 0; row < rowLength; row ++)  {
+    printf("> 0x%08x", address); address += 4;
+    if(length > 4) {
+      displayFourByteInRow(&data[index]);
+      index += 16;      
+    }
+    printf("\n");
+  }
+  printf("\n");
+}
+
 void displayTlvData(Tlv *tlv)  {
   int i, length = 0, counter = 0;
   length = tlv->length;
   
-  if(length == 5) {
-    printf("> Value : %x\n\n", get4Byte(&tlv->value[0]));
-  } else if(length > 5)  {
-    printf("> Address %x\n", get4Byte(&tlv->value[0]));
-    for(i = 4; i < length - 1; i += 4)  {
-
-      if(counter == 4) {
-        counter = 0;
-        printf("\n");
-      }
-      if(get4Byte(&tlv->value[i]) == 0) {
-        printf("  00000000 ", get4Byte(&tlv->value[i]));
-      }
-      else {
-        printf("  %x ", get4Byte(&tlv->value[i]));
-      }
-      counter++;
-    }
-    printf("\n\n");
-  }
-  else printf("> OK\n\n");
+  // if(length == 1) 
+    // printf("> OK\n\n");
+  // else 
+    displayMemoryMap(tlv->value, length - 1);
 }
 
 /** getRegisterAddress is a function to get user Input
