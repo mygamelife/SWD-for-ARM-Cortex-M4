@@ -43,9 +43,9 @@ HANDLE uartInit(void) {
   // The interval 
   timeouts.ReadIntervalTimeout = 10;
   timeouts.ReadTotalTimeoutConstant = 10;
-  timeouts.ReadTotalTimeoutMultiplier = 20;
-  timeouts.WriteTotalTimeoutConstant = 20;
-  timeouts.WriteTotalTimeoutMultiplier = 20;
+  timeouts.ReadTotalTimeoutMultiplier = 10;
+  timeouts.WriteTotalTimeoutConstant = 10;
+  timeouts.WriteTotalTimeoutMultiplier = 10;
   if(!SetCommTimeouts(hSerial, &timeouts)){
     //handle error
      DWORD errId = GetLastError();

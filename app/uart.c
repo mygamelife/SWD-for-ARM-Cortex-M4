@@ -89,6 +89,9 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
   uartReady = SET;
 }
 
+void HAL_USART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
+	__HAL_UART_FLUSH_DRREGISTER(&uartHandle);
+}
 /**
   * @brief  This function is executed in case of error occurrence.
   * @param  None
