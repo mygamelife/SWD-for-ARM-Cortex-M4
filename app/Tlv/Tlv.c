@@ -108,13 +108,13 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
 void tlvSendService(Tlv_Session *session)	{
   int length = 0;
   
-  switch(session->sendState)  {
+  switch(session->sendState) {
     case TLV_SEND_BEGIN :
       if(session->dataSendFlag == true) {
-        if(uartReady)  {
+        if(uartReady) {
           length = session->txBuffer[1] + 2;
           sendBytes(session->handler, session->txBuffer, length);
-          session->dataSendFlag = false;
+          session->dataSendFlag = FLAG_CLEAR;
           
           #if !defined (HOST)
           uartReady = 0;
@@ -124,7 +124,6 @@ void tlvSendService(Tlv_Session *session)	{
       break;
   }
 }
-// #endif
 
 /** tlvReceive is a function to receive tlv packet
   *
@@ -180,10 +179,10 @@ void tlvReceiveService(Tlv_Session *session) {
           session->dataReceiveFlag = FLAG_SET;
         }
       } else  {
-        //counter = 0;
-        //session->timeOutFlag = true;
-        //session->dataReceiveFlag = FLAG_CLEAR;
-        //session->receiveState = TLV_RECEIVE_TYPE;
+        counter = 0;
+        session->timeOutFlag = true;
+        session->dataReceiveFlag = FLAG_CLEAR;
+        session->receiveState = TLV_RECEIVE_TYPE;
       }
       break;  
   }

@@ -9,7 +9,7 @@
 #include "ErrorCode.h"
 
 ElfData *elfData;
-ElfSection *isr, *text;
+ElfSection *isr, *text, *initArray;
 uint32_t entryAddress = 0;
 int fileStatus = FILE_CLOSED;
 
@@ -638,6 +638,7 @@ void getElfSection(char *elfFile) {
   elfData = openElfFile(elfFile);
   isr     = getElfSectionInfo(elfData, ".isr_vector");
   text    = getElfSectionInfo(elfData, ".text");
+  initArray = getElfSectionInfo(elfData, ".init_array");
 
   entryAddress = (*(uint32_t *)(&isr->dataAddress[4]));
   // programSize = isr->size + text->size;
@@ -678,6 +679,7 @@ void closeElfSection(ElfSection *elfSection) {
 void closeElfFile(void) {
   closeElfSection(isr);
   closeElfSection(text);
+  closeElfSection(initArray);
   closeElfData(elfData);
   
   fileStatus = FILE_CLOSED;

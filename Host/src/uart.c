@@ -56,16 +56,18 @@ HANDLE uartInit(void) {
 
 /* Uart Transmit Function */
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
-  DWORD dwBytesRead = 0;
+  DWORD dwBytesWrite = 0;
   HANDLE *hSerial = (HANDLE *)handler;
   // printf("after typecast\n");
-  if(!WriteFile(hSerial, txBuffer, length, &dwBytesRead, NULL)){
+  if(!WriteFile(hSerial, txBuffer, length, &dwBytesWrite, NULL)){
     DWORD errId = GetLastError();
     printf("WriteFile Error: %d\n", errId);
     // printLastError();
     return UART_ERROR;
 	}
-  if(dwBytesRead != 0) {
+  if(dwBytesWrite != 0) {
+    printf("%d Bytes is Sucessfully Sent!\n", dwBytesWrite);
+    printf("address %x!\n", (*(uint32_t *)(&txBuffer[2])));
     return UART_OK;
   }
   else return UART_ERROR;
