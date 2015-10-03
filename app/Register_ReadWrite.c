@@ -148,10 +148,10 @@ int memoryReadWord(uint32_t address, uint32_t *dataRead)
 	int parity = 0 , status = 0;
 	
 	if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
-	  {
-	    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE));
-	    cswDataSize = CSW_WORD_SIZE;
-	  }
+	{
+	   swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	   cswDataSize = CSW_WORD_SIZE;
+	}
 
 	swdWriteAP(TAR_REG, address);
 	swdReadAP(DRW_REG, dataRead);

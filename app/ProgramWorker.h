@@ -61,5 +61,12 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
 void stopAllFlashPatchRemapping(Tlv_Session *session);
                    
 void checkBreakpointEvent(Tlv_Session *session);
-void checkWatchpointEvent(Tlv_Session *session);   
+void checkWatchpointEvent(Tlv_Session *session);
+
+typedef enum {
+  SET_CSW_VALUE = 1,
+  WRITE_ADDRESS,
+  READ_VALUE,
+} Test_State;
+void testing(Test_State *state);
 #endif // ProgramWorker_H

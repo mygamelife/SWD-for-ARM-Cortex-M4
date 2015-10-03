@@ -2,7 +2,8 @@
 
 UART_HandleTypeDef uartHandle;
 
-__IO ITStatus uartReady = SET;
+__IO ITStatus uartTxReady = SET;
+__IO ITStatus uartRxReady = SET;
 
 /**  initUart is a function to configure the UART peripheral
   *
@@ -39,15 +40,21 @@ UART_HandleTypeDef *uartInit(void) {
 /* Uart Transmit Function */
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
   UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
-  
+  turnOnLED3();
   return HAL_UART_Transmit_IT(uartHandle, txBuffer, length);
 }
 
 /* Uart Receive Function */
-uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
+uint8_t getByte(void *handler, uint8_t *rxBuffer) {
   UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
-  
-  return HAL_UART_Receive(uartHandle, rxBuffer, length, 20);
+  turnOnLED3();
+  return HAL_UART_Receive(uartHandle, rxBuffer, 1, 20);
+}
+
+uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
+  UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
+  turnOnLED3();
+  return HAL_UART_Receive_IT(uartHandle, rxBuffer, length);
 }
 
 void HAL_UART_MspInit(UART_HandleTypeDef *huart)
@@ -86,11 +93,20 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   /* Set transmission flag: transfer complete*/
-  uartReady = SET;
+  uartTxReady = SET;
+  turnOffLED3();
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
+{
+  /* Set transmission flag: transfer complete*/
+  uartRxReady = SET;
+  turnOffLED3();
 }
 
 void HAL_USART_ErrorCallback(UART_HandleTypeDef *UartHandle) {
-	__HAL_UART_FLUSH_DRREGISTER(&uartHandle);
+  turnOnLED4();
+  while(1) {}
 }
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -12,7 +12,8 @@
 
 #if !defined(TEST)
 #define __IO volatile
-extern __IO ITStatus uartReady;
+extern __IO ITStatus uartTxReady;
+extern __IO ITStatus uartRxReady;
 #endif
 
 #define FIVE_SEC    5000
@@ -21,7 +22,7 @@ extern __IO ITStatus uartReady;
 /* Definition for USARTx clock resources */
 #define UART_PORT                        USART1
 /* USARTx Baud Rate */
-#define UART_BAUD_RATE                   128000
+#define UART_BAUD_RATE                   128000//9600
 
 #define USARTx_CLK_ENABLE()              __HAL_RCC_USART1_CLK_ENABLE();
 #define USARTx_RX_GPIO_CLK_ENABLE()      __HAL_RCC_GPIOA_CLK_ENABLE()
@@ -50,7 +51,7 @@ void uartErrorHandler(void);
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length);
 
 /* Uart Receive Function */
-#define getByte(handler, rxBuffer)  getBytes(handler, rxBuffer, 1)
+uint8_t getByte(void *handler, uint8_t *rxBuffer);
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
 
 #endif // uart_H

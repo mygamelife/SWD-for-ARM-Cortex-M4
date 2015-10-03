@@ -44,8 +44,8 @@ HANDLE uartInit(void) {
   timeouts.ReadIntervalTimeout = 10;
   timeouts.ReadTotalTimeoutConstant = 10;
   timeouts.ReadTotalTimeoutMultiplier = 10;
-  timeouts.WriteTotalTimeoutConstant = 10;
-  timeouts.WriteTotalTimeoutMultiplier = 10;
+  timeouts.WriteTotalTimeoutConstant = 30;
+  timeouts.WriteTotalTimeoutMultiplier = 30;
   if(!SetCommTimeouts(hSerial, &timeouts)){
     //handle error
      DWORD errId = GetLastError();
@@ -58,7 +58,7 @@ HANDLE uartInit(void) {
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
   DWORD dwBytesWrite = 0;
   HANDLE *hSerial = (HANDLE *)handler;
-  // printf("after typecast\n");
+
   if(!WriteFile(hSerial, txBuffer, length, &dwBytesWrite, NULL)){
     DWORD errId = GetLastError();
     printf("WriteFile Error: %d\n", errId);
@@ -85,6 +85,7 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
     return UART_ERROR;
   }
   if(dwBytesRead != 0) {
+    // printf("Byte is Received!\n");
     return UART_OK;  
   }
   else return UART_ERROR;

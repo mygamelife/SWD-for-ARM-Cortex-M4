@@ -1,7 +1,8 @@
 #include "Tlv.h"
 
 #if defined (TEST) || defined (HOST)
-int uartReady = 1;
+int uartTxReady = 1;
+int uartRxReady = 1;
 #endif
 
 /** tlvCreateSession is a function to create necessary element needed by TLV protocol */
@@ -111,13 +112,13 @@ void tlvSendService(Tlv_Session *session)	{
   switch(session->sendState) {
     case TLV_SEND_BEGIN :
       if(session->dataSendFlag == true) {
-        if(uartReady) {
+        if(uartTxReady) {
           length = session->txBuffer[1] + 2;
           sendBytes(session->handler, session->txBuffer, length);
           session->dataSendFlag = FLAG_CLEAR;
           
           #if !defined (HOST)
-          uartReady = 0;
+          uartTxReady = 0;
           #endif
         }
       }
@@ -155,35 +156,29 @@ Tlv *tlvReceive(Tlv_Session *session) {
   * return  : NONE
   */
 void tlvReceiveService(Tlv_Session *session) {
-  static int length = 0, counter = 0;
 
   switch(session->receiveState)  {
     case TLV_RECEIVE_TYPE :
-      if(!getByte(session->handler, session->rxBuffer)) {
-        session->receiveState = TLV_RECEIVE_LENGTH;
+    	if(!getByte(session->handler, &session->rxBuffer[0])) {
+    		session->receiveState = TLV_RECEIVE_LENGTH;
       }
       break;
     
     case TLV_RECEIVE_LENGTH :
       if(!getByte(session->handler, &session->rxBuffer[1]))  {
-        length = session->rxBuffer[1];
+        #if !defined (HOST)
+        uartRxReady = 0;
+        #endif
+        getBytes(session->handler, &session->rxBuffer[2], session->rxBuffer[1]);
         session->receiveState = TLV_RECEIVE_VALUE;
       }
       break;
       
     case TLV_RECEIVE_VALUE :
-      if(!getByte(session->handler, &session->rxBuffer[2 + counter]))  {
-        if(++counter == length) {
-          length = 0; counter = 0;
-          session->receiveState = TLV_RECEIVE_TYPE;
-          session->dataReceiveFlag = FLAG_SET;
-        }
-      } else  {
-        counter = 0;
-        session->timeOutFlag = true;
-        session->dataReceiveFlag = FLAG_CLEAR;
+    	if(uartRxReady) {
+        session->dataReceiveFlag = FLAG_SET;
         session->receiveState = TLV_RECEIVE_TYPE;
-      }
+    	}
       break;  
   }
 }

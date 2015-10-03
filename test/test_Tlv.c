@@ -97,7 +97,7 @@ void test_tlvSendService_should_change_state_after_tlvSend_and_do_nothing_after_
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   session.sendState = TLV_SEND_BEGIN;
-  uartReady = SET;
+  uartTxReady = SET;
   tlvSend(&session, tlv);
   
   sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
@@ -108,7 +108,7 @@ void test_tlvSendService_should_change_state_after_tlvSend_and_do_nothing_after_
 
 void test_tlvSendService_should_not_send_when_uartReady_is_not_SET(void)
 { 
-  uartReady = RESET;
+  uartTxReady = RESET;
   Tlv_Session session;
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
@@ -176,7 +176,7 @@ void test_tlvReceiveService_should_receive_type_at_the_first_state(void)
   session.rxBuffer[0] = TLV_WRITE_RAM;
   
   /* Received Type */
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 1, 0x00); //data arrive
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[0], 0x00); //data arrive
   
   tlvReceiveService(&session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_LENGTH, session.receiveState);
@@ -184,29 +184,36 @@ void test_tlvReceiveService_should_receive_type_at_the_first_state(void)
   TEST_ASSERT_EQUAL(TLV_WRITE_RAM, session.rxBuffer[0]);
 }
 
-void test_tlvReceiveService_should_receive_length_at_the_second_state(void)
+void test_tlvReceiveService_should_receive_value_after_length(void)
 {
   Tlv_Session session;
   
   session.receiveState = TLV_RECEIVE_LENGTH;
   session.dataReceiveFlag = false;
   
+  session.rxBuffer[0] = TLV_WRITE_RAM;
   session.rxBuffer[1] = 5;
+  session.rxBuffer[2] = 0xA;
+  session.rxBuffer[3] = 0xB;
+  session.rxBuffer[4] = 0xC;
+  session.rxBuffer[5] = 0xD;
+  session.rxBuffer[6] = 0xF; //dummy chksum
+  
+  /* Received Type */
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[1], 0x00); //data arrive
   
   /* Received Length */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[1], 1, 0x00); //data arrive
+  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00); //receive 5 data
   
   tlvReceiveService(&session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session.receiveState);
-  TEST_ASSERT_EQUAL(false, session.dataReceiveFlag);
-  TEST_ASSERT_EQUAL(TLV_WRITE_RAM, session.rxBuffer[0]);
 }
 
-void test_tlvReceiveService_should_receive_value_at_the_third_state(void)
+void test_tlvReceiveService_should_type_length_and_value(void)
 {
   Tlv_Session session;
   
-  session.receiveState = TLV_RECEIVE_VALUE;
+  session.receiveState = TLV_RECEIVE_TYPE;
   session.dataReceiveFlag = false;
   
   session.rxBuffer[0] = TLV_WRITE_RAM;
@@ -217,51 +224,44 @@ void test_tlvReceiveService_should_receive_value_at_the_third_state(void)
   session.rxBuffer[5] = 0xDE;
   session.rxBuffer[6] = 0x8B;//chksum
   
-  /* Received Value */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 1, 0x00); //data arrive
+  /* Received Type */
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[0], 0x00); //received type
+  tlvReceiveService(&session);
+  TEST_ASSERT_EQUAL(TLV_RECEIVE_LENGTH, session.receiveState);
+  
+  /* Received Length */
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[1], 0x00); //received length
+  /* Received value */
+  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00); //received value (interrupt)
   tlvReceiveService(&session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session.receiveState);
-  
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[3], 1, 0x00); //data arrive
-  tlvReceiveService(&session);
-  TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session.receiveState);
-  
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[4], 1, 0x00); //data arrive
-  tlvReceiveService(&session);
-  TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session.receiveState);
-  
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[5], 1, 0x00); //data arrive
-  tlvReceiveService(&session);
-  TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session.receiveState);
-  
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[6], 1, 0x00); //data arrive
+
+  uartRxReady = 1;
   tlvReceiveService(&session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session.receiveState);
   TEST_ASSERT_EQUAL(true, session.dataReceiveFlag);
 }
 
-void test_tlvReceiveService_should_set_time_out_flag_if_no_data_arrive_after_first_2_byte(void)
-{
-  Tlv_Session session;
+// void test_tlvReceiveService_should_set_time_out_flag_if_no_data_arrive_after_first_2_byte(void)
+// {
+  // Tlv_Session session;
   
-  session.receiveState = TLV_RECEIVE_VALUE;
-  session.dataReceiveFlag = false;
+  // session.receiveState = TLV_RECEIVE_VALUE;
+  // session.dataReceiveFlag = false;
   
-  session.rxBuffer[0] = TLV_WRITE_RAM;
-  session.rxBuffer[1] = 5;
-  session.rxBuffer[2] = 0xEF;
-  session.rxBuffer[3] = 0xBE;
-  session.rxBuffer[4] = 0xAD;
-  session.rxBuffer[5] = 0xDE;
-  session.rxBuffer[6] = 0x8B;//chksum
+  // session.rxBuffer[0] = TLV_WRITE_RAM;
+  // session.rxBuffer[1] = 5;
+  // session.rxBuffer[2] = 0xEF;
+  // session.rxBuffer[3] = 0xBE;
+  // session.rxBuffer[4] = 0xAD;
+  // session.rxBuffer[5] = 0xDE;
+  // session.rxBuffer[6] = 0x8B;//chksum
   
-  /* Received Value */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 1, 0x01); //data arrive
-  tlvReceiveService(&session);
-  TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session.receiveState);
-  TEST_ASSERT_EQUAL(false, session.dataReceiveFlag);
-  TEST_ASSERT_EQUAL(true, session.timeOutFlag);
-}
+  // /* Received Value */
+  // tlvReceiveService(&session);
+  // TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session.receiveState);
+  // TEST_ASSERT_EQUAL(true, session.dataReceiveFlag);
+// }
 
 void test_tlvService_should_able_to_receive_while_sending(void)
 {
@@ -282,41 +282,29 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   session.rxBuffer[5] = 0xAA;
   session.rxBuffer[6] = 0xFF; //dummy chksum
   
-  uartReady = SET;
+  /* Send Packet */
+  uartTxReady = SET;
   sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
+  
   /* Received type */
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 1, 0x00);
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[0], 0x00);
   tlvService(&session);
+  uartTxReady = RESET;
+  
   TEST_ASSERT_EQUAL(TLV_RECEIVE_LENGTH, session.receiveState);
   
-  uartReady = RESET;
   /* Received length */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[1], 1, 0x00);
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[1], 0x00);
+  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00);
   tlvService(&session);
+  TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session.receiveState);
   
+  uartRxReady = SET;
   /* Received value */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 1, 0x00);
-  tlvService(&session);
-  
-  /* Received value */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[3], 1, 0x00);
-  tlvService(&session);
-  
-  /* Received value */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[4], 1, 0x00);
-  tlvService(&session);
-  
-  /* Received value */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[5], 1, 0x00);
-  tlvService(&session);
-
-  /* Received checksum */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[6], 1, 0x00);
   tlvService(&session);
   
   TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session.receiveState);
   TEST_ASSERT_EQUAL(true, session.dataReceiveFlag);
-  TEST_ASSERT_EQUAL(false, session.timeOutFlag);
 }
 
 void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
@@ -339,15 +327,17 @@ void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
   session.rxBuffer[5] = 0xAA;
   session.rxBuffer[6] = 0xFF; //dummy chksum
   
-  uartReady = RESET;
+  uartTxReady = RESET;
   /* Received type */
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 1, 0x00);
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[0], 0x00);
   tlvService(&session);
   
-  uartReady = SET;
+  uartTxReady = SET;
   sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
   /* Received length */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[1], 1, 0x00);
+  getByte_ExpectAndReturn(session.handler, &session.rxBuffer[1], 0x00);
+  /* Received Value */
+  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 5, 0x00);
   tlvService(&session);
   
   TEST_ASSERT_EQUAL(false, session.dataSendFlag);
@@ -355,40 +345,40 @@ void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
   TEST_ASSERT_EQUAL(false, session.timeOutFlag);
 }
 
-void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
-{
-  Tlv_Session session;
-  uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
+// void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
+// {
+  // Tlv_Session session;
+  // uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
   
-	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
-  tlvSend(&session, tlv);
-  session.sendState = TLV_SEND_BEGIN;
-  session.receiveState = TLV_RECEIVE_TYPE;
-  session.dataReceiveFlag = false;
-  session.timeOutFlag = false;
+	// Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
+  // tlvSend(&session, tlv);
+  // session.sendState = TLV_SEND_BEGIN;
+  // session.receiveState = TLV_RECEIVE_TYPE;
+  // session.dataReceiveFlag = false;
+  // session.timeOutFlag = false;
   
-  session.rxBuffer[0] = TLV_WRITE_RAM;
-  session.rxBuffer[1] = 5;
+  // session.rxBuffer[0] = TLV_WRITE_RAM;
+  // session.rxBuffer[1] = 5;
   
-  uartReady = SET;
-  sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
-  /* Received Type */
-  getBytes_ExpectAndReturn(session.handler, session.rxBuffer, 1, 0x00);
-  tlvService(&session);
+  // uartTxReady = SET;
+  // sendBytes_ExpectAndReturn(session.handler, session.txBuffer, tlv->length + 2, 0x00);
+  // /* Received Type */
+  // getByte_ExpectAndReturn(session.handler, session.rxBuffer, 0x00);
+  // tlvService(&session);
   
-  uartReady = RESET;
-  /* Received length */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[1], 1, 0x00);
-  tlvService(&session);
+  // uartTxReady = RESET;
+  // /* Received length */
+  // getByte_ExpectAndReturn(session.handler, &session.rxBuffer[1], 1, 0x00);
+  // tlvService(&session);
   
-  /* Received length */
-  getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 1, 0x01);
-  tlvService(&session);
+  // /* Received length */
+  // getBytes_ExpectAndReturn(session.handler, &session.rxBuffer[2], 1, 0x01);
+  // tlvService(&session);
   
-  TEST_ASSERT_EQUAL(false, session.dataSendFlag);
-  TEST_ASSERT_EQUAL(false, session.dataReceiveFlag);
-  TEST_ASSERT_EQUAL(true, session.timeOutFlag);
-}
+  // TEST_ASSERT_EQUAL(false, session.dataSendFlag);
+  // TEST_ASSERT_EQUAL(false, session.dataReceiveFlag);
+  // TEST_ASSERT_EQUAL(true, session.timeOutFlag);
+// }
 
 void test_verifyTlvData_should_verify_the_data_in_the_given_tlv_packet(void)
 {
