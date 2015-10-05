@@ -114,6 +114,32 @@ void readTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   tlvSend(session, tlv);
 }
 
+/** readAllTargetRegister is a function to read value from all target register using swd
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void readAllTargetRegister(Tlv_Session *session)
+{
+  int i = 0 , j = 0;
+  uint32_t data[52] = {} ;
+  
+  for (i = 0 ; i < 20 ; i ++)
+    readCoreRegister(i,&(data[i]));
+  
+  readCoreRegister(CORE_REG_FPSCR,&(data[i]));
+  
+  for(j = 33 ; j < 96 ; j++)
+  {
+    i++ ;
+    readCoreRegister(j,&(data[i]));
+  }
+  
+  Tlv *tlv = tlvCreatePacket(TLV_OK, (4*52), (uint8_t *)&data);
+  
+  tlvSend(session,tlv);
+}
+
 /** Perform a soft reset on the target device
   *
   * Input     : session contain a element/handler used by tlv protocol

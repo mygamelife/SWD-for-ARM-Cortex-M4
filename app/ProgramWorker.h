@@ -33,6 +33,7 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size);
 /*############################################### Register ###############################################*/
 void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
 void readTargetRegister(Tlv_Session *session, uint32_t registerAddress);
+void readAllTargetRegister(Tlv_Session *session);
 
 /*############################################### Reset ###############################################*/
 void performSoftResetOnTarget(Tlv_Session *session);
