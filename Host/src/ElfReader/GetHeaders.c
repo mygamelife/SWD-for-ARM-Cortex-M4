@@ -9,9 +9,16 @@
 #include "ErrorCode.h"
 
 ElfData *elfData;
-ElfSection *isr, *text, *initArray;
 uint32_t entryAddress = 0;
 int fileStatus = FILE_CLOSED;
+
+/* Elf section needs to load */
+ElfSection *isr,
+           *text,
+           *data,
+           *roData,
+           *initArray,
+           *finiArray;
 
 /******************************************************************************
  * ELF Header
@@ -634,14 +641,16 @@ ElfSection *getElfSectionInfo(ElfData *elfData, char *section) {
 void getElfSection(char *elfFile) {
   
   fileStatus = FILE_OPENED;
+  elfData   = openElfFile(elfFile);
   
-  elfData = openElfFile(elfFile);
-  isr     = getElfSectionInfo(elfData, ".isr_vector");
-  text    = getElfSectionInfo(elfData, ".text");
+  isr       = getElfSectionInfo(elfData, ".isr_vector");
+  text      = getElfSectionInfo(elfData, ".text");
+  data      = getElfSectionInfo(elfData, ".data");
+  roData    = getElfSectionInfo(elfData, ".rodata");
   initArray = getElfSectionInfo(elfData, ".init_array");
+  finiArray = getElfSectionInfo(elfData, ".fini_array");
 
   entryAddress = (*(uint32_t *)(&isr->dataAddress[4]));
-  // programSize = isr->size + text->size;
 }
 
 int getProgramSize(char *elfFile) {
@@ -673,13 +682,17 @@ void closeElfData(ElfData *elfData) {
 void closeElfSection(ElfSection *elfSection) {
   if(elfSection != NULL) {
     free(elfSection);
+    elfSection = NULL;
   }
 }
 
 void closeElfFile(void) {
   closeElfSection(isr);
   closeElfSection(text);
+  closeElfSection(data);
+  closeElfSection(roData);
   closeElfSection(initArray);
+  closeElfSection(finiArray);
   closeElfData(elfData);
   
   fileStatus = FILE_CLOSED;

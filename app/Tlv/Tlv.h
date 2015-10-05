@@ -2,7 +2,8 @@
 #define Tlv_H
 
 #ifdef TEST
-extern int uartReady;
+extern int uartTxReady;
+extern int uartRxReady;
 #endif
 
 #include <stdio.h>

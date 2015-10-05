@@ -41,9 +41,9 @@ void displayTlvData(Tlv *tlv)  {
   int i, length = 0, counter = 0;
   length = tlv->length;
   
-  // if(length == 1) 
-    // printf("> OK\n\n");
-  // else 
+  if(length == 1) 
+    printf("> OK\n\n");
+  else 
     displayMemoryMap(tlv->value, length - 1);
 }
 

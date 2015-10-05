@@ -179,7 +179,7 @@ void test_tlvLoadProgram_address_should_be_updated_after_call(void)
   tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
   tlvLoadProgram(session, "test/ELF_File/blinkLedx.elf", TLV_WRITE_FLASH);
   
-  TEST_ASSERT_EQUAL(TLV_LOAD_INIT_ARRAY, session->loadProgramState);
+  TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
   TEST_ASSERT_EQUAL_HEX32(0x200000F8, get4Byte(&session->txBuffer[2]));
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
   
@@ -263,6 +263,13 @@ void test_tlvLoadToRam_should_update_PC_and_run_the_program_after_finish_loading
   
   fileStatus = FILE_CLOSED;
   
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
+  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
@@ -394,6 +401,13 @@ void test_tlvLoadToFlash_should_load_actual_program_after_erase(void)
   tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
   tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
   tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
   
   TEST_ASSERT_EQUAL(TLV_UPDATE_PC, session->flashState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
@@ -458,6 +472,14 @@ void test_tlvLoadToFlash_should_erase_load_actual_program_update_pc_and_run_the_
   tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
   tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
   tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  
   TEST_ASSERT_EQUAL(TLV_UPDATE_PC, session->flashState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
   
@@ -598,7 +620,7 @@ void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(v
   /* ################## Sending last 248 bytes of ISR_VECTOR ################## */
   hostInterpreter(session);
   TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  TEST_ASSERT_EQUAL(TLV_LOAD_INIT_ARRAY, session->loadProgramState);
+  TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
   TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
   
   session->dataReceiveFlag = FLAG_SET;

@@ -20,9 +20,13 @@ int main(void)
 
   Tlv_Session *session = tlvCreateSession();
 
+  // Test_State state = SET_CSW_VALUE;
+
   while(1)
   {
     tlvService(session);
     probeTaskManager(session);
+    //testing(&state);
+    //checkBreakpointEvent(session);
   }
 }

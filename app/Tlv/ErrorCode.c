@@ -35,7 +35,8 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case ERR_INVALID_BANK_SELECTION     : printf("Err : Flash bank selection not found              \n"); break;
     case ERR_OPTION_NOT_FOUND           : printf("Err : Option not found                            \n"); break;
     case ERR_INVALID_COMMAND            : printf("Err : Command not found                           \n"); break;
-    
+    /* ######################################## Open file error #############################################*/
+    case ERR_FILE_NOT_EXIST             : printf("Err : File doesn't exit                           \n"); break;
     default                             : printf("Err : Undefine error code %d\n", err);                  break;
   }
 }

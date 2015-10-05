@@ -467,8 +467,9 @@ void checkWatchpointEvent(Tlv_Session *session)
   Tlv *tlv ;
   uint32_t pc =0 ;
   
-  if(!(hasDataWatchpointOccurred()))
-    return  ;
+  if(!(hasDataWatchpointOccurred())) {
+	  return;
+  }
   else
   {
     readCoreRegister(CORE_REG_PC, &pc);
@@ -685,3 +686,28 @@ void probeTaskManager(Tlv_Session *session)  {
     break;
   }
 }
+
+// void testing(Test_State *state) {
+	// uint32_t dataRead = 0;
+
+	// switch(*state) {
+		// case SET_CSW_VALUE :
+			// if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
+			// {
+			   // swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+			   // cswDataSize = CSW_WORD_SIZE;
+			// }
+			// *state = WRITE_ADDRESS;
+		// break;
+
+		// case WRITE_ADDRESS :
+			// swdWriteAP(TAR_REG, DFSR_REG);
+			// *state = READ_VALUE;
+		// break;
+
+		// case READ_VALUE :
+			// swdReadAP(DRW_REG, &dataRead);
+			// *state = WRITE_ADDRESS;
+		// break;
+	// }
+// }

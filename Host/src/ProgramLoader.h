@@ -9,6 +9,9 @@
 #include "Interface.h"
 #include "GetTime.h"
 
+// #define FLASH_PROGRAMMER_FILE_PATH    \
+        // "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/FlashProgrammer/Debug/bin/FlashProgrammer.elf"
+
 extern int programSize;
 
 /* Read/Write target register */
