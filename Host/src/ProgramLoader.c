@@ -154,33 +154,49 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
         session->ongoingProcessFlag = FLAG_SET;
       }
       tlvWriteTargetMemory(session, &isr->dataAddress, &isr->destAddress, &isr->size, memorySelect);
-      if(isr->size <= 0) session->loadProgramState = TLV_LOAD_TEXT;
+      if(isr->size <= 0) {
+        printf("Load ISR_VECTOR...OK\n");
+        session->loadProgramState = TLV_LOAD_TEXT;
+      }
     break;
     
     case TLV_LOAD_TEXT :
       tlvWriteTargetMemory(session, &text->dataAddress, &text->destAddress, &text->size, memorySelect);
-      if(text->size <= 0) session->loadProgramState = TLV_LOAD_RO_DATA;
+      if(text->size <= 0) {
+        printf("Load Text...OK\n");
+        session->loadProgramState = TLV_LOAD_RO_DATA;
+      }
     break;
     
     case TLV_LOAD_RO_DATA :
       tlvWriteTargetMemory(session, &roData->dataAddress, &roData->destAddress, &roData->size, memorySelect);
-      if(roData->size <= 0) session->loadProgramState = TLV_LOAD_INIT_ARRAY;
+      if(roData->size <= 0) {
+        printf("Load RO Data...OK\n");
+        session->loadProgramState = TLV_LOAD_INIT_ARRAY;
+      }
     break;
   
     case TLV_LOAD_INIT_ARRAY :
       tlvWriteTargetMemory(session, &initArray->dataAddress, &initArray->destAddress, &initArray->size, memorySelect);
-      if(initArray->size <= 0) session->loadProgramState = TLV_LOAD_FINI_ARRAY;
+      if(initArray->size <= 0) {
+        printf("Load Init Array...OK\n");
+        session->loadProgramState = TLV_LOAD_FINI_ARRAY;
+      }
     break;
     
     case TLV_LOAD_FINI_ARRAY :
       tlvWriteTargetMemory(session, &finiArray->dataAddress, &finiArray->destAddress, &finiArray->size, memorySelect);
-        if(finiArray->size <= 0) session->loadProgramState = TLV_LOAD_DATA;
+        if(finiArray->size <= 0) {
+          printf("Load Fini Array...OK\n");
+          session->loadProgramState = TLV_LOAD_DATA;
+        }
     break;
     
     case TLV_LOAD_DATA :
       tlvWriteTargetMemory(session, &data->dataAddress, &data->destAddress, &data->size, TLV_WRITE_RAM);
       if(data->size <= 0) {
         /* Close elf file */
+        printf("Load Data...OK\n");
         closeElfFile();
         session->ongoingProcessFlag = FLAG_CLEAR;
         session->loadProgramState = TLV_LOAD_ISR_VECTOR;
