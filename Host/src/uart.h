@@ -1,9 +1,11 @@
 #ifndef uart_H
 #define uart_H
 
-#include <windows.h>
-#include <stdint.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <windows.h>
+#include "ErrorCode.h"
+#include "CException.h"
 
 #define UART_PORT               "\\\\.\\COM10"//"COM6"
 #define UART_BAUD_RATE          128000//9600
