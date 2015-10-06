@@ -1,49 +1,48 @@
 #include "GetTime.h"
 
-static double pcFrequency = 0.0;
-static __int64 previousTime = 0;
-static __int64 currentTime;
-double elapsedTime = 0.0;
+static SYSTEMTIME st;
+static uint16_t previousTime = 0;
+static uint16_t currentTime = 0;
 
-void InitTimer(void) {
-  LARGE_INTEGER frequency;
+uint16_t getSystemTime(void) {
   
-  /* Get ticks per second */
-  QueryPerformanceFrequency(&frequency);
-
-  pcFrequency = (double)(frequency.QuadPart);
+  GetSystemTime(&st);
+  
+  return (st.wSecond * 1000) + st.wMilliseconds;
 }
 
-void startTimer(void) {
-  LARGE_INTEGER t1;
+uint16_t getElapsedTime(void) {
   
-  if(pcFrequency == 0) InitTimer();
+  if(previousTime == 0) {
+    previousTime = getSystemTime();
+  }
   
-  QueryPerformanceCounter(&t1);
-  
-  previousTime = t1.QuadPart;
+  currentTime = getSystemTime();
+
+  return currentTime - previousTime;
 }
 
-void stopTimer(void) {
-  LARGE_INTEGER t2;
-  
-  QueryPerformanceCounter(&t2);
-  
-  currentTime = t2.QuadPart;
+/** resetSystemTime is used when time out is not occur
+  */
+void resetSystemTime(void) {
+  previousTime = 0;
+  currentTime = 0;
 }
 
-int getElapsedTime(void) {
+/** isTimeOut is a function to determine if the program 
+  * running time is reached the maximum timeout time
+  *
+  * input   : NONE
+  *
+  * output  : 1 timeout occur
+  *           0 maximum timeout is not reach
+  */
+int isTimeOut(void) {
   
-  stopTimer();
-  
-  /* Compute and print the elapsed time in millisec */
-  elapsedTime += ((currentTime - previousTime) * 100000 / pcFrequency);
-  
-  // printf("elapsedTime %fms\n", elapsedTime);
-  
-  if(elapsedTime > 10) {
-    elapsedTime = 0;
+  if(getElapsedTime() > TIMEOUT_SECOND) {
+    previousTime = currentTime;
     return 1;
   }
+  
   else return 0;
 }

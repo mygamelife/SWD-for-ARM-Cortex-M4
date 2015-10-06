@@ -40,9 +40,11 @@ void test_tlvWriteTargetRegister_should_send_request_and_receive_reply(void)
   int result;
   uint32_t data = 0xDEADBEEF;
   
+  /* Send request */
   result = tlvWriteTargetRegister(session, 0x12345678, &data);
   TEST_ASSERT_EQUAL(0, result);
   
+  /* Received reply */
   session->dataReceiveFlag = FLAG_SET;
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
@@ -64,24 +66,106 @@ void test_tlvReadTargetRegister_should_wait_response_after_send_packet(void)
   uartInit_IgnoreAndReturn(hSerial);
 	Tlv_Session *session = tlvCreateSession();
   
-  tlvReadTargetRegister(session, 0x88888888);
+  int result = tlvReadTargetRegister(session, 0x88888888);
   
-  TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  TEST_ASSERT_EQUAL_HEX32(0x88888888, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(0, result);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  TEST_ASSERT_EQUAL(TLV_READ_REGISTER, session->txBuffer[0]); //type
+  TEST_ASSERT_EQUAL(5, session->txBuffer[1]); //length
+  TEST_ASSERT_EQUAL_HEX32(0x88888888, get4Byte(&session->txBuffer[2])); //value
+  TEST_ASSERT_EQUAL_HEX8(0xE0, get4Byte(&session->txBuffer[6])); //chksum
 }
 
-// void test_tlvReadTargetRegister_should_wait_response_after_send_packet(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_tlvReadTargetRegister_should_receive_response_and_return_register_value(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  int result; uint32_t data = 0x88888888;
   
-  // tlvReadTargetRegister(session, 0x88888888);
+  /* Send request */
+  result = tlvReadTargetRegister(session, data);
+  TEST_ASSERT_EQUAL(0, result);
   
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL_HEX32(0x88888888, get4Byte(&session->txBuffer[2]));
-// }
+  /* Received reply */
+  session->dataReceiveFlag = FLAG_SET;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 5;
+  session->rxBuffer[6] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 4);
+  
+  result = tlvReadTargetRegister(session, data);
+  TEST_ASSERT_EQUAL_HEX32(0x88888888, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
 
+void test_tlvHaltTarget_send_request_and_wait_for_reply_should_return_0(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  int result = tlvHaltTarget(session);
+  
+  TEST_ASSERT_EQUAL(0, result);
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+}
+
+void test_tlvHaltTarget_should_return_1_after_request_and_received_OK_reply(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  TEST_ASSERT_EQUAL(0, tlvHaltTarget(session));
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+    /* Received reply */
+  session->dataReceiveFlag = FLAG_SET;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  TEST_ASSERT_EQUAL(1, tlvHaltTarget(session));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
+
+void test_tlvRunTarget_should_return_1_after_request_and_received_OK_reply(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  TEST_ASSERT_EQUAL(0, tlvRunTarget(session));
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+    /* Received reply */
+  session->dataReceiveFlag = FLAG_SET;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  TEST_ASSERT_EQUAL(1, tlvRunTarget(session));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
+
+void test_tlvMultipleStepTarget_should_receive_response_and_return_current_program_counter_address(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  int result; uint32_t data = 0x20000010;
+  
+  /* Send request */
+  result = tlvMultipleStepTarget(session, 10);
+  TEST_ASSERT_EQUAL(0, result);
+  
+  /* Received reply */
+  session->dataReceiveFlag = FLAG_SET;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 5;
+  session->rxBuffer[6] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 4);
+  
+  result = tlvMultipleStepTarget(session, 10);
+  TEST_ASSERT_EQUAL_HEX32(0x20000010, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
 // void test_tlvWriteDataChunk_should_send_data_in_chunk_to_ram(void)
 // {
   // HANDLE hSerial;

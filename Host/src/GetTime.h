@@ -5,15 +5,14 @@
 #include <stdint.h>
 #include <windows.h>
 #include <sys/time.h>
+#include <stdlib.h>
 #include "CException.h"
 
-#define TEN_SECOND    10
+#define TIMEOUT_SECOND    5000
 
-extern double elapsedTime;
+uint16_t getSystemTime(void);
+uint16_t getElapsedTime(void);
+void resetSystemTime(void);
+int isTimeOut(void);
 
-void InitTimer(void);
-void startTimer(void);
-void stopTimer(void);
-
-int getElapsedTime(void);
 #endif // GetTime_H

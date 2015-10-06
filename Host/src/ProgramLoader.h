@@ -3,6 +3,7 @@
 
 #include <malloc.h>
 #include "Tlv.h"
+#include "Yield.h"
 #include "GetHeaders.h"
 #include "ErrorCode.h"
 #include "CException.h"
@@ -15,8 +16,17 @@
 extern int programSize;
 
 /* Read/Write target register */
-void tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
-void tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
+uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
+int tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
+
+/* Halt target */
+int tlvHaltTarget(Tlv_Session *session);
+
+/* Run target */
+int tlvRunTarget(Tlv_Session *session);
+
+/* Step target */
+uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 
 /* Read/Write target RAM */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
@@ -37,15 +47,6 @@ void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
 void tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
 
-/* Halt target */
-void tlvHaltTarget(Tlv_Session *session);
-
-/* Run target */
-void tlvRunTarget(Tlv_Session *session);
-
-/* Step target */
-void tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
-
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
 
@@ -55,6 +56,6 @@ void tlvHardReset(Tlv_Session *session);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
-void isLastOperationDone(Tlv_Session *session);
+int isLastOperationDone(Tlv_Session *session);
 
 #endif // ProgramLoader_H

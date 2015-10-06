@@ -16,6 +16,8 @@ Tlv_Session *tlvCreateSession(void) {
   session.sendState = TLV_SEND_BEGIN;
   session.receiveState = TLV_RECEIVE_TYPE;
   
+  session.state = 0;
+  
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;
   session.ramState = TLV_LOAD_PROGRAM;

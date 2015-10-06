@@ -23,6 +23,8 @@ typedef struct
   /* Send and Receive state */
   Tlv_State sendState;
   Tlv_State receiveState;
+  /* Tlv state */
+  Tlv_State state;
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
