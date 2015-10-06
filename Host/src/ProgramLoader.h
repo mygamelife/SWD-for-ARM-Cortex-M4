@@ -28,6 +28,10 @@ int tlvRunTarget(Tlv_Session *session);
 /* Step target */
 uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 
+/* Reset */
+int tlvSoftReset(Tlv_Session *session);
+int tlvHardReset(Tlv_Session *session);
+
 /* Read/Write target RAM */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
 void tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
@@ -49,10 +53,6 @@ void tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size)
 
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
-
-/* Reset */
-void tlvSoftReset(Tlv_Session *session);
-void tlvHardReset(Tlv_Session *session);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);

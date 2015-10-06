@@ -198,24 +198,72 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   *
   * Input   : session contain a element/handler used by tlv protocol
   *
-  * Return  : NONE
+  * Return  : 1 if successfully software reset
+  *           0 if waiting reply from probe
   */
-void tlvSoftReset(Tlv_Session *session) {
-  Tlv *tlv = tlvCreatePacket(TLV_SOFT_RESET, 0, 0);
-
+int tlvSoftReset(Tlv_Session *session) {
+  Tlv *tlv;
+  
+  /* Start tlv request task */
+  startTask(session->state);
+  
+  /* Send tlv request */
+  tlv = tlvCreatePacket(TLV_SOFT_RESET, 0, 0);
+  session->ongoingProcessFlag = FLAG_SET;
   tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut()) Throw(PROBE_NOT_RESPONDING);
+    yield(session->state);
+  };
+  
+  resetSystemTime();
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  session->ongoingProcessFlag = FLAG_CLEAR;
+  
+  /* End tlv request task */
+  endTask(session->state);
+  
+  return 1;
 }
 
-/** tlvSoftReset is a function hardware reset target
+/** tlvHardReset is a function hardware reset target
   *
   * Input   : session contain a element/handler used by tlv protocol
   *
-  * Return  : NONE
+  * Return  : 1 if successfully software reset
+  *           0 if waiting reply from probe
   */
-void tlvHardReset(Tlv_Session *session) {
-  Tlv *tlv = tlvCreatePacket(TLV_HARD_RESET, 0, 0);
-
+int tlvHardReset(Tlv_Session *session) {
+  Tlv *tlv;
+  
+  /* Start tlv request task */
+  startTask(session->state);
+  
+  /* Send tlv request */
+  tlv = tlvCreatePacket(TLV_HARD_RESET, 0, 0);
+  session->ongoingProcessFlag = FLAG_SET;
   tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut()) Throw(PROBE_NOT_RESPONDING);
+    yield(session->state);
+  };
+  
+  resetSystemTime();
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  session->ongoingProcessFlag = FLAG_CLEAR;
+  
+  /* End tlv request task */
+  endTask(session->state);
+  
+  return 1;
 }
 
 /** tlvWriteDataChunk is a function used to send data in chunk

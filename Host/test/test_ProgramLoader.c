@@ -166,6 +166,43 @@ void test_tlvMultipleStepTarget_should_receive_response_and_return_current_progr
   TEST_ASSERT_EQUAL_HEX32(0x20000010, result);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
 }
+
+void test_tlvSoftReset_should_return_1_after_request_and_received_OK_reply(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  TEST_ASSERT_EQUAL(0, tlvSoftReset(session));
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  /* Received reply */
+  session->dataReceiveFlag = FLAG_SET;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  TEST_ASSERT_EQUAL(1, tlvSoftReset(session));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
+
+void test_tlvHardReset_should_return_1_after_request_and_received_OK_reply(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  TEST_ASSERT_EQUAL(0, tlvHardReset(session));
+  TEST_ASSERT_EQUAL(FLAG_SET, session->ongoingProcessFlag);
+  
+  /* Received reply */
+  session->dataReceiveFlag = FLAG_SET;
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  TEST_ASSERT_EQUAL(1, tlvHardReset(session));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
+}
+
 // void test_tlvWriteDataChunk_should_send_data_in_chunk_to_ram(void)
 // {
   // HANDLE hSerial;
