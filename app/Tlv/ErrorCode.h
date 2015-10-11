@@ -9,6 +9,7 @@ typedef enum
   TLV_TIME_OUT = 1,
   TLV_CORRUPTED_DATA,
   TLV_INVALID_COMMAND,
+  TLV_TRANSMISSION_BUSY,
   TLV_CHECKSUM_ERROR,
   TLV_NOT_HALTED,
   TLV_NOT_RUNNING,
@@ -64,6 +65,14 @@ typedef enum
   ERR_OPTION_NOT_FOUND,
   ERR_INVALID_COMMAND, //45
 } Interface_ErrorCode;
+
+typedef enum
+{
+  ERR_INVALID_HANDLER = 46,
+  ERR_SET_COMM_STATE,
+  ERR_SET_COMM_TIMEOUTS,
+  ERR_GET_COMM_STATE, //49
+} Handler_ErrorCode;
 
 void displayErrorMessage(CEXCEPTION_T err);
 #endif // ErrorCode_H

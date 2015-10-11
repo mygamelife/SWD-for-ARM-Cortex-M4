@@ -3,25 +3,27 @@
 
 int main(void) {
   CEXCEPTION_T err;
-  HANDLE hSerial;
-  Tlv_Session *session = tlvCreateSession();
+  Tlv_Session *session = NULL;
   
   displayOptionMenu();
   
-  while(session->hostState != HOST_EXIT) {
-    Try {
-      tlvService(session);
-      hostInterpreter(session);
+  Try {
+    if(session == NULL) session = tlvCreateSession();
+    while(session->hostState != HOST_EXIT) {
+      Try {
+        tlvService(session);
+        hostInterpreter(session);
+      } Catch(err) {
+        session->hostState = HOST_WAIT_USER_COMMAND;
+        displayErrorMessage(err);
+      }
     }
-    Catch(err) {
-      session->hostState = HOST_WAIT_USER_COMMAND;
-      displayErrorMessage(err);
-    }
+  } Catch(err) {
+    displayErrorMessage(err);
   }
   
   printf("Closing port\n");
-  hSerial = (HANDLE)session->handler;
-  closeSerialPort(hSerial);
+  closeSerialPort((HANDLE *)session->handler);
 
   return 0;
 }

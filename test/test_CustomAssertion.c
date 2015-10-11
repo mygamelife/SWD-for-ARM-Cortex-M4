@@ -5,6 +5,7 @@
 #include "mock_uart.h"
 #include "CException.h"
 #include "ErrorCode.h"
+#include "mock_GetTime.h"
 #include <stdlib.h>
 
 void setUp(void)  {}

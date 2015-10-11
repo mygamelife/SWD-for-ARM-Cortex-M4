@@ -205,8 +205,9 @@ void haltTarget(Tlv_Session *session)
 void runTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
+  // printf("run target\n");
   
-  if(session->breakPointFlag != FLAG_SET) {
+  if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
     setCoreMode(CORE_DEBUG_MODE);
     if(getCoreMode() == CORE_DEBUG_MODE) {
       tlv = tlvCreatePacket(TLV_OK, 0, 0);
@@ -215,7 +216,7 @@ void runTarget(Tlv_Session *session)
     tlvSend(session, tlv);
   }
   else {
-    session->ongoingProcessFlag = FLAG_SET;
+    SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     checkBreakpointEvent(session);
   }
 }
@@ -313,13 +314,12 @@ void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchi
 {
   Tlv *tlv ;
   int comparatorUsed = 0;
-  
   comparatorUsed = autoSetInstructionBreakpoint(instructionAddress,matchingMode);
   
   if( comparatorUsed == -1)
     Throw(TLV_BKPT_MAXSET);
   else  {
-    session->breakPointFlag = FLAG_SET;
+    SET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG);
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
     tlvSend(session, tlv);
   }
@@ -450,9 +450,9 @@ void checkBreakpointEvent(Tlv_Session *session)
   }
   
   /* Clear ongoingProcess and breakPoint flag to indicate the breakpoint event is over*/
-  session->breakPointFlag = FLAG_CLEAR;
-  session->ongoingProcessFlag = FLAG_CLEAR;
-  
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  CLEAR_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG);
+
   tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);  
 }
@@ -520,6 +520,23 @@ void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAd
   tlvSend(session, tlv);
 }
 
+void loopBack(Tlv_Session *session, Tlv *packet) {
+
+  Tlv *tlv;
+  int i = 0, delay = 1000;
+
+  /* Size minus 1 because of the checksum value */
+  for(i = 0; i < packet->length -1; i++) {
+	  packet->value[i] += 2;
+  }
+  tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
+
+
+  tlvSend(session, tlv);
+
+  while(delay--);
+}
+
 /** readTargetMemory is a function to read target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
@@ -566,7 +583,7 @@ void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t dest
     
     case WRITE_TO_RAM :
       writeDataToRamInChunk(dataAddress, tempAddress, size);
-      session->ongoingProcessFlag = FLAG_SET;
+      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
       session->pFlashState = COPY_TO_FLASH;
     break;
     
@@ -575,7 +592,7 @@ void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t dest
         requestStubCopy(tempAddress, destAddress, size);
         tlv = tlvCreatePacket(TLV_OK, 0, 0);
         tlvSend(session, tlv);
-        session->ongoingProcessFlag = FLAG_CLEAR;
+        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->pFlashState = WRITE_TO_RAM;
       }
     break;
@@ -589,7 +606,7 @@ void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
     
     case REQUEST_ERASE :
       requestStubErase(address, size);
-      session->ongoingProcessFlag = FLAG_SET;
+      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
       session->pEraseState = WAIT_OPERATION_COMPLETE;
     break;
     
@@ -597,7 +614,7 @@ void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
       if(IsStubBusy()) {
         tlv = tlvCreatePacket(TLV_OK, 0, 0);
         tlvSend(session, tlv);
-        session->ongoingProcessFlag = FLAG_CLEAR;
+        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->pEraseState = REQUEST_ERASE;
       }
     break;
@@ -611,7 +628,7 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
     
     case REQUEST_ERASE :
       requestStubMassErase(bankSelect);
-      session->ongoingProcessFlag = FLAG_SET;
+      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
       session->pMEraseState = WAIT_OPERATION_COMPLETE;
     break;
     
@@ -619,7 +636,7 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
       if(IsStubBusy()) {
         tlv = tlvCreatePacket(TLV_OK, 0, 0);
         tlvSend(session, tlv);
-        session->ongoingProcessFlag = FLAG_CLEAR;
+        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->pMEraseState = REQUEST_ERASE;
       }
     break;
@@ -653,6 +670,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_FLASH_MASS_ERASE       : massEraseTargetFlash(session, get4Byte(&tlv->value[0])); break;
     case TLV_SOFT_RESET             : performSoftResetOnTarget(session); break;
     case TLV_HARD_RESET             : performHardResetOnTarget(session); break;
+    case TLV_LOOP_BACK              : loopBack(session, tlv); break;
   }
 }
 
@@ -677,7 +695,7 @@ void probeTaskManager(Tlv_Session *session)  {
     case PROBE_INTERPRET_PACKET :
       Try {
         selectTask(session, packet);
-        if(session->ongoingProcessFlag == FLAG_CLEAR)
+        if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
           session->probeState = PROBE_RECEIVE_PACKET;
       } Catch(err) {
         tlvErrorReporter(session, err);

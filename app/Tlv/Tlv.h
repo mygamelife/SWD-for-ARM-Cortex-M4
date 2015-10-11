@@ -1,19 +1,19 @@
 #ifndef Tlv_H
 #define Tlv_H
 
-#ifdef TEST
-extern int uartTxReady;
-extern int uartRxReady;
-#endif
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include <time.h>
-#include "Tlv_ex.h"
 #include "uart.h"
-#include "CException.h"
+#include "Tlv_ex.h"
 #include "ErrorCode.h"
+#include "GetTime.h"
+#include "Yield.h"
+
+#if defined(HOST) || defined(TEST)
+extern volatile int uartTxReady;
+extern volatile int uartRxReady;
+#endif
 
 typedef struct
 {
@@ -21,8 +21,20 @@ typedef struct
   uint8_t txBuffer[255];
   uint8_t rxBuffer[255];
   /* Send and Receive state */
-  Tlv_State sendState;
   Tlv_State receiveState;
+  /* ###### Tlv state ###### */
+  Tlv_State wregState;
+  Tlv_State regState;
+  Tlv_State haltState;
+  Tlv_State runState;
+  Tlv_State stepState;
+  Tlv_State sresetState;
+  Tlv_State hresetState;
+  Tlv_State wramState;
+  Tlv_State wflashState;
+  Tlv_State lramState;
+  Tlv_State lflashState;
+  Tlv_State rmemState;
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
@@ -38,18 +50,26 @@ typedef struct
   Tlv_State pEraseState;
   Tlv_State pMEraseState;
   /* Flags */
-  bool timeOutFlag;
-  bool dataReceiveFlag;
-  bool dataSendFlag;
-  bool ongoingProcessFlag;
-  bool breakPointFlag;
-  bool watchPointFlag;
+  uint32_t flags;
 } Tlv_Session;
 
 typedef enum {
   FLAG_CLEAR = false,
   FLAG_SET = true
 } Flag_Status;
+
+/* ##### Defined Tlv Flags In Numeric ##### */
+#define TLV_TIMEOUT_FLAG                                ((uint32_t)0x00000001)
+#define TLV_DATA_RECEIVE_FLAG                           ((uint32_t)0x00000002)
+#define TLV_DATA_TRANSMIT_FLAG                          ((uint32_t)0x00000004)
+#define TLV_ONGOING_PROCESS_FLAG                        ((uint32_t)0x00000008)
+#define TLV_SET_BREAKPOINT_FLAG                         ((uint32_t)0x00000010)
+#define TLV_SET_WATCHPOINT_FLAG                         ((uint32_t)0x00000020)
+
+/* ##### Tlv Flags Status Macros ##### */
+#define GET_FLAG_STATUS(__SESSION__, __FLAG__)          (((__SESSION__)->flags & (__FLAG__)) == (__FLAG__))
+#define SET_FLAG_STATUS(__SESSION__, __FLAG__)          ((__SESSION__)->flags |= (__FLAG__))
+#define CLEAR_FLAG_STATUS(__SESSION__, __FLAG__)        ((__SESSION__)->flags &= ~(__FLAG__))
 
 Tlv_Session *tlvCreateSession(void);
 

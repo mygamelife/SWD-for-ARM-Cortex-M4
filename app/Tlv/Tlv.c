@@ -1,8 +1,8 @@
 #include "Tlv.h"
 
-#if defined (TEST) || defined (HOST)
-int uartTxReady = 1;
-int uartRxReady = 1;
+#if defined(HOST) || defined(TEST)
+volatile int uartTxReady = 1;
+volatile int uartRxReady = 1;
 #endif
 
 /** tlvCreateSession is a function to create necessary element needed by TLV protocol */
@@ -13,12 +13,24 @@ Tlv_Session *tlvCreateSession(void) {
   session.handler = uartInit();
   
   /* Initialize begining state for send and receive */
-  session.sendState = TLV_SEND_BEGIN;
   session.receiveState = TLV_RECEIVE_TYPE;
+  
+  /* ###### Tlv state ###### */
+  session.wregState     = 0;
+  session.regState      = 0;
+  session.haltState     = 0;
+  session.runState      = 0;
+  session.stepState     = 0;
+  session.sresetState   = 0;
+  session.hresetState   = 0;
+  session.wramState     = 0;
+  session.wflashState   = 0;
+  session.lflashState   = 0;
+  session.rmemState     = 0;
   
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;
-  session.ramState = TLV_LOAD_PROGRAM;
+  session.lramState = TLV_LOAD_PROGRAM;
   
   /* host flash state */
   session.flashState = TLV_REQUEST_ERASE;
@@ -30,13 +42,8 @@ Tlv_Session *tlvCreateSession(void) {
   session.pMEraseState = REQUEST_ERASE;
   session.pEraseState = REQUEST_ERASE;
   
-  /* Initialize all the required flag */
-  session.timeOutFlag = FLAG_CLEAR;
-  session.dataSendFlag = FLAG_CLEAR;
-  session.dataReceiveFlag = FLAG_CLEAR;
-  session.ongoingProcessFlag = FLAG_CLEAR;
-  session.breakPointFlag = FLAG_CLEAR;
-  session.watchPointFlag = FLAG_CLEAR;
+  /* Initialize TLV flag */
+  session.flags = FLAG_CLEAR;
   
   /* Initialize host and probe state */
   session.hostState = HOST_WAIT_USER_COMMAND;
@@ -91,12 +98,19 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   *
   * return  : NONE
   */
-void tlvSend(Tlv_Session *session, Tlv *tlv)  {  
-  session->dataSendFlag = true;
-  
-  session->txBuffer[0] = tlv->type;
-  session->txBuffer[1] = tlv->length;
-  session->txBuffer[tlv->length + 1] = tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length - 1);
+void tlvSend(Tlv_Session *session, Tlv *tlv) {
+  /* If flag TLV_DATA_TRANSMIT_FLAG is set means uart is busy 
+     with previous transmition */
+  if(GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG) == FLAG_SET) {
+    Throw(TLV_TRANSMISSION_BUSY);
+  }
+  /* Set TLV_DATA_TRANSMIT_FLAG and copy data into TxBuffer */
+  else {
+    SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+    session->txBuffer[0] = tlv->type;
+    session->txBuffer[1] = tlv->length;
+    session->txBuffer[tlv->length + 1] = tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length - 1);    
+  }
 }
 
 /** tlvSendService is a state machine to handle the tlvSend
@@ -108,21 +122,17 @@ void tlvSend(Tlv_Session *session, Tlv *tlv)  {
   */
 void tlvSendService(Tlv_Session *session)	{
   int length = 0;
-  
-  switch(session->sendState) {
-    case TLV_SEND_BEGIN :
-      if(session->dataSendFlag == true) {
-        if(uartTxReady) {
-          length = session->txBuffer[1] + 2;
-          sendBytes(session->handler, session->txBuffer, length);
-          session->dataSendFlag = FLAG_CLEAR;
-          
-          #if !defined (HOST)
-          uartTxReady = 0;
-          #endif
-        }
-      }
-      break;
+
+  /* Start transmission if TLV_DATA_TRANSMIT_FLAG is set */
+  if(GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG) == FLAG_SET) {
+    /* Check is transmitter ready */
+    if(uartTxReady) {
+      /* Clear transmission flag */
+      CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+      length = session->txBuffer[1] + 2;
+      /* Send multiple bytes over */
+      sendBytes(session->handler, session->txBuffer, length);
+    }
   }
 }
 
@@ -135,18 +145,19 @@ void tlvSendService(Tlv_Session *session)	{
 Tlv *tlvReceive(Tlv_Session *session) {
   static Tlv tlv;
   
-  if(session->timeOutFlag == true) {
-    session->timeOutFlag = false;
+  if(GET_FLAG_STATUS(session, TLV_TIMEOUT_FLAG) == FLAG_SET) {
+    CLEAR_FLAG_STATUS(session, TLV_TIMEOUT_FLAG);
     Throw(TLV_TIME_OUT);
   }
-  if(session->dataReceiveFlag == false)  return NULL;
+  if(GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG) == FLAG_SET) {
+    CLEAR_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+    tlv.type = session->rxBuffer[0];
+    tlv.length = session->rxBuffer[1];
+    tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
+    return &tlv;    
+  }
 
-  tlv.type = session->rxBuffer[0];
-  tlv.length = session->rxBuffer[1];
-  tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
-  session->dataReceiveFlag = false;
-  
-  return &tlv;
+  else return NULL;
 }
 
 /** tlvReceiveService is a state machine to handle the tlvReceive
@@ -162,24 +173,26 @@ void tlvReceiveService(Tlv_Session *session) {
     	if(!getByte(session->handler, &session->rxBuffer[0])) {
     		session->receiveState = TLV_RECEIVE_LENGTH;
       }
-      break;
+    break;
     
     case TLV_RECEIVE_LENGTH :
-      if(!getByte(session->handler, &session->rxBuffer[1]))  {
-        #if !defined (HOST)
-        uartRxReady = 0;
-        #endif
+      if(!getByte(session->handler, &session->rxBuffer[1])) {
         getBytes(session->handler, &session->rxBuffer[2], session->rxBuffer[1]);
         session->receiveState = TLV_RECEIVE_VALUE;
       }
-      break;
+    break;
       
     case TLV_RECEIVE_VALUE :
     	if(uartRxReady) {
-        session->dataReceiveFlag = FLAG_SET;
-        session->receiveState = TLV_RECEIVE_TYPE;
+    		SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+    		session->receiveState = TLV_RECEIVE_TYPE;
     	}
-      break;  
+    	else {
+          if(isTimeOut(ONE_SECOND)) {
+            Throw(TLV_TIME_OUT);
+          }
+    	}
+    break;  
   }
 }
 
@@ -235,6 +248,7 @@ int isTlvAck(Tlv *tlv) {
     }
     else return 0;
   }
+  return 0;
 }
 
 /** verifyTlvCommand is a function to verify the tlv command
@@ -257,6 +271,7 @@ int isTlvAck(Tlv *tlv) {
 int isTlvCommand(uint8_t command) {
   
   if(command == TLV_WRITE_RAM)              return 1;
+  else if(command == TLV_WRITE_FLASH)       return 1;
   else if(command == TLV_READ_MEMORY)       return 1;
   else if(command == TLV_WRITE_REGISTER)    return 1;
   else if(command == TLV_READ_REGISTER)     return 1;
@@ -265,13 +280,12 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_STEP)              return 1;
   else if(command == TLV_MULTI_STEP)        return 1;
   else if(command == TLV_BREAKPOINT)        return 1;
-  else if(command == TLV_WRITE_RAM)         return 1;
-  else if(command == TLV_WRITE_FLASH)       return 1;
   else if(command == TLV_FLASH_ERASE)       return 1;
   else if(command == TLV_FLASH_MASS_ERASE)  return 1;
   else if(command == TLV_SOFT_RESET)        return 1;
   else if(command == TLV_HARD_RESET)        return 1;
   else if(command == TLV_OK)                return 1;
+  else if(command == TLV_LOOP_BACK)         return 1;
   
   else return 0;
 }
@@ -310,7 +324,6 @@ void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
   if(errorCode == TLV_INVALID_COMMAND || errorCode == TLV_TIME_OUT || errorCode == TLV_CHECKSUM_ERROR) {
 	  errorCode += 100;
   }
-
   
   Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
 
