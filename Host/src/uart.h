@@ -7,15 +7,20 @@
 #include "ErrorCode.h"
 #include "CException.h"
 
-#define UART_PORT               "\\\\.\\COM10"//"COM6"
-#define UART_BAUD_RATE          128000//9600
+#define UART_PORT                     "COM5"//"\\\\.\\COM10"
+#define UART_BAUD_RATE                128000//9600
+
+/* ##### Tlv Uart TX/RX Ready Flags Macros ##### */
+#define IS_UART_TX_READY()            (((uartTxReady) == 1) ? 1 : 0)
+#define IS_UART_RX_READY()            (((uartRxReady) == 1) ? 1 : 0)
+#define CLEAR_UART_TX_READY()         ((uartTxReady) = 0)
+#define CLEAR_UART_RX_READY()         ((uartRxReady) = 0)
 
 typedef enum 
 {
   UART_OK       = 0x00,
   UART_ERROR    = 0x01,
 } Uart_Status;
-
 
 HANDLE uartInit(void);
 void closeSerialPort(HANDLE hSerial);

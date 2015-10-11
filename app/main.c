@@ -21,12 +21,14 @@ int main(void)
   Tlv_Session *session = tlvCreateSession();
 
   // Test_State state = SET_CSW_VALUE;
-
+  //static Tlv *receivedPacket;
   while(1)
   {
     tlvService(session);
     probeTaskManager(session);
-    //testing(&state);
-    //checkBreakpointEvent(session);
+    //receivedPacket = tlvReceive(session);
+    //if(verifyTlvPacket(receivedPacket)) {
+    	//tlvSend(session, receivedPacket);
+    //}
   }
 }

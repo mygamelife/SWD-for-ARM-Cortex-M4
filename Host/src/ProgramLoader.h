@@ -2,6 +2,7 @@
 #define ProgramLoader_H
 
 #include <malloc.h>
+#include <string.h>
 #include "Tlv.h"
 #include "Yield.h"
 #include "GetHeaders.h"
@@ -32,9 +33,14 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 int tlvSoftReset(Tlv_Session *session);
 int tlvHardReset(Tlv_Session *session);
 
-/* Read/Write target RAM */
+/* Write target memory */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
-void tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+int tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+
+#define tlvWriteToRam(session, dataAddress, destAddress, size) \
+        tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
+        
+int tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 
 /* Load Flash/RAM */
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
@@ -49,7 +55,7 @@ void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 
 /* Read Memory */
 void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
-void tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
+uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
 
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);

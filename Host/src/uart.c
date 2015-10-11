@@ -1,5 +1,8 @@
 #include "uart.h"
 
+__IO int uartTxReady = 1;
+__IO int uartRxReady = 1;
+
 /**
  * Initialize and configure serial comm.
  * 
@@ -45,8 +48,8 @@ HANDLE uartInit(void) {
   timeouts.ReadIntervalTimeout = 10;
   timeouts.ReadTotalTimeoutConstant = 10;
   timeouts.ReadTotalTimeoutMultiplier = 10;
-  timeouts.WriteTotalTimeoutConstant = 30;
-  timeouts.WriteTotalTimeoutMultiplier = 30;
+  timeouts.WriteTotalTimeoutConstant = 20;
+  timeouts.WriteTotalTimeoutMultiplier = 20;
   if(!SetCommTimeouts(hSerial, &timeouts)){
     //handle error
     Throw(ERR_SET_COMM_TIMEOUTS);
@@ -66,7 +69,7 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
     return UART_ERROR;
 	}
   if(dwBytesWrite != 0) {
-    // printf("%d Bytes is Sucessfully Sent!\n", dwBytesWrite);
+    printf("%d Bytes is Sucessfully Sent!\n", dwBytesWrite);
     // printf("address %x!\n", (*(uint32_t *)(&txBuffer[2])));
     return UART_OK;
   }

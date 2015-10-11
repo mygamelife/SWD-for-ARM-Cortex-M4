@@ -64,6 +64,10 @@ void stopAllFlashPatchRemapping(Tlv_Session *session);
 void checkBreakpointEvent(Tlv_Session *session);
 void checkWatchpointEvent(Tlv_Session *session);
 
+
+/* ##### */
+void loopBack(Tlv_Session *session, Tlv *packet);
+
 typedef enum {
   SET_CSW_VALUE = 1,
   WRITE_ADDRESS,

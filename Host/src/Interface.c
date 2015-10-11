@@ -150,11 +150,48 @@ User_Session *userLoadProgram(String *userInput)  {
   
   if(iden->type != FILE_TOKEN)                  Throw(ERR_EXPECT_FILE_PATH);
   else if(memory->type != IDENTIFIER_TOKEN)     Throw(ERR_EXPECT_MEMORY_SELECTION);
+  else if(strcmp(memory->name, "ram") == 0)     userSession.tlvCommand = TLV_LOAD_RAM;
+  else if(strcmp(memory->name, "flash") == 0)   userSession.tlvCommand = TLV_LOAD_FLASH;
+  else Throw(ERR_INVALID_MEMORY_SELECTION);
+  
+  userSession.fileName = iden->name;
+  
+  return &userSession;
+}
+
+/** userWriteMemory is a function to get write data into
+  * memory map RAM/Flash
+  *
+  * Input   : userInput is the string enter by user
+  *
+  * return  : userSession contain all the information from the user input
+  */
+User_Session *userWriteMemory(String *userInput) {
+  static User_Session userSession; CEXCEPTION_T err;
+  Identifier *memory; Number* data, *address;
+  int i = 0; uint32_t dataBlock[1024];
+  
+  Try {
+    memory = (Identifier *)getToken(userInput);
+    address = (Number *)getToken(userInput);
+    if(address->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
+    while(userInput->length > 1) {
+      data = (Number *)getToken(userInput);
+      if(data->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
+      dataBlock[i++] = data->value;
+    }
+  } Catch(err) {
+    Throw(ERR_INCOMPLETE_COMMAND);
+  }
+  
+  if(memory->type != IDENTIFIER_TOKEN)          Throw(ERR_EXPECT_MEMORY_SELECTION);
   else if(strcmp(memory->name, "ram") == 0)     userSession.tlvCommand = TLV_WRITE_RAM;
   else if(strcmp(memory->name, "flash") == 0)   userSession.tlvCommand = TLV_WRITE_FLASH;
   else Throw(ERR_INVALID_MEMORY_SELECTION);
   
-  userSession.fileName = iden->name;
+  userSession.size = i * 4;
+  userSession.address = address->value;
+  userSession.data = dataBlock;
   
   return &userSession;
 }
@@ -418,6 +455,7 @@ Command_Code getCommandCode(char *commandName) {
 
   if(strcmp(commandName, "help") == 0)                return HELP;
   else if(strcmp(commandName, "load") == 0)           return LOAD;
+  else if(strcmp(commandName, "write") == 0)          return WRITE;
   else if(strcmp(commandName, "rmem") == 0)           return READ_MEMORY;
   else if(strcmp(commandName, "wreg") == 0)           return WRITE_REGISTER;
   else if(strcmp(commandName, "reg") == 0)            return READ_REGISTER;
@@ -594,6 +632,7 @@ User_Session *InterpreteCommand(String *userInput) {
   if(ccode == HELP) {                         helpMenu(userInput); 
                                               return NULL;}
   else if(ccode == LOAD)                      return userLoadProgram(userInput);
+  else if(ccode == WRITE)                     return userWriteMemory(userInput);
   else if(ccode == READ_MEMORY)               return userReadMemory(userInput);
   else if(ccode == WRITE_REGISTER)            return userWriteRegister(userInput);
   else if(ccode == READ_REGISTER)             return userReadRegister(userInput);

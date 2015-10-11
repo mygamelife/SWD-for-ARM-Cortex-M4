@@ -82,6 +82,7 @@ typedef enum {
 typedef enum {
   HELP = 1,
   LOAD,
+  WRITE,
   READ_MEMORY,
   WRITE_REGISTER,
   READ_REGISTER,
@@ -109,6 +110,7 @@ Command_Code getCommandCode(char *commandName);
 
 /* User Instruction */
 User_Session *userLoadProgram(String *userInput);
+User_Session *userWriteMemory(String *userInput);
 User_Session *userReadMemory(String *userInput);
 User_Session *userWriteRegister(String *userInput);
 User_Session *userReadRegister(String *userInput);

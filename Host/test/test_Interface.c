@@ -116,7 +116,7 @@ void test_userLoadProgram_should_get_load_instruction_memory_selection_and_file_
   String *str = stringNew("load ram C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test");
   User_Session *session = InterpreteCommand(str);
   
-  TEST_ASSERT_EQUAL(TLV_WRITE_RAM, session->tlvCommand);
+  TEST_ASSERT_EQUAL(TLV_LOAD_RAM, session->tlvCommand);
   TEST_ASSERT_EQUAL_STRING("C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test", session->fileName);
 }
 
@@ -213,4 +213,16 @@ void test_displayMemoryMap_given_address_and_value(void)
                      0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd};
   
   displayMemoryMap((uint8_t *)data, 164);
+}
+
+void test_userWriteMemory_should_get_data_address_and_data_input(void)
+{
+  String *str = stringNew("write ram 0x20000000 0xaaaaa 0xbbbbb");
+  User_Session *session = InterpreteCommand(str);
+  
+  TEST_ASSERT_EQUAL(TLV_WRITE_RAM, session->tlvCommand);
+  TEST_ASSERT_EQUAL(8, session->size);
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, session->address);
+  TEST_ASSERT_EQUAL_HEX32(0xaaaaa, session->data[0]);
+  TEST_ASSERT_EQUAL_HEX32(0xbbbbb, session->data[1]);
 }
