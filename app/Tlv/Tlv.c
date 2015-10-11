@@ -106,7 +106,7 @@ void tlvSend(Tlv_Session *session, Tlv *tlv) {
   }
   /* Set TLV_DATA_TRANSMIT_FLAG and copy data into TxBuffer */
   else {
-    SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);  
+    SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
     session->txBuffer[0] = tlv->type;
     session->txBuffer[1] = tlv->length;
     session->txBuffer[tlv->length + 1] = tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length - 1);    
@@ -126,7 +126,7 @@ void tlvSendService(Tlv_Session *session)	{
   /* Start transmission if TLV_DATA_TRANSMIT_FLAG is set */
   if(GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG) == FLAG_SET) {
     /* Check is transmitter ready */
-    if(IS_UART_TX_READY()) {
+    if(uartTxReady) {
       /* Clear transmission flag */
       CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
       length = session->txBuffer[1] + 2;
@@ -173,27 +173,26 @@ void tlvReceiveService(Tlv_Session *session) {
     	if(!getByte(session->handler, &session->rxBuffer[0])) {
     		session->receiveState = TLV_RECEIVE_LENGTH;
       }
-      break;
+    break;
     
     case TLV_RECEIVE_LENGTH :
       if(!getByte(session->handler, &session->rxBuffer[1])) {
         getBytes(session->handler, &session->rxBuffer[2], session->rxBuffer[1]);
         session->receiveState = TLV_RECEIVE_VALUE;
       }
-      break;
+    break;
       
     case TLV_RECEIVE_VALUE :
-    	if(IS_UART_RX_READY()) {
-        SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+    	if(uartRxReady) {
+    		SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     		session->receiveState = TLV_RECEIVE_TYPE;
     	}
     	else {
-    		if(isTimeOut(ONE_SECOND)) {
-    			Throw(TLV_TIME_OUT);
-          session->receiveState = TLV_RECEIVE_TYPE;
-        }
+          if(isTimeOut(ONE_SECOND)) {
+            Throw(TLV_TIME_OUT);
+          }
     	}
-      break;  
+    break;  
   }
 }
 

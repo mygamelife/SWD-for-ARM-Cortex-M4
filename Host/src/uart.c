@@ -1,8 +1,5 @@
 #include "uart.h"
 
-__IO int uartTxReady = 1;
-__IO int uartRxReady = 1;
-
 /**
  * Initialize and configure serial comm.
  * 

@@ -419,7 +419,7 @@ void test_tlvLoadProgram_address_should_be_updated_after_call(void)
   
   TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
   TEST_ASSERT_EQUAL_HEX32(0x200000F8, get4Byte(&session->txBuffer[2]));
-  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
   
   closeElfFile();
 }
@@ -494,10 +494,6 @@ void test_tlvLoadToRam_should_update_PC_and_run_the_program_after_finish_loading
   session->rxBuffer[2] = 0; 
   
   tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf"); 
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
-  tlvLoadToRam(session, "test/ELF_File/blinkLedx.elf");
   /* Received reply */
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
   CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);

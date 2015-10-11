@@ -449,47 +449,43 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
       if(fileStatus == FILE_CLOSED) getElfSection(file);
       
       tlvWriteTargetMemory(session, &isr->dataAddress, &isr->destAddress, &isr->size, memorySelect);
-      if(isr->size <= 0 && GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+      if(isr->size <= 0) {
         printf("Load ISR_VECTOR...OK\n");
-        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->loadProgramState = TLV_LOAD_TEXT;
-      }
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     break;
     
     case TLV_LOAD_TEXT :
       tlvWriteTargetMemory(session, &text->dataAddress, &text->destAddress, &text->size, memorySelect);
-      if(text->size <= 0 && GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+      if(text->size <= 0) {
         printf("Load Text...OK\n");
         SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->loadProgramState = TLV_LOAD_RO_DATA;
-      }
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     break;
     
     case TLV_LOAD_RO_DATA :
       tlvWriteTargetMemory(session, &roData->dataAddress, &roData->destAddress, &roData->size, memorySelect);
-      if(roData->size <= 0 && GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+      if(roData->size <= 0) {
         printf("Load RO Data...OK\n");
-        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->loadProgramState = TLV_LOAD_INIT_ARRAY;
-      }
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     break;
   
     case TLV_LOAD_INIT_ARRAY :
       tlvWriteTargetMemory(session, &initArray->dataAddress, &initArray->destAddress, &initArray->size, memorySelect);
-      if(initArray->size <= 0 && GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+      if(initArray->size <= 0) {
         printf("Load Init Array...OK\n");
-        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->loadProgramState = TLV_LOAD_FINI_ARRAY;
-      }
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     break;
     
     case TLV_LOAD_FINI_ARRAY :
       tlvWriteTargetMemory(session, &finiArray->dataAddress, &finiArray->destAddress, &finiArray->size, memorySelect);
-      if(finiArray->size <= 0 && GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+      if(finiArray->size <= 0) {
         printf("Load Fini Array...OK\n");
-        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->loadProgramState = TLV_LOAD_DATA;
-      }
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     break;
     
     case TLV_LOAD_DATA :
@@ -498,7 +494,7 @@ void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) 
         /* Close elf file */
         printf("Load Data...OK\n");
         closeElfFile(); session->loadProgramState = TLV_LOAD_ISR_VECTOR;
-      }
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     break;
   }
 }

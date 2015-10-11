@@ -11,8 +11,8 @@
 #include "stm32f4xx_hal_uart.h"
 
 #if !defined(TEST) || !defined(HOST)
-extern __IO int uartTxReady;
-extern __IO int uartRxReady;
+extern __IO ITStatus uartTxReady;
+extern __IO ITStatus uartRxReady;
 #endif
 
 #define FIVE_SEC    5000

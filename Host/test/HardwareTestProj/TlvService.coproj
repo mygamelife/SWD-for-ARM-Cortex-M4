@@ -157,9 +157,9 @@
     <File name="Code/DWT_Utilities.c" path="app/DWT_Utilities.c" type="1"/>
     <File name="STM32F4/startup_stm32f429xx.s" path="app/Hardware/startup_stm32f429xx.s" type="1"/>
     <File name="Hardware/stm32f4xx_hal_dma.c" path="app/Hardware/stm32f4xx_hal_dma.c" type="1"/>
-    <File name="Code/ErrorCode.h" path="app/Tlv/ErrorCode.h" type="1"/>
     <File name="Code/CException.h" path="vendor/ceedling/vendor/c_exception/lib/CException.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
+    <File name="Code/ErrorCode.h" path="app/Tlv/ErrorCode.h" type="1"/>
     <File name="Code/main.h" path="app/main.h" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Code/CoreDebug_Utilities.h" path="app/CoreDebug_Utilities.h" type="1"/>
