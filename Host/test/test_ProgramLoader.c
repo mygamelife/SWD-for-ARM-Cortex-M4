@@ -645,29 +645,59 @@ void test_tlvLoadToRam_should_update_PC_and_run_the_program_after_finish_loading
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
 }
 
-// void test_tlvEraseTargetFlash_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_tlvEraseTargetFlash_should_request_erase_target_memory_and_return_1_if_successfully_request_and_receive_ack(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  uint32_t address = 0x8000000; int size = 255;
+  int result = 0;
   
-  // fileStatus = FILE_CLOSED;
-  // session->eraseState = TLV_LOAD_FLASH_PROGRAMMER;
-  // session->ramState = TLV_RUN_PROGRAM;
+  result = tlvRequestFlashErase(session, address, size);
+
+  TEST_ASSERT_EQUAL(PROCESS_BUSY, result);
+  TEST_ASSERT_EQUAL(true, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL_HEX32(0x8000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(255, get4Byte(&session->txBuffer[6]));
+
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // tlvEraseTargetFlash(session, 0x081C0000, 20000);
-  // tlvEraseTargetFlash(session, 0x081C0000, 20000);
+  result = tlvRequestFlashErase(session, address, size);
+
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_tlvEraseTargetFlash_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
   
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(0x081C0000, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX8(0x20, session->txBuffer[6]);
-  // TEST_ASSERT_EQUAL_HEX8(0x4E, session->txBuffer[7]);
-  // TEST_ASSERT_EQUAL_HEX8(0x00, session->txBuffer[8]);
-  // TEST_ASSERT_EQUAL_HEX8(0x00, session->txBuffer[9]);
-// }
+  fileStatus = FILE_CLOSED;
+  session->eraseState = TLV_REQUEST_ERASE;
+  
+  tlvEraseTargetFlash(session, 0x081C0000, 20000);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  tlvEraseTargetFlash(session, 0x081C0000, 20000);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x081C0000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0x4E20, get4Byte(&session->txBuffer[6]));
+}
 
 // void test_tlvMassEraseTargetFlash_should_send_flash_mass_erase_request(void)
 // {

@@ -76,10 +76,6 @@ extern int cswDataSize ;
 #define swdWriteDP(address, data)               swdRegisterWrite(address, DP, data);
 #define swdReadDP(address, data)                swdRegisterRead(address, DP, data);
 #define swdWriteAP(address, data)               swdRegisterWrite(address, AP, data);
-// #define swdWriteSelect(ack, writeData)              swdRegisterWrite(SELECT_REG, DP, ack, writeData);
-// #define swdWriteAbort(ack, writeData)               swdRegisterWrite(ABORT_REG, DP, ack, writeData);
-// #define swdWriteCtrlStatus(ack, writeData)          swdRegisterWrite(CTRLSTAT_REG, DP, ack, writeData);
-// #define swdReadCtrlStatus(ack, parity, readData)    swdRegisterRead(CTRLSTAT_REG, DP, ack, parity, readData);
 
 void powerUpSystemAndDebug(void);
 SwdError swdRegisterRead(int address, int pointType, uint32_t *data);

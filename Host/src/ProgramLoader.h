@@ -11,10 +11,14 @@
 #include "Interface.h"
 #include "GetTime.h"
 
-// #define FLASH_PROGRAMMER_FILE_PATH    \
-        // "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/FlashProgrammer/Debug/bin/FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH            "../../../Host/FlashProgrammer.elf"
 
 extern int programSize;
+
+typedef enum {
+  PROCESS_BUSY = 0,
+  PROCESS_DONE,
+} Process_Status;
 
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
@@ -49,7 +53,7 @@ void tlvLoadToFlash(Tlv_Session *session, char *file);
 
 /* Flash Erase */
 void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
-void tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size);
+Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size);
 void tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks);
 void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 
