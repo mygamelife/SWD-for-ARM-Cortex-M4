@@ -1,6 +1,6 @@
 #FLASHER = "\"/C/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility/ST-LINK_CLI\" "
-FLASHER = "ST-LINK_CLI "
-C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib "
+FLASHER = "ST-LINK_CLI " unless defined? FLASHER
+C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib " unless defined? C_EXCEPTION_PATH
 
 # Load build script to help build C program
 load "scripts/cbuild.rb"

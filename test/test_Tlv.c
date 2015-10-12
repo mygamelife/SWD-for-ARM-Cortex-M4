@@ -261,7 +261,6 @@ void test_tlvReceiveService_should_type_length_and_value(void)
   tlvReceiveService(session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
 
-  SET_UART_RX_READY();
   tlvReceiveService(session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session->receiveState);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));

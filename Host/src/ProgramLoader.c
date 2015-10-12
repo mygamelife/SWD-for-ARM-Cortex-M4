@@ -4,8 +4,6 @@ int programSize = 0;
 static Tlv *response;
 static User_Session *userSession;
 
-char *FLASH_PROGRAMMER_FILE_PATH = "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/FlashProgrammer/Debug/bin/FlashProgrammer.elf";
-
 /** tlvWriteTargetRegister is a function to write data into target register
   * 
   * input   : session contain a element/handler used by tlv protocol
@@ -539,13 +537,39 @@ void tlvLoadToRam(Tlv_Session *session, char *file) {
   }
 }
 
-void tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size) {
+Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size) {
+  Tlv *tlv;
   uint32_t buffer[] = {address, size};
   
-  /* create tlv packet address and size */
-  Tlv *tlv = tlvCreatePacket(TLV_FLASH_ERASE, 8, (uint8_t *)buffer);
+  /* Start tlv request task */
+  startTask(session->rEraseState);
   
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Send tlv request */
+  tlv = tlvCreatePacket(TLV_FLASH_ERASE, 8, (uint8_t *)buffer);
   tlvSend(session, tlv);
+  printf("address %x\n", address);
+  printf("size %d\n", size);
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(session->rEraseState);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->rEraseState);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->rEraseState);
+  
+  return PROCESS_DONE;
 }
 
 /** tlvFlashErase
@@ -556,22 +580,20 @@ void tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size) {
   * Return  : NONE
   */
 void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
-  
-  // switch(session->eraseState) {
-    // case TLV_LOAD_FLASH_PROGRAMMER :
-      // tlvLoadToRam(session, FLASH_PROGRAMMER_FILE_PATH);
-      // if(session->ongoingProcessFlag == FLAG_CLEAR) {
-        // session->ongoingProcessFlag = FLAG_SET;
-        // session->eraseState = TLV_REQUEST_ERASE;
-      // }
-    // break;
+  switch(session->eraseState) {
+    case TLV_LOAD_FLASH_PROGRAMMER :
+      tlvLoadToRam(session, FLASH_PROGRAMMER_FILE_PATH);
+      if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+        session->eraseState = TLV_REQUEST_ERASE;
+      }
+    break;
     
-    // case TLV_REQUEST_ERASE :
-      // tlvRequestFlashErase(session, address, size);
-      // session->ongoingProcessFlag = FLAG_CLEAR;
-      // session->eraseState = TLV_LOAD_FLASH_PROGRAMMER;
-    // break;
-  // }
+    case TLV_REQUEST_ERASE :
+      if(tlvRequestFlashErase(session, address, size) == PROCESS_DONE)
+        session->eraseState = TLV_LOAD_FLASH_PROGRAMMER;
+    break;
+  }
 }
 
 void tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks) {

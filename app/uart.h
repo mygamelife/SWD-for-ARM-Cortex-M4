@@ -10,7 +10,7 @@
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_hal_uart.h"
 
-#if !defined(TEST) || !defined(HOST)
+#if !defined(TEST) && !defined(HOST)
 extern __IO ITStatus uartTxReady;
 extern __IO ITStatus uartRxReady;
 #endif
@@ -41,14 +41,6 @@ extern __IO ITStatus uartRxReady;
 /* Definition for USARTx's NVIC */
 #define USARTx_IRQn                      USART1_IRQn
 #define USARTx_IRQHandler                USART1_IRQHandler
-
-/* ##### Tlv Uart TX/RX Ready Flags Macros ##### */
-#define IS_UART_TX_READY()              (((uartTxReady) == 1) ? 1 : 0)
-#define IS_UART_RX_READY()              (((uartRxReady) == 1) ? 1 : 0)
-#define SET_UART_TX_READY()             ((uartTxReady) = 1)
-#define SET_UART_RX_READY()             ((uartRxReady) = 1)
-#define CLEAR_UART_TX_READY()           ((uartTxReady) = 0)
-#define CLEAR_UART_RX_READY()           ((uartRxReady) = 0)
 
 UART_HandleTypeDef *uartInit(void);
 void uartErrorHandler(void);

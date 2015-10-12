@@ -27,6 +27,7 @@ Tlv_Session *tlvCreateSession(void) {
   session.wflashState   = 0;
   session.lflashState   = 0;
   session.rmemState     = 0;
+  session.rEraseState   = 0;
   
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;

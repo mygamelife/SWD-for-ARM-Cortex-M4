@@ -527,14 +527,14 @@ void loopBack(Tlv_Session *session, Tlv *packet) {
 
   /* Size minus 1 because of the checksum value */
   for(i = 0; i < packet->length -1; i++) {
-	  packet->value[i] += 2;
+	 packet->value[i] += 2;
   }
   tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
-
+  //tlv = tlvCreatePacket(TLV_OK, packet->length, packet->value);
 
   tlvSend(session, tlv);
 
-  while(delay--);
+  //while(delay--);
 }
 
 /** readTargetMemory is a function to read target RAM using swd
