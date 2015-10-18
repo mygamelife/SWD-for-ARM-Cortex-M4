@@ -1,2 +1,0 @@
----
-- stm32f4xx_hal_def.h

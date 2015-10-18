@@ -1,3 +1,0 @@
----
-- stm32f4xx_hal_gpio.h
-- stm32f4xx_hal_rcc.h
