@@ -139,3 +139,14 @@ void test_selectNextFreeInstructionComparator_given_all_literal_COMP_busy_should
   
   TEST_ASSERT_EQUAL(-1,selectNextFreeComparator(LITERAL_TYPE));
 }
+
+/*--------------------------swapHalfword-----------------------*/
+void test_swapHalfword_given_0xAABBCCDD_should_return_0xCCDDAABB()
+{
+  TEST_ASSERT_EQUAL(0xCCDDAABB,swapHalfword(0xAABBCCDD));
+}
+
+void test_swapHalfword_given_0x1111AAAA_should_return_0xAAAA1111()
+{
+  TEST_ASSERT_EQUAL(0xAAAA1111,swapHalfword(0x1111AAAA));
+}

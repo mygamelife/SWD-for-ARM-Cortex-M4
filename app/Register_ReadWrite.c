@@ -43,12 +43,12 @@ SwdError swdRegisterWrite(int address, int pointType, uint32_t data)
 	send8bit(swdRequest);
 
 	turnAroundRead();
-	SWDIO_InputMode();
+	setSWDIOInputMode();
 
 	read3bit(&ack);
 
 	turnAroundWrite();
-	SWDIO_OutputMode();
+	setSWDIOOutputMode();
 
 	send32bit(data);
 	sendBit(parity);
@@ -66,7 +66,7 @@ SwdError swdRegisterRead(int address, int pointType, uint32_t *data)
 	send8bit(swdRequest);
 
 	turnAroundRead();
-	SWDIO_InputMode();
+	setSWDIOInputMode();
 
 	read3bit(&ack);
 	read32bit(data);
@@ -74,7 +74,7 @@ SwdError swdRegisterRead(int address, int pointType, uint32_t *data)
 	parity = readBit();
 
 	turnAroundWrite();
-	SWDIO_OutputMode();
+	setSWDIOOutputMode();
 
 	extraIdleClock(8);
   
@@ -148,10 +148,28 @@ int memoryReadWord(uint32_t address, uint32_t *dataRead)
 	int parity = 0 , status = 0;
 	
 	if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
-	{
-	   swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE));
-	   cswDataSize = CSW_WORD_SIZE;
-	}
+	  {
+	    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	    cswDataSize = CSW_WORD_SIZE;
+	  }
+
+	swdWriteAP(TAR_REG, address);
+	swdReadAP(DRW_REG, dataRead);
+	
+	status = compare_ParityWithData(*dataRead,parity);
+	
+	return status;
+}
+
+int memoryReadHalfword(uint32_t address,uint32_t *dataRead)
+{
+  int parity = 0 , status = 0;
+	
+	if(cswDataSize != CSW_HALFWORD_SIZE) // used to prevent setting same size again and again
+	  {
+	    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+	    cswDataSize = CSW_HALFWORD_SIZE;
+	  }
 
 	swdWriteAP(TAR_REG, address);
 	swdReadAP(DRW_REG, dataRead);

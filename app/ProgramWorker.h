@@ -5,6 +5,7 @@
 #include "CoreDebug.h"
 #include "FPB_Unit.h"
 #include "DWT_Unit.h"
+#include "CodeStepping.h"
 #include "swdStub.h"
 #include "ErrorCode.h"
 #include "CException.h"
@@ -46,10 +47,10 @@ void probeTaskManager(Tlv_Session *session);
 void haltTarget(Tlv_Session *session);
 void runTarget(Tlv_Session *session);
 
-void singleStepTarget(Tlv_Session *session);
-void multipleStepTarget(Tlv_Session *session, int nInstructions);
-
-void singleStepOver(Tlv_Session *session);
+void performSingleStepInto(Tlv_Session *session);
+void performMultipleStepInto(Tlv_Session *session, int nInstructions);
+void performStepOver(Tlv_Session *session);
+void performStepOut(Tlv_Session *session);
 
 void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchingMode);
 void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
@@ -61,8 +62,8 @@ void removeAllInstructionBreakpoint(Tlv_Session *session);
 void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
 void stopAllFlashPatchRemapping(Tlv_Session *session);
                    
-void checkBreakpointEvent(Tlv_Session *session);
-void checkWatchpointEvent(Tlv_Session *session);
+void breakpointEventHandler(Tlv_Session *session);
+void watchpointEventHandler(Tlv_Session *session);
 
 
 /* ##### */

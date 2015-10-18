@@ -5,31 +5,31 @@
 #include "Register_ReadWrite.h"
 #include "core_cm4.h"
 
-#define DHCSR_REG   (uint32_t)&(CoreDebug->DHCSR)
-#define DFSR_REG	  (uint32_t)&(SCB->DFSR)
-#define DEMCR_REG	  (uint32_t)&(CoreDebug->DEMCR)
-#define DCRSR_REG	  (uint32_t)&(CoreDebug->DCRSR)  
-#define DCRDR_REG 	(uint32_t)&(CoreDebug->DCRDR)
+#define DHCSR_REG                 (uint32_t)&(CoreDebug->DHCSR)
+#define DFSR_REG	                (uint32_t)&(SCB->DFSR)
+#define DEMCR_REG	                (uint32_t)&(CoreDebug->DEMCR)
+#define DCRSR_REG	                (uint32_t)&(CoreDebug->DCRSR)  
+#define DCRDR_REG 	              (uint32_t)&(CoreDebug->DCRDR)
 
-#define AIRCR_REG   (uint32_t)&(SCB->AIRCR)
+#define AIRCR_REG                 (uint32_t)&(SCB->AIRCR)
 
 #define REQUEST_SYSTEM_RESET      0xFA050004
 #define REQUEST_VECTOR_RESET      0xFA050001
 
-#define CORE_REG_READ   0
-#define CORE_REG_WRITE  0x10000
+#define CORE_REG_READ             0
+#define CORE_REG_WRITE            0x10000
 
-#define DFSR_EXTERNAL_MASK	0x00000010
-#define DFSR_VCATCH_MASK	  0x00000008
-#define DFSR_DWTTRAP_MASK	  0x00000004
-#define DFSR_BKPT_MASK		  0x00000002
-#define DFSR_HALTED_MASK	  0x00000001
+#define DFSR_EXTERNAL_MASK	      0x00000010
+#define DFSR_VCATCH_MASK	        0x00000008
+#define DFSR_DWTTRAP_MASK	        0x00000004
+#define DFSR_BKPT_MASK		        0x00000002
+#define DFSR_HALTED_MASK	        0x00000001
 
-#define EXTERNAL_DEBUGEVENT  (1UL << SCB_DFSR_EXTERNAL_Pos)  
-#define VCATCH_DEBUGEVENT    (1UL << SCB_DFSR_VCATCH_Pos) 
-#define DWTTRAP_DEBUGEVENT   (1UL << SCB_DFSR_DWTTRAP_Pos) 
-#define BKPT_DEBUGEVENT      (1UL << SCB_DFSR_BKPT_Pos) 
-#define HALTED_DEBUGEVENT    (1UL << SCB_DFSR_HALTED_Pos)   
+#define EXTERNAL_DEBUGEVENT       (1UL << SCB_DFSR_EXTERNAL_Pos)  
+#define VCATCH_DEBUGEVENT         (1UL << SCB_DFSR_VCATCH_Pos) 
+#define DWTTRAP_DEBUGEVENT        (1UL << SCB_DFSR_DWTTRAP_Pos) 
+#define BKPT_DEBUGEVENT           (1UL << SCB_DFSR_BKPT_Pos) 
+#define HALTED_DEBUGEVENT         (1UL << SCB_DFSR_HALTED_Pos)   
 
 #define DEMCR_TRCENA_MASK		      0x1000000
 #define DEMCR_MON_REQ_MASK		    0x80000
@@ -45,21 +45,18 @@
 #define DEMCR_VC_MMERR_MASK		    0x10
 #define DEMCR_VC_CORERESET_MASK	  0x1
 
-#define VC_DISABLEALL    0
-#define VC_CORERESET    (1UL << CoreDebug_DEMCR_VC_CORERESET_Pos)  
-#define VC_MMERR        (1UL << CoreDebug_DEMCR_VC_MMERR_Pos)
-#define VC_NOCPERR      (1UL << CoreDebug_DEMCR_VC_NOCPERR_Pos)
-#define VC_CHKERR       (1UL << CoreDebug_DEMCR_VC_CHKERR_Pos) 
-#define VC_STATERR      (1UL << CoreDebug_DEMCR_VC_STATERR_Pos) 
-#define VC_BUSERR       (1UL << CoreDebug_DEMCR_VC_BUSERR_Pos)
-#define VC_INTERR       (1UL << CoreDebug_DEMCR_VC_INTERR_Pos) 
-#define VC_HARDERR      (1UL << CoreDebug_DEMCR_VC_HARDERR_Pos)
+#define VC_DISABLEALL             0
+#define VC_CORERESET              (1UL << CoreDebug_DEMCR_VC_CORERESET_Pos)  
+#define VC_MMERR                  (1UL << CoreDebug_DEMCR_VC_MMERR_Pos)
+#define VC_NOCPERR                (1UL << CoreDebug_DEMCR_VC_NOCPERR_Pos)
+#define VC_CHKERR                 (1UL << CoreDebug_DEMCR_VC_CHKERR_Pos) 
+#define VC_STATERR                (1UL << CoreDebug_DEMCR_VC_STATERR_Pos) 
+#define VC_BUSERR                 (1UL << CoreDebug_DEMCR_VC_BUSERR_Pos)
+#define VC_INTERR                 (1UL << CoreDebug_DEMCR_VC_INTERR_Pos) 
+#define VC_HARDERR                (1UL << CoreDebug_DEMCR_VC_HARDERR_Pos)
 
-#define BL_INSTRUCTION_MASK 0xF800D000
-#define BL_ENCODING         0xF000D000
-
-#define ENABLE_DWT_ITM	1
-#define DISABLE_DWT_ITM 0
+#define ENABLE_DWT_ITM	          1
+#define DISABLE_DWT_ITM           0
 
 typedef enum 
 {
@@ -129,7 +126,4 @@ typedef enum
 	CORE_REG_FPREGS31 = 95
 }CoreRegister;
 
-CoreMode determineCoreModeFromDataRead(uint32_t dataRead);
-int doesCoreModeRequiresHaltedAndDebug(CoreMode mode);
-uint32_t getCoreModeConfiguration(CoreMode mode);
 #endif // CoreDebug_Utilities_H

@@ -4,6 +4,7 @@
 #include "Register_ReadWrite.h"
 #include "FPB_Utilities.h"
 #include "CoreDebug.h"
+#include "CodeStepping.h"
 
 #define enableFPBUnit()   memoryWriteWord((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB)
 #define disableFPBUnit()  memoryWriteWord((uint32_t)&(FPB->FP_CTRL),DISABLE_FPB)
@@ -15,6 +16,8 @@ int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_
 
 int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode);
 int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode);
+
+uint32_t autoSetSoftwareBreakpoint(uint32_t instructionAddress);
 
 int disableInstructionComparator(int instructionCOMPno);
 int disableLiteralComparator(int literalCOMPno);

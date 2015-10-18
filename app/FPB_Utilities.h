@@ -5,6 +5,8 @@
 #include "Register_ReadWrite.h"
 #include "core_cm4.h"
 
+#define SOFTBKPT_BUFFER_SIZE  100
+
 typedef struct
 {
   __IO uint32_t  FP_CTRL;
@@ -69,12 +71,17 @@ typedef struct
 
 #define REMAP_BASE        0x30000000
 
+#define LOWERHALFWORD_MASK  0x0000FFFF
+#define UPPERHALFWORD_MASK  0xFFFF0000
+
 extern int instructionComparatorReady[INSTRUCTION_COMP_NUM];
 extern int literalComparatorReady[LITERAL_COMP_NUM];
 
 int checkForValidInstructionComparator(int instructionCOMPno);
 int checkForValidLiteralComparator(int literalCOMPno);
 int checkForValidFPComparator(uint32_t compNo);
+
+uint32_t swapHalfword(uint32_t data);
 
 uint32_t selectNextFreeComparator(int comparatorType);
 #endif // FPB_Utilities_H
