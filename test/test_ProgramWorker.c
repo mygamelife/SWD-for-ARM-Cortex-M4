@@ -398,7 +398,7 @@ void test_probeTaskManager_should_run_checkPointEvent_if_set_breakPoint_is_calle
 
   readDebugEventRegister_ExpectAndReturn(0x2);
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001110);
-  disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),DISABLE_FPB,0);
   memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
   probeTaskManager(session);    
@@ -486,6 +486,8 @@ void test_runTarget_should_return_ACK_if_successful()
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
 
+  stepIntoOnce_ExpectAndReturn(0);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB,0);
   setCoreMode_Expect(CORE_DEBUG_MODE);
   getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
   
@@ -501,6 +503,8 @@ void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
     uartInit_IgnoreAndReturn(&uartHandler);
     Tlv_Session *session = tlvCreateSession();
     
+    stepIntoOnce_ExpectAndReturn(0);
+    memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB,0);
     setCoreMode_Expect(CORE_DEBUG_MODE);
     getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
     
@@ -510,7 +514,7 @@ void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
   }
 }
 
-void test_runTarget_should_run_chekcBreakPointEvent_if_breakPointFlag_is_set()
+void test_runTarget_should_run_breakpointEventHandler_if_breakPointFlag_is_set()
 {
   UART_HandleTypeDef uartHandler;
   
@@ -522,7 +526,7 @@ void test_runTarget_should_run_chekcBreakPointEvent_if_breakPointFlag_is_set()
   readDebugEventRegister_ExpectAndReturn(0x2);
   
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
-  disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),DISABLE_FPB,0);
   memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
   runTarget(session);
@@ -719,7 +723,7 @@ void test_removeAllInstructionBreakpoint_should_remove_all_breakpoint_and_return
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  removeAllBreakpoint_Expect();
+  removeAllFPComparatorSetToBreakpoint_Expect();
   
   removeAllInstructionBreakpoint(session);
 }
@@ -782,7 +786,7 @@ void test_breakpointEventHandler_should_read_PC_and_disable_comparator_if_breakp
   readDebugEventRegister_ExpectAndReturn(0x2);
   
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
-  disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),DISABLE_FPB,0);
   memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
   breakpointEventHandler(session);

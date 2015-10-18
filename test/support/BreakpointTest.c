@@ -8,7 +8,7 @@
  *
  * Result : Breakpoint at 0x500
  */
-void instructionBreakPointTestCase_2bytes_LowerHalfWord()
+void instructionBreakPointTestCase_2bytes_LowerHalfWord(Tlv_Session *session)
 {
   uint32_t PC = 0  ;
 
@@ -33,7 +33,7 @@ void instructionBreakPointTestCase_2bytes_LowerHalfWord()
  *
  * Result : Breakpoint at 0x502
  */
-void instructionBreakPointTestCase_2bytes_UpperHalfWord()
+void instructionBreakPointTestCase_2bytes_UpperHalfWord(Tlv_Session *session)
 {
   uint32_t PC = 0 ;
 
@@ -58,7 +58,7 @@ void instructionBreakPointTestCase_2bytes_UpperHalfWord()
  *
  * Result : Breakpoint at 0x500
  */
-void instructionBreakPointTestCase_2bytes_Word()
+void instructionBreakPointTestCase_2bytes_Word(Tlv_Session *session)
 {
   uint32_t PC = 0 ;
 
@@ -84,7 +84,7 @@ void instructionBreakPointTestCase_2bytes_Word()
  *
  * Result : Breakpoint will never occur
  */
-void instructionBreakPointTestCase_4bytes_UpperHalfWord()
+void instructionBreakPointTestCase_4bytes_UpperHalfWord(Tlv_Session *session)
 {
 	  uint32_t PC = 0 ;
 
@@ -111,7 +111,7 @@ void instructionBreakPointTestCase_4bytes_UpperHalfWord()
  *
  * Result : Breakpoint at 0x500
  */
-void instructionBreakPointTestCase_4bytes_Word()
+void instructionBreakPointTestCase_4bytes_Word(Tlv_Session *session)
 {
   uint32_t PC = 0 ;
 
@@ -139,7 +139,7 @@ void instructionBreakPointTestCase_4bytes_Word()
  *
  * Result : Breakpoint will never occur
  */
-void instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
+void instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword(Tlv_Session *session)
 {
   uint32_t PC = 0 ;
 
@@ -168,7 +168,7 @@ void instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
  *
  * Result : Breakpoint at 0x506
  */
-void instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
+void instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word(Tlv_Session *session)
 {
   uint32_t PC = 0 ;
 
@@ -195,7 +195,7 @@ void instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
  *
  * Result : Breakpoint at 0x506
  */
-void instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
+void instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word(Tlv_Session *session)
 {
   uint32_t PC = 0 ;
 

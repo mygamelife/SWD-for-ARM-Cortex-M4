@@ -208,6 +208,8 @@ void runTarget(Tlv_Session *session)
   // printf("run target\n");
   
   if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
+    stepIntoOnce();
+    enableFPBUnit();
     setCoreMode(CORE_DEBUG_MODE);
     if(getCoreMode() == CORE_DEBUG_MODE) {
       tlv = tlvCreatePacket(TLV_OK, 0, 0);
@@ -287,14 +289,14 @@ void performStepOver(Tlv_Session *session)
 void performStepOut(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint32_t data = 0 ;
+  uint32_t pc = 0 ;
   
-  data = stepOut();
+  pc = stepOut();
   
-  if(data == 0)
+  if(pc == 0)
     Throw(TLV_NOT_STEPOUT);
   else
-    tlv = tlvCreatePacket(TLV_STEPOUT,4, (uint8_t *)&data);
+    tlv = tlvCreatePacket(TLV_STEPOUT,4, (uint8_t *)&pc);
     
   tlvSend(session, tlv);
 }
@@ -386,7 +388,7 @@ void removeAllInstructionBreakpoint(Tlv_Session *session)
 {
   Tlv *tlv ;
   
-  removeAllBreakpoint();
+  removeAllFPComparatorSetToBreakpoint();
   
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
@@ -438,14 +440,22 @@ void stopAllFlashPatchRemapping(Tlv_Session *session)
 void breakpointEventHandler(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint32_t pc =0 ;
+  uint32_t pc =0 , machineCode = 0 ;
   
   if(!hasBreakpointDebugEventOccured())
     return ;
   else 
   {
     pc = readCoreRegister(CORE_REG_PC);
-    disableFPComparatorLoadedWithAddress(pc,INSTRUCTION_TYPE);
+    //machineCode = memoryReadAndReturnWord(pc);
+    
+    // if(machineCode & SOFTWAREBREAKPOINT_MASK ==  BKPT_ENCODING)
+    // {
+      
+    // }
+    // else
+      disableFPBUnit();
+    
     clearBreakpointDebugEvent();
   }
   

@@ -1,7 +1,7 @@
 #include "WatchpointTest.h"
 
 /*-------------------------------------------------*/
-void datawatchpoint_TestCase_ReadByte_LDRB()
+void datawatchpoint_TestCase_ReadByte_LDRB(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -20,7 +20,7 @@ void datawatchpoint_TestCase_ReadByte_LDRB()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadByte_LDRH()
+void datawatchpoint_TestCase_ReadByte_LDRH(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -39,7 +39,7 @@ void datawatchpoint_TestCase_ReadByte_LDRH()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadByte_LDR()
+void datawatchpoint_TestCase_ReadByte_LDR(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -64,7 +64,7 @@ void datawatchpoint_TestCase_ReadByte_LDR()
 /*
  * Result: Watchpoint event not occur
  */
-void datawatchpoint_TestCase_ReadHalfword_LDRB()
+void datawatchpoint_TestCase_ReadHalfword_LDRB(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -84,7 +84,7 @@ void datawatchpoint_TestCase_ReadHalfword_LDRB()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadHalfword_LDRH()
+void datawatchpoint_TestCase_ReadHalfword_LDRH(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -104,7 +104,7 @@ void datawatchpoint_TestCase_ReadHalfword_LDRH()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadHalfword_LDR()
+void datawatchpoint_TestCase_ReadHalfword_LDR(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -125,7 +125,7 @@ void datawatchpoint_TestCase_ReadHalfword_LDR()
 }
 
 /*-------------------------------------------------*/
-void datawatchpoint_TestCase_ReadWord_LDRB()
+void datawatchpoint_TestCase_ReadWord_LDRB(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -145,7 +145,7 @@ void datawatchpoint_TestCase_ReadWord_LDRB()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadWord_LDRH()
+void datawatchpoint_TestCase_ReadWord_LDRH(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -165,7 +165,7 @@ void datawatchpoint_TestCase_ReadWord_LDRH()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadWord_LDR()
+void datawatchpoint_TestCase_ReadWord_LDR(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -186,7 +186,7 @@ void datawatchpoint_TestCase_ReadWord_LDR()
 }
 
 /*-------------------------------------------------*/
-void datawatchpoint_TestCase_WriteByte_STRB()
+void datawatchpoint_TestCase_WriteByte_STRB(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -206,7 +206,7 @@ void datawatchpoint_TestCase_WriteByte_STRB()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteByte_STRH()
+void datawatchpoint_TestCase_WriteByte_STRH(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -226,7 +226,7 @@ void datawatchpoint_TestCase_WriteByte_STRH()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteByte_STR()
+void datawatchpoint_TestCase_WriteByte_STR(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -246,7 +246,7 @@ void datawatchpoint_TestCase_WriteByte_STR()
 }
 
 /*-------------------------------------------------*/
-void datawatchpoint_TestCase_WriteHalfword_STRB()
+void datawatchpoint_TestCase_WriteHalfword_STRB(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -265,7 +265,7 @@ void datawatchpoint_TestCase_WriteHalfword_STRB()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteHalfword_STRH()
+void datawatchpoint_TestCase_WriteHalfword_STRH(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -284,7 +284,7 @@ void datawatchpoint_TestCase_WriteHalfword_STRH()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteHalfword_STR()
+void datawatchpoint_TestCase_WriteHalfword_STR(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -304,7 +304,7 @@ void datawatchpoint_TestCase_WriteHalfword_STR()
 }
 
 /*-------------------------------------------------*/
-void datawatchpoint_TestCase_WriteWord_STRB()
+void datawatchpoint_TestCase_WriteWord_STRB(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -323,7 +323,7 @@ void datawatchpoint_TestCase_WriteWord_STRB()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteWord_STRH()
+void datawatchpoint_TestCase_WriteWord_STRH(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -342,7 +342,7 @@ void datawatchpoint_TestCase_WriteWord_STRH()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteWord_STR()
+void datawatchpoint_TestCase_WriteWord_STR(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   
@@ -363,7 +363,7 @@ void datawatchpoint_TestCase_WriteWord_STR()
 /*-------------------------------------------------*/
 
 
-void datawatchpoint_TestCase_WriteWord_2bytes()
+void datawatchpoint_TestCase_WriteWord_2bytes(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   uint32_t r1 = 0 ;
@@ -389,7 +389,7 @@ void datawatchpoint_TestCase_WriteWord_2bytes()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_WriteWord_4bytes()
+void datawatchpoint_TestCase_WriteWord_4bytes(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   uint32_t r11= 0 ;
@@ -417,7 +417,7 @@ void datawatchpoint_TestCase_WriteWord_4bytes()
 
 }
 
-void datawatchpoint_TestCase_ReadWord_2bytes()
+void datawatchpoint_TestCase_ReadWord_2bytes(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   uint32_t r1 = 0 ;
@@ -445,7 +445,7 @@ void datawatchpoint_TestCase_ReadWord_2bytes()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_ReadWord_4bytes()
+void datawatchpoint_TestCase_ReadWord_4bytes(Tlv_Session *session)
 {
   uint32_t pc = 0 ;
   uint32_t r11 = 0 ;
@@ -473,7 +473,7 @@ void datawatchpoint_TestCase_ReadWord_4bytes()
   setCoreMode(CORE_NORMAL_MODE);
 }
 
-void datawatchpoint_TestCase_DoubleWrite()
+void datawatchpoint_TestCase_DoubleWrite(Tlv_Session *session)
 {
 	  uint32_t pc = 0 ;
 	  uint32_t r1 = 0 ;

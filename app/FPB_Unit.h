@@ -28,6 +28,6 @@ void readAndUpdateComparatorReadyFlag(int comparatorType);
 
 void initialiseFPBUnit();
 
-void removeAllBreakpoint();
+void removeAllFPComparatorSetToBreakpoint();
 void stopAllFPRemapping();
 #endif // FPB_Unit_H

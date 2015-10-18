@@ -735,8 +735,8 @@ void test_initialiseFPBUnit_should_disable_all_comparator_and_enable_FPB_unit()
   TEST_ASSERT_EQUAL(COMP_READY,literalComparatorReady[1]);
 }
 
-/*-------------------------removeAllBreakpoint-----------------------*/
-void test_removeAllBreakpoint_should_only_disable_comparator_set_to_COMP_BUSY()
+/*-------------------------removeAllFPComparatorSetToBreakpoint-----------------------*/
+void test_removeAllFPComparatorSetToBreakpoint_should_only_disable_comparator_set_to_COMP_BUSY()
 {
   instructionComparatorReady[0] = COMP_READY ;
   instructionComparatorReady[1] = COMP_BUSY ;
@@ -757,7 +757,7 @@ void test_removeAllBreakpoint_should_only_disable_comparator_set_to_COMP_BUSY()
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[5]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  removeAllBreakpoint();
+  removeAllFPComparatorSetToBreakpoint();
   
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[1]);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[3]);
