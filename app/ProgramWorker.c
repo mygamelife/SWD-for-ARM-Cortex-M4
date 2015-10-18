@@ -123,13 +123,13 @@ void readAllTargetRegister(Tlv_Session *session)
 {
   int i = 0 , j = 0;
   uint32_t data[52] = {} ;
-  
+
   for (i = 0 ; i < 20 ; i ++)
     data[i] = readCoreRegister(i);
   
   data[i] = readCoreRegister(CORE_REG_FPSCR);
   
-  for(j = 33 ; j < 96 ; j++)
+  for(j = 64 ; j < 96 ; j++)
   {
     i++ ;
     data[i] = readCoreRegister(j);
@@ -229,10 +229,16 @@ void runTarget(Tlv_Session *session)
 void performSingleStepInto(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint32_t data = 0 ;
+  uint32_t pc = 0 , initialPC = 0 ;
   
-  data = stepIntoOnce();
-  tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
+  initialPC = readCoreRegister(CORE_REG_PC);
+  
+  pc = stepIntoOnce();
+  
+  if(pc == initialPC)
+    Throw(TLV_NOT_STEPPED);
+  else
+    tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&pc);
 
   tlvSend(session, tlv);
 }
@@ -247,15 +253,9 @@ void performMultipleStepInto(Tlv_Session *session, int nInstructions)
 {
   Tlv *tlv ;
   int i = 0 ;
-  uint32_t data = 0 ;
   
   for(i = 0 ; i < nInstructions ; i ++)
-  {
-    data = stepIntoOnce();
-    tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
-  } 
-
-  tlvSend(session, tlv);
+    performSingleStepInto(session);
 }
 
 /** Step over single instruction 
@@ -659,7 +659,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_READ_REGISTER          : readTargetRegister(session, get4Byte(&tlv->value[0])); break;
     case TLV_HALT_TARGET            : haltTarget(session); break;
     case TLV_RUN_TARGET             : runTarget(session); break;
-    case TLV_STEP                   : multipleStepTarget(session, get4Byte(&tlv->value[0])); break;
+    case TLV_STEP                   : performMultipleStepInto(session, get4Byte(&tlv->value[0])); break;
     case TLV_BREAKPOINT             : setBreakpoint(session, get4Byte(&tlv->value[0]), MATCH_WORD); break;
     case TLV_REMOVE_BREAKPOINT      : break;
     case TLV_REMOVE_ALL_BREAKPOINT  : removeAllInstructionBreakpoint(session); break;

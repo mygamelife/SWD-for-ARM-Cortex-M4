@@ -2,6 +2,7 @@
 #include "Tlv.h"
 #include "Tlv_ex.h"
 #include "ProgramWorker.h"
+#include "ErrorCode.h"
 #include "CoreDebug_Utilities.h"
 #include "mock_IoOperations.h"
 #include "mock_uart.h"
@@ -78,19 +79,19 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
 
 void test_readAllTargetRegister_should_read_all_target_register()
 {
-  int i = 0 ;
+  int i = 0, j = 0 ;
   
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
   for(i = 0 ; i < 20 ; i ++)
-    readCoreRegister_ExpectAndReturn(i,0);
+    readCoreRegister_ExpectAndReturn(i,0x11223344);
   
-  readCoreRegister_ExpectAndReturn(CORE_REG_FPSCR,0);
+  readCoreRegister_ExpectAndReturn(CORE_REG_FPSCR,0x11223344);
   
-  for(i=33 ; i < 96 ; i++)
-    readCoreRegister_ExpectAndReturn(i,0);
+  for(j=64 ; j < 96 ; j++)
+    readCoreRegister_ExpectAndReturn(j,0x11223344);
   
   readAllTargetRegister(session);
 }
@@ -530,31 +531,38 @@ void test_runTarget_should_run_chekcBreakPointEvent_if_breakPointFlag_is_set()
 }
 
 /*---------performSingleStepInto----------------------*/
-void test_performSingleStepInto_should_step_readPC_run_and_return_PC_if_successful()
+void test_performSingleStepInto_should_readPC_step_and_return_PC_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
+  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001108);
   stepIntoOnce_ExpectAndReturn(0x08001110);
   
   performSingleStepInto(session);    
 }
 
-/*---------performMultipleStepInto----------------------*/
-void test_performMultipleStepInto_should_step_readPC_run_and_return_PC_if_successful()
+void test_performSingleStepInto_should_readPC_step_and_Throw_TLV_NOT_STEPPED_if_unsuccessfu()
 {
+  CEXCEPTION_T err;
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
+
+  Try
+  {
+    readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001110);
+    stepIntoOnce_ExpectAndReturn(0x08001110);
+    performSingleStepInto(session);   
+  }
+  Catch(err)
+  {
+    
+    TEST_ASSERT_EQUAL(TLV_NOT_STEPPED,err);
+  }
   
-  stepIntoOnce_ExpectAndReturn(0x08001110);
-  stepIntoOnce_ExpectAndReturn(0x08001112);
-  stepIntoOnce_ExpectAndReturn(0x08001114);
-  stepIntoOnce_ExpectAndReturn(0x08001116);
-  stepIntoOnce_ExpectAndReturn(0x0800111A);
-  
-  performMultipleStepInto(session, 5);    
+   
 }
 
 /*---------performStepOver----------------------*/
