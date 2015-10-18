@@ -645,7 +645,7 @@ void test_tlvLoadToRam_should_update_PC_and_run_the_program_after_finish_loading
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
 }
 
-void test_tlvEraseTargetFlash_should_request_erase_target_memory_and_return_1_if_successfully_request_and_receive_ack(void)
+void test_tlvRequestFlashErase_should_request_erase_target_memory_and_return_1_if_successfully_request_and_receive_ack(void)
 {
   HANDLE hSerial;
   uartInit_IgnoreAndReturn(hSerial);
@@ -699,71 +699,132 @@ void test_tlvEraseTargetFlash_should_send_flash_erase_request_if_flash_programme
   TEST_ASSERT_EQUAL_HEX32(0x4E20, get4Byte(&session->txBuffer[6]));
 }
 
-// void test_tlvMassEraseTargetFlash_should_send_flash_mass_erase_request(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_tlvRequestFlashMassErase_should_request_erase_target_memory_and_return_1_if_successfully_request_and_receive_ack(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  int result = 0;
   
-  // fileStatus = FILE_CLOSED;
-  // session->mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
-  // session->ramState = TLV_RUN_PROGRAM;
-  
-  // tlvMassEraseTargetFlash(session, BANK_1);
-  // tlvMassEraseTargetFlash(session, BANK_1);
-  
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_FLASH_PROGRAMMER, session->mEraseState);
-  // TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(BANK_1, session->txBuffer[2]);
-// }
+  result = tlvRequestFlashMassErase(session, BOTH_BANK);
 
-// void test_tlvLoadToFlash_should_request_flash_erase_section_and_program_Size(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
-  
-  // fileStatus = FILE_CLOSED;
-  // session->eraseState = TLV_REQUEST_ERASE;
-  
-  // tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
-  
-  // TEST_ASSERT_EQUAL(TLV_LOAD_ACTUAL_PROGRAM, session->flashState);
-  // TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(0x08000000, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL(4176, get4Byte(&session->txBuffer[6]));
-// }
+  TEST_ASSERT_EQUAL(PROCESS_BUSY, result);
+  TEST_ASSERT_EQUAL(true, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL_HEX32(0x000000003, get4Byte(&session->txBuffer[2]));
 
-// void test_tlvLoadToFlash_should_update_program_counter_to_entry_address_after_loaded_actual_program(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // session->flashState = TLV_UPDATE_PC;
-  // tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
-  
-  // TEST_ASSERT_EQUAL(TLV_RUN_PROGRAM, session->flashState);
-// }
+  result = tlvRequestFlashMassErase(session, BOTH_BANK);
 
-// void test_tlvLoadToFlash_should_run_the_program_after_update_program_counter_to_entry_address(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_tlvMassEraseTargetFlash_should_send_flash_mass_erase_request(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
   
-  // session->flashState = TLV_RUN_PROGRAM;
-  // tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  fileStatus = FILE_CLOSED;
+  session->mEraseState = TLV_REQUEST_ERASE;
   
-  // TEST_ASSERT_EQUAL(TLV_REQUEST_ERASE, session->flashState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
-// }
+  tlvMassEraseTargetFlash(session, BOTH_BANK);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  tlvMassEraseTargetFlash(session, BOTH_BANK);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x00000003, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX8(0xFD, session->txBuffer[6]); //checksum
+}
+
+void test_tlvLoadToFlash_should_request_flash_erase_section_and_program_Size(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  fileStatus = FILE_CLOSED;
+  session->eraseState = TLV_REQUEST_ERASE;
+  
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  
+  TEST_ASSERT_EQUAL(TLV_REQUEST_ERASE, session->flashState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_FLASH_ERASE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x08000000, get4Byte(&session->txBuffer[2]));
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  TEST_ASSERT_EQUAL(TLV_LOAD_ACTUAL_PROGRAM, session->flashState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_tlvLoadToFlash_should_update_program_counter_to_entry_address_after_loaded_actual_program(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  session->flashState = TLV_UPDATE_PC;
+  
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  TEST_ASSERT_EQUAL(TLV_UPDATE_PC, session->flashState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  TEST_ASSERT_EQUAL(TLV_RUN_PROGRAM, session->flashState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_tlvLoadToFlash_should_run_the_program_after_update_program_counter_to_entry_address(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+  
+  session->flashState = TLV_RUN_PROGRAM;
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  TEST_ASSERT_EQUAL(TLV_RUN_PROGRAM, session->flashState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  tlvLoadToFlash(session, "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/led.elf");
+  TEST_ASSERT_EQUAL(0, session->runState);
+  TEST_ASSERT_EQUAL(TLV_REQUEST_ERASE, session->flashState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
 
 // void test_tlvSetBreakpoint_should_send_tlv_set_breakpoint_request(void)
 // {

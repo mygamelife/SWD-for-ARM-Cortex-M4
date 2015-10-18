@@ -205,7 +205,6 @@ void haltTarget(Tlv_Session *session)
 void runTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  // printf("run target\n");
   
   if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
     setCoreMode(CORE_DEBUG_MODE);

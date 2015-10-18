@@ -16,18 +16,19 @@ Tlv_Session *tlvCreateSession(void) {
   session.receiveState = TLV_RECEIVE_TYPE;
   
   /* ###### Tlv state ###### */
-  session.wregState     = 0;
-  session.regState      = 0;
-  session.haltState     = 0;
-  session.runState      = 0;
-  session.stepState     = 0;
-  session.sresetState   = 0;
-  session.hresetState   = 0;
-  session.wramState     = 0;
-  session.wflashState   = 0;
-  session.lflashState   = 0;
-  session.rmemState     = 0;
-  session.rEraseState   = 0;
+  session.wregState         = 0;
+  session.regState          = 0;
+  session.haltState         = 0;
+  session.runState          = 0;
+  session.stepState         = 0;
+  session.sresetState       = 0;
+  session.hresetState       = 0;
+  session.wramState         = 0;
+  session.wflashState       = 0;
+  session.lflashState       = 0;
+  session.rmemState         = 0;
+  session.rEraseState       = 0;
+  session.rMassEraseState   = 0;
   
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;

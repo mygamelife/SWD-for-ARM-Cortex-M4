@@ -35,7 +35,8 @@ typedef struct
   Tlv_State lramState;
   Tlv_State lflashState;
   Tlv_State rmemState;
-  Tlv_State rEraseState;              /* Request erase state */
+  Tlv_State rEraseState;                  /* Request section erase state */
+  Tlv_State rMassEraseState;              /* Request mass erase state */
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
