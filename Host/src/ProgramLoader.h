@@ -44,7 +44,10 @@ Process_Status tlvHardReset(Tlv_Session *session);
 
 /* Write target memory */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
-int tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data);
+Process_Status tlvWriteDataInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data);
+Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data);
 
 #define tlvWriteToRam(session, dataAddress, destAddress, size) \
         tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)

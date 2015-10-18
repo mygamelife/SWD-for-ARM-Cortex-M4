@@ -840,6 +840,102 @@ void test_tlvLoadToFlash_should_run_the_program_after_update_program_counter_to_
   // TEST_ASSERT_EQUAL_HEX8(0x10, session->txBuffer[6]);
 // }
 
+void test_tlvWriteDataInWord_should_request_write_data_in_word_and_return_1(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+
+  uint32_t data = 0xDEADBEEF;
+  uint32_t address = 0x20000000;
+  int result = 0;
+  
+  result = tlvWriteDataInWord(session, address, data);
+
+  TEST_ASSERT_EQUAL(PROCESS_BUSY, result);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(TLV_WRITE_WORD, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xA8, session->txBuffer[10]); //checksum
+
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  result = tlvWriteDataInWord(session, address, data);
+
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_tlvWriteDataInByte_should_request_write_data_in_word_and_return_1(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+
+  uint16_t data = 0xBE;
+  uint32_t address = 0x20000000;
+  int result = 0;
+  
+  result = tlvWriteDataInByte(session, address, data);
+
+  TEST_ASSERT_EQUAL(PROCESS_BUSY, result);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(TLV_WRITE_BYTE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(6, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX8(0xBE, getDataInByte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0x22, session->txBuffer[7]); //checksum
+
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  result = tlvWriteDataInByte(session, address, data);
+
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_tlvWriteDataInHalfWord_should_request_write_data_in_word_and_return_1(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
+
+  uint16_t data = 0xBEEF;
+  uint32_t address = 0x20000000;
+  int result = 0;
+  
+  result = tlvWriteDataInHalfWord(session, address, data);
+
+  TEST_ASSERT_EQUAL(PROCESS_BUSY, result);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(TLV_WRITE_HALFWORD, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(7, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX16(0xBEEF, getDataInHalfWord(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0x33, session->txBuffer[8]); //checksum
+
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  result = tlvWriteDataInHalfWord(session, address, data);
+
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
 void test_hostInterpreter_by_requesting_tlv_write_ram_memory(void)
 {
   HANDLE hSerial;
@@ -887,184 +983,190 @@ void test_hostInterpreter_by_requesting_tlv_write_ram_memory(void)
   TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
 }
 
-// void test_hostInterpreter_by_requesting_tlv_write_register(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_hostInterpreter_by_requesting_tlv_write_register(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
   
-  // uint32_t data32 = 0x11111111;
+  uint32_t data32 = 0x11111111;
   
-  // User_Session userSession;
-  // userSession.tlvCommand = TLV_WRITE_REGISTER;
-  // userSession.data = &data32;
-  // userSession.address = 0x20000000;
-  // userSession.size = 8;
+  User_Session userSession;
+  userSession.tlvCommand = TLV_WRITE_REGISTER;
+  userSession.data = &data32;
+  userSession.address = 0x20000000;
+  userSession.size = 8;
 
-  // waitUserCommand_ExpectAndReturn(&userSession);
-  // hostInterpreter(session);
+  waitUserCommand_ExpectAndReturn(&userSession);
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   
-  // /* ################## Send Tlv Write Register Request ################## */
-  // hostInterpreter(session);
+  /* ################## Send Tlv Write Register Request ################## */
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
-  // TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&session->txBuffer[6]));
-  // TEST_ASSERT_EQUAL_HEX32(0x9C, session->txBuffer[10]); //chksum
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX32(0x9C, session->txBuffer[10]); //chksum
   
-  // /* ################## Receive Tlv Acknowledgement ################## */
+  /* ################## Receive Tlv Acknowledgement ################## */
   
-  // session->dataSendFlag = FLAG_CLEAR;
-  // GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
+  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // hostInterpreter(session);
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
-// }
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+}
 
-// void test_hostInterpreter_by_requesting_tlv_read_register(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_hostInterpreter_by_requesting_tlv_read_register(void)
+{
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
   
-  // User_Session userSession;
-  // userSession.tlvCommand = TLV_READ_REGISTER;
-  // userSession.address = 0x20000000;
+  User_Session userSession;
+  userSession.tlvCommand = TLV_READ_REGISTER;
+  userSession.address = 0x20000000;
 
-  // waitUserCommand_ExpectAndReturn(&userSession);
-  // hostInterpreter(session);
+  waitUserCommand_ExpectAndReturn(&userSession);
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   
-  // /* ################## Send Tlv Write Register Request ################## */
-  // hostInterpreter(session);
+  /* ################## Send Tlv Write Register Request ################## */
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
-  // TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX32(0xE0, session->txBuffer[6]); //chksum
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xE0, session->txBuffer[6]); //chksum
   
-  // /* ################## Receive Tlv Acknowledgement ################## */
+  /* ################## Receive Tlv Acknowledgement ################## */
   
-  // session->dataSendFlag = FLAG_CLEAR;
-  // GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
+  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // hostInterpreter(session);
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
-// }
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+}
 
-// void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(void) {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
   
-  // fileStatus = FILE_CLOSED;
+  fileStatus = FILE_CLOSED;
   
-  // User_Session userSession;
-  // userSession.tlvCommand = TLV_WRITE_RAM;
-  // userSession.fileName = "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/blinkLedx.elf";
+  User_Session userSession;
+  userSession.tlvCommand = TLV_LOAD_RAM;
+  userSession.fileName = "C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test/ELF_File/blinkLedx.elf";
 
-  // waitUserCommand_ExpectAndReturn(&userSession);
-  // hostInterpreter(session);
+  waitUserCommand_ExpectAndReturn(&userSession);
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   
-  // /* ################## Interpret Tlv Command ################## */
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_PROGRAM, session->ramState);
+  /* ################## Sending first 248 bytes of ISR_VECTOR ################## */
+  hostInterpreter(session);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
   
-  // /* ################## Sending first 248 bytes of ISR_VECTOR ################## */
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
-  // TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
+  hostInterpreter(session);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
   
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  /* ################## Sending last 248 bytes of ISR_VECTOR ################## */
+  hostInterpreter(session);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
   
-  // /* ################## Sending last 248 bytes of ISR_VECTOR ################## */
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_WAITING_RESPONSE, session->hostState);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
-  // TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
+  hostInterpreter(session);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
   
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  
-  // closeElfFile();
-// }
+  closeElfFile();
+}
 
-// void test_hostInterpreter_should_call_flash_mass_erase_if_flash_programmer_is_loaded(void) {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_hostInterpreter_should_call_flash_mass_erase_if_flash_programmer_is_loaded(void) {
+  HANDLE hSerial;
+  uartInit_IgnoreAndReturn(hSerial);
+	Tlv_Session *session = tlvCreateSession();
   
-  // User_Session userSession;
-  // userSession.tlvCommand = TLV_FLASH_MASS_ERASE;
-  // userSession.address = BOTH_BANK;
+  User_Session userSession;
+  userSession.tlvCommand = TLV_FLASH_MASS_ERASE;
+  userSession.address = BOTH_BANK;
 
-  // waitUserCommand_ExpectAndReturn(&userSession);
-  // hostInterpreter(session);
+  waitUserCommand_ExpectAndReturn(&userSession);
+  hostInterpreter(session);
   
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->dataReceiveFlag);
+  TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   
-  // /* ################## Run flash mass erase request ################## */
-  // session->ramState = TLV_RUN_PROGRAM;
+  /* ################## Run flash mass erase request ################## */
+  session->lramState = TLV_RUN_PROGRAM;
   
-  // hostInterpreter(session);
+  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL(TLV_REQUEST_ERASE, session->mEraseState);
+  hostInterpreter(session);
   
-  // /* ################## Probe response with acknowledgment ################## */
-  // GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(TLV_REQUEST_ERASE, session->mEraseState);
   
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
+  /* ################## Probe response with acknowledgment ################## */
+  CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, session->ongoingProcessFlag);
-  // TEST_ASSERT_EQUAL(FLAG_SET, session->dataSendFlag);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_FLASH_PROGRAMMER, session->mEraseState);
-  // TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(BOTH_BANK, session->txBuffer[2]);
-// }
+  hostInterpreter(session);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(HOST_WAIT_USER_COMMAND, session->hostState);
+  
+  TEST_ASSERT_EQUAL(TLV_LOAD_FLASH_PROGRAMMER, session->mEraseState);
+  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(BOTH_BANK, session->txBuffer[2]);
+}

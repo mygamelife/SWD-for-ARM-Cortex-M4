@@ -1,0 +1,4 @@
+---
+- stm32f4xx_hal_def.h
+- stm32f4xx_hal_flash_ex.h
+- stm32f4xx_hal_flash_ramfunc.h

@@ -16,19 +16,21 @@ Tlv_Session *tlvCreateSession(void) {
   session.receiveState = TLV_RECEIVE_TYPE;
   
   /* ###### Tlv state ###### */
-  session.wregState         = 0;
-  session.regState          = 0;
-  session.haltState         = 0;
-  session.runState          = 0;
-  session.stepState         = 0;
-  session.sresetState       = 0;
-  session.hresetState       = 0;
-  session.wramState         = 0;
-  session.wflashState       = 0;
-  session.lflashState       = 0;
-  session.rmemState         = 0;
-  session.rEraseState       = 0;
-  session.rMassEraseState   = 0;
+  session.wregState           = 0;
+  session.regState            = 0;
+  session.haltState           = 0;
+  session.runState            = 0;
+  session.stepState           = 0;
+  session.sresetState         = 0;
+  session.hresetState         = 0;
+  session.wramState           = 0;
+  session.wflashState         = 0;
+  session.lflashState         = 0;
+  session.rmemState           = 0;
+  session.rEraseState         = 0;
+  session.rMassEraseState     = 0;
+  session.wDataInWordState    = 0;
+  session.memoryRwState       = 0;
   
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;
@@ -272,22 +274,25 @@ int isTlvAck(Tlv *tlv) {
   */
 int isTlvCommand(uint8_t command) {
   
-  if(command == TLV_WRITE_RAM)              return 1;
-  else if(command == TLV_WRITE_FLASH)       return 1;
-  else if(command == TLV_READ_MEMORY)       return 1;
-  else if(command == TLV_WRITE_REGISTER)    return 1;
-  else if(command == TLV_READ_REGISTER)     return 1;
-  else if(command == TLV_HALT_TARGET)       return 1;
-  else if(command == TLV_RUN_TARGET)        return 1;
-  else if(command == TLV_STEP)              return 1;
-  else if(command == TLV_MULTI_STEP)        return 1;
-  else if(command == TLV_BREAKPOINT)        return 1;
-  else if(command == TLV_FLASH_ERASE)       return 1;
-  else if(command == TLV_FLASH_MASS_ERASE)  return 1;
-  else if(command == TLV_SOFT_RESET)        return 1;
-  else if(command == TLV_HARD_RESET)        return 1;
-  else if(command == TLV_OK)                return 1;
-  else if(command == TLV_LOOP_BACK)         return 1;
+  if(command == TLV_WRITE_RAM)                      return 1;
+  else if(command == TLV_WRITE_FLASH)               return 1;
+  else if(command == TLV_READ_MEMORY)               return 1;
+  else if(command == TLV_WRITE_REGISTER)            return 1;
+  else if(command == TLV_READ_REGISTER)             return 1;
+  else if(command == TLV_HALT_TARGET)               return 1;
+  else if(command == TLV_RUN_TARGET)                return 1;
+  else if(command == TLV_STEP)                      return 1;
+  else if(command == TLV_MULTI_STEP)                return 1;
+  else if(command == TLV_BREAKPOINT)                return 1;
+  else if(command == TLV_FLASH_ERASE)               return 1;
+  else if(command == TLV_FLASH_MASS_ERASE)          return 1;
+  else if(command == TLV_SOFT_RESET)                return 1;
+  else if(command == TLV_HARD_RESET)                return 1;
+  else if(command == TLV_OK)                        return 1;
+  else if(command == TLV_LOOP_BACK)                 return 1;
+  else if(command == TLV_WRITE_WORD)                return 1;
+  else if(command == TLV_WRITE_HALFWORD)            return 1;
+  else if(command == TLV_WRITE_BYTE)                return 1;
   
   else return 0;
 }

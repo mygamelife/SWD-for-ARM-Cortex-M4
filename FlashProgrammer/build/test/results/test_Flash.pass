@@ -1,0 +1,41 @@
+---
+:source:
+  :path: test
+  :file: test_Flash.c
+:successes:
+- :test: test_flashGetSector_given_FLASH_SECTOR_0_should_select_FLASH_SECTOR_0
+  :line: 12
+  :message: ''
+- :test: test_flashGetSector_given_flash_sector_23_should_return_23
+  :line: 19
+  :message: ''
+- :test: test_flashGetSector_given_last_address_of_flash_sector_23_should_return_23
+  :line: 26
+  :message: ''
+- :test: test_flashMassErase_given_bank2_should_erase_whole_bank_2
+  :line: 33
+  :message: ''
+- :test: test_flashErase_given_StartSector_15_and_20
+  :line: 41
+  :message: ''
+- :test: test_flashWriteProgram_given_FLASH_TYPEPROGRAM_WORD
+  :line: 49
+  :message: ''
+- :test: test_flashWrite_given_data_0xABCDABCD_should_write_into_ADDR_FLASH_SECTOR_19
+  :line: 55
+  :message: ''
+- :test: test_flashWrite_given_data_and_size_5_should_write_into_Flash
+  :line: 65
+  :message: ''
+- :test: test_flashCopyFromSramToFlash_given_0x20000000_sram_address_0x08000000_flash_address_and_size_8
+  :line: 81
+  :message: ''
+:failures: []
+:ignores: []
+:counts:
+  :total: 9
+  :passed: 9
+  :failed: 0
+  :ignored: 0
+:stdout:
+- ''

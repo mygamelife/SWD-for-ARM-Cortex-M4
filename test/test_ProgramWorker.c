@@ -9,8 +9,8 @@
 #include "mock_FPB_Unit.h"
 #include "mock_DWT_Unit.h"
 #include "mock_stm32f4xx_hal_uart.h"
-#include "mock_Register_ReadWrite.h"
-#include "mock_swdStub.h"
+#include "mock_MemoryReadWrite.h"
+#include "mock_SwdStub.h"
 #include "mock_GetTime.h"
 
 void setUp(void)  {}
@@ -895,6 +895,60 @@ void test_eraseTargetFlash_should_erase_target_flash_by_given_address_and_size(v
   TEST_ASSERT_EQUAL(REQUEST_ERASE, session->pEraseState);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+void test_writeTargetInWord_should_write_word_data_into_specified_address(void)
+{ 
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t address = 0x12345678, data = 0xDEADDEAD;
+  
+  memoryWriteWord_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
+  
+  writeTargetInWord(session, address, data);
+  
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
+}
+
+void test_writeTargetInHalfWord_should_write_word_data_into_specified_address(void)
+{ 
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t address = 0x12345678, data = 0xDEAD;
+  
+  memoryWriteHalfword_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
+  
+  writeTargetInHalfWord(session, address, data);
+  
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
+}
+
+void test_writeTargetInByte_should_write_word_data_into_specified_address(void)
+{ 
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t address = 0xABCD1234, data = 0xAA;
+  
+  memoryWriteByte_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
+  
+  writeTargetInByte(session, address, data);
+  
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
 }
 
 void test_probeTaskManager_given_flash_command_should_run_writeTargetFlash(void)

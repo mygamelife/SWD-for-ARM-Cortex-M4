@@ -3,6 +3,10 @@
 
 #define TLV_DATA_SIZE   248
 
+#define getDataInByte(__DATA__)                (* (uint8_t  *)(__DATA__))
+#define getDataInHalfWord(__DATA__)            (* (uint16_t *)(__DATA__))
+#define getDataInWord(__DATA__)                (* (uint32_t *)(__DATA__))
+
 #define get4Byte(x)               (*(uint32_t *)(x))
 #define convertToBigEndian(x)     ((*(uint32_t *)(x)) >> 24 ) | (((*(uint32_t *)(x)) << 8) & 0x00ff0000) |  \
                                   (((*(uint32_t *)(x)) >> 8) & 0x0000ff00) | ((*(uint32_t *)(x)) << 24)
@@ -43,6 +47,9 @@ typedef enum
   TLV_SOFT_RESET,
   TLV_HARD_RESET,
   TLV_LOOP_BACK,
+  TLV_WRITE_WORD,                     /* Write Data Into Target In Word           */
+  TLV_WRITE_HALFWORD,                 /* Write Data Into Target In HalfWord       */
+  TLV_WRITE_BYTE,                     /* Write Data Into Target In Byte           */
 } Tlv_Command;
 
 typedef enum

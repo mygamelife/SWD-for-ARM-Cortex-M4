@@ -1,0 +1,6 @@
+---
+- swdStub.h
+- memoryRW.h
+- configurePort.h
+- stm32f4xx_hal_flash.h
+- stm32f4xx_hal_flash_ex.h

@@ -5,7 +5,7 @@
 #include "swd_Utilities.h"
 #include "configurePort.h"
 #include "IoOperations.h"
-#include "Register_ReadWrite.h"
+#include "MemoryReadWrite.h"
 
 void switchJTAGtoSWD(void);
 SwdError swdInit(void);

@@ -1,13 +1,9 @@
-#ifndef swdStub_H
-#define swdStub_H
+#ifndef SwdStub_H
+#define SwdStub_H
 
 #include <stdint.h>
 #include <malloc.h>
 #include "Flash.h"
-
-#if !defined(TEST)
-#include "SystemConfigure.h"
-#endif
 
 /** SWD Instruction address 
   */
@@ -73,4 +69,4 @@ void stubMassErase(void);
 int IsSvcActive(void);
 void svcServiceCall(void);
 void svcServiceHandler(unsigned int *svc_args);
-#endif // swdStub_H
+#endif // SwdStub_H

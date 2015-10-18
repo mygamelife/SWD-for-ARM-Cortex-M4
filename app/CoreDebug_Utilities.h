@@ -2,7 +2,7 @@
 #define CoreDebug_Utilities_H
 
 #include <stdint.h>
-#include "Register_ReadWrite.h"
+#include "MemoryReadWrite.h"
 #include "core_cm4.h"
 
 #define DHCSR_REG   (uint32_t)&(CoreDebug->DHCSR)
