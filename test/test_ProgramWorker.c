@@ -573,6 +573,7 @@ void test_performStepOver_should_return_PC_after_successful_step()
   Tlv_Session *session = tlvCreateSession();
   CEXCEPTION_T err;
   
+  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001108);
   stepOver_ExpectAndReturn(0x08001110);
   
   performStepOver(session);
@@ -587,7 +588,27 @@ void test_performStepOver_should_throw_TLV_NOT_STEPOVER_if_fail()
   
   Try
   {
+    readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001108);
     stepOver_ExpectAndReturn(0);
+    performStepOver(session);
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL(TLV_NOT_STEPOVER,err);
+  }
+}
+
+void test_performStepOver_should_throw_TLV_NOT_STEPOVER_if_fail_same_pc_case()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  CEXCEPTION_T err;
+  
+  Try
+  {
+    readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001108);
+    stepOver_ExpectAndReturn(0x08001108);
     performStepOver(session);
   }
   Catch(err)

@@ -266,14 +266,15 @@ void performMultipleStepInto(Tlv_Session *session, int nInstructions)
 void performStepOver(Tlv_Session *session)
 {
   Tlv *tlv ;
-  uint32_t data = 0 ;
+  uint32_t pc = 0 , initialPC = 0  ;
   
-  data = stepOver();
+  initialPC = readCoreRegister(CORE_REG_PC);
+  pc = stepOver();
   
-  if(data == 0)
+  if(pc == 0 || pc == initialPC)
     Throw(TLV_NOT_STEPOVER);
   else
-    tlv = tlvCreatePacket(TLV_STEPOVER,4, (uint8_t *)&data);
+    tlv = tlvCreatePacket(TLV_STEPOVER,4, (uint8_t *)&pc);
     
   tlvSend(session, tlv);
 }
