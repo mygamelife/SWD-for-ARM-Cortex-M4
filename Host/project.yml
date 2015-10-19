@@ -38,6 +38,7 @@
   :test:
     - +:test/**
     - -:test/support
+    - +:test/HardwareTest/**
   :source:
     - ../app/Tlv/**
     - src/**

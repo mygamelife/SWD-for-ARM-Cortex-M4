@@ -1,5 +1,5 @@
-#ifndef Register_ReadWrite_H
-#define Register_ReadWrite_H
+#ifndef MemoryReadWrite_H
+#define MemoryReadWrite_H
 
 #include <stdint.h>
 #include "IoOperations.h"
@@ -7,6 +7,7 @@
 #include "swd_Utilities.h"
 
 typedef int SwdError;
+
 /** AHB-AP register
   */
 #define CSW_REG           0x00
@@ -100,4 +101,4 @@ SwdError memoryWriteWord(uint32_t address, uint32_t writeData);
 
 uint32_t memoryWriteDataAlignment(uint32_t address, uint16_t writeData);
 
-#endif // Register_ReadWrite_H
+#endif // MemoryReadWrite_H

@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "swdStub.h"
+#include "SwdStub.h"
 #include "mock_Flash.h"
 #include "mock_memoryRW.h"
 

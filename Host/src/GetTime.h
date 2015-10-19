@@ -10,8 +10,10 @@
 #include <stdlib.h>
 #include "CException.h"
 
-#define FIVE_SECOND		5000
-#define ONE_SECOND		1000
+#define ONE_SECOND          1000
+#define FIVE_SECOND         5000
+#define FORTY_SECOND        40000
+#define ONE_MINUTE          60000
 
 uint16_t getSystemTime(void);
 uint16_t getElapsedTime(void);

@@ -18,8 +18,8 @@ extern volatile int uartRxReady;
 typedef struct
 {
   void *handler;
-  uint8_t txBuffer[255];
-  uint8_t rxBuffer[255];
+  uint8_t txBuffer[255];                  /* Tlv transmit buffer used to transfer tlv packet to target                */
+  uint8_t rxBuffer[255];                  /* Tlv receive buffer used to receive tlv packet from target                */
   /* Send and Receive state */
   Tlv_State receiveState;
   /* ###### Tlv state ###### */
@@ -32,17 +32,21 @@ typedef struct
   Tlv_State hresetState;
   Tlv_State wramState;
   Tlv_State wflashState;
-  Tlv_State lramState;
   Tlv_State lflashState;
   Tlv_State rmemState;
+  Tlv_State rEraseState;                       /* Request section erase state              */
+  Tlv_State rMassEraseState;                   /* Request mass erase state                 */
+  Tlv_State wDataInWordState;                  /* Write data in word state                 */
+  Tlv_State wDataInHalfWordState;              /* Write data in halfword state             */
+  Tlv_State wDataInByteState;                  /* Write data in byte state                 */
+  Tlv_State memoryRwState;                     /* memory read write state                  */
   Tlv_State breakpointHandlerState;
-  Tlv_State rEraseState;              /* Request erase state */
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
   /* Load Program state */
   Tlv_State loadProgramState;
-  Tlv_State ramState;
+  Tlv_State lramState;
   /* Host flash state */
   Tlv_State flashState;
   Tlv_State eraseState;

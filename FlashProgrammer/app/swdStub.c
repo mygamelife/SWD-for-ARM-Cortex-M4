@@ -1,4 +1,4 @@
-#include "swdStub.h"
+#include "SwdStub.h"
 
 /** stubInit is to initialize element in swd stub structure
   *

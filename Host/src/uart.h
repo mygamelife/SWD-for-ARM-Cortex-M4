@@ -7,7 +7,7 @@
 #include "ErrorCode.h"
 #include "CException.h"
 
-#define UART_PORT                     "COM3"//"COM5"//"\\\\.\\COM10"
+#define UART_PORT                     "COM7"//"COM5"//"\\\\.\\COM10"
 #define UART_BAUD_RATE                128000//9600
 
 typedef enum 

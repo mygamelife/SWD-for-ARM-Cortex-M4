@@ -5,8 +5,8 @@
 #include "CoreDebug.h"
 #include "FPB_Unit.h"
 #include "DWT_Unit.h"
+#include "SwdStub.h"
 #include "CodeStepping.h"
-#include "swdStub.h"
 #include "ErrorCode.h"
 #include "CException.h"
 
@@ -30,6 +30,9 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
 void writeDataToRamInChunk(uint32_t *dataAddress, uint32_t destAddress, int size);
 void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size);
+void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data);
+void writeTargetInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data);
+void writeTargetInByte(Tlv_Session *session, uint32_t address, uint8_t data);
 
 /*############################################### Register ###############################################*/
 void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
@@ -68,7 +71,7 @@ void breakpointEventHandler(Tlv_Session *session);
 void watchpointEventHandler(Tlv_Session *session);
 
 
-/* ##### */
+/* ### Testing Tlv Protocol ## */
 void loopBack(Tlv_Session *session, Tlv *packet);
 
 typedef enum {

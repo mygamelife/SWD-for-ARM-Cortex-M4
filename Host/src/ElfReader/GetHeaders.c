@@ -658,8 +658,14 @@ int getProgramSize(char *elfFile) {
   
   getElfSection(elfFile);
   
-  programSize = isr->size + text->size;
-  
+  /* Total size of program need to load */
+  programSize = isr->size       + 
+                text->size      + 
+                data->size      + 
+                roData->size    +
+                initArray->size +
+                finiArray->size;
+
   closeElfFile();
   
   return programSize;

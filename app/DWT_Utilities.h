@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include "CoreDebug.h"
 #include "CoreDebug_Utilities.h"
-#include "Register_ReadWrite.h"
+#include "MemoryReadWrite.h"
 #include "core_cm4.h"
 
 typedef struct 

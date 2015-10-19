@@ -6,4 +6,3 @@ Ceedling.load_project
 task :default => %w[ test:all release ]
 
 load "scripts/hw.rb"
-load "scripts/hwTlv.rb"

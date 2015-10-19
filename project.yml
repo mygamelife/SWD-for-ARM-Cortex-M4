@@ -26,8 +26,10 @@
   :test:
     - +:test/**
     - -:test/support
+    - -:Host/test/**
   :source:
     - app/Tlv**
+    - app/Stub**
     - app/**
   :support:
     - test/support

@@ -2,8 +2,7 @@
 #define swd_Utilities_H
 
 #include <stdint.h>
-#include "Register_ReadWrite.h"
-
+#include "MemoryReadWrite.h"
 
 typedef enum
 {

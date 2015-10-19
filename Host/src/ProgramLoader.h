@@ -11,7 +11,12 @@
 #include "Interface.h"
 #include "GetTime.h"
 
+#if defined(TEST)
+#define FLASH_PROGRAMMER_FILE_PATH            "FlashProgrammer.elf"
+#else
 #define FLASH_PROGRAMMER_FILE_PATH            "../../../Host/FlashProgrammer.elf"
+#endif
+// #define FLASH_PROGRAMMER_FILE_PATH            "Host/FlashProgrammer.elf"
 
 extern int programSize;
 
@@ -22,24 +27,27 @@ typedef enum {
 
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
-int tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
+Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
 
 /* Halt target */
-int tlvHaltTarget(Tlv_Session *session);
+Process_Status tlvHaltTarget(Tlv_Session *session);
 
 /* Run target */
-int tlvRunTarget(Tlv_Session *session);
+Process_Status tlvRunTarget(Tlv_Session *session);
 
 /* Step target */
 uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 
 /* Reset */
-int tlvSoftReset(Tlv_Session *session);
-int tlvHardReset(Tlv_Session *session);
+Process_Status tlvSoftReset(Tlv_Session *session);
+Process_Status tlvHardReset(Tlv_Session *session);
 
 /* Write target memory */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
-int tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data);
+Process_Status tlvWriteDataInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data);
+Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data);
 
 #define tlvWriteToRam(session, dataAddress, destAddress, size) \
         tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
@@ -52,9 +60,9 @@ void tlvLoadToRam(Tlv_Session *session, char *file);
 void tlvLoadToFlash(Tlv_Session *session, char *file);
 
 /* Flash Erase */
-void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
 Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size);
-void tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks);
+void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
+Process_Status tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks);
 void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 
 /* Read Memory */

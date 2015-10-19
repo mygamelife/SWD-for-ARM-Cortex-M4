@@ -3,6 +3,7 @@
 int programSize = 0;
 static Tlv *response;
 static User_Session *userSession;
+uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
 
 /** tlvWriteTargetRegister is a function to write data into target register
   * 
@@ -13,7 +14,7 @@ static User_Session *userSession;
   * return  : 1 successfully write into target register
   *           0 waiting reply from target
   */
-int tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data) {
+Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data) {
   Tlv *tlv; uint32_t buffer[] = {registerAddress, *data};
   
   /* Start tlv request task */
@@ -41,7 +42,7 @@ int tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint3
   /* End tlv request task */
   endTask(session->wregState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** tlvReadTargetRegister is a function to read target register
@@ -95,7 +96,7 @@ uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   * return  : 1 if successfully halted
   *           0 if waiting reply from probe
   */
-int tlvHaltTarget(Tlv_Session *session) {
+Process_Status tlvHaltTarget(Tlv_Session *session) {
   Tlv *tlv;
   
   /* Start tlv request task */
@@ -123,7 +124,7 @@ int tlvHaltTarget(Tlv_Session *session) {
   /* End tlv request task */
   endTask(session->haltState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** tlvRunTarget is a function run target processor
@@ -134,7 +135,7 @@ int tlvHaltTarget(Tlv_Session *session) {
   * return  : 1 if successfully run
   *           0 if waiting reply from probe
   */
-int tlvRunTarget(Tlv_Session *session) {
+Process_Status tlvRunTarget(Tlv_Session *session) {
   Tlv *tlv;
   
   /* Start tlv request task */
@@ -163,7 +164,7 @@ int tlvRunTarget(Tlv_Session *session) {
   /* End tlv request task */
   endTask(session->runState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** tlvMultipleStepTarget is a function send tlv request to
@@ -216,7 +217,7 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   * Return  : 1 if successfully software reset
   *           0 if waiting reply from probe
   */
-int tlvSoftReset(Tlv_Session *session) {
+Process_Status tlvSoftReset(Tlv_Session *session) {
   Tlv *tlv;
   
   /* Start tlv request task */
@@ -245,7 +246,7 @@ int tlvSoftReset(Tlv_Session *session) {
   /* End tlv request task */
   endTask(session->sresetState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** tlvHardReset is a function hardware reset target
@@ -255,7 +256,7 @@ int tlvSoftReset(Tlv_Session *session) {
   * Return  : 1 if successfully software reset
   *           0 if waiting reply from probe
   */
-int tlvHardReset(Tlv_Session *session) {
+Process_Status tlvHardReset(Tlv_Session *session) {
   Tlv *tlv;
   
   /* Start tlv request task */
@@ -284,7 +285,7 @@ int tlvHardReset(Tlv_Session *session) {
   /* End tlv request task */
   endTask(session->hresetState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** tlvReadDataChunk is a function used to read data in chunk
@@ -353,6 +354,132 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   return response->value;
 }
 
+/** tlvWriteDataInWord is a function used to send data in word
+  * by using tlv protocol
+  * 
+  * input   : session contain a element/handler used by tlv protocol
+  *           address is the address of the data need to send
+  *           data(32bit) is data need to be store into the memory
+  *
+  * return  : PROCESS_DONE if success
+  */
+Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data) {
+  uint32_t buffer[] = {address, data};
+  
+  /* Start tlv request task */
+  startTask(session->wDataInWordState);
+  /* Send tlv request 
+     size = address 4 byte + data 4 byte */
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_WORD, 8, (uint8_t *)buffer);
+  
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(session->wDataInWordState);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->wDataInWordState);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->wDataInWordState);
+  
+  return PROCESS_DONE;
+}
+
+/** tlvWriteDataInHalfWord is a function used to send data in halfword
+  * by using tlv protocol
+  * 
+  * input   : session contain a element/handler used by tlv protocol
+  *           address is the address of the data need to send
+  *           data(16bit) is data need to be store into the memory
+  *
+  * return  : PROCESS_DONE if success
+  */
+Process_Status tlvWriteDataInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data) {
+  uint32_t buffer[] = {address, data};
+  
+  /* Start tlv request task */
+  startTask(session->wDataInHalfWordState);
+  /* Send tlv request 
+     size = address 4 byte + data 2 byte */
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_HALFWORD, 6, (uint8_t *)buffer);
+  
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(session->wDataInHalfWordState);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->wDataInHalfWordState);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->wDataInHalfWordState);
+  
+  return PROCESS_DONE;
+}
+
+/** tlvWriteDataInByte is a function used to send data in byte
+  * by using tlv protocol
+  * 
+  * input   : session contain a element/handler used by tlv protocol
+  *           address is the address of the data need to send
+  *           data(8bit) is data need to be store into the memory
+  *
+  * return  : PROCESS_DONE if success
+  */
+Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data) {
+  uint32_t buffer[] = {address, data};
+  
+  /* Start tlv request task */
+  startTask(session->wDataInByteState);
+  /* Send tlv request 
+     size = address 4 byte + data 1 byte */
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_BYTE, 5, (uint8_t *)buffer);
+  
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(session->wDataInByteState);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->wDataInByteState);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->wDataInByteState);
+  
+  return PROCESS_DONE;  
+}
+
 /** tlvWriteDataChunk is a function used to send data in chunk
   * by using tlv protocol
   * 
@@ -394,7 +521,7 @@ void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t dest
   *
   * return  : NONE
   */
-int tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect)  {
+Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect) {
   /* Start tlv request task */
   startTask(session->wramState);
   
@@ -549,8 +676,7 @@ Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int 
   /* Send tlv request */
   tlv = tlvCreatePacket(TLV_FLASH_ERASE, 8, (uint8_t *)buffer);
   tlvSend(session, tlv);
-  printf("address %x\n", address);
-  printf("size %d\n", size);
+
   /* Waiting reply from probe */
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
@@ -596,11 +722,47 @@ void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   }
 }
 
-void tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks) {
-  /* create tlv packet address and size */
-  Tlv *tlv = tlvCreatePacket(TLV_FLASH_MASS_ERASE, 4, (uint8_t *)&banks);
+/** tlvRequestFlashMassErase
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           banks is the memory banks need to erase can be one of the 
+  *           following values :
+  *             - BANK_1
+  *             - BANK_2
+  *             - BOTH_BANK
+  *
+  * Return  : 0 if process stil doing
+  *           1 if process done
+  */
+Process_Status tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks) {
+  /* Start tlv request task */
+  startTask(session->rMassEraseState);
   
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Send tlv request */
+  Tlv *tlv = tlvCreatePacket(TLV_FLASH_MASS_ERASE, 4, (uint8_t *)&banks);
   tlvSend(session, tlv);
+
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FORTY_SECOND)) {
+      resetTask(session->rMassEraseState);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->rMassEraseState);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->rMassEraseState);
+  
+  return PROCESS_DONE;
 }
 
 /** tlvFlashMassErase
@@ -611,22 +773,22 @@ void tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks) {
   * Return  : NONE
   */
 void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks) {
-  
-  // switch(session->mEraseState) {
-    // case TLV_LOAD_FLASH_PROGRAMMER :
-      // tlvLoadToRam(session, FLASH_PROGRAMMER_FILE_PATH);
-      // if(session->ongoingProcessFlag == FLAG_CLEAR) {
-        // session->ongoingProcessFlag = FLAG_SET;
-        // session->mEraseState = TLV_REQUEST_ERASE;
-      // }
-    // break;
+  switch(session->mEraseState) {
+    case TLV_LOAD_FLASH_PROGRAMMER :
+      tlvLoadToRam(session, FLASH_PROGRAMMER_FILE_PATH);
+      if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+        session->mEraseState = TLV_REQUEST_ERASE;
+      }
+    break;
     
-    // case TLV_REQUEST_ERASE :
-      // tlvRequestFlashMassErase(session, banks);
-      // session->ongoingProcessFlag = FLAG_CLEAR;
-      // session->mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
-    // break;
-  // }
+    case TLV_REQUEST_ERASE :
+      if(tlvRequestFlashMassErase(session, banks) == PROCESS_DONE) {
+        printf("Done Mass Erase\n");
+        session->mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
+      }
+    break;
+  }
 }
 
 /** tlvLoadToFlash is a function to load elf file and update PC 
@@ -637,48 +799,44 @@ void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks) {
   *
   * Return  : NONE
   */
-void tlvLoadToFlash(Tlv_Session *session, char *file)  {
-  
-  // switch(session->flashState) {
-    // case TLV_REQUEST_ERASE :
-      // if(programSize == 0) programSize = getProgramSize(file);
-
-      // /* Request Flash Programmer to erase flash according to program size */
-      // tlvEraseTargetFlash(session, 0x08000000, programSize);
+void tlvLoadToFlash(Tlv_Session *session, char *file) {
+  switch(session->flashState) {
+    case TLV_REQUEST_ERASE :
+      if(programSize == 0) programSize = getProgramSize(file);
+      /* Request Flash Programmer to erase flash according to program size */
+      tlvEraseTargetFlash(session, FLASH_BEGIN_ADDRESS, programSize);
+      if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+        programSize = 0;
+        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+        session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
+      }
+    break;
       
-      // if(session->ongoingProcessFlag == FLAG_CLEAR) {
-        // programSize = 0;
-        // session->ongoingProcessFlag = FLAG_SET;
-        // session->flashState = TLV_LOAD_ACTUAL_PROGRAM;
-      // }
-    // break;
-      
-    // case TLV_LOAD_ACTUAL_PROGRAM :
-      // /* Load elf file isr_vector, ro_data, data
-      // and text section into target Flash */
-      // tlvLoadProgram(session, file, TLV_WRITE_FLASH);
-      
-      // if(session->ongoingProcessFlag == FLAG_CLEAR) {
-        // session->ongoingProcessFlag = FLAG_SET;
-        // session->flashState = TLV_UPDATE_PC;
-      // }
-    // break;
+    case TLV_LOAD_ACTUAL_PROGRAM :
+      /* Load elf file isr_vector, ro_data, data
+      and text section into target Flash */
+      tlvLoadProgram(session, file, TLV_WRITE_FLASH);
+      if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+        session->flashState = TLV_UPDATE_PC;
+      }
+    break;
     
-    // case TLV_UPDATE_PC :
-      // /* Update program counter to the entry address 
-         // of the loaded program */
-      // tlvWriteTargetRegister(session, PC, &entryAddress);
-      // session->flashState = TLV_RUN_PROGRAM;
-      // break;
+    case TLV_UPDATE_PC :
+      /* Update program counter to the entry address 
+         of the loaded program */
+      if(tlvWriteTargetRegister(session, PC, &entryAddress) == PROCESS_DONE) {
+        SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+        session->flashState = TLV_RUN_PROGRAM;
+      }
+      break;
       
-    // case TLV_RUN_PROGRAM :
-      // /* Run program on target */
-      // tlvRunTarget(session);
-
-      // session->ongoingProcessFlag = FLAG_CLEAR;
-      // session->flashState = TLV_REQUEST_ERASE;
-    // break;
-  // }
+    case TLV_RUN_PROGRAM :
+      /* Run program on target */
+      if(tlvRunTarget(session) == PROCESS_DONE)
+        session->flashState = TLV_REQUEST_ERASE;
+    break;
+  }
 }
 
 /** tlvSetBreakpoint is a function to set breakpoint

@@ -1,5 +1,5 @@
-#ifndef swdStub_H
-#define swdStub_H
+#ifndef SwdStub_H
+#define SwdStub_H
 
 #include <stdint.h>
 #include <malloc.h>
@@ -47,12 +47,12 @@ typedef enum {
   */
 typedef struct
 {
-  __IO int instruction;                     /*!< Offset: 0x00 (R/W)  Swd Stub instruction       */
-  __IO int status;                          /*!< Offset: 0x04 (R/W)  Swd Stub status            */
-  __IO int dataSize;                        /*!< Offset: 0x08 (R/W)  Swd Stub data size         */
-  __IO uint32_t flashAddress;               /*!< Offset: 0x0C (R/W)  Swd Stub flash address     */
-  __IO uint32_t sramAddress;                /*!< Offset: 0x10 (R/W)  Swd Stub sram address      */
-  __IO uint32_t banks;                      /*!< Offset: 0x14 (R/W)  Swd Stub bank selection    */
+  volatile int instruction;                     /*!< Offset: 0x00 (R/W)  Swd Stub instruction       */
+  volatile int status;                          /*!< Offset: 0x04 (R/W)  Swd Stub status            */
+  volatile int dataSize;                        /*!< Offset: 0x08 (R/W)  Swd Stub data size         */
+  volatile uint32_t flashAddress;               /*!< Offset: 0x0C (R/W)  Swd Stub flash address     */
+  volatile uint32_t sramAddress;                /*!< Offset: 0x10 (R/W)  Swd Stub sram address      */
+  volatile uint32_t banks;                      /*!< Offset: 0x14 (R/W)  Swd Stub bank selection    */
 } Stub_Type;
 
 #if defined (TEST)
@@ -73,4 +73,4 @@ void stubMassErase(void);
 int IsSvcActive(void);
 void svcServiceCall(void);
 void svcServiceHandler(unsigned int *svc_args);
-#endif // swdStub_H
+#endif // SwdStub_H
