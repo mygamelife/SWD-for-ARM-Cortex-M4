@@ -128,7 +128,7 @@ void test_instructionBreakPointTestCase_2bytes_Word()
  */
 void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
 {
-	  uint32_t PC = 0 , data = 0;
+	  uint32_t PC = 0 , data = 0, fail = 0;
 
 	  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_UPPERHALFWORD);
 
@@ -138,9 +138,12 @@ void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
 	  while(!hasBreakpointDebugEventOccured()
     {
       PC = readCoreRegister(CORE_REG_PC);
-      memoryReadWord(PC,&data);
-      if(data == 0xB7FE)
-        break;
+      memoryReadHalfWord(PC,&data);
+      if(data == 0xE7FE)
+      {
+        fail = 1 ;
+        break ;
+      }
       setCoreMode(CORE_DEBUG_MODE);
     }
 
@@ -148,7 +151,8 @@ void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
 	  disableFPComparator(INSTRUCTION_COMP2);
 	  clearBreakpointDebugEvent();
 
-	 // TEST_ASSERT_EQUAL(,PC);
+    if(fail)
+      TEST_ASSERT_EQUAL(0x80003b6,PC);
 }
 
 
@@ -190,7 +194,7 @@ void test_instructionBreakPointTestCase_4bytes_Word()
  */
 void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
 {
-  uint32_t PC = 0 ;
+  uint32_t PC = 0, data = 0 ,fail= 0 ;
 
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_LOWERHALFWORD);
 
@@ -200,9 +204,12 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
   while(!hasBreakpointDebugEventOccured())
     {
       PC = readCoreRegister(CORE_REG_PC);
-      memoryReadWord(PC,&data);
-      if(data == 0xB7FE)
-        break;
+      memoryReadHalfWord(PC,&data);
+      if(data == 0xE7FE)
+      {
+        fail = 1 ;
+        break ;
+      }
       setCoreMode(CORE_DEBUG_MODE);
     }
 
@@ -210,7 +217,8 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
   disableFPComparator(INSTRUCTION_COMP3);
   clearBreakpointDebugEvent();
 
-  //TEST_ASSERT_EQUAL(,PC);
+  if(fail)
+    TEST_ASSERT_EQUAL(0x80003da,PC);
 }
 
 

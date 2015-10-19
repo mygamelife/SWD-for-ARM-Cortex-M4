@@ -18,6 +18,7 @@ int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode);
 int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode);
 
 uint32_t autoSetSoftwareBreakpoint(uint32_t instructionAddress);
+void restoreSoftwareBreakpointOriginalInstruction(uint32_t instructionAddress,uint32_t machineCode);
 
 int disableInstructionComparator(int instructionCOMPno);
 int disableLiteralComparator(int literalCOMPno);

@@ -28,8 +28,8 @@
 #include "GetTime.h"
 void setUp(void) 
 {
-  void initialiseFPBUnit();
   setCoreMode(CORE_DEBUG_HALT);
+  enableDWTandITM()
 }
 
 void tearDown(void) {}

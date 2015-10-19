@@ -188,6 +188,13 @@ uint32_t autoSetSoftwareBreakpoint(uint32_t instructionAddress)
   return data ;
 }
 
+void restoreSoftwareBreakpointOriginalInstruction(uint32_t instructionAddress,uint32_t machineCode)
+{
+  if(machineCode > 0xFFFF)
+    memoryWriteWord(instructionAddress,machineCode);
+  else
+    memoryWriteHalfword(instructionAddress,machineCode);
+}
 
 /**
  *  Disable the selected Instruction Comparator

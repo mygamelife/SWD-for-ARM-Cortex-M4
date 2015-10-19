@@ -314,6 +314,28 @@ void test_autoSetSoftwareBreakpoint_should_replace_the_address_with_bkpt_instruc
   TEST_ASSERT_EQUAL(0x1234,autoSetSoftwareBreakpoint(0x08001000));
 }
 
+/*-------------------------restoreSoftwareBreakpointOriginalInstruction-----------------------*/
+void test_restoreSoftwareBreakpointOriginalInstruction_given_32bit_machineCode_should_write_word()
+{
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08000000);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x1234ABCD);
+  
+  restoreSoftwareBreakpointOriginalInstruction(0x08000000,0x1234ABCD);
+}
+
+void test_restoreSoftwareBreakpointOriginalInstruction_given_16bit_machineCode_should_write_halfword()
+{
+  cswDataSize = CSW_HALFWORD_SIZE ;
+  
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08000000);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x1234);
+  
+  restoreSoftwareBreakpointOriginalInstruction(0x08000000,0x1234);
+}
+
+
 /*-------------------------disableInstructionComparator-----------------------*/
 void test_disableInstructionComparator_should_write_FP_COMP_DISABLE_to_the_selected_instruction_comparator()
 {
