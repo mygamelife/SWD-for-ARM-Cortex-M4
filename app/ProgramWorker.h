@@ -60,7 +60,9 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
  
 void removeInstructionBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
-void removeAllInstructionBreakpoint(Tlv_Session *session);
+void removeAllBreakpoint(Tlv_Session *session);
+void removeAllHardwareBreakpoint(Tlv_Session *session);
+void removeAllSoftwareBreakpoint(Tlv_Session *session);
 
 void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
 void stopAllFlashPatchRemapping(Tlv_Session *session);

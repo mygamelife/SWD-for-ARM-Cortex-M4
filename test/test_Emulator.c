@@ -87,14 +87,13 @@ void test_emulateSwdInput()
 {
   emulateSwdInput();
   
-  SWDIO_InputMode();
+  setSWDIOInputMode();
 }
 
 void test_emulateSwdOutput()
 {
   emulateSwdOutput();
-  
-  SWDIO_OutputMode();
+  setSWDIOOutputMode();
 }
 
 void test_emulateIdleClock_should_generate_SWDIO_low_and_SWDCLK_OFF_ON_8_times()

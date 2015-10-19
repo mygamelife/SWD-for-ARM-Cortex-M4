@@ -368,10 +368,10 @@ void initialiseFPBUnit()
 }
 
 /**
- *  Remove all breakpoint , flash patch remapping will not be affected
+ *  Remove all flash patch comparator set to breakpoint , flash patch remapping will not be affected
  *
  */
-void removeAllBreakpoint()
+void removeAllFPComparatorSetToBreakpoint()
 {
   int i = 0 ;
   for (i = 0 ; i < INSTRUCTION_COMP_NUM ; i ++)

@@ -6,7 +6,7 @@
 #include "mock_CoreDebug.h"
 #include "CoreDebug_Utilities.h"
 #include "Emulator.h"
-#include "Register_ReadWrite.h"
+#include "MemoryReadWrite.h"
 #include "swd_Utilities.h"
 #include "IoOperations.h"
 #include "Delay.h"
@@ -37,9 +37,9 @@ void test_isStackPointerPointingToDefaultLocation_given_false_should_return_0()
   
   TEST_ASSERT_EQUAL(0,isStackPointerPointingToDefaultLocation());
 }
-/*-------------------------isSelectedAddressContains32bitsInstructionExtendedExtended---------------------------*/
+/*-------------------------isSelectedAddressContains32bitsInstructionExtended---------------------------*/
 
-void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xE800_should_return_1()
+void test_isSelectedAddressContains32bitsInstructionExtended_given_0xE800_should_return_1()
 {
   cswDataSize = CSW_HALFWORD_SIZE ;
   
@@ -50,7 +50,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xE80
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xE800));
   
-  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtendedExtended(0x10000000,&machineCode));
+  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtended(0x10000000,&machineCode));
   TEST_ASSERT_EQUAL(0xE800,machineCode);
 }
 
@@ -63,7 +63,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xF00
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xF000));
   
-  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtendedExtended(0x10000000,&machineCode));
+  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtended(0x10000000,&machineCode));
   TEST_ASSERT_EQUAL(0xF000,machineCode);
 }
 
@@ -76,7 +76,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xF80
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xF800));
   
-  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtendedExtended(0x10000000,&machineCode));
+  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtended(0x10000000,&machineCode));
   TEST_ASSERT_EQUAL(0xF800,machineCode);
 }
 
@@ -89,7 +89,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xFF0
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xFF00));
   
-  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtendedExtended(0x10000000,&machineCode));;
+  TEST_ASSERT_EQUAL(1,isSelectedAddressContains32bitsInstructionExtended(0x10000000,&machineCode));;
   TEST_ASSERT_EQUAL(0xFF00,machineCode);
 }
 
@@ -102,7 +102,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xE70
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xE700));
   
-  TEST_ASSERT_EQUAL(0,isSelectedAddressContains32bitsInstructionExtendedExtended(0x10000000,&machineCode));
+  TEST_ASSERT_EQUAL(0,isSelectedAddressContains32bitsInstructionExtended(0x10000000,&machineCode));
   TEST_ASSERT_EQUAL(0xE700,machineCode);
 }
 

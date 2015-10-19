@@ -66,11 +66,11 @@ void emulateTurnAroundWrite() {
 }
 
 void emulateSwdOutput() {
-  SWDIO_OutputMode_Expect();
+  setSWDIOOutputMode_Expect();
 }
 
 void emulateSwdInput()  {
-  SWDIO_InputMode_Expect();
+  setSWDIOInputMode_Expect();
 }
 
 void emulateIdleClock(int numOfClocks)  {
