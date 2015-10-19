@@ -26,11 +26,11 @@
   :test:
     - +:test/**
     - -:test/support
-    - -:Host/test/**
+    # - +:Host/test/HardwareTest/**
   :source:
-    - app/Tlv**
-    - app/Stub**
     - app/**
+    - -:app/Specialize/**
+    - src/**
   :support:
     - test/support
 

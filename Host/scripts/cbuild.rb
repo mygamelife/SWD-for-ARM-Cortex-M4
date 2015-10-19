@@ -252,8 +252,3 @@ def createCompilationDependencyList(list, ext_filter_list, out_path, out_ext)
   dependers.zip(list) { |key, val| dependency_list[key] = val }
   dependency_list
 end
-
-def get_all_tests(path)
-  filenames = FileList.new(path)
-  filenames = filenames.map {|f| 'test:' + File.basename(f, '.')}
-end
