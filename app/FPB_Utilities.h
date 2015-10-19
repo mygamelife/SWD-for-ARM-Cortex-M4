@@ -75,6 +75,8 @@ typedef struct
 #define LOWERHALFWORD_MASK  0x0000FFFF
 #define UPPERHALFWORD_MASK  0xFFFF0000
 
+#define UPPERMATCHINGMODE_MASK  0x2
+
 extern int instructionComparatorReady[INSTRUCTION_COMP_NUM];
 extern int literalComparatorReady[LITERAL_COMP_NUM];
 

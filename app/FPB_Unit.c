@@ -163,25 +163,27 @@ int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_
 /**
  *  Use to set for instruction address breakpoint ()
  *
- *  Input : instructionAddress is the address that will be breakpointed
- *          matchingMode defines the behaviour when the comparator is matched
- *          Possible value :
- *					  MATCH_LOWERHALFWORD	    Set breakpoint on lower halfword (Bits[1:0] are 0b00)			
- *					  MATCH_UPPERHALFWORD	    Set breakpoint on upper halfword (Bits[1:0] are 0b10)			
- *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword						
+ *  Input : instructionAddress is the address that will be breakpointed			
  *
  *  Output :  return INSTRUCTION_COMP0 - INSTRUCTION_COMP5 for valid comparator used
  *            return -1 if invalid comparator is chosen
  */
-int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode)
+int autoSetInstructionBreakpoint(uint32_t instructionAddress)
 {
   int comparatorToUse = 0 ;
+  int matchingMode = 0 ;
   
   comparatorToUse = selectNextFreeComparator(INSTRUCTION_TYPE);
   if(comparatorToUse == -1)
     return -1 ;
 
+  if((instructionAddress & UPPERMATCHINGMODE_MASK))
+    matchingMode = MATCH_UPPERHALFWORD ;
+  else
+    matchingMode = MATCH_LOWERHALFWORD ;
+  
   manualSetInstructionBreakpoint(comparatorToUse,instructionAddress,matchingMode);
+
   
   return comparatorToUse;
 }

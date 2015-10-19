@@ -219,9 +219,9 @@ void test_autoSetInstructionBreakpoint_given_INSTRUCTION_COMP5_free_should_use_I
   
   //Program comparator
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[5]));
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x5FFFFFFD);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x9FFFFFFD);
   
-  TEST_ASSERT_EQUAL(5,autoSetInstructionBreakpoint(0xFFFFFFFF,MATCH_LOWERHALFWORD));
+  TEST_ASSERT_EQUAL(5,autoSetInstructionBreakpoint(0xFFFFFFFF));
   TEST_ASSERT_EQUAL(COMP_BUSY,instructionComparatorReady[5]);
   
 }

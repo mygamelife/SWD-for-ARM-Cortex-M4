@@ -378,7 +378,7 @@ void test_probeTaskManager_should_run_checkPointEvent_if_set_breakPoint_is_calle
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
-  autoSetInstructionBreakpoint_ExpectAndReturn(0x20000000, MATCH_WORD, INSTRUCTION_COMP0);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x20000000, INSTRUCTION_COMP0);
   probeTaskManager(session);
   
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
@@ -659,9 +659,9 @@ void test_setBreakpoint_should_set_breakpoint_and_return_ACK()
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,MATCH_WORD,INSTRUCTION_COMP0);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,INSTRUCTION_COMP0);
 
-  setBreakpoint(session,0x12345678,MATCH_WORD);
+  setBreakpoint(session,0x12345678);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG));
 }
 
@@ -674,14 +674,14 @@ void test_setBreakpoint_should_return_NACK_and_ERR_BKPT_MAXSET_if_all_comparator
     uartInit_IgnoreAndReturn(&uartHandler);
     Tlv_Session *session = tlvCreateSession();
     
-    autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,MATCH_LOWERHALFWORD,-1);
-    setBreakpoint(session,0x12345678,MATCH_LOWERHALFWORD);
+    autoSetInstructionBreakpoint_ExpectAndReturn(0x12345678,-1);
+    setBreakpoint(session,0x12345678);
   } Catch(err) {
     TEST_ASSERT_EQUAL(TLV_BKPT_MAXSET, err);
   }
 }
 
-/*---------setBreakpoint----------------------*/
+/*---------setWatchpoint----------------------*/
 void test_setWatchpoint_should_set_watchpoint_and_return_ACK()
 {
   UART_HandleTypeDef uartHandler;
@@ -693,8 +693,8 @@ void test_setWatchpoint_should_set_watchpoint_and_return_ACK()
   setWatchpoint(session,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ);
 }
 
-/*---------removeInstructionBreakpoint----------------------*/
-void test_removeInstructionBreakpoint_should_remove_breakpoint_and_return_ACK()
+/*---------removeHardwareBreakpoint----------------------*/
+void test_removeHardwareBreakpoint_should_remove_breakpoint_and_return_ACK()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -702,10 +702,10 @@ void test_removeInstructionBreakpoint_should_remove_breakpoint_and_return_ACK()
   
   disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,1);
   
-  removeInstructionBreakpoint(session,0x10203040);
+  removeHardwareBreakpoint(session,0x10203040);
 }
 
-void test_removeInstructionBreakpoint_should_return_NACK_if_not_found()
+void test_removeHardwareBreakpoint_should_return_NACK_if_not_found()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -713,11 +713,11 @@ void test_removeInstructionBreakpoint_should_return_NACK_if_not_found()
   
   disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,-1);
   
-  removeInstructionBreakpoint(session,0x10203040);
+  removeHardwareBreakpoint(session,0x10203040);
 }
 
-/*---------removeAllInstructionBreakpoint----------------------*/
-void test_removeAllInstructionBreakpoint_should_remove_all_breakpoint_and_return_ACK()
+/*---------removeAllHardwareBreakpoint----------------------*/
+void test_removeAllHardwareBreakpoint_should_remove_all_breakpoint_and_return_ACK()
 {  
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -725,7 +725,7 @@ void test_removeAllInstructionBreakpoint_should_remove_all_breakpoint_and_return
   
   removeAllFPComparatorSetToBreakpoint_Expect();
   
-  removeAllInstructionBreakpoint(session);
+  removeAllHardwareBreakpoint(session);
 }
 
 /*---------stopFlashPatchRemapping----------------------*/

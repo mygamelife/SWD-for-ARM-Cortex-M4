@@ -302,19 +302,14 @@ void performStepOut(Tlv_Session *session)
 /** Set instruction breakpoint
  *
  * Input : session contain a element/handler used by tlv protocol
- *         instructionAddress is the address that will be breakpointed
- *         matchingMode defines the behaviour when the comparator is matched
- *         Possible value :
- *					  MATCH_LOWERHALFWORD	    Set breakpoint on lower halfword 	
- *					  MATCH_UPPERHALFWORD	    Set breakpoint on upper halfword 	
- *					  MATCH_WORD		          Set breakpoint on both upper and lower halfword			
+ *         instructionAddress is the address that will be breakpointed		
  *
  */
-void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchingMode)
+void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
 {
   Tlv *tlv ;
   int comparatorUsed = 0;
-  comparatorUsed = autoSetInstructionBreakpoint(instructionAddress,matchingMode);
+  comparatorUsed = autoSetInstructionBreakpoint(instructionAddress);
   
   if( comparatorUsed == -1)
     Throw(TLV_BKPT_MAXSET);
@@ -365,7 +360,7 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
  * Input     : session contain a element/handler used by tlv protocol
  *             instructionAddress is the address set to breakpoint previously going to be removed
  */
-void removeInstructionBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
+void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
 {
   Tlv *tlv ;
   uint8_t errorCode = TLV_ADDRESS_NOT_FOUND ;
@@ -378,11 +373,11 @@ void removeInstructionBreakpoint(Tlv_Session *session, uint32_t instructionAddre
 }
 
 
-/** Remove all instruction breakpoint
+/** Remove all hardware breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
  */
-void removeAllInstructionBreakpoint(Tlv_Session *session)
+void removeAllHardwareBreakpoint(Tlv_Session *session)
 {
   Tlv *tlv ;
   
@@ -714,27 +709,31 @@ void writeTargetInByte(Tlv_Session *session, uint32_t address, uint8_t data) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
-    case TLV_WRITE_RAM              : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);          break;
-    case TLV_WRITE_FLASH            : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);        break;
-    case TLV_READ_MEMORY            : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                          break;
-    case TLV_WRITE_REGISTER         : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                       break;
-    case TLV_READ_REGISTER          : readTargetRegister(session, get4Byte(&tlv->value[0]));                                                  break;
-    case TLV_HALT_TARGET            : haltTarget(session);                                                                                    break;
-    case TLV_RUN_TARGET             : runTarget(session);                                                                                     break;
-    case TLV_STEP                   : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                                                  break;
-    case TLV_BREAKPOINT             : setBreakpoint(session, get4Byte(&tlv->value[0]), MATCH_WORD);                                           break;
-    case TLV_REMOVE_BREAKPOINT      : break;
-    case TLV_REMOVE_ALL_BREAKPOINT  : removeAllInstructionBreakpoint(session);                                                                break;
-    case TLV_STOP_REMAP             : break;
-    case TLV_STOP_ALL_REMAP         : stopAllFlashPatchRemapping(session);                                                                    break;
-    case TLV_FLASH_ERASE            : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                          break;
-    case TLV_FLASH_MASS_ERASE       : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                                break;
-    case TLV_SOFT_RESET             : performSoftResetOnTarget(session);                                                                      break;
-    case TLV_HARD_RESET             : performHardResetOnTarget(session);                                                                      break;
-    case TLV_LOOP_BACK              : loopBack(session, tlv);                                                                                 break;
-    case TLV_WRITE_WORD             : writeTargetInWord(session, get4Byte(&tlv->value[0]), getDataInWord(&tlv->value[4]));                    break;
-    case TLV_WRITE_HALFWORD         : writeTargetInHalfWord(session, get4Byte(&tlv->value[0]), getDataInHalfWord(&tlv->value[4]));            break;
-    case TLV_WRITE_BYTE             : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));                    break;
+    case TLV_WRITE_RAM                  : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);          break;
+    case TLV_WRITE_FLASH                : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);        break;
+    case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                          break;
+    case TLV_WRITE_REGISTER             : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                       break;
+    case TLV_READ_REGISTER              : readTargetRegister(session, get4Byte(&tlv->value[0]));                                                  break;
+    case TLV_HALT_TARGET                : haltTarget(session);                                                                                    break;
+    case TLV_RUN_TARGET                 : runTarget(session);                                                                                     break;
+    case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                                             break;
+    case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                                       break;
+    case TLV_SOFTBREAKPOINT             : break;
+    case TLV_REMOVE_BREAKPOINT          : break;
+    case TLV_REMOVE_SOFTBREAKPOINT      : break;
+    case TLV_REMOVE_ALL_HWBREAKPOINT    : removeAllHardwareBreakpoint(session);                                                                   break;
+    case TLV_REMOVE_ALL_SOFTBREAKPOINT  : break ;
+    case TLV_REMOVE_ALL_BREAKPOINT      : break ;
+    case TLV_STOP_REMAP                 : break;
+    case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                                    break;
+    case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                          break;
+    case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                                break;
+    case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                                      break;
+    case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                                      break;
+    case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                                 break;
+    case TLV_WRITE_WORD                 : writeTargetInWord(session, get4Byte(&tlv->value[0]), getDataInWord(&tlv->value[4]));                    break;
+    case TLV_WRITE_HALFWORD             : writeTargetInHalfWord(session, get4Byte(&tlv->value[0]), getDataInHalfWord(&tlv->value[4]));            break;
+    case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));                    break;
   }
 }
 

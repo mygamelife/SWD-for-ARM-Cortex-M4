@@ -19,7 +19,7 @@ int manualSetInstructionBreakpoint(int instructionCOMPno,uint32_t instructionAdd
 int manualSetInstructionRemapping(int instructionCOMPno,uint32_t instructionAddress, uint32_t remapAddress);
 int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_t remapAddress);
 
-int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode);
+int autoSetInstructionBreakpoint(uint32_t instructionAddress);
 int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode);
 
 uint32_t autoSetSoftwareBreakpoint(uint32_t instructionAddress);
