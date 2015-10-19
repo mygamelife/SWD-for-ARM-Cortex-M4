@@ -30,18 +30,34 @@ void configureTargetResetPin()
 	GPIO_InitTypeDef GpioInfo;
 
 	GpioInfo.Mode = GPIO_MODE_OUTPUT_OD;
-	GpioInfo.Pin = SWDNRST_PIN;
+	GpioInfo.Pin = RESET_PIN;
 	GpioInfo.Pull = GPIO_PULLUP ;
 	GpioInfo.Speed = GPIO_SPEED_FAST ;
 
-	HAL_GPIO_Init(SWD_PORT, &GpioInfo);
+	HAL_GPIO_Init(RESET_PORT, &GpioInfo);
+}
+
+/**
+ * Configure the port and pin to be used to connect to the SWO pin of the target
+ *
+ */
+void configureSWOPin()
+{	
+  GPIO_InitTypeDef GpioInfo;
+
+	GpioInfo.Mode = GPIO_MODE_INPUT ;
+	GpioInfo.Pin = SWO_PIN;
+	GpioInfo.Pull = GPIO_PULLUP;
+	GpioInfo.Speed = GPIO_SPEED_FAST ;
+
+	HAL_GPIO_Init(SWO_PORT,&GpioInfo);
 }
 
 /**
  * Configure the port and pin as OUTPUT to be used as SWDIO
  *
  */
-void SWDIO_OutputMode()
+void setSWDIOOutputMode()
 {
 	GPIO_InitTypeDef GpioInfo;
 
@@ -57,7 +73,7 @@ void SWDIO_OutputMode()
  * Configure the port and pin as INPUT to be used as SWDIO
  *
  */
-void SWDIO_InputMode()
+void setSWDIOInputMode()
 {
 	GPIO_InitTypeDef GpioInfo;
 
@@ -73,15 +89,14 @@ void SWDIO_InputMode()
  * Configure SWDCLK, SWDIO, SWDnRST
  *
  */
-void configure_IOPorts()
+void configureIOPorts()
 {
 	CLK_EN();
 
 	configureClock();
 	configureTargetResetPin();
-	SWDIO_OutputMode();
-
-	//delay(10,1,1);
+	setSWDIOOutputMode();
+  configureSWOPin();
 }
 
 /**

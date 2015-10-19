@@ -22,6 +22,14 @@ int checkForValidLiteralComparator(int literalCOMPno)
   return result ;
 }
 
+uint32_t swapHalfword(uint32_t data)
+{
+  uint32_t lowerHalfword = (data & LOWERHALFWORD_MASK) << 16 ;
+  uint32_t upperHalfword = (data & UPPERHALFWORD_MASK) >> 16 ;
+
+  return (upperHalfword + lowerHalfword);
+}
+
 /**
  *  Use to select the next free/available instruction comparator to use
  *

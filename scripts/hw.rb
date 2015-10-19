@@ -49,9 +49,9 @@ namespace :hw do
     Rake::Task["build/release/hw/SWD-for-ARM-Cortex-M4.elf"].invoke
   end
 
-  desc 'Run hardware-in-the-loop test code'
+  desc 'Run hardware-in-the-loop test'
   task :test => :prepare_release do
-    Rake::task["Host/test/test_hwTlv"].invoke
+    Rake::test["Host/test/test_hwTlv"].invoke
   end
   
   desc 'Flash program and run test'
