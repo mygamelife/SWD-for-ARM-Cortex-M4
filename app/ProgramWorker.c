@@ -252,7 +252,6 @@ void performSingleStepInto(Tlv_Session *session)
   */
 void performMultipleStepInto(Tlv_Session *session, int nInstructions)
 {
-  Tlv *tlv ;
   int i = 0 ;
   
   for(i = 0 ; i < nInstructions ; i ++)

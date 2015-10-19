@@ -57,7 +57,8 @@ typedef struct
 #define FP_COMP_MATCH_MASK			0xC0000000
 #define FP_REMAP_ADDRESS_MASK		0x1FFFFFE0
 
-#define FPB_ENABLED_MASK 			0x1
+#define FPB_ENABLED_MASK 			      0x1
+#define FP_COMPARATOR_ENABLED_MASK  0x1
 
 #define DISABLE_FPB 0x2
 #define ENABLE_FPB 	0x3
@@ -77,11 +78,7 @@ typedef struct
 extern int instructionComparatorReady[INSTRUCTION_COMP_NUM];
 extern int literalComparatorReady[LITERAL_COMP_NUM];
 
-int checkForValidInstructionComparator(int instructionCOMPno);
-int checkForValidLiteralComparator(int literalCOMPno);
-int checkForValidFPComparator(uint32_t compNo);
 
-uint32_t swapHalfword(uint32_t data);
 
-uint32_t selectNextFreeComparator(int comparatorType);
+
 #endif // FPB_Utilities_H

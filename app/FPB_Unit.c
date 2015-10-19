@@ -1,5 +1,61 @@
 #include "FPB_Unit.h"
 
+int instructionComparatorReady[INSTRUCTION_COMP_NUM] = {};
+int literalComparatorReady[LITERAL_COMP_NUM] = {};
+
+/**
+ *  Use to check for valid Flash Patch Instruction Comparator
+ *
+ *  Input   : instructionCOMPno contains the comparator number to be checked
+ *  Output  : return 1 for valid comparator
+ *            return -1 for invalid comparator
+ *
+ */
+int checkForValidInstructionComparator(int instructionCOMPno)
+{
+  int result = - 1;
+  
+  if(instructionCOMPno >= 0 && instructionCOMPno <= 5)
+    result = 1;
+  
+  return result ;
+}
+
+/**
+ *  Use to check for valid Flash Patch Literal Comparator
+ *
+ *  Input   : literalCOMPno contains the comparator number to be checked
+ *  Output  : return 1 for valid comparator
+ *            return -1 for invalid comparator
+ *
+ */
+int checkForValidLiteralComparator(int literalCOMPno)
+{
+  int result = - 1;
+  
+  if(literalCOMPno == 0 || literalCOMPno == 1)
+    result = 1 ;
+  
+  return result ;
+}
+
+/**
+ *  Swap the halfword of a 32 bit data
+ *  
+ *  Input   : data contains the 32 bit data to be swapped
+ *  Output  : returns the swapped 32 bit data
+ */
+uint32_t swapHalfword(uint32_t data)
+{
+  uint32_t lowerHalfword = (data & LOWERHALFWORD_MASK) << 16 ;
+  uint32_t upperHalfword = (data & UPPERHALFWORD_MASK) >> 16 ;
+
+  return (upperHalfword + lowerHalfword);
+}
+
+
+
+
 
 /**
  *  Use to set for instruction address breakpoint
@@ -332,16 +388,52 @@ void readAndUpdateComparatorReadyFlag(int comparatorType)
   for(i = 0 ; i < max ; i ++)
   { 
       memoryReadWord((uint32_t)&(compPtr[i]),&data);
-      if((data & FPB_ENABLED_MASK))
+      if((data & FP_COMPARATOR_ENABLED_MASK))
       {
-        if((data & remapMask))
-          compFlagPtr[i] = COMP_BUSY ;
-        else
+        if(!(data & remapMask))
           compFlagPtr[i] = COMP_REMAP ;
+        else
+          compFlagPtr[i] = COMP_BUSY ;
       }
       else
         compFlagPtr[i] = COMP_READY ;
   }
+}
+
+/**
+ *  Use to select the next free/available instruction comparator to use
+ *
+ *  Output : return INSTRUCTION_COMP0 - INSTRUCTION_COMP5 if any one of them is free and INSTRUCTION_TYPE is chosen
+ *           return LITERAL_COMP0     - LITERAL_COMP1 if any one of them is free and LITERAL_TYPE is chosen
+ *           return -1 if all the comparators are busy
+ *
+ */
+uint32_t selectNextFreeComparator(int comparatorType)
+{
+  int *compFlagPtr ;
+  int nextComparator = 0 ;
+  int max = 0 ;
+  
+  readAndUpdateComparatorReadyFlag(comparatorType);
+  
+  if(comparatorType == INSTRUCTION_TYPE)
+  {
+    max = INSTRUCTION_COMP_NUM;
+    compFlagPtr = &(instructionComparatorReady[0]);
+  }
+  else
+  {
+    max = LITERAL_COMP_NUM;
+    compFlagPtr = &(literalComparatorReady[0]);
+  }
+  
+  for(nextComparator = 0 ; nextComparator < max ; nextComparator++)
+  {
+    if(compFlagPtr[nextComparator] == COMP_READY)
+      return nextComparator;
+  }
+
+  return -1 ;
 }
 
 /**

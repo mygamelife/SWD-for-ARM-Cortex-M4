@@ -3,11 +3,11 @@
 int main(void)
 {
   uint32_t idr = 0;
-  int errorCode = 0; CoreMode mode ;
+  int errorCode = 0 ;
 
   /* Hardware configuration */
   HAL_Init();
-  configure_IOPorts();
+  configureIOPorts();
   configureLED();
   SystemClock_Config();
 
