@@ -22,13 +22,12 @@ typedef enum {
 //SWD Protocol bit sequence
 #define DP 0
 #define AP 1
-// #define WRITE 0
+#define WRITE 0
 #define READ 1
 #define STARTBIT 1
 #define STOPBIT 0
 #define PARKBIT 1
 //Acknowledgment response
-
 
 int calculateParity_SWDRequest(int Address_bit3,int Address_bit2,int APnDP, int ReadWrite);
 int calculateParity_32bitData(uint32_t data);

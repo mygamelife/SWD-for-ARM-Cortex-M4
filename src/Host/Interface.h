@@ -82,7 +82,7 @@ typedef enum {
 typedef enum {
   HELP = 1,
   LOAD,
-  WRITE,
+  WRITE_COMMAND,
   READ_MEMORY,
   WRITE_REGISTER,
   READ_REGISTER,

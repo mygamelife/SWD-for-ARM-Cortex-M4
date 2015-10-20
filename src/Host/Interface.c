@@ -459,7 +459,7 @@ Command_Code getCommandCode(char *commandName) {
 
   if(strcmp(commandName, "help") == 0)                return HELP;
   else if(strcmp(commandName, "load") == 0)           return LOAD;
-  else if(strcmp(commandName, "write") == 0)          return WRITE;
+  else if(strcmp(commandName, "write") == 0)          return WRITE_COMMAND;
   else if(strcmp(commandName, "rmem") == 0)           return READ_MEMORY;
   else if(strcmp(commandName, "wreg") == 0)           return WRITE_REGISTER;
   else if(strcmp(commandName, "reg") == 0)            return READ_REGISTER;
@@ -636,7 +636,7 @@ User_Session *InterpreteCommand(String *userInput) {
   if(ccode == HELP) {                         helpMenu(userInput); 
                                               return NULL;}
   else if(ccode == LOAD)                      return userLoadProgram(userInput);
-  else if(ccode == WRITE)                     return userWriteMemory(userInput);
+  else if(ccode == WRITE_COMMAND)             return userWriteMemory(userInput);
   else if(ccode == READ_MEMORY)               return userReadMemory(userInput);
   else if(ccode == WRITE_REGISTER)            return userWriteRegister(userInput);
   else if(ccode == READ_REGISTER)             return userReadRegister(userInput);

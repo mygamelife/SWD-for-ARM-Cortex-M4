@@ -7,7 +7,10 @@
 #include "CException.h"
 #include "IoOperations.h"
 #include "configurePort.h"
+
+#ifdef TEST
 #include "ProgramLoader.h"
+#endif
 
 /** AHB-AP register
   */
