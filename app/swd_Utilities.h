@@ -6,26 +6,27 @@
 
 typedef enum
 {
-  NO_ERROR = 0,
+  // NO_ERROR = 0,
   ERR_ACK_WAIT_RESPONSE = -1,
   ERR_ACK_FAULT_RESPONSE = -2,
-	ERR_INVALID_PARITY_RECEIVED ,
+	ERR_INVALID_PARITY_RECEIVED = -3,
 }ErrorCode;
-
-//SWD Protocol bit sequence
-#define DP 0
-#define AP 1
-#define WRITE 0
-#define READ 1
-#define STARTBIT 1
-#define STOPBIT 0
-#define PARKBIT 1
 
 typedef enum {
 	OK_RESPONSE = 0x01,
 	WAIT_RESPONSE = 0x02,
-	FAULT_RESPONSE = 0x04
+	FAULT_RESPONSE = 0x04,
 } Swd_Response;
+
+
+//SWD Protocol bit sequence
+#define DP 0
+#define AP 1
+// #define WRITE 0
+#define READ 1
+#define STARTBIT 1
+#define STOPBIT 0
+#define PARKBIT 1
 //Acknowledgment response
 
 

@@ -2,11 +2,12 @@
 #define MemoryReadWrite_H
 
 #include <stdint.h>
+#include "swd_Utilities.h"
+#include "Yield.h"
+#include "CException.h"
 #include "IoOperations.h"
 #include "configurePort.h"
-#include "swd_Utilities.h"
-
-typedef int SwdError;
+#include "ProgramLoader.h"
 
 /** AHB-AP register
   */
@@ -69,6 +70,8 @@ typedef int SwdError;
 #define CSW_DISABLE_ADDR_INC          ((uint32_t)0x00000000)
 #define CSW_ENABLE_ADDR_INC_SINGLE    ((uint32_t)0x00000010)
 #define CSW_ENABLE_ADDR_INC_PACKED    ((uint32_t)0x00000020)
+
+typedef int SwdError;
 
 extern int cswDataSize ;
 

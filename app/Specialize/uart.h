@@ -42,7 +42,7 @@ extern __IO ITStatus uartRxReady;
 #define USARTx_IRQn                      USART1_IRQn
 #define USARTx_IRQHandler                USART1_IRQHandler
 
-UART_HandleTypeDef *uartInit(void);
+void uartInit(void *huart);
 void uartErrorHandler(void);
 
 /* Uart Transmit Function */

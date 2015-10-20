@@ -61,7 +61,7 @@ typedef struct
 
 typedef enum {
   FLAG_CLEAR = false,
-  FLAG_SET = true
+  FLAG_SET = true,
 } Flag_Status;
 
 /* ##### Defined Tlv Flags In Numeric ##### */

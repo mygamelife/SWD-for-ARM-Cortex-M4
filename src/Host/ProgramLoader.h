@@ -22,7 +22,7 @@ extern int programSize;
 
 typedef enum {
   PROCESS_BUSY = 0,
-  PROCESS_DONE,
+  PROCESS_DONE
 } Process_Status;
 
 /* Read/Write target register */

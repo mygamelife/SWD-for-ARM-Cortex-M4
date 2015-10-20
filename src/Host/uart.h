@@ -12,11 +12,11 @@
 
 typedef enum 
 {
-  UART_OK       = 0x00,
-  UART_ERROR    = 0x01,
+  UART_OK = 0,
+  UART_ERROR
 } Uart_Status;
 
-HANDLE uartInit(void);
+void uartInit(void *huart);
 void closeSerialPort(HANDLE hSerial);
 DWORD uartSendBytes(HANDLE hSerial, uint8_t * data, int length);
 DWORD uartGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize);
@@ -26,9 +26,8 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length);
 
 /* Uart Receive Function */
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
+uint8_t getByte(void *handler, uint8_t *rxBuffer);
 
 int isByteAvailable();
-
-#define getByte(handler, rxBuffer)  getBytes(handler, rxBuffer, 1)
 
 #endif // uart_H

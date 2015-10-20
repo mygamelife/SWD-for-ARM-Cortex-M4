@@ -7,8 +7,7 @@ __IO ITStatus uartRxReady = 1;
 /**  initUart is a function to configure the UART peripheral
   *
   */
-UART_HandleTypeDef *uartInit(void) {
-  static UART_HandleTypeDef *pHandler;
+void uartInit(void *huart) {
   
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
   /* UART1 configured as follow:
@@ -32,8 +31,7 @@ UART_HandleTypeDef *uartInit(void) {
 	  uartErrorHandler();
   }
   
-  pHandler = &uartHandle;
-  return pHandler;
+  huart = &uartHandle;
 }
 
 /* Uart Transmit Function */

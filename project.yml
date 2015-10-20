@@ -26,11 +26,10 @@
   :test:
     - +:test/**
     - -:test/support
-    # - +:Host/test/HardwareTest/**
   :source:
-    - app/**
-    - -:app/Specialize/**
     - src/**
+    - -:app/Specialize/**
+    - app/**
   :support:
     - test/support
 

@@ -91,24 +91,24 @@ typedef enum
   HOST_RECEIVE_COMMAND,
   HOST_INTERPRET_COMMAND,
   HOST_WAITING_RESPONSE,
-  HOST_EXIT
+  HOST_EXIT,
 } Host_State;
 
 typedef enum
 {
   PROBE_RECEIVE_PACKET,
-  PROBE_INTERPRET_PACKET
+  PROBE_INTERPRET_PACKET,
 } Probe_State;
 
 /* Tlv acknowledge */
 typedef enum
 {
-  TLV_OK = 1
+  TLV_OK = 1,
 } Tlv_Ack;
 
 typedef enum
 {
-  TLV_NOT_OK = 2
+  TLV_NOT_OK = 2,
 } Tlv_Nack;
 
 #endif // Tlv_ex_H

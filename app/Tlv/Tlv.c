@@ -10,7 +10,7 @@ Tlv_Session *tlvCreateSession(void) {
   static Tlv_Session session;
   
   /* Get uart handler */
-  session.handler = uartInit();
+  uartInit(session.handler);
   
   /* Initialize begining state for send and receive */
   session.receiveState = TLV_RECEIVE_TYPE;

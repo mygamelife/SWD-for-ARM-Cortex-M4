@@ -8,7 +8,7 @@
  * Return:
  *   The serial comm. handle
  */
-HANDLE uartInit(void) {
+void uartInit(void *huart) {
   COMMTIMEOUTS timeouts={0};
   DCB dcbSerialParams = {0};
   DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
@@ -51,7 +51,8 @@ HANDLE uartInit(void) {
     //handle error
     Throw(ERR_SET_COMM_TIMEOUTS);
   }  
-  return hSerial;
+  
+  huart = &hSerial;
 }
 
 /* Uart Transmit Function */
@@ -73,8 +74,25 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
   else return UART_ERROR;
 }
 
+uint8_t getByte(void *handler, uint8_t *rxBuffer) {
+  DWORD dwBytesRead = 0;
+  HANDLE *hSerial = (HANDLE *)handler;
+  
+  if(!ReadFile(hSerial, rxBuffer, 1, &dwBytesRead, NULL)){
+    // handle error
+    DWORD errId = GetLastError();
+    printf("ReadFile Error: %d\n", errId);
+    return UART_ERROR;
+  }
+  if(dwBytesRead != 0) {
+    // printf("Byte is Received!\n");
+    return UART_OK;  
+  }
+  else return UART_ERROR;
+}
+
 /* Uart Receive Function */
-uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length)  {
+uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
   DWORD dwBytesRead = 0;
   HANDLE *hSerial = (HANDLE *)handler;
   
