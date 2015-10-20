@@ -888,12 +888,18 @@ void hostInterpreter(Tlv_Session *session) {
   switch(session->hostState)  {
     
     case HOST_WAIT_USER_COMMAND :
-      userSession = waitUserCommand();
-      if(userSession != NULL) {
+//      userSession = waitUserCommand();
+      if((userSession = waitUserCommand()) != NULL)
+        session->hostState = HOST_GOT_COMMAND;
+        
+      break;
+      
+    case HOST_GOT_COMMAND:
+//      if(userSession != NULL) {
         if(userSession->tlvCommand == TLV_EXIT) 
           session->hostState = HOST_EXIT;
         else session->hostState = HOST_INTERPRET_COMMAND;
-      }
+//      }
     break;
       
     case HOST_INTERPRET_COMMAND :

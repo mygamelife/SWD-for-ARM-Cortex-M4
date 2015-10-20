@@ -13,6 +13,8 @@ int main(void) {
       Try {
         tlvService(session);
         hostInterpreter(session);
+        //if(tlvHasReceivedPacket(session))
+          //service packet
       } Catch(err) {
         session->hostState = HOST_WAIT_USER_COMMAND;
         displayErrorMessage(err);
