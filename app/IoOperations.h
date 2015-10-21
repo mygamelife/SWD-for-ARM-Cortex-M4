@@ -2,17 +2,18 @@
 #define IoOperations_H
 
 #include "stm32f4xx_hal_gpio.h"
-
 #include <stdint.h>
 #include "configurePort.h"
-#include "LowLevelIO.h"
-#include "Delay.h"
+#include "IoOperationsEx.h"
+
+/* ############################ Swd I/O Operation Functions ############################### */
 
 void generateOneClockCycle();
 void extraIdleClock(int numberOfClocks);
 void turnAroundRead();
 void turnAroundWrite();
 
+void delay(int ms,int numberOfLoops, int division);
 void lineReset(int numberOfClock);
 void hardResetTarget();
 

@@ -1,4 +1,4 @@
-#include "swd.h"
+#include "Swd.h"
 
 /**
  *  Initialise SWD on the target by 

@@ -1,11 +1,10 @@
 #include "unity.h"
-#include "swd.h"
+#include "Swd.h"
 #include "Emulator.h"
 #include "IoOperations.h"
 #include "swd_Utilities.h"
-#include "Delay.h"
 #include "MemoryReadWrite.h"
-#include "mock_LowLevelIO.h"
+#include "mock_IoOperationsEx.h"
 #include "mock_configurePort.h"
 
 void setUp(void)

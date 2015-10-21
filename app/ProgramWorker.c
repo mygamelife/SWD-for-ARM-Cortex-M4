@@ -107,7 +107,7 @@ void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_
 void readTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   uint32_t data = 0;
   
-  readCoreRegister(registerAddress, &data);
+  data = readCoreRegister(registerAddress);
   
   Tlv *tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&data);
   
@@ -125,14 +125,14 @@ void readAllTargetRegister(Tlv_Session *session)
   uint32_t data[52] = {} ;
   
   for (i = 0 ; i < 20 ; i ++)
-    readCoreRegister(i,&(data[i]));
+    data[i] = readCoreRegister(i);
   
-  readCoreRegister(CORE_REG_FPSCR,&(data[i]));
+  data[i] = readCoreRegister(CORE_REG_FPSCR);
   
   for(j = 33 ; j < 96 ; j++)
   {
     i++ ;
-    readCoreRegister(j,&(data[i]));
+    data[i] = readCoreRegister(j);
   }
   
   Tlv *tlv = tlvCreatePacket(TLV_OK, (4*52), (uint8_t *)&data);
@@ -216,7 +216,7 @@ void runTarget(Tlv_Session *session)
   }
   else {
     SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-    checkBreakpointEvent(session);
+    breakpointEventHandler(session);
   }
 }
 
@@ -225,20 +225,14 @@ void runTarget(Tlv_Session *session)
   * Input     : session contain a element/handler used by tlv protocol
   *
   */
-void singleStepTarget(Tlv_Session *session)
+void performSingleStepInto(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t data = 0 ;
   
-  setCoreMode(CORE_SINGLE_STEP);
-  
-  if(getCoreMode() == CORE_SINGLE_STEP)
-  {
-    readCoreRegister(CORE_REG_PC, &data);
-    tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
-  } 
-  else Throw(TLV_NOT_STEPPED);
-  
+  data = stepIntoOnce();
+  tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
+
   tlvSend(session, tlv);
 }
 
@@ -248,20 +242,18 @@ void singleStepTarget(Tlv_Session *session)
   *           : nInstructions is the number of instructions to step
   *
   */
-void multipleStepTarget(Tlv_Session *session, int nInstructions)
+void performMultipleStepInto(Tlv_Session *session, int nInstructions)
 {
   Tlv *tlv ;
+  int i = 0 ;
   uint32_t data = 0 ;
   
-  stepOnly(nInstructions);
-  
-  if(getCoreMode() == CORE_SINGLE_STEP)
+  for(i = 0 ; i < nInstructions ; i ++)
   {
-    readCoreRegister(CORE_REG_PC, &data);
+    data = stepIntoOnce();
     tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&data);
   } 
-  else Throw(TLV_NOT_STEPPED);
-  
+
   tlvSend(session, tlv);
 }
 
@@ -270,30 +262,37 @@ void multipleStepTarget(Tlv_Session *session, int nInstructions)
   * Input     : session contain a element/handler used by tlv protocol
   *
   */
-void singleStepOver(Tlv_Session *session)
+void performStepOver(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t data = 0 ;
-  uint32_t nextInstruction = 0 ;
-  uint32_t comparatorUsed = 0 ;
   
-  nextInstruction = isNextInstructionCallingSubroutine();
+  data = stepOver();
   
-  if(nextInstruction)
-  {
-    comparatorUsed = autoSetInstructionBreakpoint(nextInstruction + 4, MATCH_WORD);
-    if(comparatorUsed == -1)
-      Throw(TLV_NOT_STEPOVER);
-    
-    while(!(hasBreakpointDebugEventOccured()));
-    disableInstructionComparator(comparatorUsed);
-    clearBreakpointDebugEvent();
-  }
+  if(data == 0)
+    Throw(TLV_NOT_STEPOVER);
   else
-    stepOnly(1);
+    tlv = tlvCreatePacket(TLV_STEPOVER,4, (uint8_t *)&data);
+    
+  tlvSend(session, tlv);
+}
+
+/** Step out from subroutine
+  *
+  * Input     : session contain a element/handler used by tlv protocol
+  *
+  */
+void performStepOut(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  uint32_t data = 0 ;
   
-  readCoreRegister(CORE_REG_PC, &data);
-  tlv = tlvCreatePacket(TLV_STEPOVER,4, (uint8_t *)&data);
+  data = stepOut();
+  
+  if(data == 0)
+    Throw(TLV_NOT_STEPOUT);
+  else
+    tlv = tlvCreatePacket(TLV_STEPOUT,4, (uint8_t *)&data);
     
   tlvSend(session, tlv);
 }
@@ -434,7 +433,7 @@ void stopAllFlashPatchRemapping(Tlv_Session *session)
  *
  * Input  : session contain a element/handler used by tlv protocol
  */
-void checkBreakpointEvent(Tlv_Session *session)
+void breakpointEventHandler(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc =0 ;
@@ -443,7 +442,7 @@ void checkBreakpointEvent(Tlv_Session *session)
     return ;
   else 
   {
-    readCoreRegister(CORE_REG_PC, &pc);
+    pc = readCoreRegister(CORE_REG_PC);
     disableFPComparatorLoadedWithAddress(pc,INSTRUCTION_TYPE);
     clearBreakpointDebugEvent();
   }
@@ -461,7 +460,7 @@ void checkBreakpointEvent(Tlv_Session *session)
  *
  * Input  : session contain a element/handler used by tlv protocol
  */
-void checkWatchpointEvent(Tlv_Session *session)
+void watchpointEventHandler(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc =0 ;
@@ -471,7 +470,7 @@ void checkWatchpointEvent(Tlv_Session *session)
   }
   else
   {
-    readCoreRegister(CORE_REG_PC, &pc);
+    pc = readCoreRegister(CORE_REG_PC);
     disableDWTComparator(COMPARATOR_1);
     clearDWTTrapDebugEvent() ;
   }

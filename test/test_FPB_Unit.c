@@ -11,7 +11,7 @@
 #include "IoOperations.h"
 #include "mock_configurePort.h"
 #include "mock_LowLevelIO.h"
-
+#include "mock_CodeStepping.h"
 void setUp(void)
 {
 }
@@ -195,7 +195,7 @@ void test_autoSetInstructionRemapping_should_program_machineCode_to_REMAP_BASE_g
   
   //Program machine code
   emulateSwdRegisterWrite(TAR_REG,AP,4,REMAP_BASE);
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x56781234);
   
   //Program FP_REMAP
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(FPB->FP_REMAP));
@@ -209,9 +209,116 @@ void test_autoSetInstructionRemapping_should_program_machineCode_to_REMAP_BASE_g
   TEST_ASSERT_EQUAL(COMP_REMAP,instructionComparatorReady[0]);
 }
 
+void test_autoSetInstructionRemapping_16bit_machineCode_case()
+{
+  //Read INSTRUCTION_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0));
+  
+  //Read INSTRUCTION_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(1));
+  
+  //Read INSTRUCTION_COMP2
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[2]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(1));
+  
+  //Read INSTRUCTION_COMP3
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[3]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(1));
+  
+  //Read INSTRUCTION_COMP4
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[4]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(1));
+  
+  //Read INSTRUCTION_COMP5
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[5]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Set CSW to Halfword Size
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+  
+  //Read Instruction Address + 2
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x08000002);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xBBBB));
+
+  //Set CSW to Word Size
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+  
+  //Program machine code
+  emulateSwdRegisterWrite(TAR_REG,AP,4,REMAP_BASE);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xAAAABBBB);
+  
+  //Program FP_REMAP
+  emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(FPB->FP_REMAP));
+	emulateSwdRegisterWrite(DRW_REG,AP,4,REMAP_BASE & FP_REMAP_ADDRESS_MASK);
+  
+  //Program comparator
+  emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[0]));
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x08000001);
+
+  TEST_ASSERT_EQUAL(INSTRUCTION_COMP0,autoSetInstructionRemapping(0x08000000,0xAAAA));
+  TEST_ASSERT_EQUAL(COMP_REMAP,instructionComparatorReady[0]);
+}
+/*-------------------------autoSetSoftwareBreakpoint-----------------------*/
+//32bit case
+void test_autoSetSoftwareBreakpoint_should_replace_the_address_with_bkpt_and_nop_instruction_and_return_machineCode()
+{
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  //Check is it 32 bit instruction
+  isSelectedAddressContains32bitsInstruction_ExpectAndReturn(0x08001000,1);
+  
+  //Read the machince code
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x08001000);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xA5A5A5A));
+  
+  //Write bkpt and nop instruction into the address
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08001000);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xBE00BF00);
+  
+  TEST_ASSERT_EQUAL(0xA5A5A5A,autoSetSoftwareBreakpoint(0x08001000));
+  
+}
+//16bit case
+void test_autoSetSoftwareBreakpoint_should_replace_the_address_with_bkpt_instruction_and_return_machineCode()
+{
+  //Check is it 32 bit instruction
+  isSelectedAddressContains32bitsInstruction_ExpectAndReturn(0x08001000,0);
+  
+  //Write SELECT_BANK0 to select register
+	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+  //Write CSW_HALFWORD_SIZE to csw register
+	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+  
+  //Read 16bit machince code
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x08001000);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1234));
+  
+  //Write bkpt and nop instruction into the address
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08001000);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0xBE00);
+  
+  
+  TEST_ASSERT_EQUAL(0x1234,autoSetSoftwareBreakpoint(0x08001000));
+}
+
 /*-------------------------disableInstructionComparator-----------------------*/
 void test_disableInstructionComparator_should_write_FP_COMP_DISABLE_to_the_selected_instruction_comparator()
 {
+  cswDataSize = CSW_WORD_SIZE ;
+  
   //Program comparator
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[0]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);

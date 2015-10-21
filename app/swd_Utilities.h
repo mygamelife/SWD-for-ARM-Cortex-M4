@@ -1,16 +1,16 @@
 #ifndef swd_Utilities_H
 #define swd_Utilities_H
 
-#include <stdint.h>
-#include "MemoryReadWrite.h"
-
 typedef enum
 {
   NO_ERROR = 0,
-  ERR_ACK_WAIT_RESPONSE = -1,
-  ERR_ACK_FAULT_RESPONSE = -2,
-	ERR_INVALID_PARITY_RECEIVED ,
-}ErrorCode;
+  ERR_ACK_WAIT_RESPONSE       = -1,
+  ERR_ACK_FAULT_RESPONSE      = -2,
+	ERR_INVALID_PARITY_RECEIVED = -3,
+} SwdError;
+
+#include <stdint.h>
+#include "MemoryReadWrite.h"
 
 //SWD Protocol bit sequence
 #define DP 0

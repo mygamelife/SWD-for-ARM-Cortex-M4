@@ -142,10 +142,20 @@ int autoSetInstructionBreakpoint(uint32_t instructionAddress,int matchingMode)
 int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode)
 {
   int comparatorToUse = 0 ;
+  uint32_t dataRead = 0 ;
   
   comparatorToUse = selectNextFreeComparator(INSTRUCTION_TYPE);
   if(comparatorToUse == -1)
     return -1 ;
+  
+  if(machineCode > 0xFFFF)
+    machineCode = swapHalfword(machineCode);
+  else
+  {
+    memoryReadHalfword(instructionAddress+2,&dataRead);
+    dataRead = dataRead << 16 ;
+    machineCode = swapHalfword(machineCode+dataRead);
+  }
   
   memoryWriteWord((REMAP_BASE + (4*comparatorToUse)),machineCode);
   
@@ -153,6 +163,31 @@ int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode
   
   return comparatorToUse;
 }
+
+/**
+ *  Use to set for software breakpoint
+ *
+ *  Input   : instructionAddress is the address that will be breakpointed
+ *  Output  : return machine code of the instructionAddress for later replacement uses
+ */
+uint32_t autoSetSoftwareBreakpoint(uint32_t instructionAddress)
+{
+  uint32_t data = 0 ;
+  
+  if(isSelectedAddressContains32bitsInstruction(instructionAddress))
+  {
+    memoryReadWord(instructionAddress,&data);
+    memoryWriteWord(instructionAddress,0xBE00BF00);
+  }
+  else
+  {
+    memoryReadHalfword(instructionAddress,&data);
+    memoryWriteHalfword(instructionAddress,0xBE00);
+  }
+  
+  return data ;
+}
+
 
 /**
  *  Disable the selected Instruction Comparator

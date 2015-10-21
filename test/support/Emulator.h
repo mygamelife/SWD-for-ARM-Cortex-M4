@@ -4,7 +4,7 @@
 #include "unity.h"
 #include <stdint.h>
 #include "swd_Utilities.h"
-#include "mock_LowLevelIO.h"
+#include "mock_IoOperationsEx.h"
 #include "mock_configurePort.h"
 
 #define OK      0x4

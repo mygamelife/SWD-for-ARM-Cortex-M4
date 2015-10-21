@@ -11,6 +11,7 @@
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_MemoryReadWrite.h"
 #include "mock_SwdStub.h"
+#include "mock_CodeStepping.h"
 #include "mock_GetTime.h"
 
 void setUp(void)  {}
@@ -70,7 +71,7 @@ void test_readTargetRegister_given_register_address_should_read_the_given_regist
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  readCoreRegister_Ignore();
+  readCoreRegister_ExpectAndReturn(0xBEEFBEEF,0x12345670);
  
   readTargetRegister(session, 0xBEEFBEEF);
 }
@@ -83,8 +84,13 @@ void test_readAllTargetRegister_should_read_all_target_register()
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  for(i = 0 ; i < 52 ; i ++)
-    readCoreRegister_Ignore();
+  for(i = 0 ; i < 20 ; i ++)
+    readCoreRegister_ExpectAndReturn(i,0);
+  
+  readCoreRegister_ExpectAndReturn(CORE_REG_FPSCR,0);
+  
+  for(i=33 ; i < 96 ; i++)
+    readCoreRegister_ExpectAndReturn(i,0);
   
   readAllTargetRegister(session);
 }
@@ -240,7 +246,7 @@ void test_probeTaskManager_should_receive_TLV_READ_REGISTER_and_perform_the_task
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   
-  readCoreRegister_Expect(0x11223344, &readData);
+  readCoreRegister_ExpectAndReturn(0x11223344,0x1);
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
@@ -390,9 +396,9 @@ void test_probeTaskManager_should_run_checkPointEvent_if_set_breakPoint_is_calle
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG));
 
   readDebugEventRegister_ExpectAndReturn(0x2);
-  readCoreRegister_Ignore();
+  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08001110);
   disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
-  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
+  memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
   probeTaskManager(session);    
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
@@ -514,98 +520,57 @@ void test_runTarget_should_run_chekcBreakPointEvent_if_breakPointFlag_is_set()
   
   readDebugEventRegister_ExpectAndReturn(0x2);
   
-  readCoreRegister_Ignore();
+  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
   disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
-  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
+  memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
   runTarget(session);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG));
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
 }
 
-/*---------singleStepTarget----------------------*/
-void test_singleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
+/*---------performSingleStepInto----------------------*/
+void test_performSingleStepInto_should_step_readPC_run_and_return_PC_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  setCoreMode_Expect(CORE_SINGLE_STEP);
-  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
-  readCoreRegister_Ignore();
+  stepIntoOnce_ExpectAndReturn(0x08001110);
   
-  singleStepTarget(session);    
+  performSingleStepInto(session);    
 }
 
-void test_singleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
-  CEXCEPTION_T err;
-  
-  Try {
-    setCoreMode_Expect(CORE_SINGLE_STEP);
-    getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
-    
-    singleStepTarget(session);        
-  } Catch(err) {
-    TEST_ASSERT_EQUAL(TLV_NOT_STEPPED, err);
-  }
-}
-
-/*---------multipleStepTarget----------------------*/
-void test_multipleStepTarget_should_step_readPC_run_and_return_PC_if_successful()
+/*---------performMultipleStepInto----------------------*/
+void test_performMultipleStepInto_should_step_readPC_run_and_return_PC_if_successful()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   
-  stepOnly_Expect(5);
-  getCoreMode_ExpectAndReturn(CORE_SINGLE_STEP);
-  readCoreRegister_Ignore();
+  stepIntoOnce_ExpectAndReturn(0x08001110);
+  stepIntoOnce_ExpectAndReturn(0x08001112);
+  stepIntoOnce_ExpectAndReturn(0x08001114);
+  stepIntoOnce_ExpectAndReturn(0x08001116);
+  stepIntoOnce_ExpectAndReturn(0x0800111A);
   
-  multipleStepTarget(session, 5);    
+  performMultipleStepInto(session, 5);    
 }
 
-void test_multipleStepTarget_should_return_NACK_and_ERR_NOT_STEPPED_if_unsuccessful()
+/*---------performStepOver----------------------*/
+void test_performStepOver_should_return_PC_after_successful_step()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
   Tlv_Session *session = tlvCreateSession();
   CEXCEPTION_T err;
   
-  Try {
-    stepOnly_Expect(5);
-    getCoreMode_ExpectAndReturn(CORE_NORMAL_MODE);
-    
-    multipleStepTarget(session, 5);
-  } Catch(err) {
-    TEST_ASSERT_EQUAL(TLV_NOT_STEPPED, err);
-  }
+  stepOver_ExpectAndReturn(0x08001110);
+  
+  performStepOver(session);
 }
 
-/*---------singleStepOver----------------------*/
-void test_singleStepOver_should_return_PC_after_successful_step()
-{
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession();
-  CEXCEPTION_T err;
-  
-  isNextInstructionCallingSubroutine_ExpectAndReturn(0x12345678);
-  autoSetInstructionBreakpoint_ExpectAndReturn(0x1234567C,MATCH_WORD,INSTRUCTION_COMP0);
-  
-  readDebugEventRegister_ExpectAndReturn(0x2);
-  disableInstructionComparator_ExpectAndReturn(INSTRUCTION_COMP0,0);
-  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
-  
-  readCoreRegister_Ignore();
-  
-  singleStepOver(session);
-}
-
-void test_singleStepOver_should_throw_TLV_NOT_STEPOVER_if_fail()
+void test_performStepOver_should_throw_TLV_NOT_STEPOVER_if_fail()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -614,18 +579,46 @@ void test_singleStepOver_should_throw_TLV_NOT_STEPOVER_if_fail()
   
   Try
   {
-    isNextInstructionCallingSubroutine_ExpectAndReturn(0x12345670);
-    autoSetInstructionBreakpoint_ExpectAndReturn(0x12345674,MATCH_WORD,-1);
-    
-    singleStepOver(session);
+    stepOver_ExpectAndReturn(0);
+    performStepOver(session);
   }
   Catch(err)
   {
     TEST_ASSERT_EQUAL(TLV_NOT_STEPOVER,err);
   }
-  
-  
 }
+
+/*---------performStepOut----------------------*/
+void test_performStepOut_should_return_PC_after_successful_step()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  CEXCEPTION_T err;
+  
+  stepOut_ExpectAndReturn(0x08001110);
+  
+  performStepOut(session);
+}
+
+void test_performStepOut_should_throw_TLV_NOT_STEPOUT_if_fail()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession();
+  CEXCEPTION_T err;
+  
+  Try
+  {
+    stepOut_ExpectAndReturn(0);
+    performStepOut(session);
+  }
+  Catch(err)
+  {
+    TEST_ASSERT_EQUAL(TLV_NOT_STEPOUT,err);
+  }
+}
+
 /*---------setBreakpoint----------------------*/
 void test_setBreakpoint_should_set_breakpoint_and_return_ACK()
 {
@@ -739,8 +732,8 @@ void test_stopAllFlashPatchRemapping_should_stop_all_remapping_and_return_ACK()
   stopAllFlashPatchRemapping(session);
 }
 
-/*---------checkBreakpointEvent----------------------*/
-void test_checkBreakpointEvent_should_force_quit_if_breakpoint_not_occur()
+/*---------breakpointEventHandler----------------------*/
+void test_breakpointEventHandler_should_force_quit_if_breakpoint_not_occur()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -748,10 +741,10 @@ void test_checkBreakpointEvent_should_force_quit_if_breakpoint_not_occur()
   
   readDebugEventRegister_ExpectAndReturn(0);
   
-  checkBreakpointEvent(session);
+  breakpointEventHandler(session);
 }
 
-void test_checkBreakpointEvent_should_read_PC_and_disable_comparator_if_breakpoint_occur(void)
+void test_breakpointEventHandler_should_read_PC_and_disable_comparator_if_breakpoint_occur(void)
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -759,15 +752,15 @@ void test_checkBreakpointEvent_should_read_PC_and_disable_comparator_if_breakpoi
   
   readDebugEventRegister_ExpectAndReturn(0x2);
   
-  readCoreRegister_Ignore();
+  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
   disableFPComparatorLoadedWithAddress_IgnoreAndReturn(3);
-  clearDebugEvent_Expect((BKPT_DEBUGEVENT));
+  memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
-  checkBreakpointEvent(session);
+  breakpointEventHandler(session);
 }
 
-/*---------checkWatchpointEvent----------------------*/
-void test_checkWatchpointEvent_should_force_quit_if_watchpoint_not_occur()
+/*---------watchpointEventHandler----------------------*/
+void test_watchpointEventHandler_should_force_quit_if_watchpoint_not_occur()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -775,10 +768,10 @@ void test_checkWatchpointEvent_should_force_quit_if_watchpoint_not_occur()
   
   hasDataWatchpointOccurred_ExpectAndReturn(0);
   
-  checkWatchpointEvent(session);
+  watchpointEventHandler(session);
 }
 
-void test_checkWatchpointEvent_should_read_PC_and_disable_comparator_if_watchpoint_occur()
+void test_watchpointEventHandler_should_read_PC_and_disable_comparator_if_watchpoint_occur()
 {
   UART_HandleTypeDef uartHandler;
   uartInit_IgnoreAndReturn(&uartHandler);
@@ -786,11 +779,11 @@ void test_checkWatchpointEvent_should_read_PC_and_disable_comparator_if_watchpoi
   
   hasDataWatchpointOccurred_ExpectAndReturn(1);
   
-  readCoreRegister_Ignore();
+  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
   disableDWTComparator_ExpectAndReturn(COMPARATOR_1,0);
-  clearDebugEvent_Expect((DWTTRAP_DEBUGEVENT));
+  memoryWriteWord_ExpectAndReturn(DFSR_REG,DWTTRAP_DEBUGEVENT,0);
   
-  checkWatchpointEvent(session);
+  watchpointEventHandler(session);
 }
 
 void test_writeTargetFlash_should_write_into_target_ram_first_then_change_state(void)

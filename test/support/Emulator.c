@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "Emulator.h"
 
-
 uint32_t interconvertMSBandLSB(uint32_t input)
 {
 	// swap odd and even bits
@@ -66,11 +65,11 @@ void emulateTurnAroundWrite() {
 }
 
 void emulateSwdOutput() {
-  SWDIO_OutputMode_Expect();
+  setSWDIOOutputMode_Expect();
 }
 
 void emulateSwdInput()  {
-  SWDIO_InputMode_Expect();
+  setSWDIOInputMode_Expect();
 }
 
 void emulateIdleClock(int numOfClocks)  {
