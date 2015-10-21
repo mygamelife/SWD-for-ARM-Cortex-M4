@@ -44,7 +44,8 @@ config = {
   :compiler     => 'gcc',
   :linker       => 'gcc',
   :include_path => [CEXCEPTION_PATH,
-                    'src'],
+                    'src/Host',
+                    'app/Tlv'],
   :user_define  => ['CEXCEPTION_USE_CONFIG_FILE'],
 #  :library_path => 'lib',
 #  :library => ['libusb'],
@@ -60,7 +61,7 @@ config = {
                     :define => '-D'}
 }
 
-namespace :custom do
+namespace :host do
   desc 'Build custom release code'
   task :release do
     #            dependency list  directory of   directory of     directory of    config
@@ -82,5 +83,13 @@ namespace :brute do
     Rake::Task["build/release/Main.exe"].invoke
 #    p Rake.application.tasks
 #    p Rake::Task.tasks
+  end
+end
+
+namespace :host do
+  namespace :test do
+    filenames = get_all_tests("test/Host/**/test_*.c")
+    desc 'Run all probe tests'
+    task :all => filenames
   end
 end

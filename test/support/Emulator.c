@@ -107,8 +107,8 @@ void emulateSwdRegisterWrite(int address, int pointType, int ack, uint32_t data)
 {
 	int swdRequest, parity;
   
-	swdRequest = getSWD_Request(address, pointType, WRITE);
-	parity = calculateParity_32bitData(data);
+	swdRequest = getSwdRequest(address, pointType, SWD_WRITE);
+	parity = calculateParity32bitData(data);
 	
 	emulateWrite(swdRequest, 8);
 	emulateTurnAroundRead();
@@ -128,7 +128,7 @@ void emulateSwdRegisterWrite(int address, int pointType, int ack, uint32_t data)
 void emulateSwdRegisterRead(int address, int pointType, int ack, int parity, uint32_t data)
 {
 	int swdRequest;
-	swdRequest = getSWD_Request(address, pointType, READ);
+	swdRequest = getSwdRequest(address, pointType, SWD_READ);
 
 	emulateWrite(swdRequest, 8);
 

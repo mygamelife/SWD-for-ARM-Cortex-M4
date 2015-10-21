@@ -10,7 +10,7 @@ Tlv_Session *tlvCreateSession(void) {
   static Tlv_Session session;
   
   /* Get uart handler */
-  session.handler = uartInit();
+  uartInit(session.handler);
   
   /* Initialize begining state for send and receive */
   session.receiveState = TLV_RECEIVE_TYPE;
@@ -31,6 +31,7 @@ Tlv_Session *tlvCreateSession(void) {
   session.rMassEraseState     = 0;
   session.wDataInWordState    = 0;
   session.memoryRwState       = 0;
+  session.breakpointHandlerState = 0;
   
   /* Initialize load program state */
   session.loadProgramState = TLV_LOAD_ISR_VECTOR;

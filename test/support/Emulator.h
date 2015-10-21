@@ -3,7 +3,7 @@
 
 #include "unity.h"
 #include <stdint.h>
-#include "swd_Utilities.h"
+#include "Swd.h"
 #include "mock_IoOperationsEx.h"
 #include "mock_configurePort.h"
 

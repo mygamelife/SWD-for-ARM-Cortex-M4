@@ -30,7 +30,7 @@ int isSelectedAddressContains32bitsInstructionExtended(uint32_t address,uint32_t
 {
   uint32_t dataRead = 0 ;
   
-  memoryReadHalfword(address,&dataRead);
+  memoryReadHalfword(address, &dataRead);
   *machineCode = dataRead ;
 
   dataRead = dataRead & ENCODING_32BIT_MASK ;

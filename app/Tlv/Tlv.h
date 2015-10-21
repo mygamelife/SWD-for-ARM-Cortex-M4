@@ -4,10 +4,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
-#include "uart.h"
-#include "Tlv_ex.h"
+#include "Uart.h"
+#include "TlvEx.h"
 #include "ErrorCode.h"
-#include "GetTime.h"
+#include "SystemTime.h"
 #include "Yield.h"
 
 #if defined(HOST) || defined(TEST)
@@ -40,6 +40,7 @@ typedef struct
   Tlv_State wDataInHalfWordState;              /* Write data in halfword state             */
   Tlv_State wDataInByteState;                  /* Write data in byte state                 */
   Tlv_State memoryRwState;                     /* memory read write state                  */
+  Tlv_State breakpointHandlerState;
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
@@ -60,7 +61,7 @@ typedef struct
 
 typedef enum {
   FLAG_CLEAR = false,
-  FLAG_SET = true
+  FLAG_SET = true,
 } Flag_Status;
 
 /* ##### Defined Tlv Flags In Numeric ##### */

@@ -7,7 +7,7 @@ int main(void)
 
   /* Hardware configuration */
   HAL_Init();
-  configure_IOPorts();
+  configureIOPorts();
   configureLED();
   SystemClock_Config();
 
