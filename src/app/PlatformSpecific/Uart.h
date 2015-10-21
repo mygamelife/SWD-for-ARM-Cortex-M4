@@ -1,14 +1,13 @@
 #ifndef Uart_H
 #define Uart_H
 
-#if !defined(TEST)
-  #include "stm32f4xx_hal.h"
-#endif
-
 #include <stdint.h>
 #include "configurePort.h"
+#include "stm32f4xx_hal.h"
 #include "stm32f4xx_it.h"
 #include "stm32f4xx_hal_uart.h"
+
+extern UART_HandleTypeDef uartHandle;
 
 #if !defined(TEST) && !defined(HOST)
 extern __IO ITStatus uartTxReady;
@@ -42,7 +41,7 @@ extern __IO ITStatus uartRxReady;
 #define USARTx_IRQn                      USART1_IRQn
 #define USARTx_IRQHandler                USART1_IRQHandler
 
-void uartInit(void *huart);
+void uartInit(void **huart);
 void uartErrorHandler(void);
 
 /* Uart Transmit Function */

@@ -2,7 +2,6 @@
 #define Read_File_H
 
 #include <stdio.h>
-
 #include "elf.h"
 
 typedef struct InStream InStream;

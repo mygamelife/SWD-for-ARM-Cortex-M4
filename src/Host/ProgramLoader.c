@@ -348,7 +348,7 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   
   /* End tlv request task */
   endTask(session->rmemState);
-  #if !defined (TEST)
+  #if defined (HOST)
   displayMemoryMap(response->value, response->length - 1);
   #endif
   return response->value;

@@ -23,7 +23,7 @@ int main(void) {
   }
   
   printf("Closing port\n");
-  closeSerialPort((HANDLE *)session->handler);
+  closeSerialPort(session->handler);
 
   return 0;
 }

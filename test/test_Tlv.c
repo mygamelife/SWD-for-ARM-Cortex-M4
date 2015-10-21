@@ -1,12 +1,12 @@
 #include "unity.h"
 #include <stdbool.h>
 #include "Tlv.h"
-#include "Tlv_ex.h"
-#include "mock_uart.h"
+#include "TlvEx.h"
+#include "mock_Uart.h"
 #include "ErrorCode.h"
-#include "mock_GetTime.h"
+#include "mock_SystemTime.h"
 
-void setUp(void)  {}
+void setUp(void) {}
 
 void tearDown(void) {}
 
@@ -65,10 +65,10 @@ void test_tlvCreatePacket_given_32bit_data_should_convert_to_byte(void)
 
 void test_tlvSend_given_session_and_tlv_structure_pointer_should_transmit_the_tlv_over_using_UART(void)
 {
+  uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
+  
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  
-  uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   
   tlvSend(session, tlv);

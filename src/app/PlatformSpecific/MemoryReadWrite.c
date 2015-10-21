@@ -23,7 +23,7 @@ int memoryReadWord(uint32_t address, uint32_t *dataRead)
 	swdWriteAP(TAR_REG, address);
 	swdReadAP(DRW_REG, dataRead);
 	
-	status = compare_ParityWithData(*dataRead,parity);
+	status = compareParityWithData(*dataRead,parity);
 	
 	return status;
 }
@@ -41,7 +41,7 @@ int memoryReadHalfword(uint32_t address,uint32_t *dataRead)
 	swdWriteAP(TAR_REG, address);
 	swdReadAP(DRW_REG, dataRead);
 	
-	status = compare_ParityWithData(*dataRead,parity);
+	status = compareParityWithData(*dataRead,parity);
 	
 	return status;
 }
@@ -59,7 +59,7 @@ SwdError memoryWriteByte(uint32_t address, uint8_t writeData)
   alignedData = memoryWriteDataAlignment(address,writeData);
   
   error = swdWriteAP(TAR_REG, address);
-  if(error != NO_ERROR) return error;
+  if(error != SWD_NO_ERROR) return error;
   
   error = swdWriteAP(DRW_REG, alignedData);
   return error;
@@ -79,7 +79,7 @@ SwdError memoryWriteHalfword(uint32_t address, uint16_t writeData)
   alignedData = memoryWriteDataAlignment(address,writeData);
   
   error = swdWriteAP(TAR_REG, address);
-  if(error != NO_ERROR) return error;
+  if(error != SWD_NO_ERROR) return error;
   
   error = swdWriteAP(DRW_REG, alignedData);
   return error;
@@ -96,7 +96,7 @@ SwdError memoryWriteWord(uint32_t address, uint32_t writeData)
   }
  
   error = swdWriteAP(TAR_REG, address);
-  if(error != NO_ERROR) return error;
+  if(error != SWD_NO_ERROR) return error;
   
   error = swdWriteAP(DRW_REG, writeData);
   return error;

@@ -41,14 +41,14 @@
 #define BUTTON_PORT                      GPIOA
 #define BUTTON_PIN                       GPIO_PIN_0
 
-void configureClock();
-void configureTargetResetPin();
-void setSWDIOOutputMode();
-void setSWDIOInputMode();
+void configureClock(void);
+void configureTargetResetPin(void);
+void setSWDIOOutputMode(void);
+void setSWDIOInputMode(void);
 
-void configureIOPorts();
-void configureLED();
-void initButton();
-uint32_t Button_GetState();
+void configureIOPorts(void);
+void configureLED(void);
+void initButton(void);
+uint32_t Button_GetState(void);
 
 #endif // configurePort_H

@@ -9,7 +9,7 @@
  * Configure the port and pin to be used as SWCLK
  *
  */
-void configureClock()
+void configureClock(void)
 {
 	GPIO_InitTypeDef GpioInfo;
 
@@ -25,7 +25,7 @@ void configureClock()
  * Configure the port and pin to be used to perform a hard reset on target
  *
  */
-void configureTargetResetPin()
+void configureTargetResetPin(void)
 {
 	GPIO_InitTypeDef GpioInfo;
 
@@ -41,7 +41,7 @@ void configureTargetResetPin()
  * Configure the port and pin to be used to connect to the SWO pin of the target
  *
  */
-void configureSWOPin()
+void configureSWOPin(void)
 {	
   GPIO_InitTypeDef GpioInfo;
 
@@ -57,7 +57,7 @@ void configureSWOPin()
  * Configure the port and pin as OUTPUT to be used as SWDIO
  *
  */
-void setSWDIOOutputMode()
+void setSWDIOOutputMode(void)
 {
 	GPIO_InitTypeDef GpioInfo;
 
@@ -73,7 +73,7 @@ void setSWDIOOutputMode()
  * Configure the port and pin as INPUT to be used as SWDIO
  *
  */
-void setSWDIOInputMode()
+void setSWDIOInputMode(void)
 {
 	GPIO_InitTypeDef GpioInfo;
 
@@ -89,7 +89,7 @@ void setSWDIOInputMode()
  * Configure SWDCLK, SWDIO, SWDnRST
  *
  */
-void configureIOPorts()
+void configureIOPorts(void)
 {
 	CLK_EN();
 
@@ -103,7 +103,7 @@ void configureIOPorts()
   * Configure LED3 and LED4 for debug purpose
   *
   */
-void configureLED()	{
+void configureLED(void)	{
   GPIO_InitTypeDef GpioInfo ;
 
   CLK_EN();
@@ -116,7 +116,7 @@ void configureLED()	{
   HAL_GPIO_Init(GPIOG,&GpioInfo);  //Init LED1 on PG13 , lED 2 on PG14
 }
 
-void initButton() {
+void initButton(void) {
   GPIO_InitTypeDef pushButton;
 
   BUTTON_CLK_ENABLE();
@@ -129,6 +129,6 @@ void initButton() {
   HAL_GPIO_Init(BUTTON_PORT, &pushButton);
 }
 
-uint32_t Button_GetState()	{
+uint32_t Button_GetState(void)	{
 	return HAL_GPIO_ReadPin(BUTTON_PORT, BUTTON_PIN);
 }

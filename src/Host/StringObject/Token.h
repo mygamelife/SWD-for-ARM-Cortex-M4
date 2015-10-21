@@ -20,7 +20,6 @@ typedef enum
 #include "FileToken.h"
 #include "ErrorCode.h"
 #include "CException.h"
-#include "StringObject.h"
 
 typedef struct
 {

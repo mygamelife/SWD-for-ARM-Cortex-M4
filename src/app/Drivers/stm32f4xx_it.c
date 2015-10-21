@@ -38,7 +38,7 @@
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "Uart.h"
 #include "stm32f4xx_it.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
@@ -53,7 +53,6 @@
 /* Private define ------------------------------------------------------------*/
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-extern UART_HandleTypeDef uartHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
