@@ -252,7 +252,6 @@ void performSingleStepInto(Tlv_Session *session)
   */
 void performMultipleStepInto(Tlv_Session *session, int nInstructions)
 {
-  Tlv *tlv ;
   int i = 0 ;
   
   for(i = 0 ; i < nInstructions ; i ++)
@@ -532,7 +531,7 @@ void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAd
 void loopBack(Tlv_Session *session, Tlv *packet) {
 
   Tlv *tlv;
-  int i = 0, delay = 1000;
+  int i = 0;
 
   /* Size minus 1 because of the checksum value */
   for(i = 0; i < packet->length -1; i++) {
@@ -541,8 +540,6 @@ void loopBack(Tlv_Session *session, Tlv *packet) {
   tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
 
   tlvSend(session, tlv);
-
-  //while(delay--);
 }
 
 /** readTargetMemory is a function to read target RAM using swd
@@ -588,7 +585,6 @@ void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t dest
   Tlv *tlv;
   
   switch(session->pFlashState) {
-    
     case WRITE_TO_RAM :
       writeDataToRamInChunk(dataAddress, tempAddress, size);
       SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
@@ -604,6 +600,8 @@ void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t dest
         session->pFlashState = WRITE_TO_RAM;
       }
     break;
+
+    default : break;
   }
 }
 
@@ -626,7 +624,9 @@ void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
         session->pEraseState = REQUEST_ERASE;
       }
     break;
-  }  
+
+    default : break;
+  }
 }
 
 void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
@@ -648,6 +648,8 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
         session->pMEraseState = REQUEST_ERASE;
       }
     break;
+
+    default : break;
   }
 }
 

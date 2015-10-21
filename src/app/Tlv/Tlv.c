@@ -60,9 +60,9 @@ Tlv_Session *tlvCreateSession(void) {
 /** tlvPackIntoBuffer is a function to pack currentBuffer into targetBuffer
   */
 uint8_t tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int length) {
-  int index = 0;  uint8_t chksum = 0;
+  int index;  uint8_t chksum = 0;
   
-  for(index; index < length; index++) {
+  for(index = 0; index < length; index++) {
     chksum += targetBuffer[index] = currentBuffer[index];
   }
   
@@ -197,7 +197,9 @@ void tlvReceiveService(Tlv_Session *session) {
             Throw(TLV_TIME_OUT);
           }
     	}
-    break;  
+    break;
+
+    default : break;
   }
 }
 

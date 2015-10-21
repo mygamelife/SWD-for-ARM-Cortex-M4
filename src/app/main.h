@@ -3,4 +3,6 @@
 
 #include "Swd.h"
 #include "ProgramWorker.h"
+#include "SystemConfigure.h"
+
 #endif // main_H

@@ -3,7 +3,7 @@
 int main(void)
 {
   uint32_t idr = 0;
-  int errorCode = 0; CoreMode mode ;
+  SwdError errorCode = 0;
 
   /* Hardware configuration */
   HAL_Init();
@@ -24,9 +24,5 @@ int main(void)
   {
     tlvService(session);
     probeTaskManager(session);
-    //receivedPacket = tlvReceive(session);
-    //if(verifyTlvPacket(receivedPacket)) {
-    	//tlvSend(session, receivedPacket);
-    //}
   }
 }

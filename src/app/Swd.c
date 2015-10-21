@@ -132,7 +132,6 @@ int calculateParity32bitData(uint32_t data)
   *            + SWD_WDATAERR_ERROR_FLAG     0x03
   */
 uint32_t swdCheckErrorFlag(void)  {
-  int ack = 0, parity = 0;
   uint32_t readData = 0, errorFlag = 0;
 
   /* Access and read CTRL/STATUS Register */
@@ -168,7 +167,6 @@ uint32_t swdCheckErrorFlag(void)  {
  * Return : NONE
  */
 void swdClearErrorFlag(uint32_t errorFlag)  {
-  int ack = 0;
   uint32_t clearFlag = 0;
   
   if(errorFlag == SWD_STICKYORUN_ERROR_FLAG)
@@ -201,8 +199,7 @@ SwdError swdGetAckResponse(int ack) {
   else if(ack == SWD_FAULT_RESPONSE)
     return ERR_ACK_FAULT_RESPONSE;
   
-  else if(ack == SWD_OK_RESPONSE)
-    return SWD_NO_ERROR;
+  return SWD_NO_ERROR;
 }
 
 /** swdReadWriteDpWithRetries retries DP read/write operation

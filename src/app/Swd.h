@@ -6,7 +6,8 @@ typedef enum
   SWD_NO_ERROR                        = 0,
   ERR_ACK_WAIT_RESPONSE               = -1,
   ERR_ACK_FAULT_RESPONSE              = -2,
-	ERR_INVALID_PARITY_RECEIVED         = -3,
+  ERR_INVALID_PARITY_RECEIVED         = -3,
+  ERR_UNDEFINED						  = -4,
 } SwdError;
 
 #include "configurePort.h"

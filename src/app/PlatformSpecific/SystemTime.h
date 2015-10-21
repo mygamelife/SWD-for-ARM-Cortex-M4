@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "stm32f4xx_hal.h"
 #include "CException.h"
 
 #define FIVE_SECOND		5000
