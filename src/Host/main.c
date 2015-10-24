@@ -4,6 +4,7 @@
 int main(void) {
   CEXCEPTION_T err;
   Tlv_Session *session = NULL;
+  User_Session *userSession = NULL;
   
   displayOptionMenu();
   
@@ -14,6 +15,7 @@ int main(void) {
         tlvService(session);
         hostInterpreter(session);
         // 
+        // userSession = waitUserCommand();
         // Receive packet and handle it here
         //
       } Catch(err) {

@@ -923,17 +923,17 @@ void hostInterpreter(Tlv_Session *session) {
   switch(session->hostState) {    
     case HOST_WAIT_USER_COMMAND :
       userSession = waitUserCommand();
-      if(userSession != NULL) {
-        if(userSession->tlvCommand == TLV_EXIT) 
-          session->hostState = HOST_EXIT;
-        else session->hostState = HOST_INTERPRET_COMMAND;
+      /* If command is available */
+      if(IS_COMMAND_AVAILABLE(userSession)) {
+        if(IS_TLV_EXIT(userSession)) HOST_CHANGE_STATE(session, HOST_EXIT);
+        else HOST_CHANGE_STATE(session, HOST_INTERPRET_COMMAND);
       }
     break;
       
     case HOST_INTERPRET_COMMAND :
       selectCommand(session, userSession);
       if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
-        session->hostState = HOST_WAIT_USER_COMMAND;
+        HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
     break;
   }
 }
