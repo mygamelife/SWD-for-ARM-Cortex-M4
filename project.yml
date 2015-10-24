@@ -26,11 +26,9 @@
   :test:
     - +:test/**
     - -:test/support
-    - -:Host/test/**
   :source:
-    - app/Tlv**
-    - app/Stub**
-    - app/**
+    - -:src/app/PlatformSpecific/**
+    - src/**
   :support:
     - test/support
 
@@ -42,11 +40,12 @@
   :test:
     - *common_defines
     - TEST=
-    - CMOCK_MEM_DYNAMIC
+    - CMOCK_MEM_DYNAMIC=
+    - HOST=
   :test_preprocess:
     - *common_defines
     - TEST=
-    - CMOCK_MEM_DYNAMIC
+    - HOST=
 
 :cmock:
   :mock_prefix: mock_

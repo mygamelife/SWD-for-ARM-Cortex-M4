@@ -3,9 +3,9 @@
 
 #include "unity.h"
 #include <stdint.h>
-#include "swd_Utilities.h"
-#include "mock_LowLevelIO.h"
-#include "mock_configurePort.h"
+#include "Swd.h"
+#include "IoOperationsEx.h"
+#include "configurePort.h"
 
 #define OK      0x4
 #define WAIT    0x2
