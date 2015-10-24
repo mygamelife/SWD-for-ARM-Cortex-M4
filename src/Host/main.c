@@ -7,10 +7,9 @@ int main(void) {
   
   displayOptionMenu();
   
-  if(session == NULL) session = tlvCreateSession();
   Try {
     if(session == NULL) session = tlvCreateSession();
-    while(session->hostState != HOST_EXIT) {
+    while(!IS_HOST_EXIT(session)) {
       Try {
         tlvService(session);
         hostInterpreter(session);
@@ -18,7 +17,8 @@ int main(void) {
         // Receive packet and handle it here
         //
       } Catch(err) {
-        session->hostState = HOST_WAIT_USER_COMMAND;
+        HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
+        // session->hostState = HOST_WAIT_USER_COMMAND;
         displayErrorMessage(err);
       }
     }

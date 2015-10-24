@@ -73,6 +73,10 @@ typedef enum {
 #define TLV_SET_BREAKPOINT_FLAG                         ((uint32_t)0x00000010)
 #define TLV_SET_WATCHPOINT_FLAG                         ((uint32_t)0x00000020)
 
+/* ##### Tlv Host State Macros ##### */
+#define IS_HOST_EXIT(__SESSION__)                       (((__SESSION__)->hostState == HOST_EXIT) ? 1 : 0)
+#define HOST_CHANGE_STATE(__SESSION__, __STATE__)       ((__SESSION__)->hostState = __STATE__)
+ 
 /* ##### Tlv Flags Status Macros ##### */
 #define GET_FLAG_STATUS(__SESSION__, __FLAG__)          (((__SESSION__)->flags & (__FLAG__)) == (__FLAG__))
 #define SET_FLAG_STATUS(__SESSION__, __FLAG__)          ((__SESSION__)->flags |= (__FLAG__))
