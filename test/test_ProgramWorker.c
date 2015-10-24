@@ -716,6 +716,18 @@ void test_removeHardwareBreakpoint_should_return_NACK_if_not_found()
   removeHardwareBreakpoint(session,0x10203040);
 }
 
+/*---------removeSoftwareBreakpoint----------------------*/
+void test_removeSoftwareBreakpoint_should_restore_the_address_with_original_machineCode()
+{
+  UART_HandleTypeDef uartHandler;
+  uartInit_IgnoreAndReturn(&uartHandler);
+  Tlv_Session *session = tlvCreateSession(); 
+  
+  restoreSoftwareBreakpointOriginalInstruction_Expect(0x08001000,0xABCD);
+  
+  removeSoftwareBreakpoint(session,0x08001000,0xABCD);
+}
+
 /*---------removeAllHardwareBreakpoint----------------------*/
 void test_removeAllHardwareBreakpoint_should_remove_all_breakpoint_and_return_ACK()
 {  

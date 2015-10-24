@@ -358,7 +358,7 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
 /** Remove single instruction breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
- *             instructionAddress is the address set to breakpoint previously going to be removed
+ *             instructionAddress is the address set to breakpoint previously and going to be removed
  */
 void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
 {
@@ -372,6 +372,21 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   tlvSend(session, tlv);
 }
 
+/** Remove single software instruction breakpoint
+ *
+ * Input     : session contain a element/handler used by tlv protocol
+ *             instructionAddress is the address set to breakpoint previously using bkpt instruction
+ *             machineCode contains the original machineCode before it was replaced by the bkpt instruction
+ */
+void removeSoftwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress,uint32_t machineCode)
+{
+  Tlv *tlv ;
+  
+  restoreSoftwareBreakpointOriginalInstruction(instructionAddress,machineCode);
+  
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session,tlv);
+}
 
 /** Remove all hardware breakpoint
  *
