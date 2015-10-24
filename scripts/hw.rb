@@ -11,9 +11,9 @@ config = {
   :compiler     => 'arm-none-eabi-gcc',
   :linker       => 'arm-none-eabi-gcc',
 # -IC:\Users\user26\CoIDE\workspace\RTOS
-  :include_path => ['app/Hardware', 'app/Tlv',
+  :include_path => ['src/app/Drivers', 'src/app/Tlv', 'src/app/Stub', 'src/app/PlatformSpecific',
                     C_EXCEPTION_PATH,
-                    'app'],
+                    'src/app'],
   :user_define  => ['STM32F429ZI', 'STM32F429xx'],
   :library_path => '.',
 #  :library => ['libusb'],
@@ -39,6 +39,7 @@ namespace :hw do
     file 'build/release/hw/SWD-for-ARM-Cortex-M4.hex' => 'build/release/hw/SWD-for-ARM-Cortex-M4.elf' do |n|
       puts "converting #{n.prerequisites[0]} to hex..."
       system "arm-none-eabi-objcopy -O ihex #{n.prerequisites[0]} #{n.name}"
+      sh (FLASHER + '-P build/release/hw/SWD-for-ARM-Cortex-M4.hex -V while_programming -Rst -Run')
     end
   end
   CLEAN.include('build/release/hw') if File.exist? 'build/release/hw'
@@ -48,15 +49,17 @@ namespace :hw do
   #  p Rake.application.tasks
     Rake::Task["build/release/hw/SWD-for-ARM-Cortex-M4.elf"].invoke
   end
-
-  desc 'Run hardware-in-the-loop test'
-  task :test => :prepare_release do
-    Rake::test["Host/test/test_hwTlv"].invoke
-  end
   
   desc 'Flash program and run test'
   task :flash => :prepare_release do
     Rake::Task["build/release/hw/SWD-for-ARM-Cortex-M4.hex"].invoke
-    system (FLASHER + '-P build/release/hw/SWD-for-ARM-Cortex-M4.hex -V while_programming -Rst -Run')
+  end
+end
+
+namespace :hw do
+  namespace :test do
+    filenames = get_all_tests("test/Hardware/**/test_*.c")
+    desc 'Run all hardware tests'
+    task :all => (['hw:flash'] + filenames)
   end
 end

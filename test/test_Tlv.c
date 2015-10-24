@@ -1,12 +1,12 @@
 #include "unity.h"
 #include <stdbool.h>
 #include "Tlv.h"
-#include "Tlv_ex.h"
-#include "mock_uart.h"
+#include "TlvEx.h"
+#include "mock_Uart.h"
 #include "ErrorCode.h"
-#include "mock_GetTime.h"
+#include "mock_SystemTime.h"
 
-void setUp(void)  {}
+void setUp(void) {}
 
 void tearDown(void) {}
 
@@ -65,11 +65,10 @@ void test_tlvCreatePacket_given_32bit_data_should_convert_to_byte(void)
 
 void test_tlvSend_given_session_and_tlv_structure_pointer_should_transmit_the_tlv_over_using_UART(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
-	Tlv_Session *session = tlvCreateSession();
-  
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
+  
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
 	Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, sizeof(buffer), buffer);
   
   tlvSend(session, tlv);
@@ -82,8 +81,7 @@ void test_tlvSend_given_session_and_tlv_structure_pointer_should_transmit_the_tl
 
 void test_tlvSend_should_throw_err_when_tlvSend_is_call_but_flag_is_set(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   CEXCEPTION_T err;
   
@@ -100,8 +98,7 @@ void test_tlvSend_should_throw_err_when_tlvSend_is_call_but_flag_is_set(void)
 
 void test_tlvSend_given_tlv_with_command_and_length_1_and_data_is_null(void)
 { 
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
 	Tlv *tlv = tlvCreatePacket(TLV_OK, 0, NULL);
   
@@ -114,8 +111,7 @@ void test_tlvSend_given_tlv_with_command_and_length_1_and_data_is_null(void)
 
 void test_tlvSendService_should_change_state_after_tlvSend_and_do_nothing_after_that(void)
 { 
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
   
@@ -131,8 +127,7 @@ void test_tlvSendService_should_change_state_after_tlvSend_and_do_nothing_after_
 void test_tlvSendService_should_not_send_when_uartReady_is_not_SET(void)
 { 
   uartTxReady = 0;
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
@@ -145,8 +140,7 @@ void test_tlvSendService_should_not_send_when_uartReady_is_not_SET(void)
 }
 
 void test_tlvReceive_should_return_NULL_if_no_data_is_arrive(void)  {
-	UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+	uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   Tlv *tlv = tlvReceive(session);
@@ -156,8 +150,7 @@ void test_tlvReceive_should_return_NULL_if_no_data_is_arrive(void)  {
 
 void test_tlvReceive_should_throw_error_when_time_out_flag_is_set(void)  {
   CEXCEPTION_T err;
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   Try {
@@ -172,8 +165,7 @@ void test_tlvReceive_should_throw_error_when_time_out_flag_is_set(void)  {
 }
 
 void test_tlvReceive_should_receive_tlv_packet_send_by_others(void)  {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
@@ -195,8 +187,7 @@ void test_tlvReceive_should_receive_tlv_packet_send_by_others(void)  {
 
 void test_tlvReceiveService_should_receive_type_at_the_first_state(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   session->rxBuffer[0] = TLV_WRITE_RAM;
@@ -212,8 +203,7 @@ void test_tlvReceiveService_should_receive_type_at_the_first_state(void)
 
 void test_tlvReceiveService_should_receive_value_after_length(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   session->receiveState = TLV_RECEIVE_LENGTH;
@@ -237,8 +227,7 @@ void test_tlvReceiveService_should_receive_value_after_length(void)
 
 void test_tlvReceiveService_should_type_length_and_value(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   session->rxBuffer[0] = TLV_WRITE_RAM;
@@ -268,8 +257,7 @@ void test_tlvReceiveService_should_type_length_and_value(void)
 
 void test_tlvReceiveService_should_set_time_out_flag_if_no_data_arrive_after_first_2_byte(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   session->receiveState = TLV_RECEIVE_VALUE;
@@ -290,8 +278,7 @@ void test_tlvReceiveService_should_set_time_out_flag_if_no_data_arrive_after_fir
 
 void test_tlvService_should_able_to_receive_while_sending(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
@@ -334,8 +321,7 @@ void test_tlvService_should_able_to_receive_while_sending(void)
 
 void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
@@ -371,8 +357,7 @@ void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
 
 void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   uint8_t buffer[] = {0xFE, 0xCA, 0xEF, 0xBE};
@@ -499,8 +484,7 @@ void test_verifyTlvPacket_should_throw_error_if_invalid_command(void)
 
 void test_tlvReportError_is_to_create_a_packet_contain_errorCode_to_report_the_error(void)
 {
-  UART_HandleTypeDef huart;
-  uartInit_IgnoreAndReturn(&huart);
+  uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
   tlvErrorReporter(session, PROBE_TLV_CHECKSUM_ERROR);
