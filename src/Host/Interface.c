@@ -645,7 +645,7 @@ User_Session *InterpreteCommand(String *userInput) {
   else if(ccode == STEP)                      return userStepTarget(userInput);
   else if(ccode == BREAKPOINT)                return userSetBreakpoint(userInput);
   else if(ccode == ERASE)                     return userErase(userInput);
-  else if(ccode == RESET_COMMAND)                     return userReset(userInput);
+  else if(ccode == RESET_COMMAND)             return userReset(userInput);
   else if(ccode == EXIT)                      return userExit();
   
   else Throw(ERR_INVALID_USER_COMMAND);
@@ -656,12 +656,10 @@ User_Session *InterpreteCommand(String *userInput) {
   */
 User_Session *waitUserCommand(void) {
   Number *num; String *str; 
-
-  while(1) {
-    printf("> ");
-    fgets(InputBuffer, BUFFER_SIZE, stdin);
-    if(InputBuffer[strlen(InputBuffer) - 1] == '\n') break;
-  }
+  
+  if(!kbhit()) return NULL;
+  
+  else fgets(InputBuffer, BUFFER_SIZE, stdin);
   
   str = stringNew(InputBuffer);
   
