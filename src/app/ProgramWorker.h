@@ -62,11 +62,11 @@ void performMultipleStepInto(Tlv_Session *session, int nInstructions);
 void performStepOver(Tlv_Session *session);
 void performStepOut(Tlv_Session *session);
 
-void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress, int matchingMode);
+void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
 void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
  
-void removeInstructionBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
+void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
 void removeAllBreakpoint(Tlv_Session *session);
 void removeAllHardwareBreakpoint(Tlv_Session *session);
 void removeAllSoftwareBreakpoint(Tlv_Session *session);

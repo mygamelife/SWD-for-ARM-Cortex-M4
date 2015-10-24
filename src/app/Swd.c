@@ -198,8 +198,8 @@ SwdError swdGetAckResponse(int ack) {
   
   else if(ack == SWD_FAULT_RESPONSE)
     return ERR_ACK_FAULT_RESPONSE;
-  
-  return SWD_NO_ERROR;
+
+  else return SWD_NO_ERROR;
 }
 
 /** swdReadWriteDpWithRetries retries DP read/write operation

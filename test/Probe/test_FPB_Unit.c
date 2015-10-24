@@ -50,6 +50,72 @@ void test_disablePBUnit_should_write_DISABLE_FPB_to_FP_CTRL()
   disableFPBUnit();
 }
 
+/*-------------------------checkForValidInstructionComparator-----------------------*/
+void test_checkForValidInstructionComparator_given_INSTRUCTION_COMP0_to_INSTRUCTION_COMP5_should_return_1()
+{
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(INSTRUCTION_COMP0));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(INSTRUCTION_COMP1));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(INSTRUCTION_COMP2));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(INSTRUCTION_COMP3));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(INSTRUCTION_COMP4));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(INSTRUCTION_COMP5));
+
+}
+
+void test_checkForValidInstructionComparator_given_0_to_5_should_return_1()
+{
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(0));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(1));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(2));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(3));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(4));
+  TEST_ASSERT_EQUAL(1,checkForValidInstructionComparator(5));
+
+}
+
+
+void test_checkForValidInstructionComparator_given_unkown_value_should_return_minus_1()
+{
+  TEST_ASSERT_EQUAL(-1,checkForValidInstructionComparator(0x100));
+  TEST_ASSERT_EQUAL(-1,checkForValidInstructionComparator(-1));
+  TEST_ASSERT_EQUAL(-1,checkForValidInstructionComparator(-3));
+  TEST_ASSERT_EQUAL(-1,checkForValidInstructionComparator(6));
+}
+
+/*-------------------------checkForValidLiteralComparator-----------------------*/
+void test_checkForValidLiteralComparator_given_LITERAL_COMP0_to_LITERAL_COMP1_should_return_1()
+{
+  TEST_ASSERT_EQUAL(1,checkForValidLiteralComparator(LITERAL_COMP0));
+  TEST_ASSERT_EQUAL(1,checkForValidLiteralComparator(LITERAL_COMP1));
+}
+
+void test_checkForValidLiteralComparator_given_0_to_1_should_return_1()
+{
+  TEST_ASSERT_EQUAL(1,checkForValidLiteralComparator(0));
+  TEST_ASSERT_EQUAL(1,checkForValidLiteralComparator(1));
+}
+
+void test_checkForValidLiteralComparator_given_unkown_value_should_return_minus_1()
+{
+  TEST_ASSERT_EQUAL(-1,checkForValidLiteralComparator(0x100));
+  TEST_ASSERT_EQUAL(-1,checkForValidLiteralComparator(-1));
+  TEST_ASSERT_EQUAL(-1,checkForValidLiteralComparator(-3));
+  TEST_ASSERT_EQUAL(-1,checkForValidLiteralComparator(3));
+  
+}
+
+/*--------------------------swapHalfword-----------------------*/
+void test_swapHalfword_given_0xAABBCCDD_should_return_0xCCDDAABB()
+{
+  TEST_ASSERT_EQUAL(0xCCDDAABB,swapHalfword(0xAABBCCDD));
+}
+
+void test_swapHalfword_given_0x1111AAAA_should_return_0xAAAA1111()
+{
+  TEST_ASSERT_EQUAL(0xAAAA1111,swapHalfword(0x1111AAAA));
+}
+
+
 /*-------------------------manualSetInstructionBreakpoint-----------------------*/
 //MATCH_LOWERHALFWORD
 void test_manualSetInstructionBreakpoint_givenINSTRUCTION_COMP1_address_0xFFFFFFFF_MATCH_LOWERHALFWORD()
@@ -153,9 +219,9 @@ void test_autoSetInstructionBreakpoint_given_INSTRUCTION_COMP5_free_should_use_I
   
   //Program comparator
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[5]));
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x5FFFFFFD);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x9FFFFFFD);
   
-  TEST_ASSERT_EQUAL(5,autoSetInstructionBreakpoint(0xFFFFFFFF,MATCH_LOWERHALFWORD));
+  TEST_ASSERT_EQUAL(5,autoSetInstructionBreakpoint(0xFFFFFFFF));
   TEST_ASSERT_EQUAL(COMP_BUSY,instructionComparatorReady[5]);
   
 }
@@ -313,6 +379,28 @@ void test_autoSetSoftwareBreakpoint_should_replace_the_address_with_bkpt_instruc
   
   TEST_ASSERT_EQUAL(0x1234,autoSetSoftwareBreakpoint(0x08001000));
 }
+
+/*-------------------------restoreSoftwareBreakpointOriginalInstruction-----------------------*/
+void test_restoreSoftwareBreakpointOriginalInstruction_given_32bit_machineCode_should_write_word()
+{
+  cswDataSize = CSW_WORD_SIZE ;
+  
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08000000);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x1234ABCD);
+  
+  restoreSoftwareBreakpointOriginalInstruction(0x08000000,0x1234ABCD);
+}
+
+void test_restoreSoftwareBreakpointOriginalInstruction_given_16bit_machineCode_should_write_halfword()
+{
+  cswDataSize = CSW_HALFWORD_SIZE ;
+  
+  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08000000);
+	emulateSwdRegisterWrite(DRW_REG,AP,4,0x1234);
+  
+  restoreSoftwareBreakpointOriginalInstruction(0x08000000,0x1234);
+}
+
 
 /*-------------------------disableInstructionComparator-----------------------*/
 void test_disableInstructionComparator_should_write_FP_COMP_DISABLE_to_the_selected_instruction_comparator()
@@ -681,6 +769,167 @@ void test_readAndUpdateComparatorReadyFlag_should_read_all_Literal_Comparator_an
   
   TEST_ASSERT_EQUAL(COMP_READY,literalComparatorReady[0]);
   TEST_ASSERT_EQUAL(COMP_BUSY,literalComparatorReady[1]);
+}
+
+/*--------------------------selectNextFreeComparator-----------------------*/
+//INSTRUCTION_TYPE
+void test_selectNextFreeInstructionComparator_given_all_free_should_return_INSTRUCTION_COMP0()
+{
+  //Read INSTRUCTION_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP2
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[2]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP3
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[3]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP4
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[4]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP5
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[5]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+
+  
+  TEST_ASSERT_EQUAL(INSTRUCTION_COMP0,selectNextFreeComparator(INSTRUCTION_TYPE));
+}
+
+void test_selectNextFreeInstructionComparator_given_COMP0_busy_should_return_INSTRUCTION_COMP1()
+{
+  //Read INSTRUCTION_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read INSTRUCTION_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP2
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[2]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP3
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[3]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP4
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[4]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read INSTRUCTION_COMP5
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[5]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  TEST_ASSERT_EQUAL(INSTRUCTION_COMP1,selectNextFreeComparator(INSTRUCTION_TYPE));
+}
+
+void test_selectNextFreeInstructionComparator_given_all_busy_should_return_negative_1()
+{
+  //Read INSTRUCTION_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read INSTRUCTION_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read INSTRUCTION_COMP2
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[2]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read INSTRUCTION_COMP3
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[3]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read INSTRUCTION_COMP4
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[4]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read INSTRUCTION_COMP5
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(INSTRUCTION_COMP[5]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  TEST_ASSERT_EQUAL(-1,selectNextFreeComparator(INSTRUCTION_TYPE));
+}
+
+//LITERAL_TYPE
+void test_selectNextFreeInstructionComparator_given_LiteralComp0_ready_should_return_LiteralComp0()
+{
+  //Read LITERAL_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(LITERAL_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  //Read LITERAL_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(LITERAL_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x20000001));
+  
+  
+  TEST_ASSERT_EQUAL(LITERAL_COMP0,selectNextFreeComparator(LITERAL_TYPE));
+}
+
+void test_selectNextFreeInstructionComparator_given_LiteralComp1_ready_should_return_LiteralComp1()
+{
+  literalComparatorReady[0] = COMP_BUSY;
+  literalComparatorReady[1] = COMP_READY;
+  
+  //Read LITERAL_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(LITERAL_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x20000001));
+  
+  //Read LITERAL_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(LITERAL_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+  
+  TEST_ASSERT_EQUAL(LITERAL_COMP1,selectNextFreeComparator(LITERAL_TYPE));
+}
+
+void test_selectNextFreeInstructionComparator_given_all_literal_COMP_busy_should_return_neg_1()
+{
+  literalComparatorReady[0] = COMP_BUSY;
+  literalComparatorReady[1] = COMP_BUSY;
+  
+  //Read LITERAL_COMP0
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(LITERAL_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x20000001));
+  
+  //Read LITERAL_COMP1
+  emulateSwdRegisterWrite(TAR_REG, AP, OK, (uint32_t)&(LITERAL_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x20000001));
+  
+  TEST_ASSERT_EQUAL(-1,selectNextFreeComparator(LITERAL_TYPE));
 }
 
 /*-------------------------initialiseFPBUnit-----------------------*/
