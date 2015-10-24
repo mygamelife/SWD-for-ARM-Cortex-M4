@@ -16,7 +16,6 @@
 #else
 #define FLASH_PROGRAMMER_FILE_PATH            "../../FlashProgrammerElf/FlashProgrammer.elf"
 #endif
-// #define FLASH_PROGRAMMER_FILE_PATH            "Host/FlashProgrammer.elf"
 
 extern int programSize;
 
@@ -24,6 +23,12 @@ typedef enum {
   PROCESS_BUSY = 0,
   PROCESS_DONE
 } Process_Status;
+
+/* ##### Host Interpreter Macros ##### */
+#define IS_HOST_EXIT(__SESSION__)                       (((__SESSION__)->hostState == HOST_EXIT) ? 1 : 0  )
+#define IS_TLV_EXIT(__SESSION__)                        (((__SESSION__)->tlvCommand == TLV_EXIT) ? 1 : 0  )
+#define IS_COMMAND_AVAILABLE(__SESSION__)               (((__SESSION__) != NULL) ? 1 : 0                  )
+#define HOST_CHANGE_STATE(__SESSION__, __STATE__)       ((__SESSION__)->hostState = __STATE__             )
 
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);

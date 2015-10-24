@@ -1,9 +1,10 @@
 #ifndef Interface_H
 #define Interface_H
 
-#include <windows.h>
-#include <stdio.h>
 #include <stdint.h>
+#include <stdio.h>
+#include <conio.h>
+#include <windows.h>
 #include "Token.h"
 #include "Tlv.h"
 #include "ErrorCode.h"
