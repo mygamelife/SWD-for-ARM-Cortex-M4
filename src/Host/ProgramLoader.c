@@ -354,6 +354,41 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   return response->value;
 }
 
+uint8_t *tlvReadTargetDataWithType(Tlv_Session *session, uint32_t address, Tlv_Command dataType) {
+  static Tlv_State state = 0;
+  
+  /* Start tlv request task */
+  startTask(state);
+  
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Send tlv request */
+  Tlv *tlv = tlvCreatePacket(dataType, 4, (uint8_t *)&address);
+  
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(state);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(state);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(state);
+
+  return response->value;
+}
+
 /** tlvWriteDataInWord is a function used to send data in word
   * by using tlv protocol
   * 
@@ -405,7 +440,7 @@ Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32
   *
   * return  : PROCESS_DONE if success
   */
-Process_Status tlvWriteDataInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data) {
+Process_Status tlvWriteDataInHalfword(Tlv_Session *session, uint32_t address, uint16_t data) {
   uint32_t buffer[] = {address, data};
   
   /* Start tlv request task */

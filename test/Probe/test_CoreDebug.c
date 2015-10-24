@@ -4,12 +4,11 @@
 #include "CoreDebug_Utilities.h"
 #include "Emulator.h"
 #include "MemoryReadWrite.h"
-#include "swd_Utilities.h"
+#include "Swd.h"
 #include "IoOperations.h"
-#include "Delay.h"
-#include "core_cm4.h"
+#include "mock_IoOperations.h"
 #include "mock_configurePort.h"
-#include "mock_LowLevelIO.h"
+#include "core_cm4.h"
 
 void setUp(void)
 {

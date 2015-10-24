@@ -114,7 +114,7 @@ void tlvSend(Tlv_Session *session, Tlv *tlv) {
     SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
     session->txBuffer[0] = tlv->type;
     session->txBuffer[1] = tlv->length;
-    session->txBuffer[tlv->length + 1] = tlvPackIntoBuffer(&session->txBuffer[2], tlv->value, tlv->length - 1);    
+    memcpy(&session->txBuffer[2], tlv->value, tlv->length);
   }
 }
 
@@ -158,7 +158,7 @@ Tlv *tlvReceive(Tlv_Session *session) {
     CLEAR_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     tlv.type = session->rxBuffer[0];
     tlv.length = session->rxBuffer[1];
-    tlvPackIntoBuffer(tlv.value, &session->rxBuffer[2], tlv.length);
+    memcpy(tlv.value, &session->rxBuffer[2], tlv.length);
     return &tlv;    
   }
 
@@ -172,7 +172,7 @@ Tlv *tlvReceive(Tlv_Session *session) {
   * return  : NONE
   */
 void tlvReceiveService(Tlv_Session *session) {
-
+  
   switch(session->receiveState)  {
     case TLV_RECEIVE_TYPE :
     	if(!getByte(session->handler, &session->rxBuffer[0])) {
@@ -193,9 +193,8 @@ void tlvReceiveService(Tlv_Session *session) {
     		session->receiveState = TLV_RECEIVE_TYPE;
     	}
     	else {
-          if(isTimeOut(ONE_SECOND)) {
-            Throw(TLV_TIME_OUT);
-          }
+        if(isTimeOut(ONE_SECOND)) 
+          Throw(TLV_TIME_OUT);
     	}
     break;
 
@@ -296,6 +295,8 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_WRITE_WORD)                return 1;
   else if(command == TLV_WRITE_HALFWORD)            return 1;
   else if(command == TLV_WRITE_BYTE)                return 1;
+  else if(command == TLV_READ_WORD)                 return 1;
+  else if(command == TLV_READ_HALFWORD)             return 1;
   
   else return 0;
 }

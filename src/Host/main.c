@@ -7,12 +7,16 @@ int main(void) {
   
   displayOptionMenu();
   
+  if(session == NULL) session = tlvCreateSession();
   Try {
     if(session == NULL) session = tlvCreateSession();
     while(session->hostState != HOST_EXIT) {
       Try {
         tlvService(session);
         hostInterpreter(session);
+        // 
+        // Receive packet and handle it here
+        //
       } Catch(err) {
         session->hostState = HOST_WAIT_USER_COMMAND;
         displayErrorMessage(err);
@@ -23,7 +27,7 @@ int main(void) {
   }
   
   printf("Closing port\n");
-  closeSerialPort(session->handler);
+  closePort(session);
 
   return 0;
 }

@@ -41,51 +41,27 @@
 </editorArea>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="SystemTime.c" partName="SystemTime.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/SystemTime.c" title="SystemTime.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/SystemTime.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/SystemTime.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="346" selectionTopPixel="180"/>
+<editorState selectionHorizontalPixel="0" selectionLength="26" selectionOffset="130" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.h" partName="main.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/main.h" title="main.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/main.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/main.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="49" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="114" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="ProgramWorker.h" partName="ProgramWorker.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/ProgramWorker.h" title="ProgramWorker.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/ProgramWorker.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/ProgramWorker.h"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="MemoryReadWrite.c" partName="MemoryReadWrite.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/MemoryReadWrite.c" title="MemoryReadWrite.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/MemoryReadWrite.c" workbook="DefaultEditorWorkbook">
+<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="MemoryReadWrite.c" partName="MemoryReadWrite.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/MemoryReadWrite.c" title="MemoryReadWrite.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/MemoryReadWrite.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1084" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2078" selectionTopPixel="1206"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_spi.c" partName="stm32f4xx_hal_spi.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_spi.c" title="stm32f4xx_hal_spi.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_spi.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_spi.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="27" selectionOffset="67150" selectionTopPixel="42280"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SystemConfigure.c" partName="SystemConfigure.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/SystemConfigure.c" title="SystemConfigure.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/SystemConfigure.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/SystemConfigure.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="19" selectionOffset="3091" selectionTopPixel="980"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SystemConfigure.h" partName="SystemConfigure.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/SystemConfigure.h" title="SystemConfigure.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/SystemConfigure.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/SystemConfigure.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="79" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="67179" selectionTopPixel="42280"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" partName="configurePort.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/configurePort.h" title="configurePort.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/configurePort.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1528" selectionTopPixel="516"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.c" partName="configurePort.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/configurePort.c" title="configurePort.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/configurePort.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/configurePort.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2642" selectionTopPixel="2116"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SystemTime.h" partName="SystemTime.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/SystemTime.h" title="SystemTime.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/SystemTime.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/SystemTime.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="FPB_Utilities.c" partName="FPB_Utilities.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/FPB_Utilities.c" title="FPB_Utilities.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/FPB_Utilities.c" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/FPB_Utilities.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="53" selectionOffset="1232" selectionTopPixel="740"/>
-</editor>
-<editor id="org.eclipse.cdt.ui.editor.CEditor" name="FPB_Utilities.h" partName="FPB_Utilities.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/FPB_Utilities.h" title="FPB_Utilities.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/FPB_Utilities.h" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/FPB_Utilities.h"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="91" selectionTopPixel="0"/>
+<editorState selectionHorizontalPixel="0" selectionLength="31" selectionOffset="52" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="FPB_Unit.h" partName="FPB_Unit.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/FPB_Unit.h" title="FPB_Unit.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/FPB_Unit.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/FPB_Unit.h"/>
@@ -93,13 +69,13 @@
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Swd.c" partName="Swd.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Swd.c" title="Swd.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Swd.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Swd.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6328" selectionTopPixel="3800"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6253" selectionTopPixel="3780"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Tlv.c" partName="Tlv.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Tlv/Tlv.c" title="Tlv.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Tlv/Tlv.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Tlv.c"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6409" selectionTopPixel="2670"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6453" selectionTopPixel="3456"/>
 </editor>
-<editor activePart="true" focus="true" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.c" partName="stm32f4xx_hal_uart.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_uart.c" title="stm32f4xx_hal_uart.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_uart.c" workbook="DefaultEditorWorkbook">
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.c" partName="stm32f4xx_hal_uart.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_uart.c" title="stm32f4xx_hal_uart.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_uart.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
 <editorState selectionHorizontalPixel="0" selectionLength="20" selectionOffset="40148" selectionTopPixel="22770"/>
 </editor>
@@ -114,6 +90,30 @@
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="Uart.h" partName="Uart.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/Uart.h" title="Uart.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/Uart.h" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Uart.h"/>
 <editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="320" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="ProgramWorker.c" partName="ProgramWorker.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/ProgramWorker.c" title="ProgramWorker.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/ProgramWorker.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/ProgramWorker.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="18" selectionOffset="21126" selectionTopPixel="14230"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="Swd.h" partName="Swd.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Swd.h" title="Swd.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Swd.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/Swd.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="26" selectionOffset="3172" selectionTopPixel="1410"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" partName="stm32f4xx_hal.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal.c" title="stm32f4xx_hal.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal.c" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="13990" selectionTopPixel="6300"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="SystemTime.h" partName="SystemTime.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/SystemTime.h" title="SystemTime.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/SystemTime.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/SystemTime.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="365" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_gpio.h" partName="stm32f4xx_hal_gpio.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_gpio.h" title="stm32f4xx_hal_gpio.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/Drivers/stm32f4xx_hal_gpio.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_gpio.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="180"/>
+</editor>
+<editor id="org.eclipse.cdt.ui.editor.CEditor" name="MemoryReadWrite.h" partName="MemoryReadWrite.h" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/MemoryReadWrite.h" title="MemoryReadWrite.h" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/PlatformSpecific/MemoryReadWrite.h" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.h"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="406" selectionTopPixel="0"/>
 </editor>
 <editor id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" partName="main.c" path="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/main.c" title="main.c" tooltip="C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/src/app/main.c" workbook="DefaultEditorWorkbook">
 <input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
@@ -147,7 +147,7 @@
 </viewState>
 </view>
 <view id="org.coocox.builder.ui.views.ProjectView" partName="Project">
-<viewState CommonNavigator.LINKING_ENABLED="1" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="66">
+<viewState CommonNavigator.LINKING_ENABLED="1" horizontalPosition="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0" verticalPosition="25">
 <expanded>
 <element path="/SWD-for-ARM-Cortex-M4"/>
 <element path="/SWD-for-ARM-Cortex-M4/Code"/>
@@ -156,7 +156,7 @@
 <element path="/SWD-for-ARM-Cortex-M4/STM32F4"/>
 </expanded>
 <selection>
-<element path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
+<element path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.c"/>
 </selection>
 </viewState>
 </view>
@@ -208,8 +208,8 @@
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showMemoryBrowserAction"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showVariablesAction"/>
 <hide_menu_item_id id="org.coocox.builder.ui.openProjectExplorerAction"/>
-<hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
 <hide_menu_item_id id="org.eclipse.debug.ui.commands.TerminateAndRelaunch"/>
+<hide_menu_item_id id="org.coocox.codebugger.trace.actions.ShowTraceControlAction"/>
 <hide_menu_item_id id="org.coocox.codebugger.configuration.showRegistersAction"/>
 <hide_toolbar_item_id id="org.eclipse.cdt.debug.internal.ui.actions.ToggleInstructionStepModeAction"/>
 <hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
@@ -334,7 +334,7 @@
 </folder>
 </info>
 <info folder="true" part="org.eclipse.ui.internal.ViewStack@6df156" ratio="0.6332971" ratioLeft="582" ratioRight="337" relationship="4" relative="org.eclipse.ui.internal.ViewStack@1062c97">
-<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
+<folder activePageID="org.eclipse.debug.ui.DebugView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.debug.ui.DebugView" label="Debug"/>
 <page content="org.eclipse.debug.ui.BreakpointView" label="LabelNotFound"/>
@@ -380,164 +380,173 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_it.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/Tlv.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/CException.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/ProgramWorker.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.c"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/Uart.h"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/Uart.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SWD-for-ARM-Cortex-M4/STM32F4/startup_stm32f429xx.s"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/SystemTime.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_gpio.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.h"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" path="/SWD-for-ARM-Cortex-M4/STM32F4/startup_stm32f429xx.s"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.c"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/Swd.h"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 </editors>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41072" y="0"/>
+<item historyLabel="MemoryReadWrite.h" index="1">
+<position info="not_deleted" x="406" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41216" y="0"/>
+<item historyLabel="main.c" index="3">
+<position info="not_deleted" x="40" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41269" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24441" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41407" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21124" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41553" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21202" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41607" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21262" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41746" y="0"/>
+<item historyLabel="startup_stm32f429xx.s" index="4">
+<position info="not_deleted" x="0" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41794" y="0"/>
+<item historyLabel="main.c" index="5">
+<position info="not_deleted" x="40" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="59182" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24145" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="59208" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="19997" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="59233" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="20089" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="59317" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="20132" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="59746" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="20121" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="59805" y="0"/>
+<item historyLabel="MemoryReadWrite.c" index="2">
+<position info="not_deleted" x="1140" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60017" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="20121" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60059" y="0"/>
+<item historyLabel="main.c" index="5">
+<position info="not_deleted" x="40" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60171" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="20121" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60367" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24441" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60511" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21124" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60565" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21202" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60620" y="0"/>
+<item historyLabel="main.c" index="6">
+<position info="not_deleted" x="40" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60661" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24441" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="60756" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21124" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41832" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21202" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="41885" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="42023" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="42109" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="42161" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="42298" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="42385" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="42602" y="0"/>
-</item>
-<item historyLabel="stm32f4xx_it.c" index="0">
-<position info="not_deleted" x="5600" y="0"/>
-</item>
-<item historyLabel="CException.c" index="3">
-<position info="not_deleted" x="462" y="0"/>
-</item>
-<item historyLabel="CException.c" index="3">
-<position info="not_deleted" x="465" y="0"/>
-</item>
-<item historyLabel="Tlv.c" index="1">
-<position info="not_deleted" x="6419" y="0"/>
-</item>
-<item historyLabel="Tlv.c" index="1">
-<position info="not_deleted" x="6364" y="0"/>
-</item>
-<item historyLabel="Tlv.c" index="1">
-<position info="not_deleted" x="6364" y="0"/>
-</item>
-<item historyLabel="main.c" index="4">
-<position info="not_deleted" x="488" y="0"/>
-</item>
-<item historyLabel="main.c" index="4">
-<position info="not_deleted" x="661" y="0"/>
-</item>
-<item historyLabel="Uart.h" index="5">
-<position info="not_deleted" x="199" y="10"/>
-</item>
-<item historyLabel="Uart.c" index="6">
-<position info="not_deleted" x="21" y="30"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21262" y="0"/>
 </item>
 <item historyLabel="main.c" index="7">
 <position info="not_deleted" x="40" y="0"/>
 </item>
-<item historyLabel="Tlv.c" index="1">
-<position info="not_deleted" x="6364" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24441" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_it.c" index="0">
-<position info="not_deleted" x="5600" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21124" y="0"/>
 </item>
-<item historyLabel="Tlv.c" index="1">
-<position info="not_deleted" x="6409" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21202" y="0"/>
 </item>
-<item historyLabel="Uart.c" index="6">
-<position info="not_deleted" x="21" y="30"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21262" y="0"/>
 </item>
-<item historyLabel="Uart.h" index="5">
-<position info="not_deleted" x="320" y="0"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21288" y="0"/>
 </item>
-<item historyLabel="Uart.c" index="6">
-<position info="not_deleted" x="21" y="30"/>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24616" y="0"/>
 </item>
-<item historyLabel="stm32f4xx_it.c" index="0">
-<position info="not_deleted" x="5600" y="0"/>
+<item historyLabel="stm32f4xx_hal.c" index="8">
+<position info="not_deleted" x="13990" y="0"/>
 </item>
-<item active="true" historyLabel="stm32f4xx_hal_uart.c" index="2">
-<position info="not_deleted" x="40148" y="20"/>
+<item historyLabel="SystemTime.h" index="9">
+<position info="not_deleted" x="365" y="0"/>
+</item>
+<item historyLabel="stm32f4xx_hal_gpio.h" index="10">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="MemoryReadWrite.h" index="11">
+<position info="not_deleted" x="406" y="0"/>
+</item>
+<item historyLabel="main.c" index="7">
+<position info="not_deleted" x="40" y="0"/>
+</item>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="24739" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="12">
+<position/>
+</item>
+<item historyLabel="main.c" index="13">
+<position info="not_deleted" x="432" y="0"/>
+</item>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21202" y="0"/>
+</item>
+<item historyLabel="ProgramWorker.c" index="0">
+<position info="not_deleted" x="21262" y="0"/>
+</item>
+<item historyLabel="MemoryReadWrite.c" index="14">
+<position info="not_deleted" x="996" y="0"/>
+</item>
+<item historyLabel="MemoryReadWrite.h" index="11">
+<position info="not_deleted" x="406" y="0"/>
+</item>
+<item historyLabel="Swd.h" index="15">
+<position info="not_deleted" x="3172" y="26"/>
+</item>
+<item historyLabel="MemoryReadWrite.c" index="14">
+<position info="not_deleted" x="996" y="0"/>
+</item>
+<item historyLabel="MemoryReadWrite.c" index="14">
+<position info="not_deleted" x="1962" y="0"/>
+</item>
+<item historyLabel="startup_stm32f429xx.s" index="12">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="main.c" index="16">
+<position info="not_deleted" x="40" y="0"/>
+</item>
+<item active="true" historyLabel="MemoryReadWrite.c" index="14">
+<position info="not_deleted" x="2080" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -549,10 +558,26 @@
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="main.c" tooltip="SWD-for-ARM-Cortex-M4/Code/main.c">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/main.c"/>
 </file>
-<file factoryID="org.coocox.builder.ui.persistent.PersistentElementFactory" id="org.coocox.welcome.ui.WelcomePage" name="" tooltip="">
-<persistable>
-<org.coocox.welcome.ui.WelcomePage/>
-</persistable>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" tooltip="SWD-for-ARM-Cortex-M4/STM32F4/startup_stm32f429xx.s">
+<persistable path="/SWD-for-ARM-Cortex-M4/STM32F4/startup_stm32f429xx.s"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="MemoryReadWrite.h" tooltip="SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/MemoryReadWrite.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_gpio.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_gpio.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_gpio.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="SystemTime.h" tooltip="SWD-for-ARM-Cortex-M4/Code/SystemTime.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/SystemTime.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Swd.h" tooltip="SWD-for-ARM-Cortex-M4/Code/Swd.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/Swd.h"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ProgramWorker.c" tooltip="SWD-for-ARM-Cortex-M4/Code/ProgramWorker.c">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/ProgramWorker.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Uart.h" tooltip="SWD-for-ARM-Cortex-M4/Code/Uart.h">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/Uart.h"/>
@@ -560,17 +585,11 @@
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Uart.c" tooltip="SWD-for-ARM-Cortex-M4/Code/Uart.c">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/Uart.c"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.asm.AsmEditor" name="startup_stm32f429xx.s" tooltip="SWD-for-ARM-Cortex-M4/STM32F4/startup_stm32f429xx.s">
-<persistable path="/SWD-for-ARM-Cortex-M4/STM32F4/startup_stm32f429xx.s"/>
-</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_it.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_it.c">
 <persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_it.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="configurePort.h" tooltip="SWD-for-ARM-Cortex-M4/Code/configurePort.h">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/configurePort.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal.c"/>
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.c" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c">
 <persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.c"/>
@@ -578,17 +597,8 @@
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ErrorCode.h" tooltip="SWD-for-ARM-Cortex-M4/Code/ErrorCode.h">
 <persistable path="/SWD-for-ARM-Cortex-M4/Code/ErrorCode.h"/>
 </file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="Tlv_ex.h" tooltip="SWD-for-ARM-Cortex-M4/Code/Tlv_ex.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/Tlv_ex.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="GetTime.c" tooltip="SWD-for-ARM-Cortex-M4/Code/GetTime.c">
-<persistable path="/SWD-for-ARM-Cortex-M4/Code/GetTime.c"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_usart.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_usart.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_usart.h"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="stm32f4xx_hal_uart.h" tooltip="SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.h">
-<persistable path="/SWD-for-ARM-Cortex-M4/Hardware/stm32f4xx_hal_uart.h"/>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.cdt.ui.editor.CEditor" name="ErrorCode.h" tooltip="SWD-for-ARM-Cortex-M4/Code/ErrorCode.h">
+<persistable path="/SWD-for-ARM-Cortex-M4/Code/ErrorCode.h"/>
 </file>
 </mruList>
 </workbench>

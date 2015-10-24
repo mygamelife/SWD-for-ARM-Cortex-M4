@@ -11,9 +11,9 @@ config = {
   :compiler     => 'arm-none-eabi-gcc',
   :linker       => 'arm-none-eabi-gcc',
 # -IC:\Users\user26\CoIDE\workspace\RTOS
-  :include_path => ['app/Hardware', 'app/Tlv', 'app/Stub', 'app/Specialize',
+  :include_path => ['src/app/Drivers', 'src/app/Tlv', 'src/app/Stub', 'src/app/PlatformSpecific',
                     C_EXCEPTION_PATH,
-                    'app'],
+                    'src/app'],
   :user_define  => ['STM32F429ZI', 'STM32F429xx'],
   :library_path => '.',
 #  :library => ['libusb'],

@@ -12,9 +12,9 @@
 #include "SystemTime.h"
 
 #if defined(TEST)
-#define FLASH_PROGRAMMER_FILE_PATH            "FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH            "FlashProgrammerElf/FlashProgrammer.elf"
 #else
-#define FLASH_PROGRAMMER_FILE_PATH            "../../../Host/FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH            "../../FlashProgrammerElf/FlashProgrammer.elf"
 #endif
 // #define FLASH_PROGRAMMER_FILE_PATH            "Host/FlashProgrammer.elf"
 
@@ -45,8 +45,10 @@ Process_Status tlvHardReset(Tlv_Session *session);
 /* Write target memory */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
 Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+
+/* Write Byte, Halfword, Word */
 Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data);
-Process_Status tlvWriteDataInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data);
+Process_Status tlvWriteDataInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
 Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data);
 
 #define tlvWriteToRam(session, dataAddress, destAddress, size) \
@@ -68,6 +70,8 @@ void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 /* Read Memory */
 void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
 uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
+/* Read Byte, Halfword, Word */
+uint8_t *tlvReadTargetDataWithType(Tlv_Session *session, uint32_t address, Tlv_Command dataType);
 
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);

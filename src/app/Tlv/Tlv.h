@@ -2,9 +2,9 @@
 #define Tlv_H
 
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdint.h>
-#include <malloc.h>
+#include <stdbool.h>
+#include <string.h>
 #include "Uart.h"
 #include "TlvEx.h"
 #include "ErrorCode.h"

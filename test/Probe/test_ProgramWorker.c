@@ -1,11 +1,11 @@
 #include "unity.h"
 #include "Tlv.h"
-#include "Tlv_ex.h"
+#include "TlvEx.h"
 #include "ProgramWorker.h"
 #include "ErrorCode.h"
 #include "CoreDebug_Utilities.h"
 #include "mock_IoOperations.h"
-#include "mock_uart.h"
+#include "mock_Uart.h"
 #include "mock_CoreDebug.h"
 #include "mock_FPB_Unit.h"
 #include "mock_DWT_Unit.h"
@@ -13,7 +13,7 @@
 #include "mock_MemoryReadWrite.h"
 #include "mock_SwdStub.h"
 #include "mock_CodeStepping.h"
-#include "mock_GetTime.h"
+#include "mock_SystemTime.h"
 
 void setUp(void)  {}
 
@@ -901,7 +901,7 @@ void test_writeTargetInHalfWord_should_write_word_data_into_specified_address(vo
   
   memoryWriteHalfword_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
   
-  writeTargetInHalfWord(session, address, data);
+  writeTargetInHalfword(session, address, data);
   
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);

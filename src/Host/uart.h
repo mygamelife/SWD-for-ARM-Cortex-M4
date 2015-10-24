@@ -7,17 +7,17 @@
 #include "ErrorCode.h"
 #include "CException.h"
 
-#define UART_PORT                     "COM7"//"COM3"
-#define UART_BAUD_RATE                128000//9600
-
 typedef enum 
 {
   UART_OK = 0,
   UART_ERROR
 } Uart_Status;
 
+#define UART_PORT                     "COM7"//"COM3"
+#define UART_BAUD_RATE                128000//9600
+#define closePort(__SESSION__)        CloseHandle(((HANDLE *)((__SESSION__)->handler)))
+
 void uartInit(void **handler);
-void closeSerialPort(void *handler);
 DWORD uartSendBytes(HANDLE hSerial, uint8_t * data, int length);
 DWORD uartGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize);
 

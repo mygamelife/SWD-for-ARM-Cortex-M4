@@ -108,8 +108,3 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
   }
   else return UART_ERROR;
 }
-
-void closeSerialPort(void *handler) {
-  HANDLE *hSerial = (HANDLE *)handler;
-	CloseHandle(hSerial);
-}

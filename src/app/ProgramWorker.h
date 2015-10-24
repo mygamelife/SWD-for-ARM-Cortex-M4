@@ -9,6 +9,7 @@
 #include "CodeStepping.h"
 #include "ErrorCode.h"
 #include "CException.h"
+#include "stm32f4xx_hal.h"
 
 #define ENABLE_SVC          0x80
 
@@ -29,9 +30,15 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
 /*############################################### RAM ###############################################*/
 void writeDataToRamInChunk(uint32_t *dataAddress, uint32_t destAddress, int size);
 void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
+/* ###### read ###### */
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size);
+void readTargetInWord(Tlv_Session *session, uint32_t destAddress);
+void readTargetInHalfword(Tlv_Session *session, uint32_t destAddress);
+/* ###### write ###### */
 void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data);
-void writeTargetInHalfWord(Tlv_Session *session, uint32_t address, uint16_t data);
+void writeTargetInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
+void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data);
+void writeTargetInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
 void writeTargetInByte(Tlv_Session *session, uint32_t address, uint8_t data);
 
 /*############################################### Register ###############################################*/

@@ -91,7 +91,7 @@ SwdError memoryWriteWord(uint32_t address, uint32_t writeData)
   
   if(cswDataSize != CSW_WORD_SIZE) // used to prevent setting same size again and again
   {  
-    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_WORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
     cswDataSize = CSW_WORD_SIZE;
   }
  

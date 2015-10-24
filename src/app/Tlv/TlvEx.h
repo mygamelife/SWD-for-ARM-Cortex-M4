@@ -52,6 +52,8 @@ typedef enum
   TLV_WRITE_WORD,                     /* Write Data Into Target In Word           */
   TLV_WRITE_HALFWORD,                 /* Write Data Into Target In HalfWord       */
   TLV_WRITE_BYTE,                     /* Write Data Into Target In Byte           */
+  TLV_READ_WORD,                      /* Read Data Into Target In Word            */
+  TLV_READ_HALFWORD,                  /* Read Data Into Target In HalfWord        */
 } Tlv_Command;
 
 typedef enum

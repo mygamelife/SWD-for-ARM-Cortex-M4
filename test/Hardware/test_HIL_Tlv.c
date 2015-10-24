@@ -1,10 +1,10 @@
 #include "unity.h"
 #include <stdbool.h>
 #include "Tlv.h"
-#include "Tlv_ex.h"
-#include "uart.h"
+#include "Uart.h"
+#include "TlvEx.h"
+#include "SystemTime.h"
 #include "ErrorCode.h"
-#include "GetTime.h"
 
 void setUp(void) {}
 
@@ -32,9 +32,8 @@ void test_tlvLoopBack_(void) {
     printf("packet number %d\n", j);
     
     for(i = 0, k = j; i < 252; i++, k++) {
-      // printf("i %d actual %d\n", k + 2, reply->value[i]);
       TEST_ASSERT_EQUAL_HEX8(k + 2, reply->value[i]);
     }
   }
-  closeSerialPort((HANDLE *)session->handler);
+  closePort(session);
 }
