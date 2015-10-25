@@ -1,10 +1,10 @@
 #include "unity.h"
 #include <stdint.h>
 #include "mock_FPB_Unit.h"
-#include "FPB_Utilities.h"
+#include "FPBUnitEx.h"
 #include "CodeStepping.h"
 #include "mock_CoreDebug.h"
-#include "CoreDebug_Utilities.h"
+#include "CoreDebugEx.h"
 #include "Emulator.h"
 #include "Swd.h"
 #include "core_cm4.h"

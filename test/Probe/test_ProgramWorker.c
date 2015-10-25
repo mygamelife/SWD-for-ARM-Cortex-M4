@@ -3,7 +3,7 @@
 #include "TlvEx.h"
 #include "ProgramWorker.h"
 #include "ErrorCode.h"
-#include "CoreDebug_Utilities.h"
+#include "CoreDebugEx.h"
 #include "mock_IoOperations.h"
 #include "mock_Uart.h"
 #include "mock_CoreDebug.h"

@@ -3,8 +3,8 @@
 
 #include "Tlv.h"
 #include "CoreDebug.h"
-#include "FPB_Unit.h"
-#include "DWT_Unit.h"
+#include "FPBUnit.h"
+#include "DWTUnit.h"
 #include "SwdStub.h"
 #include "CodeStepping.h"
 #include "ErrorCode.h"

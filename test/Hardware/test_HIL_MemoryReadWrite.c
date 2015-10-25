@@ -1,6 +1,6 @@
 #include "unity.h"
 #include "Tlv.h"
-#include "Uart.h"
+#include "uart.h"
 #include "TlvEx.h"
 #include "SystemTime.h"
 #include "ErrorCode.h"

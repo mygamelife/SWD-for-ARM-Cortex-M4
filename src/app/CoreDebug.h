@@ -1,7 +1,7 @@
 #ifndef CoreDebug_H
 #define CoreDebug_H
 
-#include "CoreDebug_Utilities.h"
+#include "CoreDebugEx.h"
 
 #define enableDWTandITM()                   {memoryWriteByte((DEMCR_REG+3),ENABLE_DWT_ITM);}
 #define disableDWTandITM()                  {memoryWriteByte((DEMCR_REG+3),DISABLE_DWT_ITM);}

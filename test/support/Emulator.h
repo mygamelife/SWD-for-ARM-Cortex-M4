@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include "Swd.h"
 #include "IoOperationsEx.h"
+#include "mock_IoOperations.h"
 #include "configurePort.h"
 
 #define OK      0x4

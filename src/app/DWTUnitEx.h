@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include "CoreDebug.h"
-#include "CoreDebug_Utilities.h"
+#include "CoreDebugEx.h"
 #include "MemoryReadWrite.h"
 // #include "core_cm4.h"
 
@@ -63,5 +63,5 @@ typedef enum
 	WATCHPOINT_WORD
 }Watchpoint_DataSize;
 
-int checkForValidDWTComparator(int dwtCompNumber);
+
 #endif // DWT_Utilities_H
