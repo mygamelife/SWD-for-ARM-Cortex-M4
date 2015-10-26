@@ -3,7 +3,8 @@
 
 #include <stdint.h>
 #include "MemoryReadWrite.h"
-// #include "core_cm4.h"
+#include "stm32f429xx.h"
+#include "core_cm4.h"
 
 #define DHCSR_REG                 (uint32_t)&(CoreDebug->DHCSR)
 #define DFSR_REG	                (uint32_t)&(SCB->DFSR)

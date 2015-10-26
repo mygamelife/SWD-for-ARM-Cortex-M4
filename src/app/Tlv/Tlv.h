@@ -24,6 +24,7 @@ typedef struct
   /* Send and Receive state */
   Tlv_State receiveState;
   /* ###### Tlv state ###### */
+  Tlv_State state;
   Tlv_State wregState;
   Tlv_State regState;
   Tlv_State haltState;

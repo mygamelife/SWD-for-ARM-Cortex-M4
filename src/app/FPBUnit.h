@@ -2,7 +2,7 @@
 #define FPB_Unit_H
 
 #include "MemoryReadWrite.h"
-#include "FPB_Utilities.h"
+#include "FPBUnitEx.h"
 #include "CoreDebug.h"
 #include "CodeStepping.h"
 

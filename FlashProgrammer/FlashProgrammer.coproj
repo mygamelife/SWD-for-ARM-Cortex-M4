@@ -32,7 +32,7 @@
           <Memory name="IROM2" type="ReadOnly" size="" startValue=""/>
           <Memory name="IRAM2" type="ReadWrite" size="" startValue=""/>
         </MemoryAreas>
-        <LocateLinkFile path="./toram.ld" type="0"/>
+        <LocateLinkFile path="./toflash.ld" type="0"/>
       </Link>
       <Output>
         <Option name="OutputFileType" value="0"/>
@@ -75,7 +75,7 @@
     <File name="Hardware/stm32f4xx_hal.h" path="app/Hardware/stm32f4xx_hal.h" type="1"/>
     <File name="Code/memoryRW.c" path="app/memoryRW.c" type="1"/>
     <File name="Code/SystemConfigure.c" path="app/SystemConfigure.c" type="1"/>
-    <File name="Code/swdStub.h" path="app/swdStub.h" type="1"/>
+    <File name="Code/swdStub.h" path="app/SwdStub.h" type="1"/>
     <File name="configuration/configurePort.h" path="app/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ex.c" path="app/Hardware/stm32f4xx_hal_flash_ex.c" type="1"/>
     <File name="startup/system_stm32f4xx.h" path="app/Hardware/system_stm32f4xx.h" type="1"/>
@@ -114,7 +114,7 @@
     <File name="Code/main.h" path="app/main.h" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="app/Hardware/stm32f4xx_it.c" type="1"/>
-    <File name="Code/swdStub.c" path="app/swdStub.c" type="1"/>
+    <File name="Code/swdStub.c" path="app/SwdStub.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Code/Flash.c" path="app/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="app/Hardware/stm32f4xx_hal_flash.c" type="1"/>

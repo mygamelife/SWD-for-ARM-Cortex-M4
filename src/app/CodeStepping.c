@@ -121,7 +121,7 @@ uint32_t stepOver()
   {
     if(isSelectedAddressContainsCallingSubroutineInstruction(pc))
     {
-      //comparatorUsed = autoSetInstructionBreakpoint(pc + 4, MATCH_WORD);
+      comparatorUsed = autoSetInstructionBreakpoint(pc + 4);
       if(comparatorUsed == -1)
         return 0 ;
     
@@ -167,7 +167,7 @@ uint32_t stepOut()
     }
   }
   
-  //comparatorUsed = autoSetInstructionBreakpoint(pc,MATCH_WORD);
+  comparatorUsed = autoSetInstructionBreakpoint(pc);  
   if(comparatorUsed == -1)
     return 0 ;
     

@@ -111,6 +111,111 @@
       </target>
       <target file="stm32f4xx_hal_pwr_ex.o" lastModified="150a05b3d6d">
          <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_pwr_ex.c" lastModified="150896c9a74"/>
+   <processor signature="arm-none-eabi-gcc 4.8.1 mingw32 -mcpu=cortex-m4 -mthumb -g2 -Wall -O0 -c -DSTM32F429ZI -DSTM32F429xx -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\vendor\ceedling\vendor\c_exception -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\vendor\ceedling\vendor -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\vendor\ceedling\vendor\c_exception\lib -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\src\app\PlatformSpecific -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4 -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\src\app\Stub -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\src\app\Drivers -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\src\app -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\src -I..\..\..\..\..\..\..\Documents\VT\SWD-for-ARM-Cortex-M4\src\app\Tlv">
+      <target file="Flash.o" lastModified="150a35c3302">
+         <source file="..\..\..\src\app\Stub\Flash.c" lastModified="150a3471c8b"/>
+      </target>
+      <target file="stm32f4xx_hal_spi.o" lastModified="150a35c2116">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_spi.c" lastModified="150a3471bd0"/>
+      </target>
+      <target file="CoreDebug.o" lastModified="150a35c2b24">
+         <source file="..\..\..\src\app\CoreDebug.c" lastModified="150a3471a98"/>
+      </target>
+      <target file="stm32f4xx_hal_uart.o" lastModified="150a35c279b">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_uart.c" lastModified="150a3471bdf"/>
+      </target>
+      <target file="stm32f4xx_hal.o" lastModified="150a35c3505">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal.c" lastModified="150a3471ac7"/>
+      </target>
+      <target file="stm32f4xx_hal_rcc.o" lastModified="150a35c35ff">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_rcc.c" lastModified="150a3471b91"/>
+      </target>
+      <target file="FPBUnit.o" lastModified="150a35c343a">
+         <source file="..\..\..\src\app\FPBUnit.c" lastModified="150a3471c5c"/>
+      </target>
+      <target file="stm32f4xx_hal_pwr.o" lastModified="150a35c31f9">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_pwr.c" lastModified="150a3471b82"/>
+      </target>
+      <target file="IoOperations.o" lastModified="150a35c2866">
+         <source file="..\..\..\src\app\IoOperations.c" lastModified="150a3471c6c"/>
+      </target>
+      <target file="memoryRW.o" lastModified="150a35c2d36">
+         <source file="..\..\..\src\app\Stub\memoryRW.c" lastModified="150a3471c8b"/>
+      </target>
+      <target file="system_stm32f4xx.o" lastModified="150a35c385f">
+         <source file="..\..\..\src\app\Drivers\system_stm32f4xx.c" lastModified="150a3471c5c"/>
+      </target>
+      <target file="stm32f4xx_hal_i2c.o" lastModified="150a35c24dd">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_i2c.c" lastModified="150a3471b53"/>
+      </target>
+      <target file="stm32f4xx_hal_pwr_ex.o" lastModified="150a35c3cd2">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_pwr_ex.c" lastModified="150a3471b91"/>
+      </target>
+      <target file="stm32f4xx_hal_flash_ramfunc.o" lastModified="150a35c2338">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_flash_ramfunc.c" lastModified="150a3471b24"/>
+      </target>
+      <target file="SwdStub.o" lastModified="150a35c4135">
+         <source file="..\..\..\src\app\Stub\SwdStub.c" lastModified="150a3471c8b"/>
+      </target>
+      <target file="Tlv.o" lastModified="150a35c3ddb">
+         <source file="..\..\..\src\app\Tlv\Tlv.c" lastModified="150a3471c9b"/>
+      </target>
+      <target file="DWTUnit.o" lastModified="150a35c393a">
+         <source file="..\..\..\src\app\DWTUnit.c" lastModified="150a3471aa7"/>
+      </target>
+      <target file="stm32f4xx_hal_flash.o" lastModified="150a35c313e">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_flash.c" lastModified="150a3471b15"/>
+      </target>
+      <target file="Swd.o" lastModified="150a35c421f">
+         <source file="..\..\..\src\app\Swd.c" lastModified="150a3471c8b"/>
+      </target>
+      <target file="stm32f4xx_it.o" lastModified="150a35c3062">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_it.c" lastModified="150a3471bef"/>
+      </target>
+      <target file="Uart.o" lastModified="150a35c2663">
+         <source file="..\..\..\src\app\PlatformSpecific\Uart.c" lastModified="150a3471c7b"/>
+      </target>
+      <target file="MemoryReadWrite.o" lastModified="150a35c3b1d">
+         <source file="..\..\..\src\app\PlatformSpecific\MemoryReadWrite.c" lastModified="150a3471c6c"/>
+      </target>
+      <target file="startup_stm32f429xx.o" lastModified="150a35c3228">
+         <source file="..\..\..\src\app\Drivers\startup_stm32f429xx.s" lastModified="150a3471ab7"/>
+      </target>
+      <target file="CodeStepping.o" lastModified="150a35c2a59">
+         <source file="..\..\..\src\app\CodeStepping.c" lastModified="150a3471a98"/>
+      </target>
+      <target file="SystemTime.o" lastModified="150a35c2f97">
+         <source file="..\..\..\src\app\PlatformSpecific\SystemTime.c" lastModified="150a3471c7b"/>
+      </target>
+      <target file="configurePort.o" lastModified="150a35c3a43">
+         <source file="..\..\..\src\app\configurePort.c" lastModified="150a3471caa"/>
+      </target>
+      <target file="stm32f4xx_hal_flash_ex.o" lastModified="150a35c36e9">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_flash_ex.c" lastModified="150a3471b24"/>
+      </target>
+      <target file="SystemConfigure.o" lastModified="150a35c2589">
+         <source file="..\..\..\src\app\SystemConfigure.c" lastModified="150a3471c9b"/>
+      </target>
+      <target file="stm32f4xx_hal_cortex.o" lastModified="150a35c37c3">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_cortex.c" lastModified="150a3471ae6"/>
+      </target>
+      <target file="stm32f4xx_hal_dma.o" lastModified="150a35c406a">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_dma.c" lastModified="150a3471b05"/>
+      </target>
+      <target file="ProgramWorker.o" lastModified="150a35c2e8e">
+         <source file="..\..\..\src\app\ProgramWorker.c" lastModified="150a3471c7b"/>
+      </target>
+      <target file="CException.o" lastModified="150a35c2bb0">
+         <source file="..\..\..\vendor\ceedling\vendor\c_exception\lib\CException.c" lastModified="150a3471e40"/>
+      </target>
+      <target file="stm32f4xx_hal_usart.o" lastModified="150a35c2912">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_usart.c" lastModified="150a3471bdf"/>
+      </target>
+      <target file="stm32f4xx_hal_gpio.o" lastModified="150a35c3bf8">
+         <source file="..\..\..\src\app\Drivers\stm32f4xx_hal_gpio.c" lastModified="150a3471b34"/>
+      </target>
+      <target file="main.o" lastModified="150a35c2cba">
+         <source file="..\..\..\src\app\main.c" lastModified="150a3471caa"/>
       </target>
    </processor>
 </history>

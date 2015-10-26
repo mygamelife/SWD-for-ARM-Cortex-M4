@@ -1,5 +1,5 @@
 #include "unity.h"
-#include "Tlv.h"
+#include "mock_Tlv.h"
 #include "TlvEx.h"
 #include "SystemTime.h"
 #include "MemoryReadWrite.h"
@@ -8,8 +8,9 @@
 #include "mock_ProgramLoader.h"
 
 void setUp(void) {
-  uartInit_Ignore();
-	initMemoryReadWrite();
+  // Tlv_Session *_session = NULL;
+  // tlvCreateSession_ExpectAndReturn(_session);
+	// initMemoryReadWrite();
 }
 
 void tearDown(void) {}
@@ -28,11 +29,10 @@ void test_memoryReadWord_should_read_memory_and_return_data_in_word(void)
 
 void test_memoryReadHalfword_should_read_memory_and_return_data_in_halfword(void)
 {
-  uint16_t dataRead = 0;
-  uint32_t address = 0x20000000;
-  uint8_t data[] = {0x00, 0x00, 0x00, 0x20, 0xCD, 0xAB, 0x34, 0x12};
+  uint32_t address = 0x20000000, dataRead = 0;
+  uint8_t data[] = {0xCD, 0xAB, 0x34, 0x12};
   
-  tlvReadTargetMemory_IgnoreAndReturn(data);
+  tlvReadTargetDataWithType_IgnoreAndReturn(data);
 	int result = memoryReadHalfword(address, &dataRead);
   
   TEST_ASSERT_EQUAL(1, result);
@@ -53,8 +53,8 @@ void test_memoryWriteHalfWord_should_write_memory_in_word_and_return_1_if_succes
 {
   uint32_t writeData = 0xBEEFCAFE, address = 0x20000000;
   
-  tlvWriteDataInHalfWord_IgnoreAndReturn(PROCESS_DONE);
-	int result = memoryWriteHalfWord(address, writeData);
+  tlvWriteDataInHalfword_IgnoreAndReturn(PROCESS_DONE);
+	int result = memoryWriteHalfword(address, writeData);
   
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
 }
@@ -65,6 +65,14 @@ void test_memoryWriteByte_should_write_memory_in_word_and_return_1_if_success(vo
   
   tlvWriteDataInByte_IgnoreAndReturn(PROCESS_DONE);
 	int result = memoryWriteByte(address, writeData);
+  
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+}
+
+void test_flashWriteWord_should_write_memory_in_word_to_flash_and_return_1_if_success(void)
+{ 
+  tlvWriteTargetMemory_IgnoreAndReturn(PROCESS_DONE);
+	int result = _flashWriteWord(0x8000000, 0xBEEFCAFE);
   
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
 }

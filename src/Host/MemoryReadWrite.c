@@ -1,12 +1,10 @@
 #include "MemoryReadWrite.h"
 
 /* Global Tlv Session */
-static Tlv_Session *_session = NULL;
+Tlv_Session *_session = NULL;
 
 /* Global Error code */
 CEXCEPTION_T err = 0;
-
-int cswDataSize = -1;
 
 /**
   ==============================================================================
@@ -16,6 +14,11 @@ int cswDataSize = -1;
 void initMemoryReadWrite(void) {
   if(_session == NULL)
     _session = tlvCreateSession();
+  
+  do {
+    tlvService(_session);
+    tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
+  } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);
 }
 
 int memoryReadWord(uint32_t address, uint32_t *dataRead) {
@@ -88,6 +91,22 @@ int memoryWriteByte(uint32_t address, uint8_t writeData) {
   Try {
     /* Waiting reply from probe */
     while((status = tlvWriteDataInByte(_session, address, writeData)) == 0) {
+      tlvService(_session);
+    };
+  } Catch(err) {
+    return err;
+  }
+  
+  return 1;
+}
+
+int _flashWriteWord(uint32_t address, uint32_t writeData) {
+  int status = 0, size = 4;
+  uint8_t *pData = (uint8_t *)&writeData;
+  
+  Try {
+    /* Waiting reply from probe */
+    while((status = tlvWriteToFlash(_session, &pData, &address, &size)) == 0) {
       tlvService(_session);
     };
   } Catch(err) {
