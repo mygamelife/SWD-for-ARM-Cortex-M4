@@ -81,12 +81,20 @@ void test_flashWrite_given_data_and_size_5_should_write_into_Flash()  {
 void test_flashCopyFromSramToFlash_given_0x20000000_sram_address_0x08000000_flash_address_and_size_8(void) {
   
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  readMemoryData_ExpectAndReturn(0x20000000, 0xDEADBEEF);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x08000000, 0xDEADBEEF, HAL_OK);
+
+  readMemoryData_ExpectAndReturn(0x20000000, 0xEF);
+  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_BYTE, 0x08000000, 0xEF, HAL_OK);
   
-  readMemoryData_ExpectAndReturn(0x20000004, 0xBEEFCAFE);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x08000004, 0xBEEFCAFE, HAL_OK);
+  readMemoryData_ExpectAndReturn(0x20000001, 0xBE);
+  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_BYTE, 0x08000001, 0xBE, HAL_OK);
+  
+  readMemoryData_ExpectAndReturn(0x20000002, 0xAD);
+  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_BYTE, 0x08000002, 0xAD, HAL_OK);
+  
+  readMemoryData_ExpectAndReturn(0x20000003, 0xDE);
+  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_BYTE, 0x08000003, 0xDE, HAL_OK);
+
   HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
   
-  flashCopyFromSramToFlash(0x20000000, 0x08000000, 8);
+  flashCopyFromSramToFlash(0x20000000, 0x08000000, 4);
 }

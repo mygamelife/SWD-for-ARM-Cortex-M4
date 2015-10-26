@@ -589,7 +589,7 @@ Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress,
   /* End tlv request task */
   endTask(session->wramState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** !< Internal Function used by Load Program To Memory >!

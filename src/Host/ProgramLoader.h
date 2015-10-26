@@ -33,6 +33,9 @@ typedef enum {
 #define tlvWriteToRam(session, dataAddress, destAddress, size) \
         tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
 
+#define tlvWriteToFlash(session, dataAddress, destAddress, size) \
+        tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_FLASH)
+        
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
@@ -58,8 +61,6 @@ Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress,
 Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data);
 Process_Status tlvWriteDataInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
 Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data);
-        
-int tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 
 /* Load Flash/RAM */
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);

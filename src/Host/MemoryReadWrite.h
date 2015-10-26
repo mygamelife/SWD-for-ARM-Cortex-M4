@@ -10,7 +10,7 @@
 #define HALFWORD_SIZE            2
 #define WORD_SIZE                4
 
-extern int cswDataSize ;
+extern Tlv_Session *_session;
 
 /* Used for mocking */
 uint32_t memoryReadAndReturnWord(uint32_t address);
@@ -23,6 +23,8 @@ int memoryReadHalfword(uint32_t address, uint32_t *dataRead);
 int memoryWriteByte(uint32_t address, uint8_t writeData);
 int memoryWriteHalfword(uint32_t address, uint16_t writeData);
 int memoryWriteWord(uint32_t address, uint32_t writeData);
+
+int _flashWriteWord(uint32_t address, uint32_t writeData);
 
 uint32_t memoryWriteDataAlignment(uint32_t address, uint16_t writeData);
 

@@ -499,59 +499,6 @@ void watchpointEventHandler(Tlv_Session *session)
   tlvSend(session, tlv);  
 }
 
-/** writeDataToRamInChunk is a function to write data
-  * to Ram in specified size
-  *
-  * Input   : dataAddress is the address of the data need to send
-  *           destAddress is the address of the data need to be store
-  *           size is the size of the data can be any value
-  *
-  * return  : NONE
-  */
-void writeDataToRamInChunk(uint32_t *dataAddress, uint32_t destAddress, int size) {
-  int i;
-  
-  /* Write to RAM using swd */
-  for(i = 0; i < size; i += 4)  {
-    /* Data start at position 4 */
-    memoryWriteWord(destAddress, *dataAddress++);
-    destAddress += 4;
-  }  
-}
-
-/** writeTargetRam is a function to write target RAM using swd
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           dataAddress is the address of the data need to send
-  *           destAddress is the address of the data need to be store
-  *           size is the size of the data can be any value
-  *
-  * return  : NONE
-  */
-void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size)  {
-
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  /* Size minus 1 because of the checksum value */
-  writeDataToRamInChunk(dataAddress, destAddress, size);
-  
-  tlvSend(session, tlv);
-}
-
-void loopBack(Tlv_Session *session, Tlv *packet) {
-
-  Tlv *tlv;
-  int i = 0;
-
-  /* Size minus 1 because of the checksum value */
-  for(i = 0; i < packet->length -1; i++) {
-	 packet->value[i] += 2;
-  }
-  tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
-
-  tlvSend(session, tlv);
-}
-
 /** readTargetMemory is a function to read target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
@@ -582,7 +529,26 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   tlvSend(session, tlv);
 }
 
-/** writeTargetFlash is a function to write target RAM using swd
+/** writeDataToRamInChunk is a function to write data
+  * to Ram in specified size
+  *
+  * Input   : dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeRamInChunk(uint8_t *dataAddress, uint32_t destAddress, int size) {
+  int i;
+  
+  /* Write to RAM using swd */
+  for(i = 0; i < size; i ++, dataAddress++, destAddress++)  {
+    /* Data start at position 4 */
+    memoryWriteByte(destAddress, *dataAddress);
+  }
+}
+
+/** writeTargetRam is a function to write target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
   *           dataAddress is the address of the data need to send
@@ -591,28 +557,49 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   *
   * return  : NONE
   */
-void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size) {
+void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
+
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  /* Size minus 1 because of the checksum value */
+  writeRamInChunk(dataAddress, destAddress, size);
+  
+  tlvSend(session, tlv);
+}
+
+/** writeTargetFlashInChunk is a function to write target RAM using swd
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
   Tlv *tlv;
   
-  switch(session->pFlashState) {
-    case WRITE_TO_RAM :
-      writeDataToRamInChunk(dataAddress, tempAddress, size);
-      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-      session->pFlashState = COPY_TO_FLASH;
-    break;
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  writeRamInChunk(dataAddress, destAddress, size);
+  
+  while(IsStubBusy() == 0);
+    // case WRITE_TO_RAM :
+      // writeDataToRamInChunk(dataAddress, tempAddress, size);
+      // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+      // session->pFlashState = COPY_TO_FLASH;
+    // break;
     
-    case COPY_TO_FLASH :
-      if(IsStubBusy()) {
-        requestStubCopy(tempAddress, destAddress, size);
-        tlv = tlvCreatePacket(TLV_OK, 0, 0);
-        tlvSend(session, tlv);
-        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-        session->pFlashState = WRITE_TO_RAM;
-      }
-    break;
+    // case COPY_TO_FLASH :
+      // if(IsStubBusy()) {
+        // requestStubCopy(tempAddress, destAddress, size);
+        // tlv = tlvCreatePacket(TLV_OK, 0, 0);
+        // tlvSend(session, tlv);
+        // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+        // session->pFlashState = WRITE_TO_RAM;
+      // }
+    // break;
 
-    default : break;
-  }
+    // default : break;
 }
 
 void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
@@ -762,6 +749,20 @@ void checkDebugEvent(Tlv_Session *session, EventType event) {
   }
 }
 
+void loopBack(Tlv_Session *session, Tlv *packet) {
+
+  Tlv *tlv;
+  int i = 0;
+
+  /* Size minus 1 because of the checksum value */
+  for(i = 0; i < packet->length -1; i++) {
+	 packet->value[i] += 2;
+  }
+  tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
+
+  tlvSend(session, tlv);
+}
+
 /** selectTask is a function to select instruction 
   * base on tlv->type
   *
@@ -772,8 +773,8 @@ void checkDebugEvent(Tlv_Session *session, EventType event) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
-    case TLV_WRITE_RAM                  : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);   break;
-    case TLV_WRITE_FLASH                : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
+    // case TLV_WRITE_RAM                  : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);   break;
+    case TLV_WRITE_FLASH                : writeTargetFlashInChunk(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
     case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                   break;
     case TLV_WRITE_REGISTER             : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                break;
     case TLV_READ_REGISTER              : readTargetRegister(session, get4Byte(&tlv->value[0]));                                           break;
