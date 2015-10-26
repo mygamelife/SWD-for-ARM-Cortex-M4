@@ -56,7 +56,8 @@ typedef enum
   TLV_WRITE_HALFWORD,                 /* Write Data Into Target In HalfWord       */
   TLV_WRITE_BYTE,                     /* Write Data Into Target In Byte           */
   TLV_READ_WORD,                      /* Read Data Into Target In Word            */
-  TLV_READ_HALFWORD,                  /* Read Data Into Target In HalfWord        */
+  TLV_READ_HALFWORD,                  /* Request Read Halfword Data from target                           */
+  TLV_DEBUG_EVENTS,                   /* Request Debug Event to check for specific event to happen        */
 } Tlv_Command;
 
 typedef enum
@@ -115,5 +116,10 @@ typedef enum
 {
   TLV_NOT_OK = 2,
 } Tlv_Nack;
+
+typedef enum {
+  BREAKPOINT_EVENT = 1,
+  WATCHPOINT_EVENT,
+} EventType;
 
 #endif // TlvEx_H

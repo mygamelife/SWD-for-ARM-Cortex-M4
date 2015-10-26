@@ -78,6 +78,8 @@ void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session);
 void breakpointEventHandler(Tlv_Session *session);
 void watchpointEventHandler(Tlv_Session *session);
 
+void eventOccured(Tlv_Session *session, EventType event);
+void checkDebugEvent(Tlv_Session *session, EventType event);
 
 /* ### Testing Tlv Protocol ## */
 void loopBack(Tlv_Session *session, Tlv *packet);

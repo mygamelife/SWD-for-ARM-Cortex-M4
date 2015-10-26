@@ -15,6 +15,7 @@ Tlv_Session *tlvCreateSession(void) {
   /* Initialize begining state for send and receive */
   session.receiveState = TLV_RECEIVE_TYPE;
   
+  session.state               = 0;
   /* ###### Tlv state ###### */
   session.wregState           = 0;
   session.regState            = 0;
@@ -297,6 +298,7 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_WRITE_BYTE)                return 1;
   else if(command == TLV_READ_WORD)                 return 1;
   else if(command == TLV_READ_HALFWORD)             return 1;
+  else if(command == TLV_DEBUG_EVENTS)              return 1;
   
   else return 0;
 }

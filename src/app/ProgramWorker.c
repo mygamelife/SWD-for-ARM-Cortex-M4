@@ -737,6 +737,31 @@ void readTargetInHalfword(Tlv_Session *session, uint32_t destAddress) {
   tlvSend(session, tlv);
 }
 
+void eventOccured(Tlv_Session *session, EventType event) {
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 1, (uint8_t *)&event);
+  
+  tlvSend(session, tlv);
+}
+
+void checkDebugEvent(Tlv_Session *session, EventType event) {
+
+  switch(event) {
+    case BREAKPOINT_EVENT :
+      if(hasBreakpointDebugEventOccured()) {
+        eventOccured(session, event);
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+    break;
+    
+    case WATCHPOINT_EVENT :
+      if((hasDataWatchpointOccurred())) {
+        eventOccured(session, event);
+      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+    break;
+  }
+}
+
 /** selectTask is a function to select instruction 
   * base on tlv->type
   *
@@ -773,6 +798,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_WRITE_HALFWORD             : writeTargetInHalfword(session, get4Byte(&tlv->value[0]), getDataInHalfWord(&tlv->value[4]));     break;
     case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));             break;
     case TLV_READ_HALFWORD              : readTargetInHalfword(session, get4Byte(&tlv->value[0]));                                         break;
+    case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                         break;
     default : break;
   }
 }
