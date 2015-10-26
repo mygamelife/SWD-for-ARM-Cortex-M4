@@ -30,6 +30,9 @@ typedef enum {
 #define IS_COMMAND_AVAILABLE(__SESSION__)               (((__SESSION__) != NULL) ? 1 : 0                  )
 #define HOST_CHANGE_STATE(__SESSION__, __STATE__)       ((__SESSION__)->hostState = __STATE__             )
 
+#define tlvWriteToRam(session, dataAddress, destAddress, size) \
+        tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
+
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
@@ -55,9 +58,6 @@ Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress,
 Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data);
 Process_Status tlvWriteDataInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
 Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data);
-
-#define tlvWriteToRam(session, dataAddress, destAddress, size) \
-        tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
         
 int tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 
@@ -80,6 +80,9 @@ uint8_t *tlvReadTargetDataWithType(Tlv_Session *session, uint32_t address, Tlv_C
 
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
+
+/* Wait Debug Events */
+EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);

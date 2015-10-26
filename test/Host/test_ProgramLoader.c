@@ -873,7 +873,7 @@ void test_tlvWriteDataInByte_should_request_write_data_in_word_and_return_1(void
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
 }
 
-void test_tlvWriteDataInHalfWord_should_request_write_data_in_word_and_return_1(void)
+void test_tlvWriteDataInHalfword_should_request_write_data_in_word_and_return_1(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
@@ -882,7 +882,7 @@ void test_tlvWriteDataInHalfWord_should_request_write_data_in_word_and_return_1(
   uint32_t address = 0x20000000;
   int result = 0;
   
-  result = tlvWriteDataInHalfWord(session, address, data);
+  result = tlvWriteDataInHalfword(session, address, data);
 
   TEST_ASSERT_EQUAL(PROCESS_BUSY, result);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
@@ -898,12 +898,42 @@ void test_tlvWriteDataInHalfWord_should_request_write_data_in_word_and_return_1(
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
-  result = tlvWriteDataInHalfWord(session, address, data);
+  result = tlvWriteDataInHalfword(session, address, data);
 
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
 }
 
+void test_tlvWaitDebugEvents_by_sending_specific_event_and_wait_for_reply(void) {
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  EventType event;
+  
+  event = tlvWaitDebugEvents(session, BREAKPOINT_EVENT);
+  
+  TEST_ASSERT_EQUAL(TLV_DEBUG_EVENTS, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(2, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX8(BREAKPOINT_EVENT, session->txBuffer[2]);
+  TEST_ASSERT_EQUAL_HEX8(0xFF, session->txBuffer[3]); //chksum
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 2;
+  session->rxBuffer[2] = BREAKPOINT_EVENT;
+  session->rxBuffer[3] = 0xFF;
+  
+  event = tlvWaitDebugEvents(session, BREAKPOINT_EVENT);
+  
+  TEST_ASSERT_EQUAL(BREAKPOINT_EVENT, event);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
+/**
+  ==============================================================================
+                      ##### Test For Host Interpreter #####
+  ==============================================================================  
+  */
 void test_hostInterpreter_by_requesting_tlv_write_ram_memory(void)
 {
   uartInit_Ignore();
