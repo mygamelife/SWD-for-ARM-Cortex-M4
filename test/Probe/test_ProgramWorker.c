@@ -726,7 +726,7 @@ void test_stopFlashPatchRemapping_should_return_NACK_if_not_found()
   stopFlashPatchRemapping(session,0x12345678);
 }
 
-/*---------stopAllFlashPatchRemapping----------------------*/
+/*---------disableAllFlashPatchComparatorSetToRemap----------------------*/
 void test_stopAllFlashPatchRemapping_should_stop_all_remapping_and_return_ACK()
 {
   uartInit_Ignore();
@@ -734,7 +734,7 @@ void test_stopAllFlashPatchRemapping_should_stop_all_remapping_and_return_ACK()
 
   stopAllFPRemapping_Expect();
   
-  stopAllFlashPatchRemapping(session);
+  disableAllFlashPatchComparatorSetToRemap(session);
 }
 
 /*---------breakpointEventHandler----------------------*/

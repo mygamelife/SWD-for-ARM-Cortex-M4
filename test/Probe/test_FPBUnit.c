@@ -11,7 +11,6 @@
 #include "IoOperations.h"
 #include "mock_configurePort.h"
 #include "mock_LowLevelIO.h"
-#include "mock_CodeStepping.h"
 void setUp(void)
 {
 }
@@ -335,74 +334,8 @@ void test_autoSetInstructionRemapping_16bit_machineCode_case()
   TEST_ASSERT_EQUAL(INSTRUCTION_COMP0,autoSetInstructionRemapping(0x08000000,0xAAAA));
   TEST_ASSERT_EQUAL(COMP_REMAP,instructionComparatorReady[0]);
 }
-/*-------------------------autoSetSoftwareBreakpoint-----------------------*/
-//32bit case
-void test_autoSetSoftwareBreakpoint_should_replace_the_address_with_bkpt_and_nop_instruction_and_return_machineCode()
-{
-  cswDataSize = CSW_WORD_SIZE ;
-  
-  //Check is it 32 bit instruction
-  isSelectedAddressContains32bitsInstruction_ExpectAndReturn(0x08001000,1);
-  
-  //Read the machince code
-  emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x08001000);
-	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
-	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xA5A5A5A));
-  
-  //Write bkpt and nop instruction into the address
-  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08001000);
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0xBE00BF00);
-  
-  TEST_ASSERT_EQUAL(0xA5A5A5A,autoSetSoftwareBreakpoint(0x08001000));
-  
-}
-//16bit case
-void test_autoSetSoftwareBreakpoint_should_replace_the_address_with_bkpt_instruction_and_return_machineCode()
-{
-  //Check is it 32 bit instruction
-  isSelectedAddressContains32bitsInstruction_ExpectAndReturn(0x08001000,0);
-  
-  //Write SELECT_BANK0 to select register
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
-  //Write CSW_HALFWORD_SIZE to csw register
-	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
-  
-  //Read 16bit machince code
-  emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x08001000);
-	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
-	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0x1234));
-  
-  //Write bkpt and nop instruction into the address
-  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08001000);
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0xBE00);
-  
-  
-  TEST_ASSERT_EQUAL(0x1234,autoSetSoftwareBreakpoint(0x08001000));
-}
 
-/*-------------------------restoreSoftwareBreakpointOriginalInstruction-----------------------*/
-void test_restoreSoftwareBreakpointOriginalInstruction_given_32bit_machineCode_should_write_word()
-{
-  cswDataSize = CSW_WORD_SIZE ;
-  
-  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08000000);
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x1234ABCD);
-  
-  restoreSoftwareBreakpointOriginalInstruction(0x08000000,0x1234ABCD);
-}
-
-void test_restoreSoftwareBreakpointOriginalInstruction_given_16bit_machineCode_should_write_halfword()
-{
-  cswDataSize = CSW_HALFWORD_SIZE ;
-  
-  emulateSwdRegisterWrite(TAR_REG,AP,4,0x08000000);
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x1234);
-  
-  restoreSoftwareBreakpointOriginalInstruction(0x08000000,0x1234);
-}
-
-
-/*-------------------------disableInstructionComparator-----------------------*/
+/*-------------------------disableFlashPatchInstructionComparator-----------------------*/
 void test_disableInstructionComparator_should_write_FP_COMP_DISABLE_to_the_selected_instruction_comparator()
 {
   cswDataSize = CSW_WORD_SIZE ;
@@ -411,33 +344,33 @@ void test_disableInstructionComparator_should_write_FP_COMP_DISABLE_to_the_selec
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[0]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  TEST_ASSERT_EQUAL(0,disableInstructionComparator(INSTRUCTION_COMP0));
+  TEST_ASSERT_EQUAL(0,disableFlashPatchInstructionComparator(INSTRUCTION_COMP0));
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[0]);
 }
 
 void test_disableInstructionComparator_should_return_negative_1_given_unkwown_comp()
 {
-  TEST_ASSERT_EQUAL(-1,disableInstructionComparator(100));
+  TEST_ASSERT_EQUAL(-1,disableFlashPatchInstructionComparator(100));
 }
 
 
-/*-------------------------disableLiteralComparator-----------------------*/
+/*-------------------------disableFlashPatchLiteralComparator-----------------------*/
 void test_disableLiteralComparator_should_write_FP_COMP_DISABLE_to_the_selected_literal_comparator()
 {
   //Program comparator
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(LITERAL_COMP[1]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  TEST_ASSERT_EQUAL(0,disableLiteralComparator(LITERAL_COMP1));
+  TEST_ASSERT_EQUAL(0,disableFlashPatchLiteralComparator(LITERAL_COMP1));
   TEST_ASSERT_EQUAL(COMP_READY,literalComparatorReady[1]);
 }
 
 void test_disableLiteralComparator_should_return_negative_1_given_unkwown_comp()
 {
-  TEST_ASSERT_EQUAL(-1,disableLiteralComparator(100));
+  TEST_ASSERT_EQUAL(-1,disableFlashPatchLiteralComparator(100));
 }
 
-/*-------------------------disableFPComparatorLoadedWithAddress-----------------------*/
+/*-------------------------disableFlashPatchComparatorLoadedWithAddress-----------------------*/
 //INSTRUCTION_TYPE
 void test_disableFPComparatorLoadedWithAddress_given_found_comp3_should_disable_comp3()
 {
@@ -482,7 +415,7 @@ void test_disableFPComparatorLoadedWithAddress_given_found_comp3_should_disable_
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(0xBEEFBEEF));
   
-  disableFPComparatorLoadedWithAddress(0x12345678,INSTRUCTION_TYPE);
+  disableFlashPatchComparatorLoadedWithAddress(0x12345678,INSTRUCTION_TYPE);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[3]);
   
 }
@@ -550,7 +483,7 @@ void test_disableFPComparatorLoadedWithAddress_given_all_loaded_with_same_addres
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[5]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  disableFPComparatorLoadedWithAddress(0x12345678,INSTRUCTION_TYPE);
+  disableFlashPatchComparatorLoadedWithAddress(0x12345678,INSTRUCTION_TYPE);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[0]);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[1]);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[2]);
@@ -568,7 +501,7 @@ void test_disableFPComparatorLoadedWithAddress_given_all_comparator_free_should_
   instructionComparatorReady[4] = COMP_READY ;
   instructionComparatorReady[5] = COMP_READY ;
   
-  disableFPComparatorLoadedWithAddress(0,INSTRUCTION_TYPE);
+  disableFlashPatchComparatorLoadedWithAddress(0,INSTRUCTION_TYPE);
 }
 
 void test_disableFPComparatorLoadedWithAddress_given_non_match_should_do_nothing()
@@ -610,7 +543,7 @@ void test_disableFPComparatorLoadedWithAddress_given_non_match_should_do_nothing
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, interconvertMSBandLSB(1));
   
-  disableFPComparatorLoadedWithAddress(0xFFFFFFFF,INSTRUCTION_TYPE);
+  disableFlashPatchComparatorLoadedWithAddress(0xFFFFFFFF,INSTRUCTION_TYPE);
   
 }
 
@@ -635,7 +568,7 @@ void test_disableFPComparatorLoadedWithAddress_given_found_literal_comp1_should_
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(LITERAL_COMP[1]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  disableFPComparatorLoadedWithAddress(0x12345678,LITERAL_TYPE);
+  disableFlashPatchComparatorLoadedWithAddress(0x12345678,LITERAL_TYPE);
   TEST_ASSERT_EQUAL(COMP_READY,literalComparatorReady[1]);
   
 }
@@ -685,7 +618,7 @@ void test_disableAllFPBComparator_should_disable_all_comparator_and_set_all_read
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(LITERAL_COMP[1]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  disableAllFPComparator();
+  disableAllFlashPatchComparator();
   
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[0]);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[1]);
@@ -984,7 +917,7 @@ void test_initialiseFPBUnit_should_disable_all_comparator_and_enable_FPB_unit()
   TEST_ASSERT_EQUAL(COMP_READY,literalComparatorReady[1]);
 }
 
-/*-------------------------removeAllFPComparatorSetToBreakpoint-----------------------*/
+/*-------------------------disableAllFlashPatchComparatorSetToBreakpoint-----------------------*/
 void test_removeAllFPComparatorSetToBreakpoint_should_only_disable_comparator_set_to_COMP_BUSY()
 {
   instructionComparatorReady[0] = COMP_READY ;
@@ -1006,14 +939,14 @@ void test_removeAllFPComparatorSetToBreakpoint_should_only_disable_comparator_se
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(INSTRUCTION_COMP[5]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  removeAllFPComparatorSetToBreakpoint();
+  disableAllFlashPatchComparatorSetToBreakpoint();
   
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[1]);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[3]);
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[5]);
 }
 
-/*-------------------------stopAllFPRemapping-----------------------*/
+/*-------------------------disableAllFlashPatchComparatorSetToRemap-----------------------*/
 void test_stopAllFlashPatchRemapping_should_only_disable_comparator_set_to_COMP_REMAP()
 {
   instructionComparatorReady[0] = COMP_READY ;
@@ -1034,7 +967,7 @@ void test_stopAllFlashPatchRemapping_should_only_disable_comparator_set_to_COMP_
   emulateSwdRegisterWrite(TAR_REG,AP,4,(uint32_t)&(LITERAL_COMP[1]));
 	emulateSwdRegisterWrite(DRW_REG,AP,4,FP_COMP_DISABLE);
   
-  stopAllFPRemapping();
+  disableAllFlashPatchComparatorSetToRemap();
   
   TEST_ASSERT_EQUAL(COMP_READY,instructionComparatorReady[2]);
   TEST_ASSERT_EQUAL(COMP_READY,literalComparatorReady[1]);

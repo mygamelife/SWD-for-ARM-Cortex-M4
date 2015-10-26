@@ -26,14 +26,12 @@
 void setUp(void) 
 {
   initMemoryReadWrite();
-  setCoreMode(CORE_DEBUG_HALT);
   enableDWTandITM();
 }
 
 void tearDown(void)
 {
-  disableDWTandITM();
-  setCoreMode(CORE_NORMAL_MODE);
+  disableDWTComparator(COMPARATOR_1);
 }
 
 
@@ -52,6 +50,22 @@ void tearDown(void)
 // 0x0800040E    2121       movs r1,#33
 // 0x08000410    E7FE       b.n	8000410
 
+void prepareWatchpointTestCaseReadLDRB()
+{
+  memoryWriteWord(0x080003F0,0xF2433644);
+  memoryWriteWord(0x080003F4,0xF2C11622);
+  
+  memoryWriteWord(0x080003F8,0xF64C4CDD);
+  memoryWriteWord(0x080003FC,0xF6CA2CBB);
+  
+  memoryWriteWord(0x08000400,0xF240405C);
+  memoryWriteWord(0x08000404,0xF2C20000);
+  
+  memoryWriteWord(0x08000408,0xF8C0C000);
+  memoryWriteHalfword(0x0800040C,0x7806);
+  memoryWriteHalfword(0x0800040E,0x2121);
+  memoryWriteHalfword(0x08000410,0xE7FE);
+}
 
 void test_programWatchpoint_TestCaseRead_LDRB()
 {
@@ -72,21 +86,32 @@ void test_programWatchpoint_TestCaseRead_LDRB()
 
 void test_datawatchpoint_TestCase_ReadByte_LDRB()
 {
-  uint32_t pc = 0 ;
-
-  setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0x44,WATCHPOINT_BYTE,WATCHPOINT_READ);
-
+  uint32_t pc = 0,pc1 = 1 ,r6=0, data = 0;
+  int wpoccur = 0 ;
+  
+  
   writeCoreRegister(CORE_REG_PC,0x080003F0);
+  
+  setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0x11223344,WATCHPOINT_BYTE,WATCHPOINT_READ);
+
   setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasDWTTrapDebugEventOccured());
+  for(wpoccur = 0 ; wpoccur != 0xFFFF ; wpoccur++);
+  //while(!hasDWTTrapDebugEventOccured());
 
   pc = readCoreRegister(CORE_REG_PC);
+  r6 = readCoreRegister(CORE_REG_R6);
   disableDWTComparator(COMPARATOR_1);
   clearDWTTrapDebugEvent();
   disableDWTandITM();
 
+  memoryReadWord(0x080003F0,&data);
+  printf("\n\n data : %x",data);
+  
   printf("\n\n PC : %x",pc);
+  printf("\n\n wpoccur : %x",wpoccur);
+  printf("\n\n r6 : %x",r6);
+  
   //TEST_ASSERT_EQUAL(0x080003FC,pc);
 }
 

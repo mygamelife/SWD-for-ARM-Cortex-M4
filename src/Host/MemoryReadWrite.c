@@ -1,7 +1,7 @@
 #include "MemoryReadWrite.h"
 
 /* Global Tlv Session */
-static Tlv_Session *_session = NULL;
+Tlv_Session *_session = NULL;
 
 /* Global Error code */
 CEXCEPTION_T err = 0;

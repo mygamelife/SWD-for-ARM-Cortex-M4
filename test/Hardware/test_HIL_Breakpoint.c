@@ -22,19 +22,16 @@
 #include "CoreDebugEx.h"
 #include "FPBUnit.h"
 #include "FPBUnitEx.h"
-#include "CodeStepping.h"
 
 void setUp(void) 
 {
   initMemoryReadWrite();
-  initialiseFPBUnit();
-  setCoreMode(CORE_DEBUG_HALT);
+  enableFPBUnit();
 }
 
 void tearDown(void) 
 {
-  disableAllFPComparator();
-  setCoreMode(CORE_NORMAL_MODE);
+  clearBreakpointDebugEvent();
 }
 
 /* ---------------- Breakpoint Test Case 2 Bytes -------------------- */
@@ -42,12 +39,12 @@ void tearDown(void)
 // 0x080003C2    E7FE    b.n	80003c2 
 // 0x080003C4
 
-
-void test_programBreakpointTestCase2Bytes()
+void prepare2ByteInstruction()
 {
   memoryWriteHalfword(0x080003C0,0x2117);
   memoryWriteHalfword(0x080003C2,0xE7FE);
 }
+
 
 /**
  * 0x080003C0	   ________   <- set lower halfword breakpoint at 0x080003C0
@@ -59,7 +56,8 @@ void test_programBreakpointTestCase2Bytes()
 void test_instructionBreakPointTestCase_2bytes_LowerHalfWord()
 {
   uint32_t PC = 0  ;
-  
+ 
+  prepare2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
@@ -68,9 +66,8 @@ void test_instructionBreakPointTestCase_2bytes_LowerHalfWord()
   while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP0);
-  clearBreakpointDebugEvent();
-
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP0);
+  
   TEST_ASSERT_EQUAL(0x080003C0,PC);
 }
 
@@ -85,6 +82,7 @@ void test_instructionBreakPointTestCase_2bytes_UpperHalfWord()
 {
   uint32_t PC = 0 ;
 
+  prepare2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP1,0x080003C0,MATCH_UPPERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
@@ -93,8 +91,7 @@ void test_instructionBreakPointTestCase_2bytes_UpperHalfWord()
   while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP1);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP1);
 
   TEST_ASSERT_EQUAL(0x080003C2,PC);
 }
@@ -110,6 +107,7 @@ void test_instructionBreakPointTestCase_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
+  prepare2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C0,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
@@ -118,8 +116,7 @@ void test_instructionBreakPointTestCase_2bytes_Word()
   while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP2);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
   TEST_ASSERT_EQUAL(0x080003C0,PC);
 }
@@ -130,13 +127,11 @@ void test_instructionBreakPointTestCase_2bytes_Word()
 // 0x080003B6
 
 
-void test_programBreakpointTestCase4Bytes()
+void prepare4byteInstruction()
 {
   memoryWriteWord(0x080003B0,0xF04F01FF);
   memoryWriteHalfword(0x080003B4,0xE7FE);
 }
-
-
 
 /**
  * 0x080003B0	   ________    <---set upper halfword breakpoint at 0x080003B0
@@ -148,28 +143,27 @@ void test_programBreakpointTestCase4Bytes()
  */
 void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
 {
-	  uint32_t PC = 0 , data = 0;
-    int fail = 0 ;
+  uint32_t PC = 0 , data = 0;
+  int fail = 0 ;
     
-	  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_UPPERHALFWORD);
+  prepare4byteInstruction();
+  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_UPPERHALFWORD);
 
-	  writeCoreRegister(CORE_REG_PC,0x080003B0);
-	  setCoreMode(CORE_DEBUG_MODE);
+  writeCoreRegister(CORE_REG_PC,0x080003B0);
+  setCoreMode(CORE_DEBUG_MODE);
 
-	  while(!hasBreakpointDebugEventOccured())
+  while(!hasBreakpointDebugEventOccured())
+  {
+    PC = readCoreRegister(CORE_REG_PC);
+    if(PC == 0x080003B4)
     {
-      PC = readCoreRegister(CORE_REG_PC);
-      if(PC == 0x080003B4)
-      {
-        fail = 1;
-        break;
-      }
-      setCoreMode(CORE_DEBUG_MODE);
+      fail = 1;
+      break;
     }
+    setCoreMode(CORE_DEBUG_MODE);
+  }
 
-
-  disableInstructionComparator(INSTRUCTION_COMP2);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
   TEST_ASSERT_EQUAL(1,fail); 
   TEST_ASSERT_EQUAL(0x080003B4,PC);
@@ -188,6 +182,7 @@ void test_instructionBreakPointTestCase_4bytes_Word()
 {
   uint32_t PC = 0 ;
 
+  prepare4byteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003B0);
@@ -196,8 +191,7 @@ void test_instructionBreakPointTestCase_4bytes_Word()
   while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP2);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
   TEST_ASSERT_EQUAL(0x080003B0,PC);
 }
@@ -210,7 +204,7 @@ void test_instructionBreakPointTestCase_4bytes_Word()
 // 0x080003DC
 
 
-void test_programBreakpointTestCase2Bytes_4bytes_4bytes()
+void prepare2Byte4Byte4ByteInstruction()
 {
   memoryWriteHalfword(0x080003D0,0x210D);
   memoryWriteWord(0x080003D2,0xF04F01FF);
@@ -235,6 +229,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
   uint32_t PC = 0 ;
   int fail ;
 
+  prepare2Byte4Byte4ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_LOWERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003D0);
@@ -252,8 +247,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
     }
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP3);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(0x080003DA,PC);
   TEST_ASSERT_EQUAL(1,fail);
@@ -275,6 +269,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
 {
   uint32_t PC = 0 ;
   
+  prepare2Byte4Byte4ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003D0);
@@ -283,8 +278,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
   while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP3);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(0x080003D6,PC);
 }
@@ -297,7 +291,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
 // 0x080003EA
 
 
-void test_programBreakpointTestCase2Bytes_4bytes_2bytes()
+void prepare2Byte4Byte2ByteInstruction()
 {
   memoryWriteHalfword(0x080003E0,0x210D);
   memoryWriteWord(0x080003E2,0xF04F01FF);
@@ -318,6 +312,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
+  prepare2Byte4Byte2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003E4,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003E0);
@@ -326,8 +321,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
   while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
-  disableInstructionComparator(INSTRUCTION_COMP3);
-  clearBreakpointDebugEvent();
+  disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(0x080003E6,PC);
 }

@@ -223,38 +223,6 @@ int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode
 }
 
 /**
- *  Use to set for software breakpoint
- *
- *  Input   : instructionAddress is the address that will be breakpointed
- *  Output  : return machine code of the instructionAddress for later replacement uses
- */
-uint32_t autoSetSoftwareBreakpoint(uint32_t instructionAddress)
-{
-  uint32_t data = 0 ;
-  
-  if(isSelectedAddressContains32bitsInstruction(instructionAddress))
-  {
-    memoryReadWord(instructionAddress,&data);
-    memoryWriteWord(instructionAddress,0xBE00BF00);
-  }
-  else
-  {
-    memoryReadHalfword(instructionAddress,&data);
-    memoryWriteHalfword(instructionAddress,0xBE00);
-  }
-  
-  return data ;
-}
-
-void restoreSoftwareBreakpointOriginalInstruction(uint32_t instructionAddress,uint32_t machineCode)
-{
-  if(machineCode > 0xFFFF)
-    memoryWriteWord(instructionAddress,machineCode);
-  else
-    memoryWriteHalfword(instructionAddress,machineCode);
-}
-
-/**
  *  Disable the selected Instruction Comparator
  * 
  *  Input : instructionCOMPno is the comparator number going to be disabled		
@@ -269,7 +237,7 @@ void restoreSoftwareBreakpointOriginalInstruction(uint32_t instructionAddress,ui
  *  Output :  return 0 if comparator is disabled
  *            return -1 if invalid comparator is chosen
  */
-int disableInstructionComparator(int instructionCOMPno)
+int disableFlashPatchInstructionComparator(int instructionCOMPno)
 {
   if(checkForValidInstructionComparator(instructionCOMPno) == -1)
     return -1 ;
@@ -292,7 +260,7 @@ int disableInstructionComparator(int instructionCOMPno)
  *  Output :  return 0 if comparator is disabled
  *            return -1 if invalid comparator is chosen
  */
-int disableLiteralComparator(int literalCOMPno)
+int disableFlashPatchLiteralComparator(int literalCOMPno)
 {
   if(checkForValidLiteralComparator(literalCOMPno) == -1)
     return -1 ;
@@ -316,7 +284,7 @@ int disableLiteralComparator(int literalCOMPno)
  * Output  : return 1 if found
  *           return -1 if not found
  */
-int disableFPComparatorLoadedWithAddress(uint32_t address,int comparatorType)
+int disableFlashPatchComparatorLoadedWithAddress(uint32_t address,int comparatorType)
 {
   uint32_t mask = 0x1FFFFFFC ;
   uint32_t dataRead = 0 ;
@@ -333,14 +301,14 @@ int disableFPComparatorLoadedWithAddress(uint32_t address,int comparatorType)
     max = INSTRUCTION_COMP_NUM ;
     compPtr = (uint32_t *)&(INSTRUCTION_COMP[0]);
     compFlagPtr = &(instructionComparatorReady[0]);
-    funcPtr = &(disableInstructionComparator);
+    funcPtr = &(disableFlashPatchInstructionComparator);
   }
   else
   {
     max = LITERAL_COMP_NUM;
     compPtr = (uint32_t *)&(LITERAL_COMP[0]);
     compFlagPtr = &(literalComparatorReady[0]);
-    funcPtr = &(disableLiteralComparator);
+    funcPtr = &(disableFlashPatchLiteralComparator);
   }
   
   for(i = 0 ; i < max ; i ++ )
@@ -442,19 +410,19 @@ uint32_t selectNextFreeComparator(int comparatorType)
  *  Disable all instruction and literal comparator in FPB unit
  *  
  */
-void disableAllFPComparator()
+void disableAllFlashPatchComparator()
 {
   int i = 0 ;
   
   for (i=0 ; i < INSTRUCTION_COMP_NUM ; i++)
   {
-    disableInstructionComparator(i);
+    disableFlashPatchInstructionComparator(i);
     instructionComparatorReady[i] = COMP_READY;
   }
   
   for (i=0 ; i < LITERAL_COMP_NUM ; i++)
   {
-    disableLiteralComparator(i);
+    disableFlashPatchLiteralComparator(i);
     literalComparatorReady[i] = COMP_READY ;
   }
 }
@@ -464,21 +432,21 @@ void disableAllFPComparator()
  */
 void initialiseFPBUnit()
 {
-  disableAllFPComparator();
+  disableAllFlashPatchComparator();
   enableFPBUnit();
 }
 
 /**
- *  Remove all flash patch comparator set to breakpoint , flash patch remapping will not be affected
+ *  Disable all flash patch comparator set to breakpoint , flash patch remapping will not be affected
  *
  */
-void removeAllFPComparatorSetToBreakpoint()
+void disableAllFlashPatchComparatorSetToBreakpoint()
 {
   int i = 0 ;
   for (i = 0 ; i < INSTRUCTION_COMP_NUM ; i ++)
   {
     if(instructionComparatorReady[i] == COMP_BUSY)
-      disableInstructionComparator(i);
+      disableFlashPatchInstructionComparator(i);
   }
 }
 
@@ -486,19 +454,19 @@ void removeAllFPComparatorSetToBreakpoint()
  * Stop all flash patch remapping , breakpoint will not be affected
  *
  */
-void stopAllFPRemapping()
+void disableAllFlashPatchComparatorSetToRemap()
 {
   int i = 0 ;
   
   for(i=0 ; i < INSTRUCTION_COMP_NUM ; i ++)
   {
     if(instructionComparatorReady[i] == COMP_REMAP)
-      disableInstructionComparator(i);
+      disableFlashPatchInstructionComparator(i);
   }
   
   for (i=0 ; i < LITERAL_COMP_NUM ; i++)
   {
     if(literalComparatorReady[i] == COMP_REMAP)
-    disableLiteralComparator(i);
+    disableFlashPatchLiteralComparator(i);
   }
 }

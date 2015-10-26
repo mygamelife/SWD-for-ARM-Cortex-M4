@@ -10,6 +10,7 @@
 #define HALFWORD_SIZE            2
 #define WORD_SIZE                4
 
+extern Tlv_Session *_session ;
 extern int cswDataSize ;
 
 /* Used for mocking */

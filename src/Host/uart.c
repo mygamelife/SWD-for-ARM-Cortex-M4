@@ -67,7 +67,7 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
     return UART_ERROR;
 	}
   if(dwBytesWrite != 0) {
-    printf("%d Bytes is Sucessfully Sent!\n", dwBytesWrite);
+    //printf("%d Bytes is Sucessfully Sent!\n", dwBytesWrite);
     // printf("address %x!\n", (*(uint32_t *)(&txBuffer[2])));
     return UART_OK;
   }
