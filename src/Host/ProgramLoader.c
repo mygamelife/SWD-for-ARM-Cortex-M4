@@ -348,7 +348,8 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   
   /* End tlv request task */
   endTask(session->rmemState);
-  #if defined (HOST)
+  
+  #if !defined (TEST)
   displayMemoryMap(response->value, response->length - 1);
   #endif
   return response->value;
@@ -886,6 +887,49 @@ void tlvSetBreakpoint(Tlv_Session *session, uint32_t address) {
   Tlv *tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&address);
 
   tlvSend(session, tlv);
+}
+
+/** tlvWaitDebugEvents is a function to send expected event
+  * to probe and wait for event to happen
+  *
+  * packet :    type     length   event   chksum
+  *          +-----------------------------------+
+  *          | 1 byte | 1 byte | 1 byte | 1 byte |           
+  *          +-----------------------------------+
+  *
+  * Input   : event is the expected event defined in Tlv_Command enum
+  *
+  * Return  : NONE
+  */
+EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
+  /* Start tlv request task */
+  startTask(session->state);
+  
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Send tlv request */
+  Tlv *tlv = tlvCreatePacket(TLV_DEBUG_EVENTS, 1, (uint8_t *)&event);
+  tlvSend(session, tlv);
+
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(session->state);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->state);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->state);
+  
+  return response->value[0];
 }
 
 /** selectCommand is a function to select instruction 

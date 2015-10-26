@@ -7,8 +7,8 @@
 #include "mock_IoOperations.h"
 #include "mock_Uart.h"
 #include "mock_CoreDebug.h"
-#include "mock_FPB_Unit.h"
-#include "mock_DWT_Unit.h"
+#include "mock_FPBUnit.h"
+#include "mock_DWTUnit.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_MemoryReadWrite.h"
 #include "mock_SwdStub.h"
@@ -683,9 +683,8 @@ void test_removeHardwareBreakpoint_should_return_NACK_if_not_found()
 /*---------removeSoftwareBreakpoint----------------------*/
 void test_removeSoftwareBreakpoint_should_restore_the_address_with_original_machineCode()
 {
-  UART_HandleTypeDef uartHandler;
-  uartInit_IgnoreAndReturn(&uartHandler);
-  Tlv_Session *session = tlvCreateSession(); 
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
   
   restoreSoftwareBreakpointOriginalInstruction_Expect(0x08001000,0xABCD);
   
@@ -938,6 +937,38 @@ void test_writeTargetInByte_should_write_word_data_into_specified_address(void)
   TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
 }
 
+void test_checkDebugEvent_should_return_BREAKPOINT_EVENT_if_event_occur(void)
+{ 
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  readDebugEventRegister_ExpectAndReturn(0x2);
+  checkDebugEvent(session, BREAKPOINT_EVENT);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(2, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX8(BREAKPOINT_EVENT, session->txBuffer[2]);
+  TEST_ASSERT_EQUAL_HEX8(0xFF, session->txBuffer[3]); //chksum
+}
+
+void test_checkDebugEvent_should_return_WATCHPOINT_EVENT_if_event_occur(void)
+{ 
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  hasDataWatchpointOccurred_ExpectAndReturn(1);
+  checkDebugEvent(session, WATCHPOINT_EVENT);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(2, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX8(WATCHPOINT_EVENT, session->txBuffer[2]);
+  TEST_ASSERT_EQUAL_HEX8(0xFE, session->txBuffer[3]); //chksum
+}
+
 void test_probeTaskManager_given_flash_command_should_run_writeTargetFlash(void)
 {
   uartInit_Ignore();
@@ -1046,4 +1077,32 @@ void test_probeTaskManager_given_flash_erase_command_should_run_eraseFlashTarget
   TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
   TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
   TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
+}
+
+void test_probeTaskManager_given_TLV_DEBUG_EVENTS_should_call_checkDebugEvent(void)
+{
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  
+  session->rxBuffer[0] = TLV_DEBUG_EVENTS; // command
+  session->rxBuffer[1] = 2; //length
+  session->rxBuffer[2] = BREAKPOINT_EVENT; //specific event
+  session->rxBuffer[3] = 0xFF; //chksum
+  
+  /* Received packet */
+  probeTaskManager(session);
+  TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
+  
+  /* Intepret packet and goes to eraseTargetFlash() */
+  readDebugEventRegister_ExpectAndReturn(0x2);
+  probeTaskManager(session);
+  
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(2, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX8(BREAKPOINT_EVENT, session->txBuffer[2]);
+  TEST_ASSERT_EQUAL_HEX8(0xFF, session->txBuffer[3]); //chksum
 }
