@@ -10,6 +10,27 @@ uint32_t memoryReadAndReturnWord(uint32_t address) {
   return dataRead;
 }
 
+uint8_t memoryReadByte(uint32_t address) {
+  int parity = 0 , status = 0; uint32_t data;
+
+  if(cswDataSize != CSW_BYTE_SIZE) // used to prevent setting same size again and again
+  {
+    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_BYTE_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
+    cswDataSize = CSW_BYTE_SIZE;
+  }
+  swdWriteAP(TAR_REG, address);
+  swdReadAP(DRW_REG, &data);
+  
+  /* 0x00 */
+  if     ((address & 0x3) == 0x0) return ((data & 0xFF       ) >> 0  );
+  /* 0x01 */
+  else if((address & 0x3) == 0x1) return ((data & 0xFF00     ) >> 8  );
+  /* 0x10 */
+  else if((address & 0x3) == 0x2) return ((data & 0xFF0000   ) >> 16 );
+  /* 0x11 */
+  else if((address & 0x3) == 0x3) return ((data & 0xFF000000 ) >> 24 );
+}
+
 int memoryReadWord(uint32_t address, uint32_t *dataRead)
 {
 	int parity = 0 , status = 0;
@@ -31,19 +52,31 @@ int memoryReadWord(uint32_t address, uint32_t *dataRead)
 int memoryReadHalfword(uint32_t address,uint32_t *dataRead)
 {
   int parity = 0 , status = 0;
-	
-	if(cswDataSize != CSW_HALFWORD_SIZE) // used to prevent setting same size again and again
-	  {
-	    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
-	    cswDataSize = CSW_HALFWORD_SIZE;
-	  }
+	uint32_t data;
+  
+  if(cswDataSize != CSW_HALFWORD_SIZE) // used to prevent setting same size again and again
+  {
+    swdSelectMemorySize((CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
+    cswDataSize = CSW_HALFWORD_SIZE;
+  }
 
-	swdWriteAP(TAR_REG, address);
-	swdReadAP(DRW_REG, dataRead);
-	
-	status = compareParityWithData(*dataRead,parity);
-	
-	return status;
+  swdWriteAP(TAR_REG, address);
+  swdReadAP(DRW_REG, &data);
+
+  /* 0x00 */
+  if     ((address & 0x3) == 0x0) *dataRead = ((data & 0xFFFF     ) >> 0  );
+  /* 0x01 */
+  else if((address & 0x3) == 0x1) *dataRead = ((data & 0xFFFF00   ) >> 8  );
+  /* 0x10 */
+  else if((address & 0x3) == 0x2) *dataRead = ((data & 0xFFFF0000 ) >> 16 );
+  /* 0x11 */
+  else if((address & 0x3) == 0x3) {
+    *dataRead = (((data & 0xFF000000  ) >> 24 ) | ((data & 0x000000FF ) << 8 ));
+  }
+  
+  status = compareParityWithData(*dataRead,parity);
+
+  return status;
 }
 
 SwdError memoryWriteByte(uint32_t address, uint8_t writeData)

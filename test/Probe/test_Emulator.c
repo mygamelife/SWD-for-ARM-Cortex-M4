@@ -20,7 +20,6 @@ void test_convertMSB_LSB_given_0x2BA01477_should_return_0xEE2805D4()
 	TEST_ASSERT_EQUAL(0xEE2805D4,interconvertMSBandLSB(0x2BA01477));
 }
 
-
 void test_emulateWrite_given_0x2_and_number_of_bits_2()
 {
   emulateWrite(0x2, 2);

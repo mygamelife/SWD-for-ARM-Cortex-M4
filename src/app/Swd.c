@@ -36,7 +36,7 @@ int calculateParitySwdRequest(int addressBit3, int addressBit2, int pointType, i
  *			    return ERR_INVALID_PARITY_RECEIVED if both of the parity does not match
  *			
  */
-int compareParityWithData(uint32_t data,int parity)
+int compareParityWithData(uint32_t data, int parity)
 {
 	int calculatedParity = 0 ;
 	

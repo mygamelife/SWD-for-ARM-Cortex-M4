@@ -53,10 +53,6 @@ typedef struct
   Tlv_State flashState;
   Tlv_State eraseState;
   Tlv_State mEraseState;
-  /* Probe flash state */
-  Tlv_State pFlashState;
-  Tlv_State pEraseState;
-  Tlv_State pMEraseState;
   /* Flags */
   uint32_t flags;
 } Tlv_Session;

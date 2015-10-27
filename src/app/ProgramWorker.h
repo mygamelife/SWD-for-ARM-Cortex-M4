@@ -25,8 +25,6 @@ void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size);
 
 /*############################################### FLASH ###############################################*/
 void writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
-void writeTargetFlashInWord(Tlv_Session *session, uint32_t *data, uint32_t address);
-void writeTargetFlashInChunk(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size);
 void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
 void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
 
@@ -88,10 +86,4 @@ void checkDebugEvent(Tlv_Session *session, EventType event);
 /* ### Testing Tlv Protocol ## */
 void loopBack(Tlv_Session *session, Tlv *packet);
 
-typedef enum {
-  SET_CSW_VALUE = 1,
-  WRITE_ADDRESS,
-  READ_VALUE,
-} Test_State;
-void testing(Test_State *state);
 #endif // ProgramWorker_H
