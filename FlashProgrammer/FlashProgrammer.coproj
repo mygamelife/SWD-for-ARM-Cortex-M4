@@ -71,12 +71,12 @@
   <LocalComponents/>
   <Files>
     <File name="Hardware/stm32f4xx_hal_flash.h" path="app/Hardware/stm32f4xx_hal_flash.h" type="1"/>
-    <File name="configuration/LED.c" path="app/LED.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal.h" path="app/Hardware/stm32f4xx_hal.h" type="1"/>
+    <File name="configuration/LED.c" path="app/LED.c" type="1"/>
     <File name="Code/memoryRW.c" path="app/memoryRW.c" type="1"/>
     <File name="Code/SystemConfigure.c" path="app/SystemConfigure.c" type="1"/>
-    <File name="Code/swdStub.h" path="app/SwdStub.h" type="1"/>
     <File name="configuration/configurePort.h" path="app/configurePort.h" type="1"/>
+    <File name="Code/swdStub.h" path="app/SwdStub.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ex.c" path="app/Hardware/stm32f4xx_hal_flash_ex.c" type="1"/>
     <File name="startup/system_stm32f4xx.h" path="app/Hardware/system_stm32f4xx.h" type="1"/>
     <File name="Core/core_cmSimd.h" path="app/Hardware/core_cmSimd.h" type="1"/>
@@ -91,8 +91,8 @@
     <File name="Hardware/stm32f4xx_hal_def.h" path="app/Hardware/stm32f4xx_hal_def.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.c" path="app/Hardware/stm32f4xx_hal_flash_ramfunc.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.c" path="app/Hardware/stm32f4xx_hal_rcc.c" type="1"/>
-    <File name="Hardware/stm32f4xx_it.h" path="app/Hardware/stm32f4xx_it.h" type="1"/>
     <File name="Code/Flash.h" path="app/Flash.h" type="1"/>
+    <File name="Hardware/stm32f4xx_it.h" path="app/Hardware/stm32f4xx_it.h" type="1"/>
     <File name="startup" path="" type="2"/>
     <File name="Code" path="" type="2"/>
     <File name="startup/system_stm32f4xx.c" path="app/Hardware/system_stm32f4xx.c" type="1"/>
@@ -107,10 +107,10 @@
     <File name="Hardware/stm32f4xx_hal_gpio_ex.h" path="app/Hardware/stm32f4xx_hal_gpio_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="app/Hardware/stm32f4xx_hal_cortex.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.h" path="app/Hardware/stm32f4xx_hal_rcc.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
     <File name="configuration/LED.h" path="app/LED.h" type="1"/>
-    <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal.c" path="app/Hardware/stm32f4xx_hal.c" type="1"/>
     <File name="startup/startup_stm32f429xx.s" path="app/Hardware/startup_stm32f429xx.s" type="1"/>
+    <File name="Core/core_cmInstr.h" path="app/Hardware/core_cmInstr.h" type="1"/>
     <File name="Code/main.h" path="app/main.h" type="1"/>
     <File name="Code/SystemConfigure.h" path="app/SystemConfigure.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="app/Hardware/stm32f4xx_it.c" type="1"/>
@@ -119,8 +119,8 @@
     <File name="Code/Flash.c" path="app/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="app/Hardware/stm32f4xx_hal_flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="app/Hardware/stm32f4xx_hal_rcc_ex.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_gpio.h" path="app/Hardware/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.h" path="app/Hardware/stm32f4xx_hal_cortex.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_gpio.h" path="app/Hardware/stm32f4xx_hal_gpio.h" type="1"/>
     <File name="Code/memoryRW.h" path="app/memoryRW.h" type="1"/>
     <File name="Core" path="" type="2"/>
   </Files>

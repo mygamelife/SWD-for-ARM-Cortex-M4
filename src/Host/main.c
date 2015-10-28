@@ -15,12 +15,10 @@ int main(void) {
         tlvService(session);
         hostInterpreter(session);
         // 
-        // userSession = waitUserCommand();
         // Receive packet and handle it here
         //
       } Catch(err) {
         HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
-        // session->hostState = HOST_WAIT_USER_COMMAND;
         displayErrorMessage(err);
       }
     }

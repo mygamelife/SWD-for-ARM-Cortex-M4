@@ -18,20 +18,12 @@ int main(void)
   /* Power Up AHB Port */
   errorCode = readAhbIDR(&idr);
 
-  //Tlv_Session *session = tlvCreateSession();
-
-  uint8_t data0, data1, data2, data3;
-  memoryWriteWord(0x20000004, 0xDEADBEEF);
-  memoryWriteWord(0x20000008, 0xABCD1234);
-  memoryReadHalfword(0x20000004, &data);
-  memoryReadHalfword(0x20000005, &data);
-  memoryReadHalfword(0x20000006, &data);
-  memoryReadHalfword(0x20000007, &data);
+  Tlv_Session *session = tlvCreateSession();
 
   while(1)
   {
-    //tlvService(session);
-    //probeTaskManager(session);
+    tlvService(session);
+    probeTaskManager(session);
   }
 }
 
