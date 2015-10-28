@@ -24,24 +24,13 @@ void requestStubMassErase(uint32_t bankSelect);
 void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size);
 
 /*############################################### FLASH ###############################################*/
-void writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
-void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
-void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
+int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
+int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
+int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
 
 /*############################################### RAM ###############################################*/
 void writeRamInChunk(uint8_t *dataAddress, uint32_t destAddress, int size);
 void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
-
-/* ###### read ###### */
-void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size);
-void readTargetInWord(Tlv_Session *session, uint32_t destAddress);
-void readTargetInHalfword(Tlv_Session *session, uint32_t destAddress);
-/* ###### write ###### */
-void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data);
-void writeTargetInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
-void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data);
-void writeTargetInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
-void writeTargetInByte(Tlv_Session *session, uint32_t address, uint8_t data);
 
 /*############################################### Register ###############################################*/
 void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);

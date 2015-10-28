@@ -51,6 +51,32 @@ int memoryWrite(uint32_t address, uint32_t dataWrite, int size) {
   return 1;
 }
 
+/* ########################## Mock ############################ */
+int memoryReadByte(uint32_t address, uint32_t *dataRead) {
+  return memoryRead(address, dataRead, BYTE_SIZE);
+}
+
+int memoryReadHalfword(uint32_t address, uint32_t *dataRead) {
+  return memoryRead(address, dataRead, HALFWORD_SIZE);
+}
+
+int memoryReadWord(uint32_t address, uint32_t *dataRead) {
+  return memoryRead(address, dataRead, WORD_SIZE);
+}
+
+int memoryWriteByte(uint32_t address, uint32_t dataWrite) {
+  return memoryWrite(address, dataWrite, BYTE_SIZE);
+}
+
+int memoryWriteHalfword(uint32_t address, uint32_t dataWrite) {
+  return memoryWrite(address, dataWrite, HALFWORD_SIZE);
+}
+
+int memoryWriteWord(uint32_t address, uint32_t dataWrite) {
+  return memoryWrite(address, dataWrite, WORD_SIZE);
+}
+/* ########################## Mock ############################ */
+
 int _flashWriteWord(uint32_t address, uint32_t writeData) {
   int status = 0, size = 4;
   uint8_t *pData = (uint8_t *)&writeData;

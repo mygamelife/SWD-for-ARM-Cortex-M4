@@ -125,10 +125,10 @@ void test_readTargetRam_should_reply_back_with_the_correct_chksum()
   Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
   
   // 0xABCDABCD
-  memoryReadByte_ExpectAndReturn(0x20000000, 0xCD);
-  memoryReadByte_ExpectAndReturn(0x20000001, 0xAB);
-  memoryReadByte_ExpectAndReturn(0x20000002, 0xCD);
-  memoryReadByte_ExpectAndReturn(0x20000003, 0xAB);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000000, 0xCD);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000001, 0xAB);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000002, 0xCD);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000003, 0xAB);
   
   readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
   
@@ -148,8 +148,8 @@ void test_readTargetRam_should_only_read_2_byte()
   Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 8, (uint8_t *)buffer);
   
   // 0xDEAD
-  memoryReadByte_ExpectAndReturn(0x20000004, 0xAD);
-  memoryReadByte_ExpectAndReturn(0x20000005, 0xDE);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000004, 0xAD);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000005, 0xDE);
   
   readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));
   
@@ -681,57 +681,6 @@ void test_massEraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
 }
 
-void test_writeTargetInWord_should_write_word_data_into_specified_address(void)
-{ 
-  uartInit_Ignore();
-  Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t address = 0x12345678, data = 0xDEADDEAD;
-  
-  memoryWriteWord_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
-  
-  writeTargetInWord(session, address, data);
-  
-  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
-  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
-  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
-  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
-}
-
-void test_writeTargetInHalfWord_should_write_word_data_into_specified_address(void)
-{ 
-  uartInit_Ignore();
-  Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t address = 0x12345678, data = 0xDEAD;
-  
-  memoryWriteHalfword_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
-  
-  writeTargetInHalfword(session, address, data);
-  
-  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
-  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
-  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
-  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
-}
-
-void test_writeTargetInByte_should_write_word_data_into_specified_address(void)
-{ 
-  uartInit_Ignore();
-  Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t address = 0xABCD1234, data = 0xAA;
-  
-  memoryWriteByte_ExpectAndReturn(address, data, NO_ERROR);     //Set flash Address
-  
-  writeTargetInByte(session, address, data);
-  
-  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
-  TEST_ASSERT_EQUAL(TLV_OK, session->txBuffer[0]);
-  TEST_ASSERT_EQUAL(1, session->txBuffer[1]);
-  TEST_ASSERT_EQUAL(0, session->txBuffer[2]);
-}
-
 void test_checkDebugEvent_should_return_BREAKPOINT_EVENT_if_event_occur(void)
 { 
   uartInit_Ignore();
@@ -914,22 +863,22 @@ void test_probeTaskManager_should_receive_TLV_READ_MEMORY_and_perform_the_task(v
   tlvService(session);
   
   // 0xDEADBEEF
-  memoryReadByte_ExpectAndReturn(0x20000000, 0xEF);
-  memoryReadByte_ExpectAndReturn(0x20000001, 0xBE);
-  memoryReadByte_ExpectAndReturn(0x20000002, 0xAD);
-  memoryReadByte_ExpectAndReturn(0x20000003, 0xDE);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000000, 0xEF);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000001, 0xBE);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000002, 0xAD);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000003, 0xDE);
   
   // 0xABCDABCD
-  memoryReadByte_ExpectAndReturn(0x20000004, 0xCD);
-  memoryReadByte_ExpectAndReturn(0x20000005, 0xAB);
-  memoryReadByte_ExpectAndReturn(0x20000006, 0xCD);
-  memoryReadByte_ExpectAndReturn(0x20000007, 0xAB);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000004, 0xCD);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000005, 0xAB);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000006, 0xCD);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000007, 0xAB);
   
   // 0x12345678
-  memoryReadByte_ExpectAndReturn(0x20000008, 0x78);
-  memoryReadByte_ExpectAndReturn(0x20000009, 0x56);
-  memoryReadByte_ExpectAndReturn(0x2000000A, 0x34);
-  memoryReadByte_ExpectAndReturn(0x2000000B, 0x12);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000008, 0x78);
+  memoryReadAndReturnByte_ExpectAndReturn(0x20000009, 0x56);
+  memoryReadAndReturnByte_ExpectAndReturn(0x2000000A, 0x34);
+  memoryReadAndReturnByte_ExpectAndReturn(0x2000000B, 0x12);
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);

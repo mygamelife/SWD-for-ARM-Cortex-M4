@@ -10,7 +10,12 @@ uint32_t memoryReadAndReturnWord(uint32_t address) {
   return dataRead;
 }
 
-uint8_t memoryReadByte(uint32_t address) {
+uint8_t memoryReadAndReturnByte(uint32_t address) {
+  
+  return memoryReadByte(address);
+}
+
+int memoryReadByte(uint32_t address, uint32_t *dataRead) {
   int parity = 0 , status = 0; uint32_t data;
 
   if(cswDataSize != CSW_BYTE_SIZE) // used to prevent setting same size again and again
@@ -22,13 +27,17 @@ uint8_t memoryReadByte(uint32_t address) {
   swdReadAP(DRW_REG, &data);
   
   /* 0x00 */
-  if     ((address & 0x3) == 0x0) return ((data & 0xFF       ) >> 0  );
+  if     ((address & 0x3) == 0x0) *dataRead = ((data & 0xFF       ) >> 0  );
   /* 0x01 */
-  else if((address & 0x3) == 0x1) return ((data & 0xFF00     ) >> 8  );
+  else if((address & 0x3) == 0x1) *dataRead = ((data & 0xFF00     ) >> 8  );
   /* 0x10 */
-  else if((address & 0x3) == 0x2) return ((data & 0xFF0000   ) >> 16 );
+  else if((address & 0x3) == 0x2) *dataRead = ((data & 0xFF0000   ) >> 16 );
   /* 0x11 */
-  else if((address & 0x3) == 0x3) return ((data & 0xFF000000 ) >> 24 );
+  else if((address & 0x3) == 0x3) *dataRead = ((data & 0xFF000000 ) >> 24 );
+  
+  status = compareParityWithData(*dataRead,parity);
+	
+	return status;
 }
 
 int memoryReadWord(uint32_t address, uint32_t *dataRead)

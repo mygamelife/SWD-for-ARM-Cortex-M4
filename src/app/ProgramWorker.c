@@ -521,7 +521,7 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   
   /* Read from RAM using swd */
   for(i = 0; i < size; i++, destAddress++)  {
-    readData = memoryReadByte(destAddress);
+    readData = memoryReadAndReturnByte(destAddress);
     /* Data start at position 4 */
     chksum += tlvPackIntoBuffer(&tlv->value[4 + i], &readData, 1);
   }
@@ -562,7 +562,7 @@ void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAdd
   *
   * return  : NONE
   */
-void writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
+int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
   Tlv *tlv;
   
   startTask(session->state);
@@ -598,7 +598,7 @@ void writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destA
   *
   * return  : NONE
   */
-void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
+int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   Tlv *tlv;
   
   startTask(session->state);
@@ -629,7 +629,7 @@ void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   *
   * return  : NONE
   */
-void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
+int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
   Tlv *tlv;
   
   startTask(session->state);
@@ -650,80 +650,6 @@ void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
   tlvSend(session, tlv);
   
   endTask(session->state);
-}
-
-/** writeTargetInWord is a function write data into target
-  * in Word size (32bit)
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to be store
-  *           data is the data need to be send
-  *
-  * Return  : NONE
-  */
-void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data) {
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  /* Write data into specified address */
-  memoryWriteWord(address, data);
-  
-  tlvSend(session, tlv);
-}
-
-/** writeTargetInHalfWord is a function write data into target
-  * in halfWord size (16bit)
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to be store
-  *           data is the data need to be send
-  *
-  * Return  : NONE
-  */
-void writeTargetInHalfword(Tlv_Session *session, uint32_t address, uint16_t data) {
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  /* Write data into specified address */
-  memoryWriteHalfword(address, data);
-  
-  tlvSend(session, tlv);
-}
-
-/** writeTargetInByte is a function write data into target
-  * in halfWord size (8bit)
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to be store
-  *           data is the data need to be send
-  *
-  * Return  : NONE
-  */
-void writeTargetInByte(Tlv_Session *session, uint32_t address, uint8_t data) {
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  /* Write data into specified address */
-  memoryWriteByte(address, data);
-  
-  tlvSend(session, tlv);
-}
-
-/** readTargetInHalfword is a function read data fram target
-  * in halfWord size (16bit)
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data want to read
-  *
-  * Return  : NONE
-  */
-void readTargetInHalfword(Tlv_Session *session, uint32_t destAddress) {
-  Tlv *tlv; uint32_t data;
-  
-  /* Write data into specified address */
-  memoryReadHalfword(destAddress, &data);
-  
-  /* data16 is 2 byte size */
-  tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&data);
-   
-  tlvSend(session, tlv);
 }
 
 void eventOccured(Tlv_Session *session, EventType event) {
@@ -797,10 +723,6 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
-    case TLV_WRITE_WORD                 : writeTargetInWord(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));           break;
-    case TLV_WRITE_HALFWORD             : writeTargetInHalfword(session, get4Byte(&tlv->value[0]), get2Byte(&tlv->value[4]));       break;
-    case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), get1Byte(&tlv->value[4]));           break;
-    case TLV_READ_HALFWORD              : readTargetInHalfword(session, get4Byte(&tlv->value[0]));                                  break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                  break;
     default : break;
   }
