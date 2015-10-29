@@ -129,11 +129,19 @@ void test_tlvWriteToFlash_write_0xDEADBEEF_into_0x8000000_and_should_read_back_t
   
   result = _flashWrite(0x08000000, 0xBEEF, HALFWORD_SIZE);
   TEST_ASSERT_EQUAL(1, result);
-  
   result = _flashWrite(0x08000002, 0xDEAD, HALFWORD_SIZE);
   TEST_ASSERT_EQUAL(1, result);
   
-  result = memoryReadWord(0x08000000, &dataRead);
+  result = _flashWrite(0x08000004, 0xCAFE, HALFWORD_SIZE);
   TEST_ASSERT_EQUAL(1, result);
-  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, dataRead);
+  result = _flashWrite(0x08000006, 0xABCD, HALFWORD_SIZE);
+  TEST_ASSERT_EQUAL(1, result);
+  
+  // result = memoryReadWord(0x08000000, &dataRead);
+  // TEST_ASSERT_EQUAL(1, result);
+  // TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, dataRead);
+  
+  // result = memoryReadWord(0x08000004, &dataRead);
+  // TEST_ASSERT_EQUAL(1, result);
+  // TEST_ASSERT_EQUAL_HEX32(0xABCDCAFE, dataRead);
 }
