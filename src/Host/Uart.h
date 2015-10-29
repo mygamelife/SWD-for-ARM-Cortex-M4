@@ -13,7 +13,7 @@ typedef enum
   UART_ERROR
 } Uart_Status;
 
-#define UART_PORT                     "COM3"//"COM4"//"COM7"//
+#define UART_PORT                     "COM7"//"COM4"
 #define UART_BAUD_RATE                128000//9600
 #define closePort(__SESSION__)        CloseHandle(((HANDLE *)((__SESSION__)->handler)))
 

@@ -167,7 +167,7 @@ uint32_t stepOut()
     }
   }
   
-  comparatorUsed = autoSetInstructionBreakpoint(pc);
+  comparatorUsed = autoSetInstructionBreakpoint(pc);  
   if(comparatorUsed == -1)
     return 0 ;
     

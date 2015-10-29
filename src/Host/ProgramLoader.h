@@ -30,9 +30,12 @@ typedef enum {
 #define IS_COMMAND_AVAILABLE(__SESSION__)               (((__SESSION__) != NULL) ? 1 : 0                  )
 #define HOST_CHANGE_STATE(__SESSION__, __STATE__)       ((__SESSION__)->hostState = __STATE__             )
 
-#define tlvWriteToRam(session, dataAddress, destAddress, size) \
+#define tlvWriteToRam(session, dataAddress, destAddress, size)                    \
         tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
 
+#define tlvWriteToFlash(session, dataAddress, destAddress, size)                  \
+        tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_FLASH)
+        
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
@@ -54,13 +57,6 @@ Process_Status tlvHardReset(Tlv_Session *session);
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
 Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
 
-/* Write Byte, Halfword, Word */
-Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data);
-Process_Status tlvWriteDataInHalfword(Tlv_Session *session, uint32_t address, uint16_t data);
-Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data);
-        
-int tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
-
 /* Load Flash/RAM */
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
 void tlvLoadToRam(Tlv_Session *session, char *file);
@@ -75,8 +71,6 @@ void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 /* Read Memory */
 void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size);
 uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
-/* Read Byte, Halfword, Word */
-uint8_t *tlvReadTargetDataWithType(Tlv_Session *session, uint32_t address, Tlv_Command dataType);
 
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);

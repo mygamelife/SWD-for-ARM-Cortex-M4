@@ -273,16 +273,16 @@ void flashErrorHandler(void)
   */
 void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size) {
   int i;
-  __IO uint32_t data = 0;
-  uint32_t sram = src, flash = dest;
+  __IO uint8_t data = 0;
+  uint32_t sramAddress = src, flashAddress = dest;
 
   /* Unlock the Flash to enable the flash control register access */ 
   HAL_FLASH_Unlock();
   
   /* Copy data to flash */
-  for(i = 0; i < size; i += 4, sram += 4, flash += 4) {
-	  data = readMemoryData(sram);
-	  flashWriteWord(flash, data);
+  for(i = 0; i < size; i += BYTE_SIZE, sramAddress += BYTE_SIZE, flashAddress += BYTE_SIZE) {
+    data = (uint8_t)readMemoryData(sramAddress);
+    flashWriteByte(flashAddress, data);
   }
   
   /* Lock the Flash to disable the flash control register access (recommended

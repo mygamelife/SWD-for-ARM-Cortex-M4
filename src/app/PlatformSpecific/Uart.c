@@ -48,8 +48,8 @@ uint8_t getByte(void *handler, uint8_t *rxBuffer) {
   UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
   
   turnOnLED3();
-
-  return HAL_UART_Receive(uartHandle, rxBuffer, 1, 30);
+  //uartRxReady = 1;
+  return HAL_UART_Receive(uartHandle, rxBuffer, 1, 10);
 }
 
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {

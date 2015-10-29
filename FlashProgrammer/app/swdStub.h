@@ -5,10 +5,6 @@
 #include <malloc.h>
 #include "Flash.h"
 
-#if !defined(TEST)
-#include "SystemConfigure.h"
-#endif
-
 /** SWD Instruction address 
   */
 #define TWO_KBYTES                    2048 //2k byte

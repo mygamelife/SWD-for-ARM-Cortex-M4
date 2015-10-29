@@ -13,6 +13,11 @@
 
 typedef uint32_t FLASH_ErrorTypeDef;
 
+#define BYTE_SIZE                     1
+#define HALFWORD_SIZE                 2
+#define WORD_SIZE                     4
+
+#define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
 /* Base address of the Flash sectors Bank 1 */
