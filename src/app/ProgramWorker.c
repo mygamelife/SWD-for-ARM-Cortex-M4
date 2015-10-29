@@ -377,7 +377,7 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   Tlv *tlv ;
   uint8_t errorCode = TLV_ADDRESS_NOT_FOUND ;
   
-  if(disableFPComparatorLoadedWithAddress(instructionAddress,INSTRUCTION_TYPE) == -1)
+  if(disableFlashPatchComparatorLoadedWithAddress(instructionAddress,INSTRUCTION_TYPE) == -1)
     tlv = tlvCreatePacket(TLV_NOT_OK,1,&errorCode);
   else
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
@@ -408,7 +408,7 @@ void removeAllHardwareBreakpoint(Tlv_Session *session)
 {
   Tlv *tlv ;
   
-  removeAllFPComparatorSetToBreakpoint();
+  disableAllFlashPatchComparatorSetToBreakpoint();
   
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
@@ -425,8 +425,8 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
   int found = 0 ;
   uint8_t errorCode = TLV_ADDRESS_NOT_FOUND;
  
-  found = disableFPComparatorLoadedWithAddress(address,INSTRUCTION_TYPE);
-  found += disableFPComparatorLoadedWithAddress(address,LITERAL_TYPE);
+  found = disableFlashPatchComparatorLoadedWithAddress(address,INSTRUCTION_TYPE);
+  found += disableFlashPatchComparatorLoadedWithAddress(address,LITERAL_TYPE);
   
   if(found < 0)
     tlv = tlvCreatePacket(TLV_NOT_OK,1,&errorCode);
@@ -441,11 +441,11 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
  *
  * Input     : session contain a element/handler used by tlv protocol
  */
-void stopAllFlashPatchRemapping(Tlv_Session *session)
+void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session)
 {
   Tlv *tlv ;
   
-  stopAllFPRemapping();
+  disableAllFlashPatchComparatorSetToRemap();
   
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);

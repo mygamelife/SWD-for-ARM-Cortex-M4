@@ -127,7 +127,7 @@ uint32_t stepOver()
     
       while(!(hasBreakpointDebugEventOccured()));
 
-      disableInstructionComparator(comparatorUsed);
+      disableFlashPatchInstructionComparator(comparatorUsed);
       clearBreakpointDebugEvent();
     
       return pc + 4 ;
@@ -172,7 +172,7 @@ uint32_t stepOut()
     return 0 ;
     
   while(!(hasBreakpointDebugEventOccured()));
-  disableInstructionComparator(comparatorUsed);
+  disableFlashPatchInstructionComparator(comparatorUsed);
   clearBreakpointDebugEvent();
  
   return(stepIntoOnce());

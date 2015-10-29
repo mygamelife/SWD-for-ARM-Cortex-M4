@@ -83,7 +83,7 @@ uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   /* End tlv request task */
   endTask(session->regState);
   
-  printf("value %x\n", get4Byte(&response->value[0]));
+  //printf("value %x\n", get4Byte(&response->value[0]));
   
   return get4Byte(&response->value[0]);
 }
@@ -205,7 +205,7 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   /* End tlv request task */
   endTask(session->stepState);
   
-  printf("value %x\n", get4Byte(&response->value[0]));
+  //printf("value %x\n", get4Byte(&response->value[0]));
   
   return get4Byte(&response->value[0]);
 }
@@ -348,7 +348,7 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   
   /* End tlv request task */
   endTask(session->rmemState);
-  
+
   #if !defined (TEST)
   displayMemoryMap(response->value, response->length - 1);
   #endif

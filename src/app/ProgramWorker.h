@@ -64,7 +64,7 @@ void removeAllHardwareBreakpoint(Tlv_Session *session);
 void removeAllSoftwareBreakpoint(Tlv_Session *session);
 
 void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
-void stopAllFlashPatchRemapping(Tlv_Session *session);
+void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session);
                    
 void breakpointEventHandler(Tlv_Session *session);
 void watchpointEventHandler(Tlv_Session *session);

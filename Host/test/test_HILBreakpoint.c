@@ -34,7 +34,7 @@ void setUp(void)
 
 void tearDown(void) {}
 {
-  disableAllFPComparator();
+  disableAllFlashPatchComparator();
   setCoreMode(CORE_NORMAL_MODE);
 }
 
