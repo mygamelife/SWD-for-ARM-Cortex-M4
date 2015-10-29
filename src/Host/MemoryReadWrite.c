@@ -77,13 +77,27 @@ int memoryWriteWord(uint32_t address, uint32_t dataWrite) {
 }
 /* ########################## Mock ############################ */
 
-int _flashWriteWord(uint32_t address, uint32_t writeData) {
-  int status = 0, size = 4;
+int _flashWrite(uint32_t address, uint32_t writeData, int size) {
   uint8_t *pData = (uint8_t *)&writeData;
+  int dataSize = size;
   
   Try {
     /* Waiting reply from probe */
-    while((status = tlvWriteToFlash(_session, &pData, &address, &size)) == 0) {
+    while(tlvWriteToFlash(_session, &pData, &address, &dataSize) != PROCESS_DONE) {
+      tlvService(_session);
+    };
+  } Catch(err) {
+    return err;
+  }
+  
+  return 1;
+}
+
+int _flashErase(uint32_t address, int size) {
+  int status = 0;
+  
+  Try {
+    while((status = tlvRequestFlashErase(_session, address, size)) == 0) {
       tlvService(_session);
     };
   } Catch(err) {

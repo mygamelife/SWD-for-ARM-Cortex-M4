@@ -43,6 +43,9 @@ Tlv_Session *tlvCreateSession(void) {
   session.eraseState = TLV_LOAD_FLASH_PROGRAMMER;
   session.mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
   
+  /* probe flash state */
+  session.pFlashState = WRITE_TO_RAM;
+  
   /* Initialize TLV flag */
   session.flags = FLAG_CLEAR;
   

@@ -38,7 +38,8 @@ int memoryWriteByte(uint32_t address, uint32_t dataWrite);
 int memoryWriteHalfword(uint32_t address, uint32_t dataWrite);
 int memoryWriteWord(uint32_t address, uint32_t dataWrite);
 
-int _flashWriteWord(uint32_t address, uint32_t writeData);
+int _flashWrite(uint32_t address, uint32_t writeData, int size);
+int _flashErase(uint32_t address, int size);
 
 uint32_t memoryWriteDataAlignment(uint32_t address, uint16_t writeData);
 

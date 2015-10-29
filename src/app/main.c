@@ -4,7 +4,7 @@ int main(void)
 {
   uint32_t idr = 0;
   SwdError errorCode = 0;
-  uint32_t data = 0;
+
   /* Hardware configuration */
   HAL_Init();
   configureIOPorts();

@@ -209,20 +209,29 @@ void runTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
   
-  if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
-    stepIntoOnce();
-    enableFPBUnit();
-    setCoreMode(CORE_DEBUG_MODE);
-    if(getCoreMode() == CORE_DEBUG_MODE) {
-      tlv = tlvCreatePacket(TLV_OK, 0, 0);
-    }
-    else Throw(TLV_NOT_RUNNING);
-    tlvSend(session, tlv);
-  }
-  else {
-    SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-    breakpointEventHandler(session);
-  }
+  setCoreMode(CORE_DEBUG_MODE);
+  
+  if(getCoreMode() == CORE_DEBUG_MODE)
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  else Throw(TLV_NOT_RUNNING);
+  
+  tlvSend(session, tlv);
+
+  //if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
+    //stepIntoOnce();
+    //enableFPBUnit();
+    //setCoreMode(CORE_DEBUG_MODE);
+    //if(getCoreMode() == CORE_DEBUG_MODE) {
+  	  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
+    //}
+    //else Throw(TLV_NOT_RUNNING);
+    //tlvSend(session, tlv);
+  //}
+  //else {
+    //SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+    //breakpointEventHandler(session);
+  //}
 }
 
 /** Step the processor of target device once and send the current PC to host
@@ -563,15 +572,18 @@ void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAdd
   * return  : NONE
   */
 int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-  Tlv *tlv;
+	int i; Tlv *tlv; uint32_t temp = tempAddress;
   
   startTask(session->state);
   
   SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  /* Temporary store data into tempAddress */
-  writeTargetRam(session, dataAddress, tempAddress, size);
-  yield(session->state);
   
+  /* Write to RAM using swd */
+  for(i = 0; i < size; i ++, dataAddress++, temp++) {
+    /* Data start at position 4 */
+    memoryWriteByte(temp, *dataAddress);
+  }
+
   /* Yield if stub is busy */
   while(IsStubBusy() == 0) {
     yield(session->state);
