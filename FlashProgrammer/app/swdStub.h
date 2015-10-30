@@ -39,16 +39,24 @@ typedef enum {
   STUB_BUSY,
 } Stub_Status;
 
+typedef enum {
+  FLASH_PROGRAM_ERR   = 10,
+  FLASH_ERASE_ERR     = 20,
+  FLASH_MASSERASE_ERR = 30,
+} ERROR_OCCUR;
+
 /** Structure type to access the SwdStub.
   */
 typedef struct
 {
-  volatile int instruction;                     /*!< Offset: 0x00 (R/W)  Swd Stub instruction       */
-  volatile int status;                          /*!< Offset: 0x04 (R/W)  Swd Stub status            */
-  volatile int dataSize;                        /*!< Offset: 0x08 (R/W)  Swd Stub data size         */
-  volatile uint32_t flashAddress;               /*!< Offset: 0x0C (R/W)  Swd Stub flash address     */
-  volatile uint32_t sramAddress;                /*!< Offset: 0x10 (R/W)  Swd Stub sram address      */
-  volatile uint32_t banks;                      /*!< Offset: 0x14 (R/W)  Swd Stub bank selection    */
+  volatile int instruction;                 /*!< Offset: 0x00 (R/W)  Requested instruction         */
+  volatile int status;                      /*!< Offset: 0x04 (R/W)  Stub status                   */
+  volatile int dataSize;                    /*!< Offset: 0x08 (R/W)  Requested program data size   */
+  volatile uint32_t flashAddress;           /*!< Offset: 0x0C (R/W)  Stub requested flash address  */
+  volatile uint32_t sramAddress;            /*!< Offset: 0x10 (R/W)  Swd Stub sram address         */
+  volatile uint32_t banks;                  /*!< Offset: 0x14 (R/W)  Swd Stub bank selection       */
+  volatile uint32_t errorCode;              /*!< Offset: 0x18 (R/W)  flashProgrammer errorCode     */
+  volatile uint32_t errorOccur;             /*!< Offset: 0x1C (R/W)  flash section occur error     */
 } Stub_Type;
 
 #if defined (TEST)

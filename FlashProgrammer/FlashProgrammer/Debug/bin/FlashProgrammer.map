@@ -200,366 +200,365 @@ LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm
                 0x00000000                _Min_Heap_Size = 0x0
                 0x00000400                _Min_Stack_Size = 0x400
 
-.isr_vector     0x08000000      0x1ac
-                0x08000000                . = ALIGN (0x4)
-                0x08000000                isr_vector_table = .
+.isr_vector     0x20000000      0x1ac
+                0x20000000                . = ALIGN (0x4)
+                0x20000000                isr_vector_table = .
  *(.isr_vector)
- .isr_vector    0x08000000      0x1ac ..\obj\startup_stm32f429xx.o
-                0x08000000                g_pfnVectors
-                0x080001ac                . = ALIGN (0x4)
+ .isr_vector    0x20000000      0x1ac ..\obj\startup_stm32f429xx.o
+                0x20000000                g_pfnVectors
+                0x200001ac                . = ALIGN (0x4)
 
-.text           0x080001ac     0x3eb0
-                0x080001ac                . = ALIGN (0x4)
+.text           0x200001ac     0x3e30
+                0x200001ac                . = ALIGN (0x4)
  *(.text)
- .text          0x080001ac       0x5c c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
- .text          0x08000208       0x3c ..\obj\memoryRW.o
-                0x08000208                readMemoryData
-                0x08000228                writeMemoryData
- .text          0x08000244       0xb0 ..\obj\SystemConfigure.o
-                0x08000244                SystemClock_Config
-                0x080002e0                FlashSystemConfig
- .text          0x080002f4      0x9a4 ..\obj\stm32f4xx_hal_flash_ex.o
-                0x080002f4                HAL_FLASHEx_Erase
-                0x080003e0                HAL_FLASHEx_Erase_IT
-                0x0800048c                HAL_FLASHEx_OBProgram
-                0x0800056c                HAL_FLASHEx_OBGetConfig
-                0x080005b0                HAL_FLASHEx_AdvOBProgram
-                0x08000634                HAL_FLASHEx_AdvOBGetConfig
-                0x08000670                HAL_FLASHEx_OB_SelectPCROP
-                0x080006a4                HAL_FLASHEx_OB_DeSelectPCROP
-                0x080006d4                HAL_FLASHEx_OB_GetBank2WRP
-                0x08000768                FLASH_Erase_Sector
- .text          0x08000c98      0x4ec ..\obj\stm32f4xx_hal_pwr_ex.o
-                0x08000c98                HAL_PWREx_EnableBkUpReg
-                0x08000d08                HAL_PWREx_DisableBkUpReg
-                0x08000d78                HAL_PWREx_EnableFlashPowerDown
-                0x08000db8                HAL_PWREx_DisableFlashPowerDown
-                0x08000df8                HAL_PWREx_GetVoltageRange
-                0x08000e14                HAL_PWREx_ControlVoltageScaling
-                0x08000efc                HAL_PWREx_EnableOverDrive
-                0x08000fdc                HAL_PWREx_DisableOverDrive
-                0x080010bc                HAL_PWREx_EnterUnderDriveSTOPMode
- .text          0x08001184      0x674 ..\obj\stm32f4xx_hal_gpio.o
-                0x08001184                HAL_GPIO_Init
-                0x080014cc                HAL_GPIO_DeInit
-                0x080016e0                HAL_GPIO_ReadPin
-                0x08001710                HAL_GPIO_WritePin
-                0x08001740                HAL_GPIO_TogglePin
-                0x08001764                HAL_GPIO_LockPin
-                0x080017b4                HAL_GPIO_EXTI_IRQHandler
-                0x080017e4                HAL_GPIO_EXTI_Callback
- .text          0x080017f8      0xd74 ..\obj\stm32f4xx_hal_rcc.o
-                0x080017f8                HAL_RCC_DeInit
-                0x08001870                HAL_RCC_OscConfig
-                0x08001d28                HAL_RCC_ClockConfig
-                0x08002044                HAL_RCC_MCOConfig
-                0x08002108                HAL_RCC_EnableCSS
-                0x08002120                HAL_RCC_DisableCSS
-                0x08002138                HAL_RCC_GetSysClockFreq
-                0x08002250                HAL_RCC_GetHCLKFreq
-                0x080022a8                HAL_RCC_GetPCLK1Freq
-                0x080022f4                HAL_RCC_GetPCLK2Freq
-                0x08002340                HAL_RCC_GetOscConfig
-                0x080024dc                HAL_RCC_GetClockConfig
-                0x0800253c                HAL_RCC_NMI_IRQHandler
-                0x08002560                HAL_RCC_CSSCallback
- .text          0x0800256c      0x154 ..\obj\system_stm32f4xx.o
-                0x0800256c                SystemInit
-                0x080025c8                SystemCoreClockUpdate
- .text          0x080026c0       0x9c ..\obj\main.o
-                0x080026c0                main
- .text          0x0800275c      0x2b4 ..\obj\configurePort.o
-                0x0800275c                configureClock
-                0x08002788                configureTargetResetPin
-                0x080027b4                SWDIO_OutputMode
-                0x080027e0                SWDIO_InputMode
-                0x0800280c                configure_IOPorts
-                0x08002888                configureLED
-                0x0800291c                initButton
-                0x08002964                Button_GetState
-                0x0800297c                configureUartPorts
- .text          0x08002a10      0x544 ..\obj\stm32f4xx_hal_cortex.o
-                0x08002da4                HAL_NVIC_SetPriorityGrouping
-                0x08002db8                HAL_NVIC_SetPriority
-                0x08002df0                HAL_NVIC_EnableIRQ
-                0x08002e0c                HAL_NVIC_DisableIRQ
-                0x08002e28                HAL_NVIC_SystemReset
-                0x08002e34                HAL_SYSTICK_Config
-                0x08002e4c                HAL_NVIC_GetPriorityGrouping
-                0x08002e5c                HAL_NVIC_GetPriority
-                0x08002e8c                HAL_NVIC_SetPendingIRQ
-                0x08002ea8                HAL_NVIC_GetPendingIRQ
-                0x08002ec8                HAL_NVIC_ClearPendingIRQ
-                0x08002ee4                HAL_NVIC_GetActive
-                0x08002f04                HAL_SYSTICK_CLKSourceConfig
-                0x08002f3c                HAL_SYSTICK_IRQHandler
-                0x08002f48                HAL_SYSTICK_Callback
- .text          0x08002f54      0x36c ..\obj\stm32f4xx_hal.o
-                0x08002f54                HAL_Init
-                0x08002f90                HAL_DeInit
-                0x08002fe8                HAL_MspInit
-                0x08002ff4                HAL_MspDeInit
-                0x08003000                HAL_InitTick
-                0x08003038                HAL_IncTick
-                0x08003054                HAL_GetTick
-                0x0800306c                HAL_Delay
-                0x08003098                HAL_SuspendTick
-                0x080030b4                HAL_ResumeTick
-                0x080030d0                HAL_GetHalVersion
-                0x080030e4                HAL_GetREVID
-                0x080030fc                HAL_GetDEVID
-                0x08003118                HAL_DBGMCU_EnableDBGSleepMode
-                0x08003134                HAL_DBGMCU_DisableDBGSleepMode
-                0x08003150                HAL_DBGMCU_EnableDBGStopMode
-                0x0800316c                HAL_DBGMCU_DisableDBGStopMode
-                0x08003188                HAL_DBGMCU_EnableDBGStandbyMode
-                0x080031a4                HAL_DBGMCU_DisableDBGStandbyMode
-                0x080031c0                HAL_EnableCompensationCell
-                0x08003200                HAL_DisableCompensationCell
-                0x08003240                HAL_EnableMemorySwappingBank
-                0x08003280                HAL_DisableMemorySwappingBank
- .text          0x080032c0       0x64 ..\obj\stm32f4xx_it.o
-                0x080032c0                NMI_Handler
-                0x080032cc                HardFault_Handler
-                0x080032d4                MemManage_Handler
-                0x080032dc                BusFault_Handler
-                0x080032e4                UsageFault_Handler
-                0x080032ec                SVC_Handler
-                0x08003300                DebugMon_Handler
-                0x0800330c                PendSV_Handler
-                0x08003318                SysTick_Handler
- .text          0x08003324      0x1b4 ..\obj\SwdStub.o
-                0x08003324                stubInit
-                0x08003358                swdStub
-                0x08003388                stubCopy
-                0x080033bc                stubErase
-                0x080033e8                stubMassErase
-                0x08003410                svcServiceHandler
-                0x0800349c                svcServiceCall
-                0x080034ac                IsSvcActive
- .text          0x080034d8      0x440 ..\obj\Flash.o
-                0x080034d8                flashMassErase
-                0x08003528                flashErase
-                0x080035a8                flashWriteProgram
-                0x080035e4                flashWrite
-                0x08003630                flashGetSector
-                0x080038a0                flashErrorHandler
-                0x080038b8                flashCopyFromSramToFlash
- .text          0x08003918      0x5ec ..\obj\stm32f4xx_hal_flash.o
-                0x08003918                HAL_FLASH_Program
-                0x080039c0                HAL_FLASH_Program_IT
-                0x08003a60                HAL_FLASH_IRQHandler
-                0x08003bcc                HAL_FLASH_EndOfOperationCallback
-                0x08003be0                HAL_FLASH_OperationErrorCallback
-                0x08003bf4                HAL_FLASH_Unlock
-                0x08003c28                HAL_FLASH_Lock
-                0x08003c48                HAL_FLASH_OB_Unlock
-                0x08003c80                HAL_FLASH_OB_Lock
-                0x08003ca0                HAL_FLASH_OB_Launch
-                0x08003cc8                HAL_FLASH_GetError
-                0x08003ce0                FLASH_WaitForLastOperation
+ .text          0x200001ac       0x5c c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
+ .text          0x20000208       0x3c ..\obj\memoryRW.o
+                0x20000208                readMemoryData
+                0x20000228                writeMemoryData
+ .text          0x20000244       0xb0 ..\obj\SystemConfigure.o
+                0x20000244                SystemClock_Config
+                0x200002e0                FlashSystemConfig
+ .text          0x200002f4      0x9a4 ..\obj\stm32f4xx_hal_flash_ex.o
+                0x200002f4                HAL_FLASHEx_Erase
+                0x200003e0                HAL_FLASHEx_Erase_IT
+                0x2000048c                HAL_FLASHEx_OBProgram
+                0x2000056c                HAL_FLASHEx_OBGetConfig
+                0x200005b0                HAL_FLASHEx_AdvOBProgram
+                0x20000634                HAL_FLASHEx_AdvOBGetConfig
+                0x20000670                HAL_FLASHEx_OB_SelectPCROP
+                0x200006a4                HAL_FLASHEx_OB_DeSelectPCROP
+                0x200006d4                HAL_FLASHEx_OB_GetBank2WRP
+                0x20000768                FLASH_Erase_Sector
+ .text          0x20000c98      0x4ec ..\obj\stm32f4xx_hal_pwr_ex.o
+                0x20000c98                HAL_PWREx_EnableBkUpReg
+                0x20000d08                HAL_PWREx_DisableBkUpReg
+                0x20000d78                HAL_PWREx_EnableFlashPowerDown
+                0x20000db8                HAL_PWREx_DisableFlashPowerDown
+                0x20000df8                HAL_PWREx_GetVoltageRange
+                0x20000e14                HAL_PWREx_ControlVoltageScaling
+                0x20000efc                HAL_PWREx_EnableOverDrive
+                0x20000fdc                HAL_PWREx_DisableOverDrive
+                0x200010bc                HAL_PWREx_EnterUnderDriveSTOPMode
+ .text          0x20001184      0x674 ..\obj\stm32f4xx_hal_gpio.o
+                0x20001184                HAL_GPIO_Init
+                0x200014cc                HAL_GPIO_DeInit
+                0x200016e0                HAL_GPIO_ReadPin
+                0x20001710                HAL_GPIO_WritePin
+                0x20001740                HAL_GPIO_TogglePin
+                0x20001764                HAL_GPIO_LockPin
+                0x200017b4                HAL_GPIO_EXTI_IRQHandler
+                0x200017e4                HAL_GPIO_EXTI_Callback
+ .text          0x200017f8      0xd74 ..\obj\stm32f4xx_hal_rcc.o
+                0x200017f8                HAL_RCC_DeInit
+                0x20001870                HAL_RCC_OscConfig
+                0x20001d28                HAL_RCC_ClockConfig
+                0x20002044                HAL_RCC_MCOConfig
+                0x20002108                HAL_RCC_EnableCSS
+                0x20002120                HAL_RCC_DisableCSS
+                0x20002138                HAL_RCC_GetSysClockFreq
+                0x20002250                HAL_RCC_GetHCLKFreq
+                0x200022a8                HAL_RCC_GetPCLK1Freq
+                0x200022f4                HAL_RCC_GetPCLK2Freq
+                0x20002340                HAL_RCC_GetOscConfig
+                0x200024dc                HAL_RCC_GetClockConfig
+                0x2000253c                HAL_RCC_NMI_IRQHandler
+                0x20002560                HAL_RCC_CSSCallback
+ .text          0x2000256c      0x154 ..\obj\system_stm32f4xx.o
+                0x2000256c                SystemInit
+                0x200025c8                SystemCoreClockUpdate
+ .text          0x200026c0       0x2c ..\obj\main.o
+                0x200026c0                main
+ .text          0x200026ec      0x2b4 ..\obj\configurePort.o
+                0x200026ec                configureClock
+                0x20002718                configureTargetResetPin
+                0x20002744                SWDIO_OutputMode
+                0x20002770                SWDIO_InputMode
+                0x2000279c                configure_IOPorts
+                0x20002818                configureLED
+                0x200028ac                initButton
+                0x200028f4                Button_GetState
+                0x2000290c                configureUartPorts
+ .text          0x200029a0      0x544 ..\obj\stm32f4xx_hal_cortex.o
+                0x20002d34                HAL_NVIC_SetPriorityGrouping
+                0x20002d48                HAL_NVIC_SetPriority
+                0x20002d80                HAL_NVIC_EnableIRQ
+                0x20002d9c                HAL_NVIC_DisableIRQ
+                0x20002db8                HAL_NVIC_SystemReset
+                0x20002dc4                HAL_SYSTICK_Config
+                0x20002ddc                HAL_NVIC_GetPriorityGrouping
+                0x20002dec                HAL_NVIC_GetPriority
+                0x20002e1c                HAL_NVIC_SetPendingIRQ
+                0x20002e38                HAL_NVIC_GetPendingIRQ
+                0x20002e58                HAL_NVIC_ClearPendingIRQ
+                0x20002e74                HAL_NVIC_GetActive
+                0x20002e94                HAL_SYSTICK_CLKSourceConfig
+                0x20002ecc                HAL_SYSTICK_IRQHandler
+                0x20002ed8                HAL_SYSTICK_Callback
+ .text          0x20002ee4      0x36c ..\obj\stm32f4xx_hal.o
+                0x20002ee4                HAL_Init
+                0x20002f20                HAL_DeInit
+                0x20002f78                HAL_MspInit
+                0x20002f84                HAL_MspDeInit
+                0x20002f90                HAL_InitTick
+                0x20002fc8                HAL_IncTick
+                0x20002fe4                HAL_GetTick
+                0x20002ffc                HAL_Delay
+                0x20003028                HAL_SuspendTick
+                0x20003044                HAL_ResumeTick
+                0x20003060                HAL_GetHalVersion
+                0x20003074                HAL_GetREVID
+                0x2000308c                HAL_GetDEVID
+                0x200030a8                HAL_DBGMCU_EnableDBGSleepMode
+                0x200030c4                HAL_DBGMCU_DisableDBGSleepMode
+                0x200030e0                HAL_DBGMCU_EnableDBGStopMode
+                0x200030fc                HAL_DBGMCU_DisableDBGStopMode
+                0x20003118                HAL_DBGMCU_EnableDBGStandbyMode
+                0x20003134                HAL_DBGMCU_DisableDBGStandbyMode
+                0x20003150                HAL_EnableCompensationCell
+                0x20003190                HAL_DisableCompensationCell
+                0x200031d0                HAL_EnableMemorySwappingBank
+                0x20003210                HAL_DisableMemorySwappingBank
+ .text          0x20003250       0x64 ..\obj\stm32f4xx_it.o
+                0x20003250                NMI_Handler
+                0x2000325c                HardFault_Handler
+                0x20003264                MemManage_Handler
+                0x2000326c                BusFault_Handler
+                0x20003274                UsageFault_Handler
+                0x2000327c                SVC_Handler
+                0x20003290                DebugMon_Handler
+                0x2000329c                PendSV_Handler
+                0x200032a8                SysTick_Handler
+ .text          0x200032b4      0x1b4 ..\obj\SwdStub.o
+                0x200032b4                stubInit
+                0x200032e8                swdStub
+                0x20003318                stubCopy
+                0x2000334c                stubErase
+                0x20003378                stubMassErase
+                0x200033a0                svcServiceHandler
+                0x2000342c                svcServiceCall
+                0x2000343c                IsSvcActive
+ .text          0x20003468      0x430 ..\obj\Flash.o
+                0x20003468                flashMassErase
+                0x200034cc                flashErase
+                0x20003560                flashWriteProgram
+                0x200035b0                flashGetSector
+                0x20003820                flashErrorHandler
+                0x20003838                flashCopyFromSramToFlash
+ .text          0x20003898      0x5ec ..\obj\stm32f4xx_hal_flash.o
+                0x20003898                HAL_FLASH_Program
+                0x20003940                HAL_FLASH_Program_IT
+                0x200039e0                HAL_FLASH_IRQHandler
+                0x20003b4c                HAL_FLASH_EndOfOperationCallback
+                0x20003b60                HAL_FLASH_OperationErrorCallback
+                0x20003b74                HAL_FLASH_Unlock
+                0x20003ba8                HAL_FLASH_Lock
+                0x20003bc8                HAL_FLASH_OB_Unlock
+                0x20003c00                HAL_FLASH_OB_Lock
+                0x20003c20                HAL_FLASH_OB_Launch
+                0x20003c48                HAL_FLASH_GetError
+                0x20003c60                FLASH_WaitForLastOperation
  *(.text*)
  .text.startup.register_fini
-                0x08003f04       0x14 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-__call_atexit.o)
- .text.atexit   0x08003f18        0xc c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-atexit.o)
-                0x08003f18                atexit
+                0x20003e84       0x14 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-__call_atexit.o)
+ .text.atexit   0x20003e98        0xc c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-atexit.o)
+                0x20003e98                atexit
  .text.__libc_fini_array
-                0x08003f24       0x2c c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-fini.o)
-                0x08003f24                __libc_fini_array
+                0x20003ea4       0x2c c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-fini.o)
+                0x20003ea4                __libc_fini_array
  .text.__register_exitproc
-                0x08003f50       0xa4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-__atexit.o)
-                0x08003f50                __register_exitproc
+                0x20003ed0       0xa4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-__atexit.o)
+                0x20003ed0                __register_exitproc
  .text.Reset_Handler
-                0x08003ff4       0x4c ..\obj\startup_stm32f429xx.o
-                0x08003ff4                Reset_Handler
+                0x20003f74       0x4c ..\obj\startup_stm32f429xx.o
+                0x20003f74                Reset_Handler
  .text.Default_Handler
-                0x08004040        0x2 ..\obj\startup_stm32f429xx.o
-                0x08004040                RTC_Alarm_IRQHandler
-                0x08004040                HASH_RNG_IRQHandler
-                0x08004040                EXTI2_IRQHandler
-                0x08004040                TIM8_CC_IRQHandler
-                0x08004040                UART8_IRQHandler
-                0x08004040                SPI4_IRQHandler
-                0x08004040                TIM1_CC_IRQHandler
-                0x08004040                DMA2_Stream5_IRQHandler
-                0x08004040                DMA1_Stream5_IRQHandler
-                0x08004040                PVD_IRQHandler
-                0x08004040                SDIO_IRQHandler
-                0x08004040                TAMP_STAMP_IRQHandler
-                0x08004040                CAN2_RX1_IRQHandler
-                0x08004040                EXTI3_IRQHandler
-                0x08004040                TIM8_TRG_COM_TIM14_IRQHandler
-                0x08004040                TIM1_UP_TIM10_IRQHandler
-                0x08004040                TIM8_UP_TIM13_IRQHandler
-                0x08004040                I2C3_ER_IRQHandler
-                0x08004040                EXTI0_IRQHandler
-                0x08004040                I2C2_EV_IRQHandler
-                0x08004040                DMA1_Stream2_IRQHandler
-                0x08004040                CAN1_RX0_IRQHandler
-                0x08004040                FPU_IRQHandler
-                0x08004040                OTG_HS_WKUP_IRQHandler
-                0x08004040                LTDC_ER_IRQHandler
-                0x08004040                CAN2_SCE_IRQHandler
-                0x08004040                DMA2_Stream2_IRQHandler
-                0x08004040                SPI1_IRQHandler
-                0x08004040                TIM6_DAC_IRQHandler
-                0x08004040                TIM1_BRK_TIM9_IRQHandler
-                0x08004040                DCMI_IRQHandler
-                0x08004040                CAN2_RX0_IRQHandler
-                0x08004040                DMA2_Stream3_IRQHandler
-                0x08004040                USART6_IRQHandler
-                0x08004040                USART3_IRQHandler
-                0x08004040                CAN1_RX1_IRQHandler
-                0x08004040                UART5_IRQHandler
-                0x08004040                DMA2_Stream0_IRQHandler
-                0x08004040                TIM4_IRQHandler
-                0x08004040                I2C1_EV_IRQHandler
-                0x08004040                DMA1_Stream6_IRQHandler
-                0x08004040                DMA1_Stream1_IRQHandler
-                0x08004040                UART4_IRQHandler
-                0x08004040                TIM3_IRQHandler
-                0x08004040                RCC_IRQHandler
-                0x08004040                TIM8_BRK_TIM12_IRQHandler
-                0x08004040                Default_Handler
-                0x08004040                EXTI15_10_IRQHandler
-                0x08004040                ADC_IRQHandler
-                0x08004040                DMA1_Stream7_IRQHandler
-                0x08004040                SPI5_IRQHandler
-                0x08004040                TIM7_IRQHandler
-                0x08004040                CAN2_TX_IRQHandler
-                0x08004040                TIM5_IRQHandler
-                0x08004040                DMA2_Stream7_IRQHandler
-                0x08004040                I2C3_EV_IRQHandler
-                0x08004040                EXTI9_5_IRQHandler
-                0x08004040                RTC_WKUP_IRQHandler
-                0x08004040                LTDC_IRQHandler
-                0x08004040                ETH_WKUP_IRQHandler
-                0x08004040                SPI2_IRQHandler
-                0x08004040                OTG_HS_EP1_IN_IRQHandler
-                0x08004040                DMA1_Stream0_IRQHandler
-                0x08004040                CAN1_TX_IRQHandler
-                0x08004040                EXTI4_IRQHandler
-                0x08004040                ETH_IRQHandler
-                0x08004040                OTG_HS_EP1_OUT_IRQHandler
-                0x08004040                WWDG_IRQHandler
-                0x08004040                SPI6_IRQHandler
-                0x08004040                TIM2_IRQHandler
-                0x08004040                OTG_FS_WKUP_IRQHandler
-                0x08004040                TIM1_TRG_COM_TIM11_IRQHandler
-                0x08004040                OTG_HS_IRQHandler
-                0x08004040                DMA2D_IRQHandler
-                0x08004040                EXTI1_IRQHandler
-                0x08004040                UART7_IRQHandler
-                0x08004040                USART2_IRQHandler
-                0x08004040                I2C2_ER_IRQHandler
-                0x08004040                DMA2_Stream1_IRQHandler
-                0x08004040                CAN1_SCE_IRQHandler
-                0x08004040                FLASH_IRQHandler
-                0x08004040                DMA2_Stream4_IRQHandler
-                0x08004040                USART1_IRQHandler
-                0x08004040                OTG_FS_IRQHandler
-                0x08004040                SPI3_IRQHandler
-                0x08004040                DMA1_Stream4_IRQHandler
-                0x08004040                I2C1_ER_IRQHandler
-                0x08004040                FMC_IRQHandler
-                0x08004040                DMA2_Stream6_IRQHandler
-                0x08004040                SAI1_IRQHandler
-                0x08004040                DMA1_Stream3_IRQHandler
+                0x20003fc0        0x2 ..\obj\startup_stm32f429xx.o
+                0x20003fc0                RTC_Alarm_IRQHandler
+                0x20003fc0                HASH_RNG_IRQHandler
+                0x20003fc0                EXTI2_IRQHandler
+                0x20003fc0                TIM8_CC_IRQHandler
+                0x20003fc0                UART8_IRQHandler
+                0x20003fc0                SPI4_IRQHandler
+                0x20003fc0                TIM1_CC_IRQHandler
+                0x20003fc0                DMA2_Stream5_IRQHandler
+                0x20003fc0                DMA1_Stream5_IRQHandler
+                0x20003fc0                PVD_IRQHandler
+                0x20003fc0                SDIO_IRQHandler
+                0x20003fc0                TAMP_STAMP_IRQHandler
+                0x20003fc0                CAN2_RX1_IRQHandler
+                0x20003fc0                EXTI3_IRQHandler
+                0x20003fc0                TIM8_TRG_COM_TIM14_IRQHandler
+                0x20003fc0                TIM1_UP_TIM10_IRQHandler
+                0x20003fc0                TIM8_UP_TIM13_IRQHandler
+                0x20003fc0                I2C3_ER_IRQHandler
+                0x20003fc0                EXTI0_IRQHandler
+                0x20003fc0                I2C2_EV_IRQHandler
+                0x20003fc0                DMA1_Stream2_IRQHandler
+                0x20003fc0                CAN1_RX0_IRQHandler
+                0x20003fc0                FPU_IRQHandler
+                0x20003fc0                OTG_HS_WKUP_IRQHandler
+                0x20003fc0                LTDC_ER_IRQHandler
+                0x20003fc0                CAN2_SCE_IRQHandler
+                0x20003fc0                DMA2_Stream2_IRQHandler
+                0x20003fc0                SPI1_IRQHandler
+                0x20003fc0                TIM6_DAC_IRQHandler
+                0x20003fc0                TIM1_BRK_TIM9_IRQHandler
+                0x20003fc0                DCMI_IRQHandler
+                0x20003fc0                CAN2_RX0_IRQHandler
+                0x20003fc0                DMA2_Stream3_IRQHandler
+                0x20003fc0                USART6_IRQHandler
+                0x20003fc0                USART3_IRQHandler
+                0x20003fc0                CAN1_RX1_IRQHandler
+                0x20003fc0                UART5_IRQHandler
+                0x20003fc0                DMA2_Stream0_IRQHandler
+                0x20003fc0                TIM4_IRQHandler
+                0x20003fc0                I2C1_EV_IRQHandler
+                0x20003fc0                DMA1_Stream6_IRQHandler
+                0x20003fc0                DMA1_Stream1_IRQHandler
+                0x20003fc0                UART4_IRQHandler
+                0x20003fc0                TIM3_IRQHandler
+                0x20003fc0                RCC_IRQHandler
+                0x20003fc0                TIM8_BRK_TIM12_IRQHandler
+                0x20003fc0                Default_Handler
+                0x20003fc0                EXTI15_10_IRQHandler
+                0x20003fc0                ADC_IRQHandler
+                0x20003fc0                DMA1_Stream7_IRQHandler
+                0x20003fc0                SPI5_IRQHandler
+                0x20003fc0                TIM7_IRQHandler
+                0x20003fc0                CAN2_TX_IRQHandler
+                0x20003fc0                TIM5_IRQHandler
+                0x20003fc0                DMA2_Stream7_IRQHandler
+                0x20003fc0                I2C3_EV_IRQHandler
+                0x20003fc0                EXTI9_5_IRQHandler
+                0x20003fc0                RTC_WKUP_IRQHandler
+                0x20003fc0                LTDC_IRQHandler
+                0x20003fc0                ETH_WKUP_IRQHandler
+                0x20003fc0                SPI2_IRQHandler
+                0x20003fc0                OTG_HS_EP1_IN_IRQHandler
+                0x20003fc0                DMA1_Stream0_IRQHandler
+                0x20003fc0                CAN1_TX_IRQHandler
+                0x20003fc0                EXTI4_IRQHandler
+                0x20003fc0                ETH_IRQHandler
+                0x20003fc0                OTG_HS_EP1_OUT_IRQHandler
+                0x20003fc0                WWDG_IRQHandler
+                0x20003fc0                SPI6_IRQHandler
+                0x20003fc0                TIM2_IRQHandler
+                0x20003fc0                OTG_FS_WKUP_IRQHandler
+                0x20003fc0                TIM1_TRG_COM_TIM11_IRQHandler
+                0x20003fc0                OTG_HS_IRQHandler
+                0x20003fc0                DMA2D_IRQHandler
+                0x20003fc0                EXTI1_IRQHandler
+                0x20003fc0                UART7_IRQHandler
+                0x20003fc0                USART2_IRQHandler
+                0x20003fc0                I2C2_ER_IRQHandler
+                0x20003fc0                DMA2_Stream1_IRQHandler
+                0x20003fc0                CAN1_SCE_IRQHandler
+                0x20003fc0                FLASH_IRQHandler
+                0x20003fc0                DMA2_Stream4_IRQHandler
+                0x20003fc0                USART1_IRQHandler
+                0x20003fc0                OTG_FS_IRQHandler
+                0x20003fc0                SPI3_IRQHandler
+                0x20003fc0                DMA1_Stream4_IRQHandler
+                0x20003fc0                I2C1_ER_IRQHandler
+                0x20003fc0                FMC_IRQHandler
+                0x20003fc0                DMA2_Stream6_IRQHandler
+                0x20003fc0                SAI1_IRQHandler
+                0x20003fc0                DMA1_Stream3_IRQHandler
  *(.glue_7)
  .glue_7        0x00000000        0x0 linker stubs
  *(.glue_7t)
  .glue_7t       0x00000000        0x0 linker stubs
  *(.eh_frame)
- *fill*         0x08004042        0x2 
- .eh_frame      0x08004044        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
+ *fill*         0x20003fc2        0x2 
+ .eh_frame      0x20003fc4        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
  *(.init)
- .init          0x08004044        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crti.o
-                0x08004044                _init
- .init          0x08004048        0x8 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtn.o
+ .init          0x20003fc4        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crti.o
+                0x20003fc4                _init
+ .init          0x20003fc8        0x8 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtn.o
  *(.fini)
- .fini          0x08004050        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crti.o
-                0x08004050                _fini
- .fini          0x08004054        0x8 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtn.o
-                0x0800405c                . = ALIGN (0x4)
-                0x0800405c                _etext = .
+ .fini          0x20003fd0        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crti.o
+                0x20003fd0                _fini
+ .fini          0x20003fd4        0x8 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtn.o
+                0x20003fdc                . = ALIGN (0x4)
+                0x20003fdc                _etext = .
 
-.vfp11_veneer   0x0800405c        0x0
+.vfp11_veneer   0x20003fdc        0x0
  .vfp11_veneer  0x00000000        0x0 linker stubs
 
-.v4_bx          0x0800405c        0x0
+.v4_bx          0x20003fdc        0x0
  .v4_bx         0x00000000        0x0 linker stubs
 
-.iplt           0x0800405c        0x0
+.iplt           0x20003fdc        0x0
  .iplt          0x00000000        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
 
-.rodata         0x0800405c       0x18
-                0x0800405c                . = ALIGN (0x4)
+.rodata         0x20003fdc       0x18
+                0x20003fdc                . = ALIGN (0x4)
  *(.rodata)
- .rodata        0x0800405c       0x10 ..\obj\stm32f4xx_hal_rcc.o
-                0x0800405c                APBAHBPrescTable
+ .rodata        0x20003fdc       0x10 ..\obj\stm32f4xx_hal_rcc.o
+                0x20003fdc                APBAHBPrescTable
  *(.rodata*)
  .rodata.str1.4
-                0x0800406c        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x20003fec        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
  .rodata._global_impure_ptr
-                0x08004070        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
-                0x08004070                _global_impure_ptr
-                0x08004074                . = ALIGN (0x4)
+                0x20003ff0        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x20003ff0                _global_impure_ptr
+                0x20003ff4                . = ALIGN (0x4)
 
-.rel.dyn        0x08004074        0x0
+.rel.dyn        0x20003ff4        0x0
  .rel.iplt      0x00000000        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
 
 .ARM.extab
  *(.ARM.extab* .gnu.linkonce.armextab.*)
 
-.ARM            0x08004074        0x0
-                0x08004074                __exidx_start = .
+.ARM            0x20003ff4        0x0
+                0x20003ff4                __exidx_start = .
  *(.ARM.exidx*)
-                0x08004074                __exidx_end = .
+                0x20003ff4                __exidx_end = .
 
-.preinit_array  0x08004074        0x0
-                0x08004074                PROVIDE (__preinit_array_start, .)
+.preinit_array  0x20003ff4        0x0
+                0x20003ff4                PROVIDE (__preinit_array_start, .)
  *(.preinit_array*)
-                0x08004074                PROVIDE (__preinit_array_end, .)
+                0x20003ff4                PROVIDE (__preinit_array_end, .)
 
-.init_array     0x08004074        0x8
-                0x08004074                PROVIDE (__init_array_start, .)
+.init_array     0x20003ff4        0x8
+                0x20003ff4                PROVIDE (__init_array_start, .)
  *(SORT(.init_array.*))
  .init_array.00000
-                0x08004074        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-__call_atexit.o)
+                0x20003ff4        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-__call_atexit.o)
  *(.init_array*)
- .init_array    0x08004078        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
-                0x0800407c                PROVIDE (__init_array_end, .)
+ .init_array    0x20003ff8        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
+                0x20003ffc                PROVIDE (__init_array_end, .)
 
-.fini_array     0x0800407c        0x4
-                0x0800407c                PROVIDE (__fini_array_start, .)
+.fini_array     0x20003ffc        0x4
+                0x20003ffc                PROVIDE (__fini_array_start, .)
  *(SORT(.fini_array.*))
  *(.fini_array*)
- .fini_array    0x0800407c        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
-                0x08004080                PROVIDE (__fini_array_end, .)
-                0x08004080                _sidata = LOADADDR (.data)
+ .fini_array    0x20003ffc        0x4 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
+                0x20004000                PROVIDE (__fini_array_end, .)
+                0x20004000                _sidata = LOADADDR (.data)
 
-.data           0x20000000      0x440 load address 0x08004080
-                0x20000000                . = ALIGN (0x4)
-                0x20000000                _sdata = .
+.data           0x20004000      0x440
+                0x20004000                . = ALIGN (0x4)
+                0x20004000                _sdata = .
  *(.data)
- .data          0x20000000       0x14 ..\obj\system_stm32f4xx.o
-                0x20000000                SystemCoreClock
-                0x20000004                AHBPrescTable
+ .data          0x20004000       0x14 ..\obj\system_stm32f4xx.o
+                0x20004000                SystemCoreClock
+                0x20004004                AHBPrescTable
  *(.data*)
- *fill*         0x20000014        0x4 
+ *fill*         0x20004014        0x4 
  .data.impure_data
-                0x20000018      0x428 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
-                0x20000440                . = ALIGN (0x4)
-                0x20000440                _edata = .
-                0x080044c0                _siccmram = LOADADDR (.ccmram)
+                0x20004018      0x428 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/../../../../arm-none-eabi/lib/armv7e-m\libc.a(lib_a-impure.o)
+                0x20004440                . = ALIGN (0x4)
+                0x20004440                _edata = .
+                0x10000000                _siccmram = LOADADDR (.ccmram)
 
-.jcr            0x20000440        0x0 load address 0x080044c0
- .jcr           0x20000440        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
+.jcr            0x20004440        0x0
+ .jcr           0x20004440        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
 
-.igot.plt       0x20000440        0x0 load address 0x080044c0
+.igot.plt       0x20004440        0x0
  .igot.plt      0x00000000        0x0 c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
 
-.ccmram         0x10000000        0x0 load address 0x080044c0
+.ccmram         0x10000000        0x0
                 0x10000000                . = ALIGN (0x4)
                 0x10000000                _sccmram = .
  *(.ccmram)
@@ -568,30 +567,30 @@ LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm
                 0x10000000                _eccmram = .
                 0x10000000                . = ALIGN (0x4)
 
-.bss            0x20000440       0x5c
-                0x20000440                _sbss = .
-                0x20000440                __bss_start__ = _sbss
+.bss            0x20004440       0x5c
+                0x20004440                _sbss = .
+                0x20004440                __bss_start__ = _sbss
  *(.bss)
- .bss           0x20000440       0x1c c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
- .bss           0x2000045c        0x4 ..\obj\stm32f4xx_hal.o
- .bss           0x20000460       0x1c ..\obj\Flash.o
+ .bss           0x20004440       0x1c c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtbegin.o
+ .bss           0x2000445c        0x4 ..\obj\stm32f4xx_hal.o
+ .bss           0x20004460       0x1c ..\obj\Flash.o
  *(.bss*)
  *(COMMON)
- COMMON         0x2000047c       0x20 ..\obj\stm32f4xx_hal_flash.o
-                0x2000047c                pFlash
-                0x2000049c                . = ALIGN (0x4)
-                0x2000049c                _ebss = .
-                0x2000049c                __bss_end__ = _ebss
+ COMMON         0x2000447c       0x20 ..\obj\stm32f4xx_hal_flash.o
+                0x2000447c                pFlash
+                0x2000449c                . = ALIGN (0x4)
+                0x2000449c                _ebss = .
+                0x2000449c                __bss_end__ = _ebss
 
 ._user_heap_stack
-                0x2000049c      0x400
-                0x2000049c                . = ALIGN (0x4)
-                0x2000049c                PROVIDE (end, .)
-                0x2000049c                PROVIDE (_end, .)
-                0x2000049c                . = (. + _Min_Heap_Size)
-                0x2000089c                . = (. + _Min_Stack_Size)
- *fill*         0x2000049c      0x400 
-                0x2000089c                . = ALIGN (0x4)
+                0x2000449c      0x400
+                0x2000449c                . = ALIGN (0x4)
+                0x2000449c                PROVIDE (end, .)
+                0x2000449c                PROVIDE (_end, .)
+                0x2000449c                . = (. + _Min_Heap_Size)
+                0x2000489c                . = (. + _Min_Stack_Size)
+ *fill*         0x2000449c      0x400 
+                0x2000489c                . = ALIGN (0x4)
 
 .memory_b1_text
  *(.mb1text)
@@ -674,7 +673,7 @@ LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm
 LOAD c:/program files (x86)/gnu tools arm embedded/4.9 2015q1/bin/../lib/gcc/arm-none-eabi/4.9.3/armv7e-m/crtn.o
 OUTPUT(FlashProgrammer.elf elf32-littlearm)
 
-.debug_info     0x00000000     0x6091
+.debug_info     0x00000000     0x60c3
  .debug_info    0x00000000       0xe7 ..\obj\memoryRW.o
  .debug_info    0x000000e7      0x466 ..\obj\SystemConfigure.o
  .debug_info    0x0000054d      0x936 ..\obj\stm32f4xx_hal_flash_ex.o
@@ -682,17 +681,17 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
  .debug_info    0x00001876      0x712 ..\obj\stm32f4xx_hal_gpio.o
  .debug_info    0x00001f88      0xe27 ..\obj\stm32f4xx_hal_rcc.o
  .debug_info    0x00002daf      0x4b4 ..\obj\system_stm32f4xx.o
- .debug_info    0x00003263      0x315 ..\obj\main.o
- .debug_info    0x00003578      0x5f4 ..\obj\configurePort.o
- .debug_info    0x00003b6c      0xbac ..\obj\stm32f4xx_hal_cortex.o
- .debug_info    0x00004718      0xa1c ..\obj\stm32f4xx_hal.o
- .debug_info    0x00005134       0xe5 ..\obj\startup_stm32f429xx.o
- .debug_info    0x00005219      0x13a ..\obj\stm32f4xx_it.o
- .debug_info    0x00005353      0x3c3 ..\obj\SwdStub.o
- .debug_info    0x00005716      0x439 ..\obj\Flash.o
- .debug_info    0x00005b4f      0x542 ..\obj\stm32f4xx_hal_flash.o
+ .debug_info    0x00003263      0x30c ..\obj\main.o
+ .debug_info    0x0000356f      0x5f4 ..\obj\configurePort.o
+ .debug_info    0x00003b63      0xbac ..\obj\stm32f4xx_hal_cortex.o
+ .debug_info    0x0000470f      0xa1c ..\obj\stm32f4xx_hal.o
+ .debug_info    0x0000512b       0xe5 ..\obj\startup_stm32f429xx.o
+ .debug_info    0x00005210      0x13a ..\obj\stm32f4xx_it.o
+ .debug_info    0x0000534a      0x3db ..\obj\SwdStub.o
+ .debug_info    0x00005725      0x45c ..\obj\Flash.o
+ .debug_info    0x00005b81      0x542 ..\obj\stm32f4xx_hal_flash.o
 
-.debug_abbrev   0x00000000     0x175e
+.debug_abbrev   0x00000000     0x173f
  .debug_abbrev  0x00000000       0x8e ..\obj\memoryRW.o
  .debug_abbrev  0x0000008e      0x117 ..\obj\SystemConfigure.o
  .debug_abbrev  0x000001a5      0x286 ..\obj\stm32f4xx_hal_flash_ex.o
@@ -700,15 +699,15 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
  .debug_abbrev  0x00000634      0x1aa ..\obj\stm32f4xx_hal_gpio.o
  .debug_abbrev  0x000007de      0x25a ..\obj\stm32f4xx_hal_rcc.o
  .debug_abbrev  0x00000a38       0xff ..\obj\system_stm32f4xx.o
- .debug_abbrev  0x00000b37      0x115 ..\obj\main.o
- .debug_abbrev  0x00000c4c      0x117 ..\obj\configurePort.o
- .debug_abbrev  0x00000d63      0x299 ..\obj\stm32f4xx_hal_cortex.o
- .debug_abbrev  0x00000ffc      0x1ff ..\obj\stm32f4xx_hal.o
- .debug_abbrev  0x000011fb       0x12 ..\obj\startup_stm32f429xx.o
- .debug_abbrev  0x0000120d       0x7f ..\obj\stm32f4xx_it.o
- .debug_abbrev  0x0000128c      0x15f ..\obj\SwdStub.o
- .debug_abbrev  0x000013eb      0x196 ..\obj\Flash.o
- .debug_abbrev  0x00001581      0x1dd ..\obj\stm32f4xx_hal_flash.o
+ .debug_abbrev  0x00000b37       0xff ..\obj\main.o
+ .debug_abbrev  0x00000c36      0x117 ..\obj\configurePort.o
+ .debug_abbrev  0x00000d4d      0x299 ..\obj\stm32f4xx_hal_cortex.o
+ .debug_abbrev  0x00000fe6      0x1ff ..\obj\stm32f4xx_hal.o
+ .debug_abbrev  0x000011e5       0x12 ..\obj\startup_stm32f429xx.o
+ .debug_abbrev  0x000011f7       0x7f ..\obj\stm32f4xx_it.o
+ .debug_abbrev  0x00001276      0x15f ..\obj\SwdStub.o
+ .debug_abbrev  0x000013d5      0x18d ..\obj\Flash.o
+ .debug_abbrev  0x00001562      0x1dd ..\obj\stm32f4xx_hal_flash.o
 
 .debug_aranges  0x00000000      0x208
  .debug_aranges
@@ -744,7 +743,7 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
  .debug_aranges
                 0x000001e8       0x20 ..\obj\stm32f4xx_hal_flash.o
 
-.debug_line     0x00000000     0x2676
+.debug_line     0x00000000     0x2668
  .debug_line    0x00000000      0x14d ..\obj\memoryRW.o
  .debug_line    0x0000014d      0x204 ..\obj\SystemConfigure.o
  .debug_line    0x00000351      0x3a1 ..\obj\stm32f4xx_hal_flash_ex.o
@@ -752,17 +751,17 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
  .debug_line    0x000009b9      0x356 ..\obj\stm32f4xx_hal_gpio.o
  .debug_line    0x00000d0f      0x4bb ..\obj\stm32f4xx_hal_rcc.o
  .debug_line    0x000011ca      0x196 ..\obj\system_stm32f4xx.o
- .debug_line    0x00001360      0x1c1 ..\obj\main.o
- .debug_line    0x00001521      0x217 ..\obj\configurePort.o
- .debug_line    0x00001738      0x2b2 ..\obj\stm32f4xx_hal_cortex.o
- .debug_line    0x000019ea      0x25f ..\obj\stm32f4xx_hal.o
- .debug_line    0x00001c49       0xc2 ..\obj\startup_stm32f429xx.o
- .debug_line    0x00001d0b      0x18f ..\obj\stm32f4xx_it.o
- .debug_line    0x00001e9a      0x1f0 ..\obj\SwdStub.o
- .debug_line    0x0000208a      0x33e ..\obj\Flash.o
- .debug_line    0x000023c8      0x2ae ..\obj\stm32f4xx_hal_flash.o
+ .debug_line    0x00001360      0x1b9 ..\obj\main.o
+ .debug_line    0x00001519      0x217 ..\obj\configurePort.o
+ .debug_line    0x00001730      0x2b2 ..\obj\stm32f4xx_hal_cortex.o
+ .debug_line    0x000019e2      0x25f ..\obj\stm32f4xx_hal.o
+ .debug_line    0x00001c41       0xc2 ..\obj\startup_stm32f429xx.o
+ .debug_line    0x00001d03      0x18f ..\obj\stm32f4xx_it.o
+ .debug_line    0x00001e92      0x1f0 ..\obj\SwdStub.o
+ .debug_line    0x00002082      0x338 ..\obj\Flash.o
+ .debug_line    0x000023ba      0x2ae ..\obj\stm32f4xx_hal_flash.o
 
-.debug_str      0x00000000     0x215b
+.debug_str      0x00000000     0x2183
  .debug_str     0x00000000      0x148 ..\obj\memoryRW.o
                                 0x185 (size before relaxing)
  .debug_str     0x00000148      0x33b ..\obj\SystemConfigure.o
@@ -777,21 +776,21 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
                                 0x6d6 (size before relaxing)
  .debug_str     0x00000f61       0x8d ..\obj\system_stm32f4xx.o
                                 0x35a (size before relaxing)
- .debug_str     0x00000fee       0xd0 ..\obj\main.o
-                                0x2e3 (size before relaxing)
- .debug_str     0x000010be       0xf2 ..\obj\configurePort.o
+ .debug_str     0x00000fee       0xb6 ..\obj\main.o
+                                0x2c9 (size before relaxing)
+ .debug_str     0x000010a4       0xf2 ..\obj\configurePort.o
                                 0x432 (size before relaxing)
- .debug_str     0x000011b0      0x834 ..\obj\stm32f4xx_hal_cortex.o
+ .debug_str     0x00001196      0x834 ..\obj\stm32f4xx_hal_cortex.o
                                 0xb58 (size before relaxing)
- .debug_str     0x000019e4      0x26a ..\obj\stm32f4xx_hal.o
+ .debug_str     0x000019ca      0x26a ..\obj\stm32f4xx_hal.o
                                 0xb1d (size before relaxing)
- .debug_str     0x00001c4e       0xee ..\obj\stm32f4xx_it.o
+ .debug_str     0x00001c34       0xee ..\obj\stm32f4xx_it.o
                                 0x264 (size before relaxing)
- .debug_str     0x00001d3c       0xe4 ..\obj\SwdStub.o
-                                0x352 (size before relaxing)
- .debug_str     0x00001e20      0x13c ..\obj\Flash.o
-                                0x3f0 (size before relaxing)
- .debug_str     0x00001f5c      0x1ff ..\obj\stm32f4xx_hal_flash.o
+ .debug_str     0x00001d22      0x113 ..\obj\SwdStub.o
+                                0x367 (size before relaxing)
+ .debug_str     0x00001e35      0x14f ..\obj\Flash.o
+                                0x438 (size before relaxing)
+ .debug_str     0x00001f84      0x1ff ..\obj\stm32f4xx_hal_flash.o
                                 0x536 (size before relaxing)
 
 .comment        0x00000000       0x70
@@ -812,7 +811,7 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
  .comment       0x00000000       0x71 ..\obj\Flash.o
  .comment       0x00000000       0x71 ..\obj\stm32f4xx_hal_flash.o
 
-.debug_frame    0x00000000     0x1738
+.debug_frame    0x00000000     0x1720
  .debug_frame   0x00000000       0x60 ..\obj\memoryRW.o
  .debug_frame   0x00000060       0x50 ..\obj\SystemConfigure.o
  .debug_frame   0x000000b0      0x358 ..\obj\stm32f4xx_hal_flash_ex.o
@@ -826,8 +825,8 @@ OUTPUT(FlashProgrammer.elf elf32-littlearm)
  .debug_frame   0x00000ea8      0x310 ..\obj\stm32f4xx_hal.o
  .debug_frame   0x000011b8       0xfc ..\obj\stm32f4xx_it.o
  .debug_frame   0x000012b4      0x110 ..\obj\SwdStub.o
- .debug_frame   0x000013c4      0x108 ..\obj\Flash.o
- .debug_frame   0x000014cc      0x26c ..\obj\stm32f4xx_hal_flash.o
+ .debug_frame   0x000013c4       0xf0 ..\obj\Flash.o
+ .debug_frame   0x000014b4      0x26c ..\obj\stm32f4xx_hal_flash.o
 
 .debug_ranges   0x00000000       0x20
  .debug_ranges  0x00000000       0x20 ..\obj\startup_stm32f429xx.o

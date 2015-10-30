@@ -35,6 +35,10 @@ void flashMassErase(uint32_t banks)  {
   { 
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
+    
+    STUB->errorCode = HAL_FLASH_GetError();
+    STUB->errorOccur = FLASH_MASSERASE_ERR;
+    
     flashErrorHandler();
   }
   
@@ -77,6 +81,10 @@ void flashErase(uint32_t flashAddress, int size)  {
   { 
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
+    
+    STUB->errorCode = HAL_FLASH_GetError();
+    STUB->errorOccur = FLASH_ERASE_ERR;
+    
     flashErrorHandler();
   }
 
@@ -101,37 +109,12 @@ void flashErase(uint32_t flashAddress, int size)  {
 void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data) {
   if(HAL_FLASH_Program(typeProgram, address, data) != HAL_OK)  {
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
+    
+    STUB->errorCode = HAL_FLASH_GetError();
+    STUB->errorOccur = FLASH_PROGRAM_ERR;
+    
     flashErrorHandler();
   }
-}
-
-/** flashWrite is a function write data is user define address
-  * !* Recommend erase flash memory first before write *!
-  *
-  * input : typeProgram 
-  *            + FLASH_TYPEPROGRAM_BYTE
-  *            + FLASH_TYPEPROGRAM_HALFWORD
-  *            + FLASH_TYPEPROGRAM_WORD
-  *            + FLASH_TYPEPROGRAM_DOUBLEWORD
-  *
-  *         data is a 32-bit data define by user
-  *
-  * output :   NONE
-  */
-void flashWrite(uint32_t *data, uint32_t address, int size) {
-  uint32_t index, startAddress = address, endAddress = address + size;
-  
-  /* Unlock the Flash to enable the flash control register access */ 
-  HAL_FLASH_Unlock();
-  
-  /* Write data into user selected area here */
-  for(index = startAddress; index < endAddress; index += 4) {
-    flashWriteWord(index, *data++);
-  }
-  
-  /* Lock the Flash to disable the flash control register access (recommended
-     to protect the FLASH memory against possible unwanted operation) */
-  HAL_FLASH_Lock();
 }
 
 /** 2 Mbyte dual bank organization can choose between sector 0 - sector 23
