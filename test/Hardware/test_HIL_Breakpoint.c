@@ -23,9 +23,15 @@
 #include "FPBUnit.h"
 #include "FPBUnitEx.h"
 
+int initFlag = 0;
+
 void setUp(void) 
 {
+  if(initFlag == 0) 
+    initFlag = 1;
   initMemoryReadWrite();
+  /* Erase flash space according to size */
+  _flashErase(0x08000000, 2000);
   enableFPBUnit();
 }
 
@@ -34,15 +40,54 @@ void tearDown(void)
   clearBreakpointDebugEvent();
 }
 
+
+void test_loadBreakpointTestProgram()
+{
 /* ---------------- Breakpoint Test Case 2 Bytes -------------------- */
 // 0x080003C0    2117    movs r1,23
 // 0x080003C2    E7FE    b.n	80003c2 
-// 0x080003C4
+// 0x080003C4    BF00    nop
+  
+  _flashWrite(0x080003C0,0x2117,HALFWORD_SIZE);
+  _flashWrite(0x080003C2,0xE7FE,HALFWORD_SIZE);
+  _flashWrite(0x080003C4,0xBF00,HALFWORD_SIZE);
+  
+/* ---------------- Breakpoint Test Case 4 Bytes -------------------- */
+// 0x080003B0    F04F01FF    mov r1,#0xFF
+// 0x080003B4    E7FE        b.n	80003b4
+// 0x080003B6    BF00        nop
 
-void prepare2ByteInstruction()
-{
-  memoryWriteHalfword(0x080003C0,0x2117);
-  memoryWriteHalfword(0x080003C2,0xE7FE);
+  _flashWrite(0x080003B0,0xF04F01FF,WORD_SIZE);
+  _flashWrite(0x080003B4,0xE7FE,HALFWORD_SIZE);
+  _flashWrite(0x080003C4,0xBF00,HALFWORD_SIZE);
+
+  
+  /* ---------------- Breakpoint Test Case 2 Bytes 4 Bytes 4 Bytes -------------------- */
+// 0x080003D0    210D        movs r1,#13
+// 0x080003D2    F04F01FF    mov r1,#0xFF
+// 0x080003D6    F04F02FF    mov r2,#0xFF
+// 0x080003DA    E7FE        b.n	80003da
+// 0x080003DC    BF00        nop
+
+  _flashWrite(0x080003D0,0x210D,HALFWORD_SIZE);
+  _flashWrite(0x080003D2,0xF04F01FF,WORD_SIZE);
+  _flashWrite(0x080003D6,0xF04F02FF,WORD_SIZE);
+  _flashWrite(0x080003DA,0xE7FE,WORD_SIZE);
+  _flashWrite(0x080003DC,0xBF00,HALFWORD_SIZE);
+
+/* ---------------- Breakpoint Test Case 2 Bytes 4 Bytes 2 Bytes -------------------- */
+// 0x080003E0    210D        movs r1,#13
+// 0x080003E2    F04F01FF    mov r1,#0xFF
+// 0x080003E6    2117        movs r1,#23
+// 0x080003E8    E7FE        b.n	80003E8 <breakpoint_TestCase_4bytes+0x4>
+// 0x080003EA    BF00        nop
+
+
+  _flashWrite(0x080003E0,0x210D,HALFWORD_SIZE);
+  _flashWrite(0x080003E2,0xF04F01FF,WORD_SIZE);
+  _flashWrite(0x080003E6,0x2117,WORD_SIZE);
+  _flashWrite(0x080003E8,0xE7FE,HALFWORD_SIZE);
+
 }
 
 
@@ -57,7 +102,6 @@ void test_instructionBreakPointTestCase_2bytes_LowerHalfWord()
 {
   uint32_t PC = 0  ;
  
-  prepare2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
@@ -82,7 +126,6 @@ void test_instructionBreakPointTestCase_2bytes_UpperHalfWord()
 {
   uint32_t PC = 0 ;
 
-  prepare2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP1,0x080003C0,MATCH_UPPERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
@@ -107,7 +150,6 @@ void test_instructionBreakPointTestCase_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  prepare2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C0,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003C0);
@@ -121,17 +163,6 @@ void test_instructionBreakPointTestCase_2bytes_Word()
   TEST_ASSERT_EQUAL(0x080003C0,PC);
 }
 
-/* ---------------- Breakpoint Test Case 4 Bytes -------------------- */
-// 0x080003B0    F04F01FF    mov r1,#0xFF
-// 0x080003B4    E7FE        b.n	80003b4
-// 0x080003B6
-
-
-void prepare4byteInstruction()
-{
-  memoryWriteWord(0x080003B0,0xF04F01FF);
-  memoryWriteHalfword(0x080003B4,0xE7FE);
-}
 
 /**
  * 0x080003B0	   ________    <---set upper halfword breakpoint at 0x080003B0
@@ -146,7 +177,6 @@ void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
   uint32_t PC = 0 , data = 0;
   int fail = 0 ;
     
-  prepare4byteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_UPPERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003B0);
@@ -182,7 +212,6 @@ void test_instructionBreakPointTestCase_4bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  prepare4byteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003B0,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003B0);
@@ -194,22 +223,6 @@ void test_instructionBreakPointTestCase_4bytes_Word()
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
   TEST_ASSERT_EQUAL(0x080003B0,PC);
-}
-
-/* ---------------- Breakpoint Test Case 2 Bytes 4 Bytes 4 Bytes -------------------- */
-// 0x080003D0    210D        movs r1,#13
-// 0x080003D2    F04F01FF    mov r1,#0xFF
-// 0x080003D6    F04F02FF    mov r2,#0xFF
-// 0x080003DA    E7FE        b.n	80003da
-// 0x080003DC
-
-
-void prepare2Byte4Byte4ByteInstruction()
-{
-  memoryWriteHalfword(0x080003D0,0x210D);
-  memoryWriteWord(0x080003D2,0xF04F01FF);
-  memoryWriteWord(0x080003D6,0xF04F02FF);
-  memoryWriteHalfword(0x080003DA,0xE7FE);
 }
 
 
@@ -229,7 +242,6 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
   uint32_t PC = 0 ;
   int fail ;
 
-  prepare2Byte4Byte4ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_LOWERHALFWORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003D0);
@@ -269,7 +281,6 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
 {
   uint32_t PC = 0 ;
   
-  prepare2Byte4Byte4ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003D0);
@@ -281,22 +292,6 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(0x080003D6,PC);
-}
-
-/* ---------------- Breakpoint Test Case 2 Bytes 4 Bytes 2 Bytes -------------------- */
-// 0x080003E0    210D        movs r1,#13
-// 0x080003E2    F04F01FF    mov r1,#0xFF
-// 0x080003E6    2117        movs r1,#23
-// 0x080003E8    E7FE        b.n	80003E8 <breakpoint_TestCase_4bytes+0x4>
-// 0x080003EA
-
-
-void prepare2Byte4Byte2ByteInstruction()
-{
-  memoryWriteHalfword(0x080003E0,0x210D);
-  memoryWriteWord(0x080003E2,0xF04F01FF);
-  memoryWriteHalfword(0x080003E6,0x2117);
-  memoryWriteHalfword(0x080003E8,0xE7FE);
 }
 
 /**
@@ -312,7 +307,6 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
-  prepare2Byte4Byte2ByteInstruction();
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003E4,MATCH_WORD);
 
   writeCoreRegister(CORE_REG_PC,0x080003E0);
