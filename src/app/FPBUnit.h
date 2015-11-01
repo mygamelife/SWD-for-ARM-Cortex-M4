@@ -1,6 +1,7 @@
 #ifndef FPB_Unit_H
 #define FPB_Unit_H
 
+#include "stm32f429xx.h"
 #include "MemoryReadWrite.h"
 #include "FPBUnitEx.h"
 #include "CoreDebug.h"

@@ -34,7 +34,6 @@
    POSSIBILITY OF SUCH DAMAGE.
    ---------------------------------------------------------------------------*/
 
-
 #if defined ( __ICCARM__ )
  #pragma system_include  /* treat file as system include file for MISRA check */
 #endif

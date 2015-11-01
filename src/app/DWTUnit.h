@@ -2,6 +2,7 @@
 #define DWT_Unit_H
 
 #include <stdint.h>
+#include "stm32f429xx.h"
 #include "DWTUnitEx.h"
 #include "Yield.h"
 
