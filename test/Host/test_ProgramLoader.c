@@ -194,6 +194,23 @@ void test_tlvHardReset_should_return_1_after_request_and_received_OK_reply(void)
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
 }
 
+void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void) {
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  TEST_ASSERT_EQUAL(0, tlvVectReset(session));
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  TEST_ASSERT_EQUAL(1, tlvVectReset(session));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+}
+
 void test_tlvReadDataChunk_should_send_request_read_data_in_chunk(void)
 {
   uartInit_Ignore();

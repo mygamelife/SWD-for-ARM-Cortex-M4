@@ -288,6 +288,45 @@ Process_Status tlvHardReset(Tlv_Session *session) {
   return PROCESS_DONE;
 }
 
+/** tlvVectReset is a function vector reset target
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *
+  * Return  : 1 if successfully software reset
+  *           0 if waiting reply from probe
+  */
+Process_Status tlvVectReset(Tlv_Session *session) {
+  Tlv *tlv;
+  
+  /* Start tlv request task */
+  startTask(session->vresetState);
+  
+  /* Send tlv request */
+  tlv = tlvCreatePacket(TLV_VECT_RESET, 0, 0);
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  tlvSend(session, tlv);
+  
+  /* Waiting reply from probe */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    if(isTimeOut(FIVE_SECOND)) {
+      resetTask(session->vresetState);
+      Throw(PROBE_NOT_RESPONDING);
+    }
+    yield(session->vresetState);
+  };
+  
+  resetSystemTime();
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  /* Verify response reply from probe */
+  verifyTlvPacket(response);
+  
+  /* End tlv request task */
+  endTask(session->vresetState);
+  
+  return PROCESS_DONE;
+}
+
 /** tlvReadDataChunk is a function used to read data in chunk
   * by using tlv protocol
   * 
