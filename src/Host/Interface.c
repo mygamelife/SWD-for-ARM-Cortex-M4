@@ -219,7 +219,7 @@ User_Session *userReadMemory(String *userInput) {
     
   userSession.tlvCommand = TLV_READ_MEMORY;
   userSession.address = address->value;
-  userSession.size = size->value * 4;
+  userSession.size = size->value;
   
   return &userSession;
 }
@@ -655,11 +655,20 @@ User_Session *InterpreteCommand(String *userInput) {
   * enter by user
   */
 User_Session *waitUserCommand(void) {
-  Number *num; String *str; 
+  static int display = 0;
+  Number *num; String *str;
+  
+  if(display == 0) {
+    display = 1;
+    printf("> ");
+  } 
   
   if(!kbhit()) return NULL;
   
-  else fgets(InputBuffer, BUFFER_SIZE, stdin);
+  else {
+    display = 0;
+    fgets(InputBuffer, BUFFER_SIZE, stdin);
+  }
   
   str = stringNew(InputBuffer);
   

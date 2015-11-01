@@ -1,7 +1,7 @@
 #include "ProgramWorker.h"
 
 /* temp SRAM address 0x20005000 */
-uint32_t tempAddress = 0x20005000;
+static uint32_t tempAddress = 0x20005000;
 
 /** IsStubBusy is a function to check if stub
   * is busy with the last operation
@@ -390,15 +390,15 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
  *             instructionAddress is the address set to breakpoint previously using bkpt instruction
  *             machineCode contains the original machineCode before it was replaced by the bkpt instruction
  */
-void removeSoftwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress,uint32_t machineCode)
-{
-  Tlv *tlv ;
+//void removeSoftwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress,uint32_t machineCode)
+//{
+  //Tlv *tlv ;
   
-  restoreSoftwareBreakpointOriginalInstruction(instructionAddress,machineCode);
+  //restoreSoftwareBreakpointOriginalInstruction(instructionAddress,machineCode);
   
-  tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session,tlv);
-}
+  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  //tlvSend(session,tlv);
+//}
 
 /** Remove all hardware breakpoint
  *
@@ -441,15 +441,15 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
  *
  * Input     : session contain a element/handler used by tlv protocol
  */
-void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session)
-{
-  Tlv *tlv ;
+//void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session)
+//{
+  //Tlv *tlv ;
   
-  disableAllFlashPatchComparatorSetToRemap();
+  //disableAllFlashPatchComparatorSetToRemap();
   
-  tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session, tlv);
-}
+  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  //tlvSend(session, tlv);
+//}
 
 
 /**
@@ -534,7 +534,7 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
     /* Data start at position 4 */
     chksum += tlvPackIntoBuffer(&tlv->value[4 + i], &readData, 1);
   }
-
+  
   tlv->value[tlv->length - 1] = chksum;
   
   tlvSend(session, tlv);
@@ -555,7 +555,6 @@ void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAdd
   
   /* Write to RAM using swd */
   for(i = 0; i < size; i ++, dataAddress++, destAddress++) {
-    /* Data start at position 4 */
     memoryWriteByte(destAddress, *dataAddress);
   }
   
@@ -579,10 +578,8 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
   SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
   /* Write to RAM using swd */
-  for(i = 0; i < size; i ++, dataAddress++, temp++) {
-    /* Data start at position 4 */
+  for(i = 0; i < size; i ++, dataAddress++, temp++)
     memoryWriteByte(temp, *dataAddress);
-  }
 
   /* Yield if stub is busy */
   while(IsStubBusy() == 0) {
@@ -729,7 +726,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_REMOVE_ALL_SOFTBREAKPOINT  : break ;
     case TLV_REMOVE_ALL_BREAKPOINT      : break ;
     case TLV_STOP_REMAP                 : break;
-    case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
+    //case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
     case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
     case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                  break;
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
@@ -751,7 +748,7 @@ void probeTaskManager(Tlv_Session *session)  {
       Try {
         packet = tlvReceive(session);
         if(verifyTlvPacket(packet)) {
-          session->probeState = PROBE_INTERPRET_PACKET;
+          PROBE_CHANGE_STATE(session, PROBE_INTERPRET_PACKET);
         }
       } Catch(err) {
         tlvErrorReporter(session, err);
@@ -762,10 +759,10 @@ void probeTaskManager(Tlv_Session *session)  {
       Try {
         selectTask(session, packet);
         if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
-          session->probeState = PROBE_RECEIVE_PACKET;
+          PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
       } Catch(err) {
         tlvErrorReporter(session, err);
-        session->probeState = PROBE_RECEIVE_PACKET;
+        PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
       }
     break;
   }

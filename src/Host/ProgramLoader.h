@@ -11,18 +11,16 @@
 #include "Interface.h"
 #include "SystemTime.h"
 
-#if defined(TEST)
-#define FLASH_PROGRAMMER_FILE_PATH            "FlashProgrammerElf/FlashProgrammer.elf"
-#else
-#define FLASH_PROGRAMMER_FILE_PATH            "../../FlashProgrammerElf/FlashProgrammer.elf"
-#endif
-
-extern int programSize;
-
 typedef enum {
   PROCESS_BUSY = 0,
   PROCESS_DONE
 } Process_Status;
+
+#if defined(TEST)
+#define FLASH_PROGRAMMER_FILE_PATH            "build/release/target/FlashProgrammer.elf"
+#else
+#define FLASH_PROGRAMMER_FILE_PATH            "target/FlashProgrammer.elf"
+#endif
 
 /* ##### Host Interpreter Macros ##### */
 #define IS_HOST_EXIT(__SESSION__)                       (((__SESSION__)->hostState == HOST_EXIT) ? 1 : 0  )
@@ -80,6 +78,5 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event);
 
 void selectCommand(Tlv_Session *session, User_Session *userSession);
 void hostInterpreter(Tlv_Session *session);
-int isLastOperationDone(Tlv_Session *session);
 
 #endif // ProgramLoader_H

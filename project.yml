@@ -41,11 +41,11 @@
     - *common_defines
     - TEST=
     - CMOCK_MEM_DYNAMIC=
-    - HOST=
+    # - HOST=
   :test_preprocess:
     - *common_defines
     - TEST=
-    - HOST=
+    # - HOST=
 
 :cmock:
   :mock_prefix: mock_

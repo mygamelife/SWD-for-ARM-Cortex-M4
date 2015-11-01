@@ -60,11 +60,11 @@ config = {
   :compiler     => 'gcc',
   :linker       => 'gcc',
   :include_path => [CEXCEPTION_PATH,
+                    'src/app/Tlv',
                     'src/Host',
                     'src/Host/ElfReader',
-                    'src/Host/StringObject',
-                    'src/app/Tlv'],
-  :user_define  => ['HOST=', 'TEST='],
+                    'src/Host/StringObject'],
+  :user_define  => ['HOST='],
 #  :library_path => 'lib',
 #  :library => ['libusb'],
 #  :linker_script => 'MyLinkerScript.ld',
@@ -100,13 +100,13 @@ namespace :host do
     dep_list.merge!(compile_all(['src/app/Tlv',                 # directory of dependee
                                  'src/Host/ElfReader', 
                                  'src/Host/StringObject',
-                                 'src/Host',],
+                                 'src/Host'],
                                  'build/release/host/c',        # director of .o files
                                   config))                      # config object
     link_all(getDependers(dep_list), 'build/release/Main.exe', config)
     Rake::Task["build/release/Main.exe"].invoke
-#    p Rake.application.tasks
-#    p Rake::Task.tasks
+   # p Rake.application.tasks
+   # p Rake::Task.tasks
   end
 end
 

@@ -13,8 +13,7 @@
 #include "Yield.h"
 
 #define ENABLE_SVC          0x80
-
-extern uint32_t tempAddress;
+#define PROBE_CHANGE_STATE(__SESSION__, __STATE__)      ((__SESSION__)->probeState = __STATE__)
 
 /** swdStub request function
   */

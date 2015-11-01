@@ -1,9 +1,9 @@
 #include "ProgramLoader.h"
 
-int programSize = 0;
+static int programSize = 0;
 static Tlv *response;
 static User_Session *userSession;
-uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
+static uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
 
 /** tlvWriteTargetRegister is a function to write data into target register
   * 
@@ -349,9 +349,10 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   /* End tlv request task */
   endTask(session->rmemState);
 
-  #if !defined (TEST)
+  #ifdef HOST
   displayMemoryMap(response->value, response->length - 1);
   #endif
+  
   return response->value;
 }
 
