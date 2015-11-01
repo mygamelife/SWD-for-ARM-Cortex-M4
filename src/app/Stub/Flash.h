@@ -13,6 +13,11 @@
 
 typedef uint32_t FLASH_ErrorTypeDef;
 
+#define BYTE_SIZE                     1
+#define HALFWORD_SIZE                 2
+#define WORD_SIZE                     4
+
+#define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 #define FLASH_USER_VOLTAGE_RANGE    	FLASH_VOLTAGE_RANGE_3
 
 /* Base address of the Flash sectors Bank 1 */
@@ -48,7 +53,6 @@ uint32_t flashGetSector(uint32_t Address);
 void flashErrorHandler(void);
 void flashMassErase(uint32_t banks);
 void flashErase(uint32_t flashAddress, int size);
-void flashWrite(uint32_t *data, uint32_t address, int size);
 void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size);
 
 void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data);

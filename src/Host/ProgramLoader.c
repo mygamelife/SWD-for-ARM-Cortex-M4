@@ -1,9 +1,9 @@
 #include "ProgramLoader.h"
 
-int programSize = 0;
+static int programSize = 0;
 static Tlv *response;
 static User_Session *userSession;
-uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
+static uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
 
 /** tlvWriteTargetRegister is a function to write data into target register
   * 
@@ -388,171 +388,11 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
   /* End tlv request task */
   endTask(session->rmemState);
 
-  #if !defined (TEST)
+  #ifdef HOST
   displayMemoryMap(response->value, response->length - 1);
   #endif
+  
   return response->value;
-}
-
-uint8_t *tlvReadTargetDataWithType(Tlv_Session *session, uint32_t address, Tlv_Command dataType) {
-  static Tlv_State state = 0;
-  
-  /* Start tlv request task */
-  startTask(state);
-  
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  
-  /* Send tlv request */
-  Tlv *tlv = tlvCreatePacket(dataType, 4, (uint8_t *)&address);
-  
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  tlvSend(session, tlv);
-  
-  /* Waiting reply from probe */
-  while((response = tlvReceive(session)) == NULL) {
-    /* Check is maximum timeout is reached */
-    if(isTimeOut(FIVE_SECOND)) {
-      resetTask(state);
-      Throw(PROBE_NOT_RESPONDING);
-    }
-    yield(state);
-  };
-  
-  resetSystemTime();
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  /* Verify response reply from probe */
-  verifyTlvPacket(response);
-  
-  /* End tlv request task */
-  endTask(state);
-
-  return response->value;
-}
-
-/** tlvWriteDataInWord is a function used to send data in word
-  * by using tlv protocol
-  * 
-  * input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to send
-  *           data(32bit) is data need to be store into the memory
-  *
-  * return  : PROCESS_DONE if success
-  */
-Process_Status tlvWriteDataInWord(Tlv_Session *session, uint32_t address, uint32_t data) {
-  uint32_t buffer[] = {address, data};
-  
-  /* Start tlv request task */
-  startTask(session->wDataInWordState);
-  /* Send tlv request 
-     size = address 4 byte + data 4 byte */
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_WORD, 8, (uint8_t *)buffer);
-  
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  tlvSend(session, tlv);
-  
-  /* Waiting reply from probe */
-  while((response = tlvReceive(session)) == NULL) {
-    /* Check is maximum timeout is reached */
-    if(isTimeOut(FIVE_SECOND)) {
-      resetTask(session->wDataInWordState);
-      Throw(PROBE_NOT_RESPONDING);
-    }
-    yield(session->wDataInWordState);
-  };
-  
-  resetSystemTime();
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  /* Verify response reply from probe */
-  verifyTlvPacket(response);
-  
-  /* End tlv request task */
-  endTask(session->wDataInWordState);
-  
-  return PROCESS_DONE;
-}
-
-/** tlvWriteDataInHalfWord is a function used to send data in halfword
-  * by using tlv protocol
-  * 
-  * input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to send
-  *           data(16bit) is data need to be store into the memory
-  *
-  * return  : PROCESS_DONE if success
-  */
-Process_Status tlvWriteDataInHalfword(Tlv_Session *session, uint32_t address, uint16_t data) {
-  uint32_t buffer[] = {address, data};
-  
-  /* Start tlv request task */
-  startTask(session->wDataInHalfWordState);
-  /* Send tlv request 
-     size = address 4 byte + data 2 byte */
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_HALFWORD, 6, (uint8_t *)buffer);
-  
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  tlvSend(session, tlv);
-  
-  /* Waiting reply from probe */
-  while((response = tlvReceive(session)) == NULL) {
-    /* Check is maximum timeout is reached */
-    if(isTimeOut(FIVE_SECOND)) {
-      resetTask(session->wDataInHalfWordState);
-      Throw(PROBE_NOT_RESPONDING);
-    }
-    yield(session->wDataInHalfWordState);
-  };
-  
-  resetSystemTime();
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  /* Verify response reply from probe */
-  verifyTlvPacket(response);
-  
-  /* End tlv request task */
-  endTask(session->wDataInHalfWordState);
-  
-  return PROCESS_DONE;
-}
-
-/** tlvWriteDataInByte is a function used to send data in byte
-  * by using tlv protocol
-  * 
-  * input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to send
-  *           data(8bit) is data need to be store into the memory
-  *
-  * return  : PROCESS_DONE if success
-  */
-Process_Status tlvWriteDataInByte(Tlv_Session *session, uint32_t address, uint8_t data) {
-  uint32_t buffer[] = {address, data};
-  
-  /* Start tlv request task */
-  startTask(session->wDataInByteState);
-  /* Send tlv request 
-     size = address 4 byte + data 1 byte */
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_BYTE, 5, (uint8_t *)buffer);
-  
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  tlvSend(session, tlv);
-  
-  /* Waiting reply from probe */
-  while((response = tlvReceive(session)) == NULL) {
-    /* Check is maximum timeout is reached */
-    if(isTimeOut(FIVE_SECOND)) {
-      resetTask(session->wDataInByteState);
-      Throw(PROBE_NOT_RESPONDING);
-    }
-    yield(session->wDataInByteState);
-  };
-  
-  resetSystemTime();
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  /* Verify response reply from probe */
-  verifyTlvPacket(response);
-  
-  /* End tlv request task */
-  endTask(session->wDataInByteState);
-  
-  return PROCESS_DONE;  
 }
 
 /** tlvWriteDataChunk is a function used to send data in chunk
@@ -628,7 +468,7 @@ Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress,
   /* End tlv request task */
   endTask(session->wramState);
   
-  return 1;
+  return PROCESS_DONE;
 }
 
 /** !< Internal Function used by Load Program To Memory >!

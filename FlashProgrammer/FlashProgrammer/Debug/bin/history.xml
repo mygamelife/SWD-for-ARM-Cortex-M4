@@ -1,27 +1,25 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <history>
    <processor signature="4.9.3 -mcpu=cortex-m4 -mthumb -g2 -Map=FlashProgrammer.map -O0 --gc-sections -LC:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer -TC:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/toram.ld -g">
-      <target file="FlashProgrammer.elf" lastModified="1507a8de085">
-         <source file="..\obj\LED.o" lastModified="1507a8dcc25"/>
-         <source file="..\obj\memoryRW.o" lastModified="1507a8dc62b"/>
-         <source file="..\obj\SystemConfigure.o" lastModified="1507a8dc528"/>
-         <source file="..\obj\stm32f4xx_hal_flash_ex.o" lastModified="1507a8dc9c1"/>
-         <source file="..\obj\stm32f4xx_hal_pwr_ex.o" lastModified="1507a8dcbc7"/>
-         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="1507a8dcb5a"/>
-         <source file="..\obj\stm32f4xx_hal_flash_ramfunc.o" lastModified="1507a8dc28b"/>
-         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="1507a8dc940"/>
-         <source file="..\obj\system_stm32f4xx.o" lastModified="1507a8dca6f"/>
-         <source file="..\obj\stm32f4xx_hal_rcc_ex.o" lastModified="1507a8dc8cb"/>
-         <source file="..\obj\main.o" lastModified="1507a8dc5ed"/>
-         <source file="..\obj\stm32f4xx_hal_pwr.o" lastModified="1507a8dc783"/>
-         <source file="..\obj\configurePort.o" lastModified="1507a8dcadd"/>
-         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="1507a8dca21"/>
-         <source file="..\obj\stm32f4xx_hal.o" lastModified="1507a8dc85e"/>
-         <source file="..\obj\startup_stm32f429xx.o" lastModified="1507a8dc793"/>
-         <source file="..\obj\stm32f4xx_it.o" lastModified="1507a8dc689"/>
-         <source file="..\obj\swdStub.o" lastModified="1507a8dc589"/>
-         <source file="..\obj\Flash.o" lastModified="1507a8dc800"/>
-         <source file="..\obj\stm32f4xx_hal_flash.o" lastModified="1507a8dc6f7"/>
+      <target file="FlashProgrammer.elf" lastModified="150c309f418">
+         <source file="..\obj\stm32f4xx_hal_rcc_ex.o" lastModified="150c309eeb3"/>
+         <source file="..\obj\memoryRW.o" lastModified="150c309ec4b"/>
+         <source file="..\obj\SystemConfigure.o" lastModified="150c309ebaf"/>
+         <source file="..\obj\main.o" lastModified="150c309ec0d"/>
+         <source file="..\obj\stm32f4xx_hal_pwr.o" lastModified="150c309ed75"/>
+         <source file="..\obj\configurePort.o" lastModified="150c309f0c6"/>
+         <source file="..\obj\stm32f4xx_hal_cortex.o" lastModified="150c309f01a"/>
+         <source file="..\obj\stm32f4xx_hal_flash_ex.o" lastModified="150c309efad"/>
+         <source file="..\obj\stm32f4xx_hal.o" lastModified="150c309ee55"/>
+         <source file="..\obj\stm32f4xx_hal_pwr_ex.o" lastModified="150c309f197"/>
+         <source file="..\obj\startup_stm32f429xx.o" lastModified="150c309ed8a"/>
+         <source file="..\obj\stm32f4xx_it.o" lastModified="150c309ec8a"/>
+         <source file="..\obj\stm32f4xx_hal_gpio.o" lastModified="150c309f133"/>
+         <source file="..\obj\Flash.o" lastModified="150c309ede7"/>
+         <source file="..\obj\stm32f4xx_hal_flash.o" lastModified="150c309ed07"/>
+         <source file="..\obj\SwdStub.o" lastModified="150c309f204"/>
+         <source file="..\obj\stm32f4xx_hal_rcc.o" lastModified="150c309ef30"/>
+         <source file="..\obj\system_stm32f4xx.o" lastModified="150c309f068"/>
       </target>
    </processor>
 </history>

@@ -22,6 +22,40 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
+// void test_tlvLoadToRam_should_load_program_into_target_Ram(void) {
+  // Tlv_Session *session = tlvCreateSession();
+  // CEXCEPTION_T err;
+  // int result = 0;
+  
+  // Try {
+    // do {
+      // tlvService(session);
+      // tlvLoadToRam(session, "test/ElfFiles/ledRam.elf");
+    // } while(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);
+  // } Catch(err) {
+    // displayErrorMessage(err);
+  // }
+  
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  
+  // Try {
+    // do {
+      // tlvService(session);
+      // tlvHardReset(session);
+    // } while(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);
+  // } Catch(err) {
+    // displayErrorMessage(err);
+  // }
+  
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  
+  // closePort(session);
+// }
+
 void test_tlvLoadToFlash_should_load_program_into_target_flash(void) {
   Tlv_Session *session = tlvCreateSession();
   CEXCEPTION_T err;

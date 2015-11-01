@@ -4,9 +4,9 @@
 #include "unity.h"
 #include <stdint.h>
 #include "Swd.h"
-#include "IoOperationsEx.h"
-#include "mock_IoOperations.h"
-#include "configurePort.h"
+#include "IoOperations.h"
+#include "mock_IoOperationsEx.h"
+#include "mock_configurePort.h"
 
 #define OK      0x4
 #define WAIT    0x2
@@ -25,4 +25,5 @@ void emulateLineReset(int numOfClocks);
 void emulatehardResetTarget();
 void emulateSwdRegisterWrite(int address, int pointType, int ack, uint32_t data);
 void emulateSwdRegisterRead(int address, int pointType, int ack, int parity, uint32_t data);
+void emulateMemoryReadByte(uint32_t address, uint8_t *data);
 #endif // Emulator_H

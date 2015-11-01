@@ -99,38 +99,16 @@ void flashErase(uint32_t flashAddress, int size)  {
   * return :   NONE
   */
 void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data) {
+  /* Unlock the Flash to enable the flash control register access */ 
+  HAL_FLASH_Unlock();
+  
   if(HAL_FLASH_Program(typeProgram, address, data) != HAL_OK)  {
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     flashErrorHandler();
   }
-}
-
-/** flashWrite is a function write data is user define address
-  * !* Recommend erase flash memory first before write *!
-  *
-  * input : typeProgram 
-  *            + FLASH_TYPEPROGRAM_BYTE
-  *            + FLASH_TYPEPROGRAM_HALFWORD
-  *            + FLASH_TYPEPROGRAM_WORD
-  *            + FLASH_TYPEPROGRAM_DOUBLEWORD
-  *
-  *         data is a 32-bit data define by user
-  *
-  * output :   NONE
-  */
-void flashWrite(uint32_t *data, uint32_t address, int size) {
-  uint32_t index, startAddress = address, endAddress = address + size;
-  
-  /* Unlock the Flash to enable the flash control register access */ 
-  HAL_FLASH_Unlock();
-  
-  /* Write data into user selected area here */
-  for(index = startAddress; index < endAddress; index += 4) {
-    flashWriteWord(index, *data++);
-  }
   
   /* Lock the Flash to disable the flash control register access (recommended
-     to protect the FLASH memory against possible unwanted operation) */
+   to protect the FLASH memory against possible unwanted operation) */
   HAL_FLASH_Lock();
 }
 
@@ -273,19 +251,12 @@ void flashErrorHandler(void)
   */
 void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size) {
   int i;
-  __IO uint32_t data = 0;
-  uint32_t sram = src, flash = dest;
-
-  /* Unlock the Flash to enable the flash control register access */ 
-  HAL_FLASH_Unlock();
+  __IO uint8_t data = 0;
+  uint32_t sramAddress = src, flashAddress = dest;
   
   /* Copy data to flash */
-  for(i = 0; i < size; i += 4, sram += 4, flash += 4) {
-	  data = readMemoryData(sram);
-	  flashWriteWord(flash, data);
+  for(i = 0; i < size; i += BYTE_SIZE, sramAddress += BYTE_SIZE, flashAddress += BYTE_SIZE) {
+    data = (uint8_t)readMemoryData(sramAddress);
+    flashWriteByte(flashAddress, data);
   }
-  
-  /* Lock the Flash to disable the flash control register access (recommended
-   to protect the FLASH memory against possible unwanted operation) */
-  HAL_FLASH_Lock();
 }

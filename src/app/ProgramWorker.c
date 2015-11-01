@@ -1,7 +1,7 @@
 #include "ProgramWorker.h"
 
 /* temp SRAM address 0x20005000 */
-uint32_t tempAddress = 0x20005000;
+static uint32_t tempAddress = 0x20005000;
 
 /** IsStubBusy is a function to check if stub
   * is busy with the last operation
@@ -14,10 +14,13 @@ uint32_t tempAddress = 0x20005000;
 int IsStubBusy(void)  {
   unsigned int stubStatus = memoryReadAndReturnWord((uint32_t)&STUB->status);
   
-  if(stubStatus == STUB_OK)
+  if(stubStatus == STUB_OK) {
     return 1;
+  }
   
-  else return 0;
+  else {
+    return 0;
+  } 
 }
 
 /** requestStubErase is a function to load the sector erase
@@ -225,6 +228,16 @@ void runTarget(Tlv_Session *session)
     SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
     breakpointEventHandler(session);
   }
+
+  setCoreMode(CORE_DEBUG_MODE);
+  
+  if(getCoreMode() == CORE_DEBUG_MODE)
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  
+  else Throw(TLV_NOT_RUNNING);
+  
+  tlvSend(session, tlv);
+
 }
 
 /** Step the processor of target device once and send the current PC to host
@@ -244,7 +257,7 @@ void performSingleStepInto(Tlv_Session *session)
   if(pc == initialPC)
     Throw(TLV_NOT_STEPPED);
   else
-    tlv = tlvCreatePacket(TLV_STEP,4, (uint8_t *)&pc);
+    tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
 
   tlvSend(session, tlv);
 }
@@ -279,7 +292,7 @@ void performStepOver(Tlv_Session *session)
   if(pc == 0 || pc == initialPC)
     Throw(TLV_NOT_STEPOVER);
   else
-    tlv = tlvCreatePacket(TLV_STEPOVER,4, (uint8_t *)&pc);
+    tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
     
   tlvSend(session, tlv);
 }
@@ -299,7 +312,7 @@ void performStepOut(Tlv_Session *session)
   if(pc == 0)
     Throw(TLV_NOT_STEPOUT);
   else
-    tlv = tlvCreatePacket(TLV_STEPOUT,4, (uint8_t *)&pc);
+    tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
     
   tlvSend(session, tlv);
 }
@@ -376,6 +389,25 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   tlvSend(session, tlv);
 }
 
+<<<<<<< HEAD
+=======
+/** Remove single software instruction breakpoint
+ *
+ * Input     : session contain a element/handler used by tlv protocol
+ *             instructionAddress is the address set to breakpoint previously using bkpt instruction
+ *             machineCode contains the original machineCode before it was replaced by the bkpt instruction
+ */
+//void removeSoftwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress,uint32_t machineCode)
+//{
+  //Tlv *tlv ;
+  
+  //restoreSoftwareBreakpointOriginalInstruction(instructionAddress,machineCode);
+  
+  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  //tlvSend(session,tlv);
+//}
+
+>>>>>>> bf06326e288bd0f99dfee275833a1055c95c0afb
 /** Remove all hardware breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
@@ -416,15 +448,21 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
  *
  * Input     : session contain a element/handler used by tlv protocol
  */
+<<<<<<< HEAD
 void stopAllFlashPatchRemapping(Tlv_Session *session)
 {
   Tlv *tlv ;
+=======
+//void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session)
+//{
+  //Tlv *tlv ;
+>>>>>>> bf06326e288bd0f99dfee275833a1055c95c0afb
   
-  disableAllFlashPatchComparatorSetToRemap();
+  //disableAllFlashPatchComparatorSetToRemap();
   
-  tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session, tlv);
-}
+  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  //tlvSend(session, tlv);
+//}
 
 
 /**
@@ -451,7 +489,7 @@ void breakpointEventHandler(Tlv_Session *session)
   CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   CLEAR_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG);
 
-  tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&pc);
+  tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);  
 }
 
@@ -475,61 +513,8 @@ void watchpointEventHandler(Tlv_Session *session)
     clearDWTTrapDebugEvent() ;
   }
   
-  tlv = tlvCreatePacket(TLV_WATCHPOINT, 4, (uint8_t *)&pc);
+  tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);  
-}
-
-/** writeDataToRamInChunk is a function to write data
-  * to Ram in specified size
-  *
-  * Input   : dataAddress is the address of the data need to send
-  *           destAddress is the address of the data need to be store
-  *           size is the size of the data can be any value
-  *
-  * return  : NONE
-  */
-void writeDataToRamInChunk(uint32_t *dataAddress, uint32_t destAddress, int size) {
-  int i;
-  
-  /* Write to RAM using swd */
-  for(i = 0; i < size; i += 4)  {
-    /* Data start at position 4 */
-    memoryWriteWord(destAddress, *dataAddress++);
-    destAddress += 4;
-  }  
-}
-
-/** writeTargetRam is a function to write target RAM using swd
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           dataAddress is the address of the data need to send
-  *           destAddress is the address of the data need to be store
-  *           size is the size of the data can be any value
-  *
-  * return  : NONE
-  */
-void writeTargetRam(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size)  {
-
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  /* Size minus 1 because of the checksum value */
-  writeDataToRamInChunk(dataAddress, destAddress, size);
-  
-  tlvSend(session, tlv);
-}
-
-void loopBack(Tlv_Session *session, Tlv *packet) {
-
-  Tlv *tlv;
-  int i = 0;
-
-  /* Size minus 1 because of the checksum value */
-  for(i = 0; i < packet->length -1; i++) {
-	 packet->value[i] += 2;
-  }
-  tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
-
-  tlvSend(session, tlv);
 }
 
 /** readTargetMemory is a function to read target RAM using swd
@@ -542,7 +527,7 @@ void loopBack(Tlv_Session *session, Tlv *packet) {
   */
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   int i; uint8_t chksum = 0;
-  uint32_t readData = 0;
+  uint8_t readData = 0;
   
   Tlv *tlv = tlvCreatePacket(TLV_OK, size + 4, NULL);
   
@@ -550,19 +535,18 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&destAddress, 4);
   
   /* Read from RAM using swd */
-  for(i = 0; i < size; i += 4)  {
-    readData = memoryReadAndReturnWord(destAddress);
+  for(i = 0; i < size; i++, destAddress++)  {
+    readData = memoryReadAndReturnByte(destAddress);
     /* Data start at position 4 */
-    chksum += tlvPackIntoBuffer(&tlv->value[4 + i], (uint8_t *)&readData, 4);
-    destAddress += 4;
+    chksum += tlvPackIntoBuffer(&tlv->value[4 + i], &readData, 1);
   }
-
+  
   tlv->value[tlv->length - 1] = chksum;
   
   tlvSend(session, tlv);
 }
 
-/** writeTargetFlash is a function to write target RAM using swd
+/** writeTargetRam is a function to write target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
   *           dataAddress is the address of the data need to send
@@ -571,150 +555,116 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   *
   * return  : NONE
   */
-void writeTargetFlash(Tlv_Session *session, uint32_t *dataAddress, uint32_t destAddress, int size) {
-  Tlv *tlv;
-  
-  switch(session->pFlashState) {
-    case WRITE_TO_RAM :
-      writeDataToRamInChunk(dataAddress, tempAddress, size);
-      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-      session->pFlashState = COPY_TO_FLASH;
-    break;
-    
-    case COPY_TO_FLASH :
-      if(IsStubBusy()) {
-        requestStubCopy(tempAddress, destAddress, size);
-        tlv = tlvCreatePacket(TLV_OK, 0, 0);
-        tlvSend(session, tlv);
-        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-        session->pFlashState = WRITE_TO_RAM;
-      }
-    break;
-
-    default : break;
-  }
-}
-
-void eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
-  Tlv *tlv;
-  
-  switch(session->pEraseState) {
-    
-    case REQUEST_ERASE :
-      requestStubErase(address, size);
-      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-      session->pEraseState = WAIT_OPERATION_COMPLETE;
-    break;
-    
-    case WAIT_OPERATION_COMPLETE :
-      if(IsStubBusy()) {
-        tlv = tlvCreatePacket(TLV_OK, 0, 0);
-        tlvSend(session, tlv);
-        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-        session->pEraseState = REQUEST_ERASE;
-      }
-    break;
-
-    default : break;
-  }
-}
-
-void massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
-  Tlv *tlv;
-  
-  switch(session->pMEraseState) {
-    
-    case REQUEST_ERASE :
-      requestStubMassErase(bankSelect);
-      SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-      session->pMEraseState = WAIT_OPERATION_COMPLETE;
-    break;
-    
-    case WAIT_OPERATION_COMPLETE :
-      if(IsStubBusy()) {
-        tlv = tlvCreatePacket(TLV_OK, 0, 0);
-        tlvSend(session, tlv);
-        CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-        session->pMEraseState = REQUEST_ERASE;
-      }
-    break;
-
-    default : break;
-  }
-}
-
-/** writeTargetInWord is a function write data into target
-  * in Word size (32bit)
-  *
-  * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to be store
-  *           data is the data need to be send
-  *
-  * Return  : NONE
-  */
-void writeTargetInWord(Tlv_Session *session, uint32_t address, uint32_t data) {
+void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
+  int i;
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   
-  /* Write data into specified address */
-  memoryWriteWord(address, data);
+  /* Write to RAM using swd */
+  for(i = 0; i < size; i ++, dataAddress++, destAddress++) {
+    memoryWriteByte(destAddress, *dataAddress);
+  }
   
   tlvSend(session, tlv);
 }
 
-/** writeTargetInHalfWord is a function write data into target
-  * in halfWord size (16bit)
+/** writeTargetFlash is a function to write target flash (require flashLoader/flashProgrammer)
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to be store
-  *           data is the data need to be send
+  *           dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
   *
-  * Return  : NONE
+  * return  : NONE
   */
-void writeTargetInHalfword(Tlv_Session *session, uint32_t address, uint16_t data) {
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
+	int i; Tlv *tlv; uint32_t temp = tempAddress;
   
-  /* Write data into specified address */
-  memoryWriteHalfword(address, data);
+  startTask(session->state);
   
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Write to RAM using swd */
+  for(i = 0; i < size; i ++, dataAddress++, temp++)
+    memoryWriteByte(temp, *dataAddress);
+
+  /* Yield if stub is busy */
+  while(IsStubBusy() == 0) {
+    yield(session->state);
+  } 
+
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+
+  /* Request flashProgrammer to copy data in 
+    tempAddress into flash */
+  requestStubCopy(tempAddress, destAddress, size);
+  /* Reply tlv acknowledge */
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
+  
+  endTask(session->state); 
 }
 
-/** writeTargetInByte is a function write data into target
-  * in halfWord size (8bit)
+/** eraseTargetFlash is a function to erase target flash by section 
+  * (require flashLoader/flashProgrammer)
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data need to be store
-  *           data is the data need to be send
+  *           address is the address of flash need to erase
+  *           size is the size of flash memory need to erase
   *
-  * Return  : NONE
+  * return  : NONE
   */
-void writeTargetInByte(Tlv_Session *session, uint32_t address, uint8_t data) {
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
+int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
+  Tlv *tlv;
   
-  /* Write data into specified address */
-  memoryWriteByte(address, data);
+  startTask(session->state);
+  /* Set process flag to indicate erase flash is on-going */
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
+  /* Yield if stub is busy */
+  while(IsStubBusy() == 0) {
+    yield(session->state);
+  }
+  
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Request flashProgrammer to erase target flash */
+  requestStubErase(address, size);
+  /* Reply tlv acknowledge */
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
+  
+  endTask(session->state);
 }
 
-/** readTargetInHalfword is a function read data fram target
-  * in halfWord size (16bit)
+/** massEraseTargetFlash is a function erase flash by bank
+  * (require flashLoader/flashProgrammer)
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           address is the address of the data want to read
+  *           bankSelect is the flash bank to erase
   *
-  * Return  : NONE
+  * return  : NONE
   */
-void readTargetInHalfword(Tlv_Session *session, uint32_t destAddress) {
-  Tlv *tlv; uint32_t data;
+int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
+  Tlv *tlv;
   
-  /* Write data into specified address */
-  memoryReadHalfword(destAddress, &data);
+  startTask(session->state);
+  /* Set process flag to indicate erase flash is on-going */
+  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
-  /* data16 is 2 byte size */
-  tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&data);
-   
+  /* Yield if stub is busy */
+  while(IsStubBusy() == 0) {
+    yield(session->state);
+  }
+  
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  
+  /* Request flashProgrammer to erase target flash */
+  requestStubMassErase(bankSelect);
+  /* Reply tlv acknowledge */
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
+  
+  endTask(session->state);
 }
 
 void eventOccured(Tlv_Session *session, EventType event) {
@@ -742,6 +692,20 @@ void checkDebugEvent(Tlv_Session *session, EventType event) {
   }
 }
 
+void loopBack(Tlv_Session *session, Tlv *packet) {
+
+  Tlv *tlv;
+  int i = 0;
+
+  /* Size minus 1 because of the checksum value */
+  for(i = 0; i < packet->length -1; i++) {
+	 packet->value[i] += 2;
+  }
+  tlv = tlvCreatePacket(TLV_OK, packet->length - 1, packet->value);
+
+  tlvSend(session, tlv);
+}
+
 /** selectTask is a function to select instruction 
   * base on tlv->type
   *
@@ -752,6 +716,7 @@ void checkDebugEvent(Tlv_Session *session, EventType event) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
+<<<<<<< HEAD
     case TLV_WRITE_RAM                  : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);   break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
     case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                   break;
@@ -776,6 +741,31 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));             break;
     case TLV_READ_HALFWORD              : readTargetInHalfword(session, get4Byte(&tlv->value[0]));                                         break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                         break;
+=======
+    case TLV_WRITE_RAM                  : writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);       break;
+    case TLV_WRITE_FLASH                : writeTargetFlash(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);     break;
+    case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
+    case TLV_WRITE_REGISTER             : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));         break;
+    case TLV_READ_REGISTER              : readTargetRegister(session, get4Byte(&tlv->value[0]));                                    break;
+    case TLV_HALT_TARGET                : haltTarget(session);                                                                      break;
+    case TLV_RUN_TARGET                 : runTarget(session);                                                                       break;
+    case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                               break;
+    case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
+    case TLV_SOFTBREAKPOINT             : break;
+    case TLV_REMOVE_BREAKPOINT          : break;
+    case TLV_REMOVE_SOFTBREAKPOINT      : break;
+    case TLV_REMOVE_ALL_HWBREAKPOINT    : removeAllHardwareBreakpoint(session);                                                     break;
+    case TLV_REMOVE_ALL_SOFTBREAKPOINT  : break ;
+    case TLV_REMOVE_ALL_BREAKPOINT      : break ;
+    case TLV_STOP_REMAP                 : break;
+    //case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
+    case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
+    case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                  break;
+    case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
+    case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
+    case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
+    case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                  break;
+>>>>>>> bf06326e288bd0f99dfee275833a1055c95c0afb
     default : break;
   }
 }
@@ -791,7 +781,7 @@ void probeTaskManager(Tlv_Session *session)  {
       Try {
         packet = tlvReceive(session);
         if(verifyTlvPacket(packet)) {
-          session->probeState = PROBE_INTERPRET_PACKET;
+          PROBE_CHANGE_STATE(session, PROBE_INTERPRET_PACKET);
         }
       } Catch(err) {
         tlvErrorReporter(session, err);
@@ -802,10 +792,10 @@ void probeTaskManager(Tlv_Session *session)  {
       Try {
         selectTask(session, packet);
         if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
-          session->probeState = PROBE_RECEIVE_PACKET;
+          PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
       } Catch(err) {
         tlvErrorReporter(session, err);
-        session->probeState = PROBE_RECEIVE_PACKET;
+        PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
       }
     break;
   }

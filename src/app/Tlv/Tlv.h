@@ -24,7 +24,7 @@ typedef struct
   /* Send and Receive state */
   Tlv_State receiveState;
   /* ###### Tlv state ###### */
-  Tlv_State state;
+  int state;
   Tlv_State wregState;
   Tlv_State regState;
   Tlv_State haltState;
@@ -60,8 +60,6 @@ typedef struct
   Tlv_State mEraseState;
   /* Probe flash state */
   Tlv_State pFlashState;
-  Tlv_State pEraseState;
-  Tlv_State pMEraseState;
   /* Flags */
   uint32_t flags;
 } Tlv_Session;
