@@ -6,6 +6,7 @@ Tlv_Session *_session = NULL;
 /* Global Error code */
 CEXCEPTION_T err = 0;
 
+int cswDataSize = 0;
 /**
   ==============================================================================
             ################ Used To Testing TDD Purpose ################

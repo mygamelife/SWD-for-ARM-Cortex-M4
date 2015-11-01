@@ -4,10 +4,9 @@
 #include <stdint.h>
 #include "FPBUnit.h"
 #include "MemoryReadWrite.h"
-// #include "core_cm4.h"
+#include "core_cm4.h"
 
 #define SOFTBKPT_BUFFER_SIZE  100
-#define __IO volatile
 
 typedef struct
 {

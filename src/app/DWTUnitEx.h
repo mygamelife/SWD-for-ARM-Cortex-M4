@@ -5,9 +5,8 @@
 #include "CoreDebug.h"
 #include "CoreDebugEx.h"
 #include "MemoryReadWrite.h"
-// #include "core_cm4.h"
+#include "core_cm4.h"
 
-#define __IO volatile
 typedef struct 
 {
   __IO uint32_t COMP;                  

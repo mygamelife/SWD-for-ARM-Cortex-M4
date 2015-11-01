@@ -7,6 +7,7 @@
 #include "ProgramLoader.h"
 
 extern Tlv_Session *_session;
+extern int cswDataSize;
 
 #define BYTE_SIZE           1
 #define HALFWORD_SIZE       2
