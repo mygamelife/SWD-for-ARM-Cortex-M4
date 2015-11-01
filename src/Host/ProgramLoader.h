@@ -17,9 +17,9 @@ typedef enum {
 } Process_Status;
 
 #if defined(TEST)
-#define FLASH_PROGRAMMER_FILE_PATH            "FlashProgrammerElf/FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH            "build/release/target/FlashProgrammer.elf"
 #else
-#define FLASH_PROGRAMMER_FILE_PATH            "../../FlashProgrammerElf/FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH            "target/FlashProgrammer.elf"
 #endif
 
 /* ##### Host Interpreter Macros ##### */

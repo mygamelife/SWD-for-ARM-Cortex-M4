@@ -68,11 +68,3 @@ void test_memoryWriteByte_should_write_memory_in_word_and_return_1_if_success(vo
   
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
 }
-
-void test_flashWriteWord_should_write_memory_in_word_to_flash_and_return_1_if_success(void)
-{ 
-  tlvWriteTargetMemory_IgnoreAndReturn(PROCESS_DONE);
-	int result = _flashWriteWord(0x8000000, 0xBEEFCAFE);
-  
-  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
-}
