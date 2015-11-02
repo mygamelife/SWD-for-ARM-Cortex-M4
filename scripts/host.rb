@@ -99,8 +99,9 @@ namespace :host do
     dep_list = compile_list(exception_dependency, CEXCEPTION_PATH, 'build/release/host/c', '.', config)
     dep_list.merge!(compile_all(['src/app/Tlv',                 # directory of dependee
                                  'src/Host/ElfReader', 
-                                 'src/Host/StringObject',
-                                 'src/Host'],
+                                 # 'src/Host/StringObject',
+                                 # 'src/Host'],
+                                 ],
                                  'build/release/host/c',        # director of .o files
                                   config))                      # config object
     link_all(getDependers(dep_list), 'build/release/Main.exe', config)

@@ -1,4 +1,4 @@
-# Build script for C (ver 0.4)
+# Build script for C (ver 0.5)
 # Copyright (C) 2015 Poh Tze Ven, <pohtv@acd.tarc.edu.my>
 #
 # This file is part of C Compiler & Interpreter project.
@@ -14,9 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with C Compiler & Interpreter.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'mkmf'
 require 'rake/clean' if !(defined? CLEAN)
 require 'rexml/document'
 include REXML
+
+$programs_found = {}
 
 # task :clobber => :clean do
   # puts "Clobbering. It may take sometime..."
@@ -60,6 +63,11 @@ def optionize(option_key, data, err_msg)
   end
 end
 
+def sys_cli(command)
+  result = system command
+  sh command if result == nil
+end
+
 def compile_list(list, src_path, obj_path, exe_path, config)
   return_list = {}
 
@@ -88,6 +96,20 @@ def compile_list(list, src_path, obj_path, exe_path, config)
   opt_lib = config[:option_keys][:library]
   opt_lib_path = config[:option_keys][:library_path]
   opt_linker_script = config[:option_keys][:linker_script]
+  # Get compiler
+  raise ArgumentError,                                                  \
+        "Error: Missing ':compiler' in the config"                      \
+                if (compiler = trim_string(config[:compiler])) == nil
+  raise ArgumentError,                                                  \
+        "Error: Cannot find #{compiler} to compile."                    \
+                if program_available?(compiler) == nil
+  # Get linker
+  raise ArgumentError,                                                  \
+        "Error: Missing ':linker' in the config"                        \
+                if (linker = trim_string(config[:linker])) == nil
+  raise ArgumentError,                                                  \
+        "Error: Cannot find #{linker} to link files."                   \
+                if program_available?(linker) == nil
 
   list.each do |obj|
     # Append path to depender
@@ -105,10 +127,6 @@ def compile_list(list, src_path, obj_path, exe_path, config)
           dependees = n.prerequisites.select { |f|
             (f =~ /\.(?:s|asm|c|cpp|cc|c\+\+)$/i) && !(File.directory? f)
           }
-          # Get compiler
-          raise ArgumentError,                                                \
-                "Error: Missing ':compiler' in the config"                    \
-                if (compiler = config[:compiler]) == nil
           # Compile compiler options
           options = optionize(opt_inc_path, config[:include_path],            \
                       "Missing ':option_keys:include_path' in the config.") + \
@@ -124,7 +142,7 @@ def compile_list(list, src_path, obj_path, exe_path, config)
           else
             puts("compiling #{n.name}...")
           end
-          system(command)
+          sys_cli(command)
         end
 #        p depender
         CLEAN.include(depender)
@@ -134,10 +152,6 @@ def compile_list(list, src_path, obj_path, exe_path, config)
         file depender => dependees do |n|
           # Gather only dependee files (exclude directories)
           dependees = n.prerequisites.select { |f| !(File.directory? f) }
-          # Get linker
-          raise ArgumentError,                                                \
-                "Error: Missing ':linker' in the config"                      \
-                if (linker = config[:linker]) == nil
           # Compile linker options
           options = optionize(opt_lib_path, config[:library_path],            \
                       "Missing ':option_keys:library_path' in the config.") + \
@@ -148,14 +162,14 @@ def compile_list(list, src_path, obj_path, exe_path, config)
                     ' ' + optionize('', config[:linker_options], nil)
           # Compile the command
           command = linker + ' ' +                                            \
-                    options + ' ' + dependees.join(' ') + ' ' +               \
+                    dependees.join(' ') + ' ' +  options + ' ' +              \
                     opt_out_file + ' ' + n.name
           if config[:verbose] == :yes
             puts(command)
           else
             puts("linking #{n.name}...")
           end
-          system(command)
+          sys_cli(command)
         end
 #        p depender
         CLEAN.include(depender)
@@ -213,9 +227,21 @@ def getDependers(dependency_list)
   dependency_list.keys
 end
 
-def getAllSrcFiles(coIdeProjectFile)
+def find_coproj(coproj)
+  if(coproj == nil)
+    coproj = FileList.new("./*.coproj").to_a
+    raise ArgumentError,                                                \
+        "Please specify the .coproj file: #{coproj}" if coproj.length > 1
+    raise ArgumentError,                                                \
+        "Error: No .coproj file given" if coproj.length == 0
+    coproj = coproj[0]
+  end
+  return coproj
+end
+
+def get_all_source_files_in_coproj(coIdeProjectFile)
   list = []
-  xmlfile = File.new(coIdeProjectFile)
+  xmlfile = File.new(coproj = find_coproj(coIdeProjectFile))
   xmldoc = Document.new(xmlfile)
 
   # Now get the root element
@@ -229,10 +255,11 @@ def getAllSrcFiles(coIdeProjectFile)
     list << name if e.attributes["type"] == "1"
   }
 
-  return list
+  return list, coproj
 end
 
 def trim_string(str)
+  return nil if str == nil
   str.gsub!(/^\s*/, "").gsub!(/\s*$/, "")
 end
 
@@ -251,6 +278,18 @@ def createCompilationDependencyList(list, ext_filter_list, out_path, out_ext)
   }
   dependers.zip(list) { |key, val| dependency_list[key] = val }
   dependency_list
+end
+
+def up_to_date?(new, old)
+  if File.exist?(new) && File.exist?(old)
+    return true if File.mtime(new) > File.mtime(old)
+  end
+  return false
+end
+
+def program_available?(filename)
+  $programs_found[filename] = find_executable(filename) if !$programs_found.key? filename
+  return $programs_found[filename]
 end
 
 def get_all_tests(path)
