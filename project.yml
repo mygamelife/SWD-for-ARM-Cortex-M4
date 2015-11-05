@@ -27,8 +27,10 @@
     - +:test/**
     - -:test/support
   :source:
-    - -:src/app/PlatformSpecific/**
-    - src/**
+    # - -:src/app/PlatformSpecific/**
+    - src/Host/**
+    - +:src/app/Tlv
+    # - -:src/app/**
   :support:
     - test/support
 

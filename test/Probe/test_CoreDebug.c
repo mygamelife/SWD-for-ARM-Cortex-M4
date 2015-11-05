@@ -6,10 +6,9 @@
 #include "Emulator.h"
 #include "MemoryReadWrite.h"
 #include "Swd.h"
-#include "IoOperationsEx.h"
-#include "mock_IoOperations.h"
+#include "mock_IoOperationsEx.h"
+#include "IoOperations.h"
 #include "mock_configurePort.h"
-#include "core_cm4.h"
 
 void setUp(void)
 {

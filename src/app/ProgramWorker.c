@@ -389,8 +389,6 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   tlvSend(session, tlv);
 }
 
-<<<<<<< HEAD
-=======
 /** Remove single software instruction breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
@@ -407,7 +405,7 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   //tlvSend(session,tlv);
 //}
 
->>>>>>> bf06326e288bd0f99dfee275833a1055c95c0afb
+
 /** Remove all hardware breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
@@ -448,15 +446,9 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
  *
  * Input     : session contain a element/handler used by tlv protocol
  */
-<<<<<<< HEAD
-void stopAllFlashPatchRemapping(Tlv_Session *session)
-{
-  Tlv *tlv ;
-=======
 //void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session)
 //{
   //Tlv *tlv ;
->>>>>>> bf06326e288bd0f99dfee275833a1055c95c0afb
   
   //disableAllFlashPatchComparatorSetToRemap();
   
@@ -716,32 +708,6 @@ void loopBack(Tlv_Session *session, Tlv *packet) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
-<<<<<<< HEAD
-    case TLV_WRITE_RAM                  : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);   break;
-    case TLV_WRITE_FLASH                : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
-    case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                   break;
-    case TLV_WRITE_REGISTER             : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                break;
-    case TLV_READ_REGISTER              : readTargetRegister(session, get4Byte(&tlv->value[0]));                                           break;
-    case TLV_HALT_TARGET                : haltTarget(session);                                                                             break;
-    case TLV_RUN_TARGET                 : runTarget(session);                                                                              break;
-    case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                                      break;
-    case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                                break;
-    case TLV_REMOVE_BREAKPOINT          : removeHardwareBreakpoint(session, get4Byte(&tlv->value[0]));                                     break;
-    case TLV_REMOVE_ALL_BREAKPOINT      : removeAllHardwareBreakpoint(session);                                                            break;
-    case TLV_STOP_REMAP                 : stopFlashPatchRemapping(session, get4Byte(&tlv->value[0]));                                      break;
-    case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                             break;
-    case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                   break;
-    case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                         break;
-    case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                               break;
-    case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                               break;
-    case TLV_VECT_RESET                 : performVectorResetOnTarget(session);                                                             break;
-    case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                          break;
-    case TLV_WRITE_WORD                 : writeTargetInWord(session, get4Byte(&tlv->value[0]), getDataInWord(&tlv->value[4]));             break;
-    case TLV_WRITE_HALFWORD             : writeTargetInHalfword(session, get4Byte(&tlv->value[0]), getDataInHalfWord(&tlv->value[4]));     break;
-    case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));             break;
-    case TLV_READ_HALFWORD              : readTargetInHalfword(session, get4Byte(&tlv->value[0]));                                         break;
-    case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                         break;
-=======
     case TLV_WRITE_RAM                  : writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);       break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);     break;
     case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
@@ -765,7 +731,6 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                  break;
->>>>>>> bf06326e288bd0f99dfee275833a1055c95c0afb
     default : break;
   }
 }

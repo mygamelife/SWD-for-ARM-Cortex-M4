@@ -28,6 +28,7 @@
     - -:test/support
   :source:
     - src/app/**
+    - -:src/Host
   :support:
     - test/support
 

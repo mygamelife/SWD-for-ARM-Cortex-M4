@@ -28,27 +28,27 @@ void test_IsStubBusy_should_read_STUB_status_and_return_1(void)
 
 void test_requestStubErase_should_write_flashAddress_and_size_into_STUB_flahsAddress_and_dataSize(void)
 { 
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);     //Set flash Address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 2048, NO_ERROR);               //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, NO_ERROR);      //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);     //Set flash Address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 2048, SWD_NO_ERROR);               //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
   
   requestStubErase(0x08000000, 2048);
 }
 
 void test_requestStubMassErase_should_write_bankSelect_into_STUB_banks(void)
 {
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_2, NO_ERROR);            //Set flash banks
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, NO_ERROR);    //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_2, SWD_NO_ERROR);            //Set flash banks
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
   
   requestStubMassErase(FLASH_BANK_2);
 }
 
 void test_requestStubCopy_should_write_into_STUB_flashAddress_sramAddress_and_size_to_copy(void)
 { 
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20000000, NO_ERROR);        //Set sram address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);       //Set flash address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 248, NO_ERROR);                  //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, NO_ERROR);         //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20000000, SWD_NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 248, SWD_NO_ERROR);                  //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
   
   requestStubCopy(0x20000000, 0x08000000, 248); 
 }
@@ -102,16 +102,16 @@ void test_writeTargetRam_should_write_data_to_specified_RAM_address(void)
   Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 12, (uint8_t *)buffer);
   
   // 0x12345678
-  memoryWriteByte_ExpectAndReturn(0x20000000, 0x78, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000001, 0x56, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000002, 0x34, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000003, 0x12, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000000, 0x78, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000001, 0x56, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000002, 0x34, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000003, 0x12, SWD_NO_ERROR);
   
   // 0xABCDABCD
-  memoryWriteByte_ExpectAndReturn(0x20000004, 0xCD, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000005, 0xAB, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000006, 0xCD, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000007, 0xAB, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000004, 0xCD, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000005, 0xAB, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000006, 0xCD, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000007, 0xAB, SWD_NO_ERROR);
   
   writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);
 }
@@ -170,7 +170,7 @@ void test_performSoftResetOnTarget_should_call_softResetTarget_and_send_TLV_ack(
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
-  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_SYSTEM_RESET,NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_SYSTEM_RESET,SWD_NO_ERROR);
   
   performSoftResetOnTarget(session);
 }
@@ -194,7 +194,7 @@ void test_performVectotrResetOnTarget_should_call_vectorResetTarget_and_send_TLV
   Tlv_Session *session = tlvCreateSession();
   
   setCoreMode_Expect(CORE_DEBUG_HALT);
-  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_VECTOR_RESET,NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_VECTOR_RESET,SWD_NO_ERROR);
   
   performVectorResetOnTarget(session);
 }
@@ -228,55 +228,55 @@ void test_haltTarget_should_return_NACK_and_ERR_NOT_HALTED_if_not_successful()
 }
 
 /*--------------runTarget--------------------*/
-void test_runTarget_should_return_ACK_if_successful()
-{
-  uartInit_Ignore();
-  Tlv_Session *session = tlvCreateSession();
+// void test_runTarget_should_return_ACK_if_successful()
+// {
+  // uartInit_Ignore();
+  // Tlv_Session *session = tlvCreateSession();
 
-  stepIntoOnce_ExpectAndReturn(0);
-  memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB,0);
-  setCoreMode_Expect(CORE_DEBUG_MODE);
-  getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
+  // stepIntoOnce_ExpectAndReturn(0);
+  // memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB,0);
+  // setCoreMode_Expect(CORE_DEBUG_MODE);
+  // getCoreMode_ExpectAndReturn(CORE_DEBUG_MODE);
   
-  runTarget(session);
-}
+  // runTarget(session);
+// }
 
-void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
-{
-  CEXCEPTION_T err;
+// void test_runTarget_should_return_NACK_and_ERR_NOT_RUNNING_if_unsuccessful()
+// {
+  // CEXCEPTION_T err;
   
-  Try {
-    uartInit_Ignore();
-    Tlv_Session *session = tlvCreateSession();
+  // Try {
+    // uartInit_Ignore();
+    // Tlv_Session *session = tlvCreateSession();
     
-    stepIntoOnce_ExpectAndReturn(0);
-    memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB,0);
-    setCoreMode_Expect(CORE_DEBUG_MODE);
-    getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
+    // stepIntoOnce_ExpectAndReturn(0);
+    // memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),ENABLE_FPB,0);
+    // setCoreMode_Expect(CORE_DEBUG_MODE);
+    // getCoreMode_ExpectAndReturn(CORE_DEBUG_HALT);
     
-    runTarget(session);      
-  } Catch(err) {
-    TEST_ASSERT_EQUAL(TLV_NOT_RUNNING, err);
-  }
-}
+    // runTarget(session);      
+  // } Catch(err) {
+    // TEST_ASSERT_EQUAL(TLV_NOT_RUNNING, err);
+  // }
+// }
 
-void test_runTarget_should_run_breakpointEventHandler_if_breakPointFlag_is_set()
-{
-  uartInit_Ignore();
-  Tlv_Session *session = tlvCreateSession();
+// void test_runTarget_should_run_breakpointEventHandler_if_breakPointFlag_is_set()
+// {
+  // uartInit_Ignore();
+  // Tlv_Session *session = tlvCreateSession();
   
-  SET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG);
+  // SET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG);
   
-  readDebugEventRegister_ExpectAndReturn(0x2);
+  // readDebugEventRegister_ExpectAndReturn(0x2);
   
-  readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
-  memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),DISABLE_FPB,0);
-  memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
+  // readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x08000000);
+  // memoryWriteWord_ExpectAndReturn((uint32_t)&(FPB->FP_CTRL),DISABLE_FPB,0);
+  // memoryWriteWord_ExpectAndReturn(DFSR_REG,BKPT_DEBUGEVENT,0);
   
-  runTarget(session);
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG));
-  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-}
+  // runTarget(session);
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG));
+  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
+// }
 
 /*---------performSingleStepInto----------------------*/
 void test_performSingleStepInto_should_readPC_step_and_return_PC_if_successful()
@@ -564,28 +564,31 @@ void test_writeTargetFlash_should_write_into_target_ram_first_then_change_state(
   uint32_t dataAddress[] = {0x11111111, 0x22222222, 0x33333333, 0x44444444};
 
   // 0x11111111
-  memoryWriteByte_ExpectAndReturn(0x20005000, 0x11, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005001, 0x11, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005002, 0x11, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005003, 0x11, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005000, 0x11, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005001, 0x11, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005002, 0x11, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005003, 0x11, SWD_NO_ERROR);
 
   // 0x22222222
-  memoryWriteByte_ExpectAndReturn(0x20005004, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005005, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005006, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005007, 0x22, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005004, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005005, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005006, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005007, 0x22, SWD_NO_ERROR);
   
   // 0x33333333
-  memoryWriteByte_ExpectAndReturn(0x20005008, 0x33, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005009, 0x33, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x2000500A, 0x33, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x2000500B, 0x33, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005008, 0x33, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005009, 0x33, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000500A, 0x33, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000500B, 0x33, SWD_NO_ERROR);
   
   // 0x44444444
-  memoryWriteByte_ExpectAndReturn(0x2000500C, 0x44, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x2000500D, 0x44, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x2000500E, 0x44, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x2000500F, 0x44, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000500C, 0x44, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000500D, 0x44, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000500E, 0x44, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000500F, 0x44, SWD_NO_ERROR);
+  
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
   
   writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
   
@@ -604,16 +607,19 @@ void test_writeTargetFlash_should_copy_from_sram_to_flash_by_sending_request_cop
   uint32_t dataAddress[] = {0x11111111, 0x22222222};
 
   // 0x11111111
-  memoryWriteByte_ExpectAndReturn(0x20005000, 0x11, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005001, 0x11, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005002, 0x11, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005003, 0x11, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005000, 0x11, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005001, 0x11, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005002, 0x11, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005003, 0x11, SWD_NO_ERROR);
 
   // 0x22222222
-  memoryWriteByte_ExpectAndReturn(0x20005004, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005005, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005006, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005007, 0x22, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005004, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005005, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005006, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005007, 0x22, SWD_NO_ERROR);
+  
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
   
   writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 8);
   
@@ -622,10 +628,10 @@ void test_writeTargetFlash_should_copy_from_sram_to_flash_by_sending_request_cop
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
   
   /* Request stub copy */
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, NO_ERROR);        //Set sram address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08001000, NO_ERROR);       //Set flash address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 8, NO_ERROR);                    //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, NO_ERROR);         //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, SWD_NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08001000, SWD_NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 8, SWD_NO_ERROR);                    //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
   
   writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 8);
   
@@ -659,9 +665,9 @@ void test_eraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   /* Stub status is OK */
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
   
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);     //Set flash Address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 20000, NO_ERROR);              //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, NO_ERROR);      //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);     //Set flash Address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 20000, SWD_NO_ERROR);              //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
   
   eraseTargetFlash(session, 0x08000000, 20000);
   
@@ -677,8 +683,8 @@ void test_massEraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   /* Stub status is OK */
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
   
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_1, NO_ERROR);            //Set flash banks
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, NO_ERROR);    //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_1, SWD_NO_ERROR);            //Set flash banks
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
   
   massEraseTargetFlash(session, FLASH_BANK_1);
   
@@ -935,10 +941,10 @@ void test_probeTaskManager_should_receive_TLV_WRITE_RAM_and_perform_the_task(voi
   tlvService(session);
   
   // 0x10203040
-  memoryWriteByte_ExpectAndReturn(0x20000000, 0x40, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000001, 0x30, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000002, 0x20, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000003, 0x10, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000000, 0x40, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000001, 0x30, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000002, 0x20, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000003, 0x10, SWD_NO_ERROR);
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);
@@ -1027,21 +1033,24 @@ void test_probeTaskManager_given_flash_command_should_run_writeTargetFlash(void)
   
   /* Mocking write into ram */
   // 0x11223344
-  memoryWriteByte_ExpectAndReturn(0x20005000, 0x44, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005001, 0x33, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005002, 0x22, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005003, 0x11, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005000, 0x44, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005001, 0x33, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005002, 0x22, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005003, 0x11, SWD_NO_ERROR);
   
   // 0x55667788
-  memoryWriteByte_ExpectAndReturn(0x20005004, 0x88, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005005, 0x77, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005006, 0x66, NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20005007, 0x55, NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005004, 0x88, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005005, 0x77, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005006, 0x66, SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20005007, 0x55, SWD_NO_ERROR);
+  
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
   
   /* Intepret packet and goes to writeTargetFlashInChunk() */
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_INTERPRET_PACKET, session->probeState);
-  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
   
   CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
@@ -1049,10 +1058,10 @@ void test_probeTaskManager_given_flash_command_should_run_writeTargetFlash(void)
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
   
   /* Request stub copy */
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, NO_ERROR);        //Set sram address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);       //Set flash address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 8, NO_ERROR);                    //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, NO_ERROR);         //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, SWD_NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 8, SWD_NO_ERROR);                    //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
   
   /* Intepret packet and goes to writeTargetFlash() */
   probeTaskManager(session);
@@ -1090,9 +1099,9 @@ void test_probeTaskManager_given_flash_erase_command_should_run_eraseFlashTarget
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
   
   /* Mocking Request Erase */
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, NO_ERROR);
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, (int)20000, NO_ERROR);
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, (int)20000, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);
   
   /* Intepret packet and goes to eraseTargetFlash() */
   probeTaskManager(session);
