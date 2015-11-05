@@ -3,5 +3,6 @@ build/*
 Host/build/*
 !Host/build/README.txt
 SerialWireDebug/*
+FlashProgrammer/FlashProgrammer/*
 /output/
 debug.log

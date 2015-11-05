@@ -50,6 +50,7 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
 /* Reset */
 Process_Status tlvSoftReset(Tlv_Session *session);
 Process_Status tlvHardReset(Tlv_Session *session);
+Process_Status tlvVectReset(Tlv_Session *session);
 
 /* Write target memory */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
@@ -72,6 +73,11 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
 
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
+
+/* Remove Breakpoint */
+
+
+/* Stop Flash Patch Remap */
 
 /* Wait Debug Events */
 EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event);

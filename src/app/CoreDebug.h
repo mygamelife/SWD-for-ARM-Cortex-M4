@@ -30,7 +30,7 @@
 #define clearExternalDebugEvent()           {memoryWriteWord(DFSR_REG,EXTERNAL_DEBUGEVENT);}
 
 #define softResetTarget()                   {memoryWriteWord(AIRCR_REG,REQUEST_SYSTEM_RESET);}             
-#define vectorResetTarget()                 {memoryWriteWord(AIRCR_REG,REQUEST_VECTOR_RESET);}
+#define vectorResetTarget()                 {setCoreMode(CORE_DEBUG_HALT);memoryWriteWord(AIRCR_REG,REQUEST_VECTOR_RESET);}
 
 
 int doesCoreModeRequiresHaltedAndDebug(CoreMode mode);

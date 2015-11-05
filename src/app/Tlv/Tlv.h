@@ -32,6 +32,7 @@ typedef struct
   Tlv_State stepState;
   Tlv_State sresetState;
   Tlv_State hresetState;
+  Tlv_State vresetState;
   Tlv_State wramState;
   Tlv_State wflashState;
   Tlv_State lflashState;
@@ -43,6 +44,10 @@ typedef struct
   Tlv_State wDataInByteState;                  /* Write data in byte state                 */
   Tlv_State memoryRwState;                     /* memory read write state                  */
   Tlv_State breakpointHandlerState;
+  Tlv_State rmBreakpointState;
+  Tlv_State rmAllBreakpointState;
+  Tlv_State stopRemapState;
+  Tlv_State stopAllRemapState;
   /* Host and Probe state */
   Host_State hostState;
   Probe_State probeState;
@@ -71,6 +76,7 @@ typedef enum {
 #define TLV_ONGOING_PROCESS_FLAG                        ((uint32_t)0x00000008)
 #define TLV_SET_BREAKPOINT_FLAG                         ((uint32_t)0x00000010)
 #define TLV_SET_WATCHPOINT_FLAG                         ((uint32_t)0x00000020)
+#define TLV_BREAKPOINT_WAS_SET_FLAG                     ((uint32_t)0x00000040)
  
 /* ##### Tlv Flags Status Macros ##### */
 #define GET_FLAG_STATUS(__SESSION__, __FLAG__)          (((__SESSION__)->flags & (__FLAG__)) == (__FLAG__))

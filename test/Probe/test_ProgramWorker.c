@@ -193,6 +193,7 @@ void test_performVectotrResetOnTarget_should_call_vectorResetTarget_and_send_TLV
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
+  setCoreMode_Expect(CORE_DEBUG_HALT);
   memoryWriteWord_ExpectAndReturn(AIRCR_REG,REQUEST_VECTOR_RESET,NO_ERROR);
   
   performVectorResetOnTarget(session);
@@ -430,30 +431,27 @@ void test_removeHardwareBreakpoint_should_remove_breakpoint_and_return_ACK()
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
-  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,1);
+  disableFlashPatchComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,1);
   
   removeHardwareBreakpoint(session,0x10203040);
 }
 
-void test_removeHardwareBreakpoint_should_return_NACK_if_not_found()
+void test_removeHardwareBreakpoint_should_throw_TLV_ADDRESS_NOT_FOUND_if_address_not_found()
 {
+  CEXCEPTION_T err ;
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
-  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,-1);
+  Try
+  {
+    disableFlashPatchComparatorLoadedWithAddress_ExpectAndReturn(0x10203040,INSTRUCTION_TYPE,-1);
+    removeHardwareBreakpoint(session,0x10203040);
+  }Catch(err)
+  {
+    TEST_ASSERT_EQUAL(TLV_ADDRESS_NOT_FOUND,err);
+  }
   
-  removeHardwareBreakpoint(session,0x10203040);
-}
-
-/*---------removeSoftwareBreakpoint----------------------*/
-void test_removeSoftwareBreakpoint_should_restore_the_address_with_original_machineCode()
-{
-  uartInit_Ignore();
-  Tlv_Session *session = tlvCreateSession();
   
-  restoreSoftwareBreakpointOriginalInstruction_Expect(0x08001000,0xABCD);
-  
-  removeSoftwareBreakpoint(session,0x08001000,0xABCD);
 }
 
 /*---------removeAllHardwareBreakpoint----------------------*/
@@ -462,7 +460,7 @@ void test_removeAllHardwareBreakpoint_should_remove_all_breakpoint_and_return_AC
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
   
-  removeAllFPComparatorSetToBreakpoint_Expect();
+  disableAllFlashPatchComparatorSetToBreakpoint_Expect();
   
   removeAllHardwareBreakpoint(session);
 }
@@ -473,30 +471,37 @@ void test_stopFlashPatchRemapping_should_stop_remapping_and_return_ACK()
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
 
-  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,INSTRUCTION_TYPE,1);
-  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,LITERAL_TYPE,1);
+  disableFlashPatchComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,INSTRUCTION_TYPE,1);
+  disableFlashPatchComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,LITERAL_TYPE,1);
   
   stopFlashPatchRemapping(session,0x12345678);
 }
 
-void test_stopFlashPatchRemapping_should_return_NACK_if_not_found()
+void test_stopFlashPatchRemapping_should_throw_TLV_ADDRESS_NOT_FOUND_if_address_not_found()
 {
+  CEXCEPTION_T err ;
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
 
-  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,INSTRUCTION_TYPE,-1);
-  disableFPComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,LITERAL_TYPE,-1);
+  Try
+  {
+    disableFlashPatchComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,INSTRUCTION_TYPE,-1);
+    disableFlashPatchComparatorLoadedWithAddress_ExpectAndReturn(0x12345678,LITERAL_TYPE,-1);
   
-  stopFlashPatchRemapping(session,0x12345678);
+    stopFlashPatchRemapping(session,0x12345678);
+  }Catch(err)
+  {
+    TEST_ASSERT_EQUAL(TLV_ADDRESS_NOT_FOUND,err);
+  }
 }
 
-/*---------disableAllFlashPatchComparatorSetToRemap----------------------*/
+/*---------stopAllFlashPatchRemapping----------------------*/
 void test_stopAllFlashPatchRemapping_should_stop_all_remapping_and_return_ACK()
 {
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
 
-  stopAllFPRemapping_Expect();
+  disableAllFlashPatchComparatorSetToRemap_Expect();
   
   disableAllFlashPatchComparatorSetToRemap(session);
 }
@@ -512,7 +517,7 @@ void test_breakpointEventHandler_should_force_quit_if_breakpoint_not_occur()
   breakpointEventHandler(session);
 }
 
-void test_breakpointEventHandler_should_read_PC_and_disable_comparator_if_breakpoint_occur(void)
+void test_breakpointEventHandler_should_read_PC_and_disable_FPBUnit_and_clear_bkptEvent_if_breakpoint_occur(void)
 {
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();

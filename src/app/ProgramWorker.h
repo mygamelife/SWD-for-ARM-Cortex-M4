@@ -57,13 +57,10 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
  
 void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
-void removeSoftwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress,uint32_t machineCode);
-void removeAllBreakpoint(Tlv_Session *session);
 void removeAllHardwareBreakpoint(Tlv_Session *session);
-void removeAllSoftwareBreakpoint(Tlv_Session *session);
 
 void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
-void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session);
+void stopAllFlashPatchRemapping(Tlv_Session *session);
                    
 void breakpointEventHandler(Tlv_Session *session);
 void watchpointEventHandler(Tlv_Session *session);
