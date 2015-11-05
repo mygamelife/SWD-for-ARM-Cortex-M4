@@ -79,35 +79,18 @@ config = {
                     :define => '-D'}
 }
 
-# namespace :host do
-  # desc 'Build custom release code'
-  # task :release do
-               # dependency list  directory of   directory of     directory of    config
-                                # dependee       .o files         .exe            object
-    # compile_list(main_dependency, 'src/app/Tlv', 'build/release/host/c', 'build/release', config)
-    # compile_list(main_dependency, 'src/Host', 'build/release/host/c', 'build/release', config)
-    # compile_list(exception_dependency, CEXCEPTION_PATH, 'build/release/host/c', 'build/release', config)
-    # compile_list(header_dependency, 'src', 'src', 'build/release', config)
-   # p Rake.application.tasks
-    # Rake::Task["build/release/Main.exe"].invoke
-  # end
-# end
-
 namespace :host do
   desc 'Build brute release code'
   task :release do
     dep_list = compile_list(exception_dependency, CEXCEPTION_PATH, 'build/release/host/c', '.', config)
     dep_list.merge!(compile_all(['src/app/Tlv',                 # directory of dependee
                                  'src/Host/ElfReader', 
-                                 # 'src/Host/StringObject',
-                                 # 'src/Host'],
-                                 ],
+                                 'src/Host/StringObject',
+                                 'src/Host'],
                                  'build/release/host/c',        # director of .o files
                                   config))                      # config object
     link_all(getDependers(dep_list), 'build/release/Main.exe', config)
     Rake::Task["build/release/Main.exe"].invoke
-   # p Rake.application.tasks
-   # p Rake::Task.tasks
   end
 end
 

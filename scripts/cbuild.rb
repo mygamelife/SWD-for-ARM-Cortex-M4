@@ -1,5 +1,5 @@
-# Build script for C (ver 0.5)
-# Copyright (C) 2015 Poh Tze Ven, <pohtv@acd.tarc.edu.my>
+# Build script for C (ver 0.9)
+# Copyright (C) 2015-2016 Poh Tze Ven <pohtv@acd.tarc.edu.my>
 #
 # This file is part of C Compiler & Interpreter project.
 #
@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with C Compiler & Interpreter.  If not, see <http://www.gnu.org/licenses/>.
 
+require 'pathname'
 require 'mkmf'
 require 'rake/clean' if !(defined? CLEAN)
 require 'rexml/document'
@@ -96,6 +97,9 @@ def compile_list(list, src_path, obj_path, exe_path, config)
   opt_lib = config[:option_keys][:library]
   opt_lib_path = config[:option_keys][:library_path]
   opt_linker_script = config[:option_keys][:linker_script]
+  raise ArgumentError,                                                  \
+        "Error: There is nothing to compile."                           \
+                if list.empty?
   # Get compiler
   raise ArgumentError,                                                  \
         "Error: Missing ':compiler' in the config"                      \
@@ -193,6 +197,12 @@ def compile_all(src_paths, obj_path, config)
     src_paths = [src_paths]
   end
   src_paths.each do |path|
+    raise ArgumentError,                                   \
+        "Error: #{path} folder does not exist."            \
+                if !File.exist?(path)
+    raise ArgumentError,                                   \
+        "Error: #{path} is not a folder."                  \
+                if !File.directory?(path)
     file_list = FileList.new( File.join(path, '*.s'),      \
                               File.join(path, '*.asm'),    \
                               File.join(path, '*.c'),      \
@@ -213,9 +223,8 @@ def compile_all(src_paths, obj_path, config)
 #      CLOBBER << depender
     end
 #    p dependency_list
-    return_list = compile_list(dependency_list, ".", obj_path, ".", config)
   end
-  return return_list
+  return return_list = compile_list(dependency_list, ".", obj_path, ".", config)
 end
 
 def link_all(obj_list, exe_path_and_name, config)
@@ -228,19 +237,29 @@ def getDependers(dependency_list)
 end
 
 def find_coproj(coproj)
-  if(coproj == nil)
-    coproj = FileList.new("./*.coproj").to_a
+  coproj = './' if coproj == nil
+  if File.directory? coproj
+    directory = coproj
+    coproj = FileList.new(File.join coproj, "*.coproj").to_a
     raise ArgumentError,                                                \
         "Please specify the .coproj file: #{coproj}" if coproj.length > 1
     raise ArgumentError,                                                \
-        "Error: No .coproj file given" if coproj.length == 0
+        "Error: Cannot find .coproj file in #{directory}" if coproj.length == 0
     coproj = coproj[0]
+  else
+    coproj = coproj + ".coproj" if !File.exists? coproj
   end
   return coproj
 end
 
-def get_all_source_files_in_coproj(coIdeProjectFile)
+# @desc   Collect all sources in coproj file
+# @param  coIdeProjectFile is the file coproj file to load
+# @param  default_search_path is the default path name to search for coproj
+#         file if coIdeProjectFile is not specified
+def get_all_source_files_in_coproj(coIdeProjectFile = nil, default_search_path = nil)
   list = []
+  coIdeProjectFile = default_search_path if (coIdeProjectFile == nil) ||            \
+                                            (trim_string(coIdeProjectFile).empty?)
   xmlfile = File.new(coproj = find_coproj(coIdeProjectFile))
   xmldoc = Document.new(xmlfile)
 
@@ -248,13 +267,13 @@ def get_all_source_files_in_coproj(coIdeProjectFile)
   root = xmldoc.root
 #  puts "Root element : " + root.attributes["version"]
 
+  path = Pathname.new(coproj).dirname
   xmldoc.elements.each("Project/Files/File") { |e|
     name = e.attributes["path"]
 #    puts "File name : " + name if e.attributes["type"] == "1"  && name =~ /\.(?:c|cc|cpp|c++|s|asm)$/i
 #    puts "File name : " + name if e.attributes["type"] == "1"
-    list << name if e.attributes["type"] == "1"
+    list << File.join(path, name) if e.attributes["type"] == "1"
   }
-
   return list, coproj
 end
 
@@ -290,6 +309,10 @@ end
 def program_available?(filename)
   $programs_found[filename] = find_executable(filename) if !$programs_found.key? filename
   return $programs_found[filename]
+end
+
+def get_value_from_env(name, default_value)
+  trim_string((flasher = ENV[name]) ? String.new(flasher):default_value)
 end
 
 def get_all_tests(path)

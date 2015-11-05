@@ -4,49 +4,10 @@ FLASHER = "ST-LINK_CLI " unless defined? FLASHER
 # Load build script to help build C program
 load "scripts/cbuild.rb"
 
-# Main dependency list
-# main_dependency = {
-  # depender                dependees
-  # 'ErrorCode.o'       => ['ErrorCode.c', 'ErrorCode.o'],
-  # 'FileToken.o'       => ['FileToken.c', 'FileToken.h', 'Token.h', 'StringObject.h'],
-  # 'GetHeaders.o'      => ['GetHeaders.c', 'GetHeaders.h', 'Read_File.h', 'elf.h', 'ProgramElf.h'],
-  # 'IdentifierToken.o' => ['IdentifierToken.c', 'IdentifierToken.h', 'Token.h', 'StringObject.h'],
-  # 'Interface.o'       => ['Interface.c', 'Interface.h', 'Token.h', 'Tlv.h', 'ErrorCode.h'],
-  # 'MemoryReadWrite.o' => ['MemoryReadWrite.c', 'MemoryReadWrite.h', 'Yield.h', 'ProgramLoader.h'],
-  # 'NumberToken.o'     => ['NumberToken.c', 'NumberToken.h', 'Token.h', 'StringObject.h'],
-  # 'OperatorToken.o'   => ['OperatorToken.c', 'OperatorToken.o', 'ErrorCode.h', 'StringObject.h'],
-  # 'ProgramLoader.o'   => ['ProgramLoader.c', 'ProgramLoader.h', 'Tlv.h', 'GetHeaders.h', 'ErrorCode.h',
-                          # 'Interface.h', 'SystemTime.h'],
-  # 'Read_File.o'       => ['Read_File.c', 'Read_File.h', 'elf.h'],
-  # 'Relocator.o'       => ['Relocator.c', 'Relocator.h', 'Read_File.h', 'elf.h', 'ProgramElf.h', 'GetHeaders.h'],
-  # 'StringObject.o'    => ['StringObject.c', 'StringObject.h'],
-  # 'SystemTime.o'      => ['SystemTime.c', 'SystemTime.h'],
-  # 'Tlv.o'             => ['Tlv.c', 'Tlv.h', 'Uart.h', 'TlvEx.h', 'ErrorCode.h', 'SystemTime.h', 'Yield.h'],
-  # 'Token.o'           => ['Token.c', 'Token.h', 'StringObject.h', 'NumberToken.h', 'OperatorToken.h',
-                          # 'IdentifierToken.h', 'FileToken.h', 'ErrorCode.h'],
-  # 'Uart.o'            => ['Uart.c', 'Uart.h', 'ErrorCode.h'],
-# }
-
-# Support library dependency list
-# exception_dependency = {'CException.o'  => ['CException.c', 'CException.h']}
-
-# Support dependency list
-# header_dependency = {
-  # 'FileToken.o'       => ['Token.h', 'StringObject.h'],
-  # 'GetHeaders.o'      => ['Read_File.h', 'elf.h', 'ProgramElf.h'],
-  # 'IdentifierToken.o' => ['Token.h', 'StringObject.h'],
-  # 'Interface.o'       => ['Token.h', 'Tlv.h', 'ErrorCode.h'],
-  # 'MemoryReadWrite.o' => ['Yield.h', 'ProgramLoader.h'],
-  # 'OperatorToken.o'   => ['ErrorCode.h', 'StringObject.h'],
-  # 'NumberToken.o'     => ['Token.h', 'StringObject.h'],
-  # 'ProgramLoader.o'   => ['Tlv.h', 'GetHeaders.h', 'ErrorCode.h', 'Interface.h', 'SystemTime.h'],
-  # 'Read_File.o'       => ['elf.h'],
-  # 'Relocator.o'       => ['Read_File.h', 'elf.h', 'ProgramElf.h', 'GetHeaders.h'],
-  # 'Token.o'           => ['StringObject.h', 'NumberToken.h', 'OperatorToken.h',
-                          # 'IdentifierToken.h', 'FileToken.h', 'ErrorCode.h'],
-  # 'Tlv.o'             => ['Uart.h', 'TlvEx.h', 'ErrorCode.h', 'SystemTime.h', 'Yield.h'],
-  # 'Uart.o'            => ['ErrorCode.h'],
-# }
+FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_CLI") unless defined? FLASHER
+ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
+C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib " unless defined? C_EXCEPTION_PATH
+TARGET_OUTPUT_PATH = 'build/release/probe/' unless defined? TARGET_OUTPUT_PATH
 
 # Configuration parameters
 config = {
@@ -73,34 +34,43 @@ config = {
                     :define => '-D'}
 }
 
-# namespace :target do
-  # desc 'Build target release code'
-  # task :release do
-               # dependency list  directory of   directory of     directory of    config
-                                # dependee       .o files         .exe            object
-    # compile_list(main_dependency, 'src/app/Tlv', 'build/release/host/c', 'build/release', config)
-    # compile_list(exception_dependency, CEXCEPTION_PATH, 'build/release/host/c', 'build/release', config)
-    # compile_list(header_dependency, 'src', 'src', 'build/release', config)
-   # p Rake.application.tasks
-    # Rake::Task["build/release/Main.exe"].invoke
-  # end
-# end
-
 namespace :target do
-  task :prepare_release do
-    dep_list = compile_all(['src/app/Stub', 'src/app/SystemConfig', 
-                            'FlashProgrammer/app/Drivers',
-                            'FlashProgrammer/app/Legacy',
-                            'FlashProgrammer/app'],
-                            'build/release/target/c',
-                            config)
-    link_all(getDependers(dep_list), 'build/release/target/FlashProgrammer.elf', config)
-  end
-  CLEAN.include('build/release/target') if File.exist? 'build/release/target'
+  ouput_elf = nil
+  ouput_hex = nil
+  task :prepare_release, [:coproj] do |t, args|
+    filenames, coproj = get_all_source_files_in_coproj(args[:coproj])
+    file = File.basename(coproj, '.coproj')
+    ouput_elf = File.join(TARGET_OUTPUT_PATH, file + '.elf')
+    ouput_hex = File.join(TARGET_OUTPUT_PATH, file + '.hex')
+    dep_list = createCompilationDependencyList(filenames, ['c', '.c++', '.s', 'cpp', 'asm'], '.', '.o')
+    dep_list = compile_list(dep_list, '.', TARGET_OUTPUT_PATH, '.', config)
+  #  p dep_list
+    link_all(getDependers(dep_list), ouput_elf, config)
 
-  desc 'Build flash programmer release code'
-  task :release => :prepare_release do
-   # p Rake.application.tasks
-    Rake::Task["build/release/target/FlashProgrammer.elf"].invoke
+    file ouput_hex => ouput_elf do |n|
+      if(program_available?(ELF_TO_HEX) == nil)
+        puts "Error: Cannot find #{ELF_TO_HEX} program to turn ELF to HEX."
+        exit
+      end
+      puts "converting #{n.prerequisites[0]} to hex..."
+      sys_cli "#{ELF_TO_HEX} -O ihex #{n.prerequisites[0]} #{n.name}"
+    end
+  end
+
+  desc 'Build probe hardware release code'
+  task :release, [:coproj] => :prepare_release do |t, args|
+    Rake::Task[ouput_elf].invoke(args)
+  end
+
+  desc "Just duplicating .gitignore"
+  task :ignore do
+    src = ".gitignore"
+    target = ".gitignoreXXX"
+    if !up_to_date?(target, src)
+      p "duplicating .gitignore"
+      sh "cp #{src} #{target}"
+    else
+      p "already have the latest copy..."
+    end
   end
 end
