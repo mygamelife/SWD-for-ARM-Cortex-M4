@@ -3,6 +3,12 @@ build/*
 Host/build/*
 !Host/build/README.txt
 SerialWireDebug/*
+*.cogui
+*.comarker
+*.comemgui
+FlashProgrammer/*.cogui
+FlashProgrammer/*.comarker
+FlashProgrammer/*.comemgui
 FlashProgrammer/FlashProgrammer/*
 /output/
 debug.log
