@@ -99,17 +99,11 @@ void flashErase(uint32_t flashAddress, int size)  {
   * return :   NONE
   */
 void flashWriteProgram(uint32_t typeProgram, uint32_t address, uint32_t data) {
-  /* Unlock the Flash to enable the flash control register access */ 
-  HAL_FLASH_Unlock();
   
   if(HAL_FLASH_Program(typeProgram, address, data) != HAL_OK)  {
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     flashErrorHandler();
   }
-  
-  /* Lock the Flash to disable the flash control register access (recommended
-   to protect the FLASH memory against possible unwanted operation) */
-  HAL_FLASH_Lock();
 }
 
 /** 2 Mbyte dual bank organization can choose between sector 0 - sector 23
@@ -254,9 +248,16 @@ void flashCopyFromSramToFlash(uint32_t src, uint32_t dest, int size) {
   __IO uint8_t data = 0;
   uint32_t sramAddress = src, flashAddress = dest;
   
+  /* Unlock the Flash to enable the flash control register access */ 
+  HAL_FLASH_Unlock();
+  
   /* Copy data to flash */
   for(i = 0; i < size; i += BYTE_SIZE, sramAddress += BYTE_SIZE, flashAddress += BYTE_SIZE) {
     data = (uint8_t)readMemoryData(sramAddress);
     flashWriteByte(flashAddress, data);
   }
+  
+  /* Lock the Flash to disable the flash control register access (recommended
+   to protect the FLASH memory against possible unwanted operation) */
+  HAL_FLASH_Lock();
 }

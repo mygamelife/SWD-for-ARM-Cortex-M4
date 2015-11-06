@@ -52,32 +52,6 @@ void test_flashWriteProgram_given_FLASH_TYPEPROGRAM_WORD() {
   flashWriteProgram(FLASH_TYPEPROGRAM_WORD, 0x081FFFFF, 0xABCDABCD);
 }
 
-void test_flashWrite_given_data_0xABCDABCD_should_write_into_ADDR_FLASH_SECTOR_19()  {
-  uint32_t data = 0xABCDABCD;
-
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, ADDR_FLASH_SECTOR_19, data, HAL_OK);
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
-  
-  flashWrite(&data, ADDR_FLASH_SECTOR_19, 1);
-}
-
-void test_flashWrite_given_data_and_size_5_should_write_into_Flash()  {
-  uint32_t data[] = {0x11111111, 0x22222222, 0x33333333, 0x44444444, 0x55555555};
-
-  HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);
-  
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x08000000, data[0], HAL_OK);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x08000004, data[1], HAL_OK);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x08000008, data[2], HAL_OK);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x0800000C, data[3], HAL_OK);
-  HAL_FLASH_Program_ExpectAndReturn(FLASH_TYPEPROGRAM_WORD, 0x08000010, data[4], HAL_OK);
-
-  HAL_FLASH_Lock_ExpectAndReturn(HAL_OK);
-  
-  flashWrite(data, 0x08000000, 20);
-}
-
 void test_flashCopyFromSramToFlash_given_0x20000000_sram_address_0x08000000_flash_address_and_size_8(void) {
   
   HAL_FLASH_Unlock_ExpectAndReturn(HAL_OK);

@@ -1,12 +1,11 @@
 #include "unity.h"
-#include "Delay.h"
+#include "Swd.h"
 #include "IoOperations.h"
 #include "Emulator.h"
 #include "MemoryReadWrite.h"
-#include "swd_Utilities.h"
 #include "IoOperations.h"
 #include "mock_configurePort.h"
-#include "mock_LowLevelIO.h"
+#include "mock_IoOperationsEx.h"
 
 void setUp(void){}
 void tearDown(void){}
@@ -18,13 +17,13 @@ void test_memoryReadWord_given_Address_0x12345678_should_write_address_to_TAR_an
   cswDataSize = CSW_WORD_SIZE;
   
 	// Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG, AP, OK, 0x12345678);
+	emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x12345678);
 
 	// Read and Discard dummy data
-	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0xAABBCCDD);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0xAABBCCDD);
 	
 	// Read actual data from DRW
-	emulateSwdRegisterRead(DRW_REG, AP, OK, 1, 0x10);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0x10);
 	
 	memoryReadWord(0x12345678, &dataRead);
 	
@@ -36,16 +35,16 @@ void test_memoryWriteByte_should_set_CSW_REG_to_byte_and_write_address_to_TAR_an
   cswDataSize = CSW_WORD_SIZE;
   
   // Write BANK_0 to select register
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	
 	// Write CSW_BYTE_SIZE to csw register
-	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_BYTE_SIZE));
   
   // Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,0x12345678);
 	
 	// Write data to DRW
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x21);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x21);
 	
 	// Write data to DRW
 	memoryWriteByte(0x12345678,0x21);
@@ -56,10 +55,10 @@ void test_memoryWriteByte_should_write_address_to_TAR_and_data_to_DRW()
   cswDataSize = CSW_BYTE_SIZE;
   
   // Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,0x12345678);
 	
 	// Write data to DRW
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x21);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x21);
 	
 	// Write data to DRW
 	memoryWriteByte(0x12345678,0x21);
@@ -70,16 +69,16 @@ void test_memoryWriteHalfword_should_set_CSW_REG_to_haflword_and_write_address_t
   cswDataSize = CSW_BYTE_SIZE;
   
   // Write BANK_0 to select register
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	
 	// Write CSW_HALFWORD_SIZE_SIZE to csw register
-	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
   
   // Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,0x12345678);
 	
 	// Write data to DRW
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x4321);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x4321);
 	
 	// Write data to DRW
 	memoryWriteHalfword(0x12345678,0x4321);
@@ -90,10 +89,10 @@ void test_memoryWriteHalfword_should_write_address_to_TAR_and_data_to_DRW()
   cswDataSize = CSW_HALFWORD_SIZE;
   
   // Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,0x12345678);
 	
 	// Write data to DRW
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x4321);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x4321);
 	
 	// Write data to DRW
 	memoryWriteHalfword(0x12345678,0x4321);
@@ -104,16 +103,16 @@ void test_memoryWriteWord_should_set_CSW_REG_to_word_and_write_address_to_TAR_an
   cswDataSize = CSW_BYTE_SIZE;
   
 	// Write BANK_0 to select register
-	emulateSwdRegisterWrite(SELECT_REG, DP, OK, SELECT_BANK0);
+	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	
 	// Write CSW_WORD_SIZE to csw register
-	emulateSwdRegisterWrite(CSW_REG, AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
   // Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,0x12345678);
 	
 	// Write data to DRW
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x87654321);
 	
 	// Write data to DRW
 	memoryWriteWord(0x12345678,0x87654321);
@@ -124,10 +123,10 @@ void test_memoryWriteWord_should_write_address_to_TAR_and_data_to_DRW()
   cswDataSize = CSW_WORD_SIZE;
   
   // Write memory address to TAR
-	emulateSwdRegisterWrite(TAR_REG,AP,4,0x12345678);
+	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,0x12345678);
 	
 	// Write data to DRW
-	emulateSwdRegisterWrite(DRW_REG,AP,4,0x87654321);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x87654321);
 	
 	// Write data to DRW
 	memoryWriteWord(0x12345678,0x87654321);
