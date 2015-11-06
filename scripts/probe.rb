@@ -6,6 +6,17 @@ FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_
 ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
 C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib " unless defined? C_EXCEPTION_PATH
 
+# ST-LINK_CLI error code. They can be found in [1].
+ERR_ST_LINK_ARGS = 1
+ERR_ST_LINK_CONNECTION = 2
+ERR_ST_LINK_COMMAND = 3
+ERR_ST_LINK_RESET = 7
+ERR_ST_LINK_HALT = 8
+ERR_ST_LINK_STEP = 9
+ERR_ST_LINK_BREAKPOINT = 10
+ERR_ST_LINK_ERASE_FLASH = 11
+ERR_ST_LINK_PROG_VERIFY = 12
+
 # Configuration parameters
 config = {
   :verbose      => :no,
