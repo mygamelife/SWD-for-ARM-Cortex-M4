@@ -432,7 +432,8 @@ SwdError swdRegisterWrite(int address, int pointType, uint32_t data)
 
 SwdError swdRegisterRead(int address, int pointType, uint32_t *data)
 {
-	int swdRequest, ack, parity;
+	int swdRequest, ack;
+	//int parity;
 
 	swdRequest = getSwdRequest(address, pointType, SWD_READ);
 	send8bit(swdRequest);
@@ -443,7 +444,8 @@ SwdError swdRegisterRead(int address, int pointType, uint32_t *data)
 	read3bit(&ack);
 	read32bit(data);
 
-	parity = readBit();
+	//parity = readBit();
+	readBit();
 
 	turnAroundWrite();
 	setSWDIOOutputMode();
