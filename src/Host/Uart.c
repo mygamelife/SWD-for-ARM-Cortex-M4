@@ -1,5 +1,57 @@
 #include "Uart.h"
 
+/* COM PORT 0 - 20 */
+static char *comPort[] = {
+                          "COM0", "COM1", "COM2", "COM3", "COM4",
+                          "COM5", "COM6", "COM7", "COM8", "COM9",
+                          /* COM PORT > 9 */
+                          "\\\\.\\COM10", "\\\\.\\COM11", "\\\\.\\COM12",
+                          "\\\\.\\COM13", "\\\\.\\COM14", "\\\\.\\COM15",
+                          "\\\\.\\COM16", "\\\\.\\COM17", "\\\\.\\COM18",
+                          "\\\\.\\COM19", "\\\\.\\COM20"
+                          };
+
+HANDLE createHandler(void) {
+  static int i;
+  uint8_t txBuffer[] = {TLV_VERIFY_COM_PORT, 1, 0};
+  uint8_t rxBuffer[10];
+  
+  COMMTIMEOUTS timeouts={0};
+  DCB dcbSerialParams = {0};
+  DWORD accessdirection = GENERIC_READ | GENERIC_WRITE;
+  //(LPCSTR)comPort[i]
+  for(i = 0; i < 10; i++) {
+    HANDLE hSerial = CreateFile((LPCSTR)comPort[i], 
+                              accessdirection, 
+                              0,
+                              0, 
+                              OPEN_EXISTING,
+                              0,
+                              0);
+    printf("%s\n", comPort[i]);                          
+    if (hSerial != INVALID_HANDLE_VALUE) {
+      printf("Found Com Port in use %s\n", comPort[i]);
+      uartInit(&hSerial);
+      
+      if(hSerial == NULL)  printf("hSerial is NULL\n");
+      if(sendBytes(hSerial, txBuffer, sizeof(txBuffer)) != UART_OK) {
+        printf("send failed\n");
+      }
+      if(getBytes(hSerial, rxBuffer, 1) != UART_OK) {
+        printf("receive failed\n");
+      }
+      if(rxBuffer[0] == TLV_OK) {
+        printf("com port is found\n");
+      } 
+      else CloseHandle(hSerial);
+      // printf("invalid handler\n");
+      // Throw(ERR_INVALID_HANDLER);
+    }
+  }
+  
+  return NULL;
+}
+
 /**
  * Initialize and configure serial comm.
  * 
@@ -11,18 +63,21 @@
 void uartInit(void **handler) {
   COMMTIMEOUTS timeouts={0};
   DCB dcbSerialParams = {0};
-  DWORD  accessdirection = GENERIC_READ | GENERIC_WRITE;
-  HANDLE hSerial = CreateFile((LPCSTR)UART_PORT, 
-                              accessdirection, 
-                              0,  
-                              0,  
-                              OPEN_EXISTING,
-                              0,
-                              0);
-  if (hSerial == INVALID_HANDLE_VALUE) {
-      //call GetLastError(); to gain more information
-    Throw(ERR_INVALID_HANDLER);
-  }
+  DWORD accessdirection = GENERIC_READ | GENERIC_WRITE;
+  
+  HANDLE hSerial = (HANDLE *)*handler;
+  // HANDLE hSerial = CreateFile((LPCSTR)UART_PORT, 
+                              // accessdirection, 
+                              // 0,  
+                              // 0,  
+                              // OPEN_EXISTING,
+                              // 0,
+                              // 0);
+  // if (hSerial == INVALID_HANDLE_VALUE) {
+      // call GetLastError(); to gain more information
+    // printf("invalid handler\n");
+    // Throw(ERR_INVALID_HANDLER);
+  // }
 
   dcbSerialParams.DCBlength=sizeof(dcbSerialParams);
   
@@ -51,8 +106,6 @@ void uartInit(void **handler) {
     //handle error
     Throw(ERR_SET_COMM_TIMEOUTS);
   }  
-  
-  *handler = hSerial;
 }
 
 /* Uart Transmit Function */

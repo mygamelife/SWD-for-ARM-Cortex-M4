@@ -292,6 +292,7 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_OK)                        return 1;
   else if(command == TLV_LOOP_BACK)                 return 1;
   else if(command == TLV_DEBUG_EVENTS)              return 1;
+  else if(command == TLV_VERIFY_COM_PORT)           return 1;
   
   else return 0;
 }

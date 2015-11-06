@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <windows.h>
+#include "Tlv.h"
 #include "ErrorCode.h"
 #include "CException.h"
 
@@ -29,5 +30,7 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
 uint8_t getByte(void *handler, uint8_t *rxBuffer);
 
 int isByteAvailable();
+int searchComPort(void);
+HANDLE createHandler(void);
 
 #endif // Uart_H
