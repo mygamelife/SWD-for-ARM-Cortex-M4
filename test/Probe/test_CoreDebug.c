@@ -416,9 +416,13 @@ void test_softResetTarget_should_write_REQUEST_SYTEM_RESET_to_AIRCR_REG()
   softResetTarget();
 }
 
-/*------------------------------softResetTarget------------------------------------*/
+/*------------------------------vectorResetTarget------------------------------------*/
 void test_vectorResetTarget_should_write_REQUEST_VECTOR_RESET_to_AIRCR_REG()
 {
+  //Set to CORE_DEBUG_HALT first
+  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DHCSR_REG);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0xA05F0003);
+  
   //Write REQUEST_VECTOR_RESET to AIRCR_REG
   emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,AIRCR_REG);
   emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,REQUEST_VECTOR_RESET);

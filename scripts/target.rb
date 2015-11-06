@@ -7,7 +7,7 @@ load "scripts/cbuild.rb"
 FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_CLI") unless defined? FLASHER
 ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
 C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib " unless defined? C_EXCEPTION_PATH
-TARGET_OUTPUT_PATH = 'build/release/probe/' unless defined? TARGET_OUTPUT_PATH
+TARGET_OUTPUT_PATH = 'build/release/target/' unless defined? TARGET_OUTPUT_PATH
 
 # Configuration parameters
 config = {

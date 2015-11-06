@@ -276,6 +276,8 @@ void test_autoSetInstructionRemapping_should_program_machineCode_to_REMAP_BASE_g
 
 void test_autoSetInstructionRemapping_16bit_machineCode_case()
 {
+  cswDataSize = CSW_WORD_SIZE;
+  
   //Read INSTRUCTION_COMP0
   emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, (uint32_t)&(INSTRUCTION_COMP[0]));
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
@@ -308,7 +310,7 @@ void test_autoSetInstructionRemapping_16bit_machineCode_case()
   
   //Set CSW to Halfword Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
-	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_HALFWORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
   
   //Read Instruction Address + 2
   emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x08000002);

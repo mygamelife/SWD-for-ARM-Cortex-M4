@@ -709,10 +709,6 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                               break;
     case TLV_VECT_RESET                 : performVectorResetOnTarget(session);                                                             break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                          break;
-    // case TLV_WRITE_WORD                 : writeTargetInWord(session, get4Byte(&tlv->value[0]), getDataInWord(&tlv->value[4]));             break;
-    // case TLV_WRITE_HALFWORD             : writeTargetInHalfword(session, get4Byte(&tlv->value[0]), getDataInHalfWord(&tlv->value[4]));     break;
-    // case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));             break;
-    // case TLV_READ_HALFWORD              : readTargetInHalfword(session, get4Byte(&tlv->value[0]));                                         break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                         break;
 
     default : break;

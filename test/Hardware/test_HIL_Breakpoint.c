@@ -24,14 +24,18 @@
 #include "FPBUnitEx.h"
 
 int initFlag = 0;
+static void loadBreakpointTestProgram();
 
 void setUp(void) 
 {
   if(initFlag == 0) 
+  {  
     initFlag = 1;
-  initMemoryReadWrite();
-  /* Erase flash space according to size */
-  _flashErase(0x08000000, 2000);
+    initMemoryReadWrite();
+    /* Erase flash space according to size */
+    _flashErase(0x08000000, 2000);
+    loadBreakpointTestProgram();
+  }
   enableFPBUnit();
 }
 
@@ -41,7 +45,7 @@ void tearDown(void)
 }
 
 
-void test_loadBreakpointTestProgram()
+static void loadBreakpointTestProgram()
 {
 /* ---------------- Breakpoint Test Case 2 Bytes -------------------- */
 // 0x080003C0    2117    movs r1,23

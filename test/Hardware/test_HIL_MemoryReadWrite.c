@@ -26,7 +26,7 @@ void setUp(void) {
     initFlag = 1;
     initMemoryReadWrite();
     /* Erase flash space according to size */
-    _flashErase(0x08000000, 2000);
+    _flashErase(0x080E0000, 2000);
   }
 }
 

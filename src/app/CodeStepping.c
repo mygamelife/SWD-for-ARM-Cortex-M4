@@ -32,7 +32,7 @@ int isSelectedAddressContains32bitsInstructionExtended(uint32_t address,uint32_t
   
   memoryReadHalfword(address, &dataRead);
   *machineCode = dataRead ;
-
+  
   dataRead = dataRead & ENCODING_32BIT_MASK ;
   
   if(dataRead == ENCODING_32BIT_CASE1 || dataRead == ENCODING_32BIT_CASE2 || dataRead == ENCODING_32BIT_CASE3)
@@ -166,7 +166,6 @@ uint32_t stepOut()
         pc += 2 ;
     }
   }
-  
   comparatorUsed = autoSetInstructionBreakpoint(pc);  
   if(comparatorUsed == -1)
     return 0 ;
