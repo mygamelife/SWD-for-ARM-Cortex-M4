@@ -389,7 +389,6 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   tlvSend(session, tlv);
 }
 
-
 /** Remove all hardware breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
@@ -433,7 +432,6 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
 void stopAllFlashPatchRemapping(Tlv_Session *session)
 {
   Tlv *tlv ;
-  
   disableAllFlashPatchComparatorSetToRemap();
   
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
@@ -692,7 +690,6 @@ void loopBack(Tlv_Session *session, Tlv *packet) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
-
     case TLV_WRITE_RAM                  : writeTargetRam(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5);   break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &get4Byte(&tlv->value[4]), get4Byte(&tlv->value[0]), tlv->length - 5); break;
     case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));                   break;
@@ -717,6 +714,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     // case TLV_WRITE_BYTE                 : writeTargetInByte(session, get4Byte(&tlv->value[0]), getDataInByte(&tlv->value[4]));             break;
     // case TLV_READ_HALFWORD              : readTargetInHalfword(session, get4Byte(&tlv->value[0]));                                         break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                         break;
+
     default : break;
   }
 }

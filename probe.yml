@@ -24,13 +24,11 @@
 
 :paths:
   :test:
-    - +:test/**
+    - +:test/Probe/**
     - -:test/support
   :source:
-    # - -:src/app/PlatformSpecific/**
-    - src/Host/**
-    - +:src/app/Tlv
-    # - -:src/app/**
+    - src/app/**
+    - -:src/Host
   :support:
     - test/support
 

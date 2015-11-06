@@ -291,11 +291,6 @@ int isTlvCommand(uint8_t command) {
   else if(command == TLV_HARD_RESET)                return 1;
   else if(command == TLV_OK)                        return 1;
   else if(command == TLV_LOOP_BACK)                 return 1;
-  else if(command == TLV_WRITE_WORD)                return 1;
-  else if(command == TLV_WRITE_HALFWORD)            return 1;
-  else if(command == TLV_WRITE_BYTE)                return 1;
-  else if(command == TLV_READ_WORD)                 return 1;
-  else if(command == TLV_READ_HALFWORD)             return 1;
   else if(command == TLV_DEBUG_EVENTS)              return 1;
   
   else return 0;
