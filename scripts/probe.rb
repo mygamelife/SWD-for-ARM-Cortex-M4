@@ -5,7 +5,6 @@ load "scripts/cbuild.rb"
 FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_CLI") unless defined? FLASHER
 ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
 C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib " unless defined? C_EXCEPTION_PATH
-OUTPUT_PATH = 'build/release/probe/' unless defined? OUTPUT_PATH
 
 # Configuration parameters
 config = {
@@ -36,11 +35,13 @@ config = {
 }
 
 namespace :probe do
+  OUTPUT_PATH = 'build/release/probe/' unless defined? OUTPUT_PATH
   ouput_elf = nil
   ouput_hex = nil
   task :prepare_release, [:coproj] do |t, args|
     filenames, coproj = get_all_source_files_in_coproj(args[:coproj])
-    file = File.basename(coproj, '.coproj')
+    puts "Building sources in #{coproj}..."
+    file = File.basename(coproj, '.*')
     ouput_elf = File.join(OUTPUT_PATH, file + '.elf')
     ouput_hex = File.join(OUTPUT_PATH, file + '.hex')
     dep_list = createCompilationDependencyList(filenames, ['c', '.c++', '.s', 'cpp', 'asm'], '.', '.o')
@@ -57,22 +58,36 @@ namespace :probe do
       sys_cli "#{ELF_TO_HEX} -O ihex #{n.prerequisites[0]} #{n.name}"
     end
   end
+#  CLEAN.include('build/release/hw') if File.exist? 'build/release/hw'
 
-  desc 'Build probe hardware release code'
+  desc 'Build hardware release code'
   task :release, [:coproj] => :prepare_release do |t, args|
+  #  p Rake.application.tasks
+
     Rake::Task[ouput_elf].invoke(args)
+  #  sh "cp #{OUTPUT_FILE} ."
   end
 
-  desc 'Flash probe program and run test'
+  desc 'Flash program and run test'
   task :flash, [:coproj] => :prepare_release do |t, args|
     Rake::Task[ouput_hex].invoke(args)
     if(program_available?(FLASHER) == nil)
       puts "Error: Cannot find #{FLASHER} program to flash ARM processor."
       exit
     end
-    sys_cli FLASHER + " -P #{ouput_hex} -V while_programming -Rst -Run"
+    # First check if there is any differences between current Hex file with
+    # the one on the MCU Flash. Download if there is, otherwise do nothing.
+    if (!system "#{FLASHER} -CmpFile #{ouput_hex}") && ($?.exitstatus != ERR_ST_LINK_CONNECTION)
+      # Flash the Hex file into the MCU Flash
+      sys_cli "#{FLASHER} -P #{ouput_hex} -V while_programming -Rst -Run"
+    end
   end
 
+  desc 'Erase all Flash sectors'
+  task :full_erase do
+    sys_cli "#{FLASHER} -ME"
+  end  
+  
   desc "Just duplicating .gitignore"
   task :ignore do
     src = ".gitignore"
