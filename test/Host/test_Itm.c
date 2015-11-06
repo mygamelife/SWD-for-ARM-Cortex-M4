@@ -1,13 +1,9 @@
 #include "unity.h"
 #include "Itm.h"
 
-void setUp(void)
-{
-}
+void setUp(void) {}
 
-void tearDown(void)
-{
-}
+void tearDown(void) {}
 
 void test_module_generator_needs_to_be_implemented(void)
 {

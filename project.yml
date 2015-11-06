@@ -27,10 +27,10 @@
     - +:test/**
     - -:test/support
   :source:
-    - -:src/app/PlatformSpecific/**
     - src/Host/**
+    - -:src/app/PlatformSpecific/**
     - +:src/app/Tlv
-    - +:src/app/*
+    - +:src/app/Drivers
   :support:
     - test/support
 

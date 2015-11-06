@@ -3,7 +3,7 @@
 int main(void)
 {
   uint32_t idr = 0;
-  SwdError errorCode = 0;
+  //SwdError errorCode = 0;
 
   /* Hardware configuration */
   HAL_Init();
@@ -14,10 +14,14 @@ int main(void)
   /* Hardware reset target board */
   hardResetTarget();
   /* Initialize SWD Protocol */
-  errorCode = swdInit();
+  swdInit();
   /* Power Up AHB Port */
-  errorCode = readAhbIDR(&idr);
+  readAhbIDR(&idr);
 
+  //itmConfig();
+  //ITM->PORT[0].u32 = 0xBEEF;
+  //ITM->PORT[1].u32 = 0x5678;
+  //printf("abcd");
   Tlv_Session *session = tlvCreateSession();
 
   while(1)

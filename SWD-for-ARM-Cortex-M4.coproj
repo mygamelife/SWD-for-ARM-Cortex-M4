@@ -25,6 +25,7 @@
         <Option name="nostartfiles" value="0"/>
         <Option name="LTO" value="0"/>
         <Option name="IsNewStartupCode" value="1"/>
+        <Option name="Library" value="Not use C Library"/>
         <LinkedLibraries/>
         <MemoryAreas debugInFlashNotRAM="1">
           <Memory name="IROM1" type="ReadOnly" size="0x00200000" startValue="0x08000000"/>
@@ -106,6 +107,7 @@
     <File name="Hardware/stm32f4xx_hal_def.h" path="src/app/Drivers/stm32f4xx_hal_def.h" type="1"/>
     <File name="Code/CodeStepping.c" path="src/app/CodeStepping.c" type="1"/>
     <File name="Stub/SwdStub.c" path="src/app/Stub/SwdStub.c" type="1"/>
+    <File name="Code/Tpiu.c" path="src/app/Tpiu.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.c" path="src/app/Drivers/stm32f4xx_hal_flash_ramfunc.c" type="1"/>
     <File name="SystemConfig/configurePort.h" path="src/app/SystemConfig/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.c" path="src/app/Drivers/stm32f4xx_hal_rcc.c" type="1"/>
@@ -135,6 +137,7 @@
     <File name="Hardware/stm32f4xx.h" path="src/app/Drivers/stm32f4xx.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio_ex.h" path="src/app/Drivers/stm32f4xx_hal_gpio_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_cortex.c" path="src/app/Drivers/stm32f4xx_hal_cortex.c" type="1"/>
+    <File name="Code/Itm.c" path="src/app/Itm.c" type="1"/>
     <File name="SystemConfig/LED.h" path="src/app/SystemConfig/LED.h" type="1"/>
     <File name="Code/Uart.c" path="src/app/PlatformSpecific/Uart.c" type="1"/>
     <File name="STM32F4/startup_stm32f429xx.s" path="src/app/Drivers/startup_stm32f429xx.s" type="1"/>
@@ -153,10 +156,12 @@
     <File name="STM32F4/stm32f429xx.h" path="src/app/Drivers/stm32f429xx.h" type="1"/>
     <File name="SystemConfig/SystemConfigure.c" path="src/app/SystemConfig/SystemConfigure.c" type="1"/>
     <File name="Code/MemoryReadWrite.h" path="src/app/PlatformSpecific/MemoryReadWrite.h" type="1"/>
+    <File name="Code/Itm.h" path="src/app/Itm.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="src/app/Drivers/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Stub/memoryRW.c" path="src/app/Stub/memoryRW.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="src/app/Drivers/stm32f4xx_hal_flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="src/app/Drivers/stm32f4xx_hal_rcc_ex.h" type="1"/>
+    <File name="Code/Tpiu.h" path="src/app/Tpiu.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_uart.c" path="src/app/Drivers/stm32f4xx_hal_uart.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_usart.h" path="src/app/Drivers/stm32f4xx_hal_usart.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.h" path="src/app/Drivers/stm32f4xx_hal_gpio.h" type="1"/>

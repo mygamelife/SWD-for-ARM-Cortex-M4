@@ -576,6 +576,8 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
   tlvSend(session, tlv);
   
   endTask(session->state); 
+
+  return 1;
 }
 
 /** eraseTargetFlash is a function to erase target flash by section 
@@ -608,6 +610,8 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   tlvSend(session, tlv);
   
   endTask(session->state);
+
+  return 1;
 }
 
 /** massEraseTargetFlash is a function erase flash by bank
@@ -639,6 +643,8 @@ int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
   tlvSend(session, tlv);
   
   endTask(session->state);
+
+  return 1;
 }
 
 void eventOccured(Tlv_Session *session, EventType event) {
