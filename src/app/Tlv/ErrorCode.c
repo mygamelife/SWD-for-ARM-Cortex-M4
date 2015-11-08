@@ -43,6 +43,7 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case ERR_SET_COMM_STATE             : printf("Err : Handler failed to SetCommState              \n"); break;
     case ERR_SET_COMM_TIMEOUTS          : printf("Err : Handler failed to SetCommTimeouts           \n"); break;
     case ERR_GET_COMM_STATE             : printf("Err : Handler failed to GetCommState              \n"); break;
+    case ERR_NO_COM_PORT                : printf("Err : Can't find any available Serial Comm Port   \n"); break;
     /* ###################################### Undefine Error Code ########################################### */
     default                             : printf("Err : Undefine error code %d\n", err);                  break;
   }

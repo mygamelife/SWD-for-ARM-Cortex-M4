@@ -10,15 +10,21 @@ void setUp(void) {}
 
 void tearDown(void) {}
 
-void test_createHandler(void)
+void xtest_getAvailableComPort_should_return_not_null_handler(void)
 {
-  CEXCEPTION_T err;
-  void *handler;
+  void *hSerial;
   
-  // Try {
-    // uartInit(&handler);
-  // } Catch (err) {
-    // printf("err %d\n", err);
-  // }
-	TEST_ASSERT_NOT_NULL(createHandler());
+  getAvailableComPort(&hSerial);
+  uartConfig((HANDLE)hSerial);
+  
+  TEST_ASSERT_NOT_NULL(hSerial);
+  
+  CloseHandle((HANDLE)hSerial);
+}
+
+void test_uartInit(void)
+{
+  void *hSerial;
+  
+  uartInit(&hSerial);
 }
