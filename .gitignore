@@ -4,8 +4,11 @@ Host/build/*
 !Host/build/README.txt
 SerialWireDebug/*
 FlashProgrammer/FlashProgrammer/*
+FlashProgrammer/*.comarker
+FlashProgrammer/*.comemgui
+FlashProgrammer/*.cogui
+*.comarker
+*.comemgui
+*.cogui
 /output/
 debug.log
-./SWD-for-ARM-Cortex-M4.comarker
-./SWD-for-ARM-Cortex-M4.comemgui
-./SWD-for-ARM-Cortex-M4.cogui
