@@ -6,3 +6,6 @@ SerialWireDebug/*
 FlashProgrammer/FlashProgrammer/*
 /output/
 debug.log
+./SWD-for-ARM-Cortex-M4.comarker
+./SWD-for-ARM-Cortex-M4.comemgui
+./SWD-for-ARM-Cortex-M4.cogui
