@@ -704,6 +704,12 @@ void loopBack(Tlv_Session *session, Tlv *packet) {
   tlvSend(session, tlv);
 }
 
+void comPortVerification(Tlv_Session *session) {
+  Tlv *tlv = tlvCreatePacket(TLV_OK, 1, NULL);
+
+  tlvSend(session, tlv);
+}
+
 /** selectTask is a function to select instruction 
   * base on tlv->type
   *
@@ -737,6 +743,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                  break;
+    case TLV_VERIFY_COM_PORT            : comPortVerification(session);                                                             break;
     default : break;
   }
 }

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <windows.h>
+#include "Tlv.h"
 #include "ErrorCode.h"
 #include "CException.h"
 
@@ -17,9 +18,9 @@ typedef enum
 #define UART_BAUD_RATE                128000//9600
 #define closePort(__SESSION__)        CloseHandle(((HANDLE *)((__SESSION__)->handler)))
 
+/* Init/Config USB-to-Serial Converter */
 void uartInit(void **handler);
-DWORD uartSendBytes(HANDLE hSerial, uint8_t * data, int length);
-DWORD uartGetBytes(HANDLE hSerial, uint8_t * buffer, int buffersize);
+void uartConfig(HANDLE handler);
 
 /* Uart Transmit Function */
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length);
@@ -28,6 +29,7 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length);
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
 uint8_t getByte(void *handler, uint8_t *rxBuffer);
 
-int isByteAvailable();
+int getAvailableComPort(void **handler);
+int isComPortAlive(void *handler);
 
 #endif // Uart_H
