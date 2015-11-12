@@ -210,16 +210,11 @@ int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode
     machineCode = swapHalfword(machineCode);
   else
   {
-    printf("Before read\n");
     memoryReadHalfword(instructionAddress+2,&dataRead);
-    printf("After read\n");
     dataRead = dataRead << 16 ;
     machineCode = swapHalfword(machineCode+dataRead);
   }
-  printf("DataRead %x\n",dataRead);
-  printf("Machine code %x\n",machineCode);
   memoryWriteWord((REMAP_BASE + (4*comparatorToUse)),machineCode);
-  printf("Reach here\n");
   manualSetInstructionRemapping(comparatorToUse,instructionAddress,REMAP_BASE);
   
   return comparatorToUse;
