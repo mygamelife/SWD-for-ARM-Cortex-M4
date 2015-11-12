@@ -17,6 +17,7 @@ static uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
 Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data) {
   Tlv *tlv; uint32_t buffer[] = {registerAddress, *data};
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->wregState);
   /* Send tlv request */
@@ -56,6 +57,7 @@ Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAdd
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->regState);
   
@@ -99,6 +101,7 @@ uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
 Process_Status tlvHaltTarget(Tlv_Session *session) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->haltState);
   /* Send tlv request */
@@ -138,6 +141,7 @@ Process_Status tlvHaltTarget(Tlv_Session *session) {
 Process_Status tlvRunTarget(Tlv_Session *session) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->runState);
   
@@ -179,6 +183,7 @@ Process_Status tlvRunTarget(Tlv_Session *session) {
 uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->stepState);
   
@@ -220,6 +225,7 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
 Process_Status tlvSoftReset(Tlv_Session *session) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->sresetState);
   
@@ -259,6 +265,7 @@ Process_Status tlvSoftReset(Tlv_Session *session) {
 Process_Status tlvHardReset(Tlv_Session *session) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->hresetState);
   
@@ -298,6 +305,7 @@ Process_Status tlvHardReset(Tlv_Session *session) {
 Process_Status tlvVectReset(Tlv_Session *session) {
   Tlv *tlv;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->vresetState);
   
@@ -340,6 +348,7 @@ void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size) {
   Tlv *tlv;
   uint32_t buffer[] = {destAddress, size};
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* create tlv packet with register address */
   tlv = tlvCreatePacket(TLV_READ_MEMORY, 8, (uint8_t *)buffer);
 
@@ -355,7 +364,9 @@ void tlvReadDataChunk(Tlv_Session *session, uint32_t destAddress, int size) {
   *
   * Return  : NONE
   */
-uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size) {  
+uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *size) {
+  
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->rmemState);
   
@@ -411,6 +422,8 @@ uint8_t *tlvReadTargetMemory(Tlv_Session *session, uint32_t *destAddress, int *s
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect) {
   Tlv *tlv; uint8_t chksum = 0;
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
   /* create tlv packet with register address */
   tlv = tlvCreatePacket(memorySelect, size + 4, NULL);
   
@@ -437,6 +450,8 @@ void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t dest
   * return  : NONE
   */
 Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect) {
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
   /* Start tlv request task */
   startTask(session->wramState);
   
@@ -583,6 +598,7 @@ Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int 
   Tlv *tlv;
   uint32_t buffer[] = {address, size};
   
+  if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(session->rEraseState);
   
@@ -650,6 +666,8 @@ void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   *           1 if process done
   */
 Process_Status tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks) {
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
   /* Start tlv request task */
   startTask(session->rMassEraseState);
   
@@ -763,6 +781,8 @@ void tlvLoadToFlash(Tlv_Session *session, char *file) {
   * Return  : NONE
   */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address) {
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
   Tlv *tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&address);
 
   tlvSend(session, tlv);
@@ -781,6 +801,8 @@ void tlvSetBreakpoint(Tlv_Session *session, uint32_t address) {
   * Return  : NONE
   */
 EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
   /* Start tlv request task */
   startTask(session->state);
   
