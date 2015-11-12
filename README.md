@@ -39,7 +39,6 @@ To release and flash `FlashProgrammer` need to specified the `.coproj` type:
 rake target:release[FlashProgrammer/FlashProgrammer.coproj]
 rake target:flash[FlashProgrammer/FlashProgrammer.coproj]
 ```
-```
 
 Flash
 =====
@@ -81,5 +80,5 @@ rake p=probe.yml probe:test:all
 
 To run all `probe` hardware-in-the-loop test:
 ```
-rake p=hw.yml probe:hw:test:all
+rake p=probe_hil.yml probe:hw:test:all
 ```
