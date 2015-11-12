@@ -1,6 +1,7 @@
 #ifndef ProgramWorker_H
 #define ProgramWorker_H
 
+#include <stdint.h>
 #include "Tlv.h"
 #include "CoreDebug.h"
 #include "FPBUnit.h"

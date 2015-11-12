@@ -389,23 +389,6 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   tlvSend(session, tlv);
 }
 
-/** Remove single software instruction breakpoint
- *
- * Input     : session contain a element/handler used by tlv protocol
- *             instructionAddress is the address set to breakpoint previously using bkpt instruction
- *             machineCode contains the original machineCode before it was replaced by the bkpt instruction
- */
-//void removeSoftwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress,uint32_t machineCode)
-//{
-  //Tlv *tlv ;
-  
-  //restoreSoftwareBreakpointOriginalInstruction(instructionAddress,machineCode);
-  
-  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  //tlvSend(session,tlv);
-//}
-
-
 /** Remove all hardware breakpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
@@ -446,15 +429,14 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
  *
  * Input     : session contain a element/handler used by tlv protocol
  */
-//void disableAllFlashPatchComparatorSetToRemap(Tlv_Session *session)
-//{
-  //Tlv *tlv ;
+void stopAllFlashPatchRemapping(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  disableAllFlashPatchComparatorSetToRemap();
   
-  //disableAllFlashPatchComparatorSetToRemap();
-  
-  //tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  //tlvSend(session, tlv);
-//}
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session, tlv);
+}
 
 
 /**
@@ -720,6 +702,7 @@ void comPortVerification(Tlv_Session *session) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
+
     case TLV_WRITE_RAM                  : writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);       break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);     break;
     case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
@@ -729,14 +712,11 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_RUN_TARGET                 : runTarget(session);                                                                       break;
     case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                               break;
     case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
-    case TLV_SOFTBREAKPOINT             : break;
-    case TLV_REMOVE_BREAKPOINT          : break;
-    case TLV_REMOVE_SOFTBREAKPOINT      : break;
-    case TLV_REMOVE_ALL_HWBREAKPOINT    : removeAllHardwareBreakpoint(session);                                                     break;
-    case TLV_REMOVE_ALL_SOFTBREAKPOINT  : break ;
-    case TLV_REMOVE_ALL_BREAKPOINT      : break ;
-    case TLV_STOP_REMAP                 : break;
-    //case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
+    case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
+    case TLV_REMOVE_BREAKPOINT          : removeHardwareBreakpoint(session, get4Byte(&tlv->value[0]));                              break;
+    case TLV_REMOVE_ALL_BREAKPOINT      : removeAllHardwareBreakpoint(session);                                                     break;
+    case TLV_STOP_REMAP                 : stopFlashPatchRemapping(session, get4Byte(&tlv->value[0]));                               break;
+    case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
     case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
     case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                  break;
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
@@ -744,6 +724,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
     case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                  break;
     case TLV_VERIFY_COM_PORT            : comPortVerification(session);                                                             break;
+
     default : break;
   }
 }

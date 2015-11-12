@@ -8,7 +8,7 @@
 #include "Emulator.h"
 #include "Swd.h"
 #include "IoOperations.h"
-#include "mock_MemoryReadWrite.h"
+#include "MemoryReadWrite.h"
 #include "mock_IoOperationsEx.h"
 #include "mock_configurePort.h"
 
@@ -34,7 +34,7 @@ void test_isStackPointerPointingToDefaultLocation_given_false_should_return_0()
 
 void test_isSelectedAddressContains32bitsInstructionExtended_given_0xE800_should_return_1()
 {
-  //cswDataSize = CSW_HALFWORD_SIZE ;
+  cswDataSize = CSW_HALFWORD_SIZE ;
   
   uint32_t machineCode = 0 ;
   
@@ -47,7 +47,7 @@ void test_isSelectedAddressContains32bitsInstructionExtended_given_0xE800_should
   TEST_ASSERT_EQUAL(0xE800, machineCode);
 }
 
-void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xF000_should_return_1()
+void test_isSelectedAddressContains32bitsInstructionExtended_given_0xF000_should_return_1()
 {
   uint32_t machineCode = 0 ;
   
@@ -60,7 +60,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xF00
   TEST_ASSERT_EQUAL(0xF000,machineCode);
 }
 
-void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xF800_should_return_1()
+void test_isSelectedAddressContains32bitsInstructionExtended_given_0xF800_should_return_1()
 {
   uint32_t machineCode = 0 ;
   
@@ -73,7 +73,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xF80
   TEST_ASSERT_EQUAL(0xF800,machineCode);
 }
 
-void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xFF00_should_return_1()
+void test_isSelectedAddressContains32bitsInstructionExtended_given_0xFF00_should_return_1()
 {
   uint32_t machineCode = 0 ;
   
@@ -86,7 +86,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xFF0
   TEST_ASSERT_EQUAL(0xFF00,machineCode);
 }
 
-void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xE700_should_return_0()
+void test_isSelectedAddressContains32bitsInstructionExtended_given_0xE700_should_return_0()
 {
   uint32_t machineCode = 0 ;
   
@@ -102,7 +102,7 @@ void test_isSelectedAddressContains32bitsInstructionExtendedExtended_given_0xE70
 /*-------------------------isSelectedAddressContainsCallingSubroutineInstruction---------------------------*/
 void test_isSelectedAddressContainsCallingSubroutineInstruction_given_0xF000D000_should_return_1()
 {
-  //cswDataSize = CSW_WORD_SIZE ;
+  cswDataSize = CSW_WORD_SIZE ;
   
   //Retrieve machine code
   emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x10000000);
@@ -199,7 +199,7 @@ void test_stepIntoOnce_should_step_and_read_and_return_PC()
 /*-------------------------stepOver---------------------------*/
 void test_stepOver_should_do_stepInto_for_16bit_Instruction_and_return_PC()
 {
-  //cswDataSize = CSW_HALFWORD_SIZE ;
+  cswDataSize = CSW_HALFWORD_SIZE ;
   
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x22334450);
   
@@ -216,7 +216,8 @@ void test_stepOver_should_do_stepInto_for_16bit_Instruction_and_return_PC()
 }
 
 void test_stepOver_should_do_stepInto_for_32bit_normal_Instruction_and_return_PC()
-{
+{ 
+  cswDataSize = CSW_HALFWORD_SIZE ;
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x22334450);
   
   //Check for 32bit instruction and true
@@ -226,7 +227,7 @@ void test_stepOver_should_do_stepInto_for_32bit_normal_Instruction_and_return_PC
   
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
-	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
   
   //Read word at the address but get not match
   emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x22334450);
@@ -242,7 +243,7 @@ void test_stepOver_should_do_stepInto_for_32bit_normal_Instruction_and_return_PC
 
 void test_stepOver_should_stepOver_by_setting_breakpoint_when_branch_is_met_and_return_PC()
 {
-  //cswDataSize = CSW_HALFWORD_SIZE ;
+  cswDataSize = CSW_HALFWORD_SIZE ;
   
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x22334450);
   
@@ -253,7 +254,7 @@ void test_stepOver_should_stepOver_by_setting_breakpoint_when_branch_is_met_and_
   
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
-	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
   
   //Read word at the address and match
   emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x22334450);
@@ -261,11 +262,11 @@ void test_stepOver_should_stepOver_by_setting_breakpoint_when_branch_is_met_and_
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xF000D000));
   
   //Set breakpoint
-  autoSetInstructionBreakpoint_ExpectAndReturn(0x22334454,MATCH_WORD,1);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x22334454,1);
   //Wait for breakpoint event
   readDebugEventRegister_ExpectAndReturn(0x2);
   //Disable breakpoint 
-  disableInstructionComparator_ExpectAndReturn(1,0);
+  disableFlashPatchInstructionComparator_ExpectAndReturn(1,0);
   //Clear breakpoint event
   emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DFSR_REG);
 	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,BKPT_DEBUGEVENT);
@@ -275,7 +276,7 @@ void test_stepOver_should_stepOver_by_setting_breakpoint_when_branch_is_met_and_
 
 void test_stepOver_will_return_0_if_fail_to_stepOver_branch_instruction()
 {
-  //cswDataSize = CSW_HALFWORD_SIZE ;
+  cswDataSize = CSW_HALFWORD_SIZE ;
   
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x22334450);
   
@@ -286,7 +287,7 @@ void test_stepOver_will_return_0_if_fail_to_stepOver_branch_instruction()
   
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
-	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE | CSW_ENABLE_ADDR_INC_PACKED));
   
   //Read word at the address and match
   emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x22334450);
@@ -294,7 +295,7 @@ void test_stepOver_will_return_0_if_fail_to_stepOver_branch_instruction()
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xF000D000));
   
   //Set breakpoint and failed
-  autoSetInstructionBreakpoint_ExpectAndReturn(0x22334454,MATCH_WORD,-1);
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x22334454,-1);
   
   TEST_ASSERT_EQUAL(0,stepOver());
 }
@@ -309,8 +310,7 @@ void test_stepOut_given_outside_of_subroutine_should_return_0()
 
 void test_stepOut_given_inside_Subroutine_should_searchforReturnsubroutineInstruction_stepOnce_and_return_PC()
 {
-  //cswDataSize = CSW_HALFWORD_SIZE ;
-  
+  cswDataSize = CSW_HALFWORD_SIZE ;
   readCoreRegister_ExpectAndReturn(CORE_REG_SP,0x2002FFE0);
   
   readCoreRegister_ExpectAndReturn(CORE_REG_PC,0x11223330);
@@ -325,32 +325,36 @@ void test_stepOut_given_inside_Subroutine_should_searchforReturnsubroutineInstru
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xFF00));
   
+  //Selected addresss contains 32bit machine code ,next call pc = pc + 4
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x11223338);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xFF00));
   
   //Selected addresss contains 16bit machine code but didnt match any return from subroutine instruction , next call pc = pc + 2
-  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x11223338);
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x1122333C);
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xBD00));
   
   //Selected addresss contains 32bit machine code ,next call pc = pc + 4
-  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x1122333A);
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x1122333E);
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
-	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xFF00));
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xABCD));
 
   //Selected addresss contains 16bit machine code and matches return from subroutine instruction
-  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x1122333E);
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, 0x11223340);
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
 	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0xBD80));
   
-  //Set breakpoint
-  autoSetInstructionBreakpoint_ExpectAndReturn(0x1122333E,MATCH_WORD,1);
-  //Wait for breakpoint event
+  // Set breakpoint
+  autoSetInstructionBreakpoint_ExpectAndReturn(0x11223340,1);
+  // Wait for breakpoint event
   readDebugEventRegister_ExpectAndReturn(0x2);
-  //Disable breakpoint 
-  disableInstructionComparator_ExpectAndReturn(1,0);
+  // Disable breakpoint 
+  disableFlashPatchInstructionComparator_ExpectAndReturn(1,0);
   
-  //Set CSW to Word Size
+  // Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
-	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
+	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE) );
   
   //Clear breakpoint event
   emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DFSR_REG);
