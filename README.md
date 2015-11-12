@@ -10,11 +10,9 @@ To view all available commands issue:
 ```
 rake -T
 ```
-The new commands added by `scripts/hw.rb` are:
-```
-rake hw:flash
-rake hw:release
-```
+
+Configuration
+=============
 
 By default rake loads `project.yml` configuration file for Ceedling. You can override that by issuing `project=<yml_filename>`. E.g.,
 ```
