@@ -12,7 +12,7 @@
   :build_root: build
   # :release_build: TRUE
   :test_file_prefix: test_
-  :load_scripts: [scripts/probe.rb]
+  :load_scripts: [scripts/probe.rb, scripts/target.rb]
 
 :release_build:
   :output: main.exe
@@ -28,7 +28,7 @@
     - +:test/Hardware/**
     - -:test/support
   :source:
-    - src/app/**
+    - src/**
     - -:src/app/PlatformSpecific/**
   :support:
     - test/support
