@@ -20,6 +20,20 @@ rake project=./myproject.yml test:all
 ```
 will load `myproject.yml` configuration file in the current directory and then run all tests.
 
+Release
+=======
+To build hardware `release` version, type:
+```
+rake probe:release
+```
+The script for building it can be found in `scripts/probe.rb`. Edit the script if you need different compilation/linking outcome.
+
+The command above only works if there is **exactly** one `.coproj` file in the current directory. If it has none, you need to specify the path and filename of the coproj. E.g.,
+```
+rake probe:release[project/Blinky.coproj]
+```
+Similarly, if there are many `coproj` files in the current directory, you need to specify which one `coproj` file to be used for building.
+
 Flash
 =====
 To flash hardware `release` version, type:
@@ -28,7 +42,7 @@ rake hw:flash
 ```
 This command is to build the source code from the path stated in '.coproj' and flash it into hardware using ST-LINK. This command relies on `ST-LINK_CLI.exe` program by default. The program can be obtained from [here](http://www.st.com/web/en/catalog/tools/PF258168). You need to include the path to that program into the system path, so that the build system is able to invoke it.
 
-There is an another way of running this command by specified the '.coproj' name. Let's say if there is two coproj inside same directory you can specified which coproj to be compile and flash.
+There is an another way of running this command by specified the '.coproj' name similar with 'probe:release'.
 ```
 rake hw:flash[Blinky02.coproj]
 ```
