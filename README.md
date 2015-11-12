@@ -34,6 +34,13 @@ rake probe:release[project/Blinky.coproj]
 ```
 Similarly, if there are many `coproj` files in the current directory, you need to specify which one `coproj` file to be used for building.
 
+To release and flash `FlashProgrammer` need to specified the `.coproj` type:
+```
+rake target:release[FlashProgrammer/FlashProgrammer.coproj]
+rake target:flash[FlashProgrammer/FlashProgrammer.coproj]
+```
+```
+
 Flash
 =====
 To flash hardware `release` version, type:
@@ -74,5 +81,5 @@ rake p=probe.yml probe:test:all
 
 To run all `probe` hardware-in-the-loop test:
 ```
-rake p=probe.yml probe:hw:test:all
+rake p=hw.yml probe:hw:test:all
 ```
