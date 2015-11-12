@@ -10,6 +10,12 @@ FlashProgrammer/*.cogui
 FlashProgrammer/*.comarker
 FlashProgrammer/*.comemgui
 FlashProgrammer/FlashProgrammer/*
+FlashProgrammer/*.comarker
+FlashProgrammer/*.comemgui
+FlashProgrammer/*.cogui
+*.comarker
+*.comemgui
+*.cogui
 /output/
 debug.log
 mkmf.log

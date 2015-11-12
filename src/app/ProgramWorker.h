@@ -72,4 +72,6 @@ void checkDebugEvent(Tlv_Session *session, EventType event);
 /* ### Testing Tlv Protocol ## */
 void loopBack(Tlv_Session *session, Tlv *packet);
 
+void comPortVerification(Tlv_Session *session);
+
 #endif // ProgramWorker_H

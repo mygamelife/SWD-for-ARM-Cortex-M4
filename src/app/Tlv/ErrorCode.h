@@ -72,6 +72,7 @@ typedef enum
   ERR_INVALID_HANDLER = 46,
   ERR_SET_COMM_STATE,
   ERR_SET_COMM_TIMEOUTS,
+  ERR_NO_COM_PORT,
   ERR_GET_COMM_STATE, //49
 } Handler_ErrorCode;
 

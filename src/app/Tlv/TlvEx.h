@@ -58,6 +58,7 @@ typedef enum
   TLV_READ_WORD,                      /* Read Data Into Target In Word            */
   TLV_READ_HALFWORD,                  /* Request Read Halfword Data from target                           */
   TLV_DEBUG_EVENTS,                   /* Request Debug Event to check for specific event to happen        */
+  TLV_VERIFY_COM_PORT
 } Tlv_Command;
 
 typedef enum
