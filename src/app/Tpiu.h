@@ -3,6 +3,7 @@
 
 #include "stm32f429xx.h"
 #include "core_cm4.h"
+#include "MemoryReadWrite.h"
 
 /* TPIU trace port size selection
  */

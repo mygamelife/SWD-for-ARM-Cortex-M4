@@ -18,16 +18,24 @@ int main(void)
   /* Power Up AHB Port */
   readAhbIDR(&idr);
 
-  //itmConfig();
-  //ITM->PORT[0].u32 = 0xBEEF;
-  //ITM->PORT[1].u32 = 0x5678;
-  //printf("abcd");
-  Tlv_Session *session = tlvCreateSession();
+  uint32_t readData;
+  int high = 0, low = 0;
+
+  itmConfig();
+  memoryReadWord((uint32_t)&ITM->LSR, &readData);
+  memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x31);
+
+  //memoryReadWord((uint32_t)&ITM->PORT[0].u32, &readData);
+
+  //Tlv_Session *session = tlvCreateSession();
 
   while(1)
   {
-    tlvService(session);
-    probeTaskManager(session);
+    //tlvService(session);
+    //probeTaskManager(session);
+	  if(readSWO() == 1) {
+		  high++;
+	  } else low++;
   }
 }
 
