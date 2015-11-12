@@ -29,6 +29,7 @@
   :source:
     - src/Host/**
     - -:src/app/PlatformSpecific/**
+    - +:src/app/*
     - +:src/app/Tlv
     - +:src/app/Drivers
   :support:

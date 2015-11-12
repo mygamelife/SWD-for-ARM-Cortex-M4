@@ -12,3 +12,4 @@ FlashProgrammer/*.comemgui
 FlashProgrammer/FlashProgrammer/*
 /output/
 debug.log
+mkmf.log

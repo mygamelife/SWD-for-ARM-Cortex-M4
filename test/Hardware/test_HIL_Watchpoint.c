@@ -23,15 +23,139 @@
 #include "DWTUnit.h"
 #include "DwTUnitEx.h"
 
+#define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
+
+uint16_t machineCode[] = 
+{
+  /* ---------------- Watchpoint TestCase Read LDRB -------------------- */
+  0xF243,0x3644,   //0x08100000  movw r6,#0x3344
+  0xF2C1,0x1622,   //0x08100004  movt r6,#0x1122
+
+  0xF64C,0x4CDD,   //0x08100008  movw r12,0xCCDD 
+  0xF6CA,0x2CBB,   //0x0810000C  movt r12,0xAABB
+
+  0xF240,0x405C,   //0x08100010  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x08100014  movt r0,#0x2000
+
+  0xF8C0,0xC000 ,  //0x08100018  str r12,[r0]
+  0x7806,          //0x0810001C  ldrb r6,[r0]
+  0x2121,          //0x0810001E  movs r1,#33
+  0xE7FE,          //0x08100020  b.
+  0xBF00,          //0x08100022  nop
+
+/* ---------------- Watchpoint TestCaseRead LDRH -------------------- */
+  0xF243,0x3644,   //0x08100024  movw r6,#0x3344
+  0xF2C1,0x1622,   //0x08100028  movt r6,#0x1122
+
+  0xF64C,0x4CDD,   //0x0810003C  movw r12,0xCCDD 
+  0xF6CA,0x2CBB,   //0x08100040  movt r12,0xAABB
+
+  0xF240,0x405C,   //0x08100044  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x08100048  movt r0,#0x2000
+
+  0xF8C0,0xC000,   //0x0810005C  str r12,[r0]
+  0x8806,          //0x08100060  ldrH r6,[r0]
+  0x2121,          //0x08100062  movs r1,#33
+  0xE7FE,          //0x08100064  b.
+  0xBF00,          //0x08100066  nop
+
+// /* ---------------- Watchpoint TestCaseRead LDR -------------------- */
+  0xF243,0x3644,   //0x08100068  movw r6,#0x3344
+  0xF2C1,0x1622,   //0x0810007C  movt r6,#0x1122
+
+  0xF64C,0x4CDD,   //0x08100080  movw r12,0xCCDD 
+  0xF6CA,0x2CBB,   //0x08100084  movt r12,0xAABB
+
+  0xF240,0x405C,   //0x08100088  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x0810009C  movt r0,#0x2000
+
+  0xF8C0,0xC000,   //0x08100100  str r12,[r0]
+  0x6806,          //0x08100104  ldrb r6,[r0]
+  0x2121,          //0x08100106  movs r1,#33
+  0xE7FE,          //0x08100108  b.
+  0xBF00,          //0x0810010A  nop
+
+/* ---------------- Watchpoint TestCaseWrite STRB -------------------- */
+  0xF243,0x3644,   //0x0810010E  movw r6,#0x3344
+  0xF2C1,0x1622,   //0x08100112  movt r6,#0x1122
+
+  0xF240,0x405C,   //0x08100116  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x0810011A  movt r0,#0x2000
+
+  0x7006,          //0x0810011E  strb r6,[r0]
+  0x2111,          //0x08100120  movs r1,#17
+  0x2112,          //0x08100122  movs r1,#18
+  0x2113,          //0x08100124  movs r1,#19
+  0x2114,          //0x08100126  movs r1,#20
+  0x2115,          //0x08100128  movs r1,#21
+  0xE7FE,          //0x0810012A  b.
+  0xBF00,          //0x0810012C  nop
+
+// /* ---------------- Watchpoint TestCaseWrite STRH -------------------- */
+  0xF243,0x3644,   //0x0810012E  movw r6,#0x3344
+  0xF2C1,0x1622,   //0x08100132  movt r6,#0x1122
+
+  0xF240,0x405C,   //0x08100136  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x0810013A  movt r0,#0x2000
+
+  0x8006,          //0x0810013C  strh r6,[r0]
+  0x2111,          //0x0810013E  movs r1,#17
+  0x2112,          //0x08100140  movs r1,#18
+  0x2113,          //0x08100142  movs r1,#19
+  0x2114,          //0x08100144  movs r1,#20
+  0x2115,          //0x08100146  movs r1,#21
+  0xE7FE,          //0x08100148  b.
+  0xBF00,          //0x0810014A  nop
+
+/* ---------------- Watchpoint TestCaseWrite STR -------------------- */
+  0xF243,0x3644,   //0x0810014C  movw r6,#0x3344
+  0xF2C1,0x1622,   //0x08100150  movt r6,#0x1122
+
+  0xF240,0x405C,   //0x08100154  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x08100158  movt r0,#0x2000
+
+  0x6006,          //0x0810015C  str r6,[r0]
+  0x2111,          //0x0810015E  movs r1,#17
+  0x2112,          //0x08100160  movs r1,#18
+  0x2113,          //0x08100162  movs r1,#19
+  0x2114,          //0x08100164  movs r1,#20
+  0x2115,          //0x08100168  movs r1,#21
+  0xE7FE,          //0x0810016A  b.
+  0xBF00,          //0x0810016C  nop
+
+/* ---------------- Watchpoint TestCaseDoubleWrite -------------------- */
+  0xF240,0x405C,   //0x0810016E  movw r0,#0x045C
+  0xF2C2,0x0000,   //0x08100172  movt r0,#0x2000
+
+  0x210A,          //0x08100176  movs r1,#10
+  0x6001,          //0x08100178  str r1,[r0]
+  0x210B,          //0x0810017A  movs r1,#11
+  0x6001,          //0x0810017C  str r1,[r0]
+
+  0xF05F,0x0B11,   //0x0810017E  movw r11,#11
+  0xF05F,0x0B12,   //0x08100182  movw r11,#12
+  0xF05F,0x0B13,   //0x08100186  movw r11,#13
+  0xF05F,0x0B14,   //0x0810018A  movw r11,#14
+  0xF05F,0x0B15,   //0x0810018C  movw r11,#15
+
+  0xE7FE,          //0x08100190  b.
+  0xBF00,          //0x08100192  nop
+
+};
+
 int initFlag = 0;
+static void loadWatchpointTestProgram();
 
 void setUp(void) 
 {
   if(initFlag == 0) 
+  {
     initFlag = 1;
-  initMemoryReadWrite();
-  /* Erase flash space according to size */
-  _flashErase(0x08000000, 2000);
+    initMemoryReadWrite();
+    /* Erase flash space according to size */
+    // _flashErase(0x08000000, 2000);
+    loadWatchpointTestProgram();
+  }
   enableDWTandITM();
 }
 
@@ -42,219 +166,33 @@ void tearDown(void)
   disableDWTandITM();
 }
 
-void test_loadWatchpointTestProgram()
+static void loadWatchpointTestProgram()
 {
-/* ---------------- Watchpoint TestCase Read LDRB -------------------- */
-// 0x080003F0    F2433644   movw r6,#0x3344
-// 0x080003F4    F2C11622   movt r6,#0x1122
-
-// 0x080003F8    F64C4CDD   movw r12,0xCCDD 
-// 0x080003FC    F6CA2CBB   movt r12,0xAABB
-
-// 0x08000400    F240405C   movw r0,#0x045C
-// 0x08000404    F2C20000   movt r0,#0x2000
-
-// 0x08000408    F8C0C000   str r12,[r0]
-// 0x0800040C    7806       ldrb r6,[r0]
-// 0x0800040E    2121       movs r1,#33
-// 0x08000410    E7FE       b.n	8000410
-
-  _flashWrite(0x080003F0,0xF2433644,WORD_SIZE);
-  _flashWrite(0x080003F4,0xF2C11622,WORD_SIZE);
+  int i , isIdenticalProgram = 1 ;
   
-  _flashWrite(0x080003F8,0xF64C4CDD,WORD_SIZE);
-  _flashWrite(0x080003FC,0xF6CA2CBB,WORD_SIZE);
+  uint32_t machineCodeReadFromTarget[CODE_SIZE] ;
+  uint32_t address = 0x08100000 ;
   
-  _flashWrite(0x08000400,0xF240405C,WORD_SIZE);
-  _flashWrite(0x08000404,0xF2C20000,WORD_SIZE);
+  for(i = 0 ; i <CODE_SIZE ; i++, address+=2)
+  {  
+    memoryReadHalfword(address,&machineCodeReadFromTarget[i]);
+    printf("Address : %x \tMachineCodeRead %x vs MachineCode %x\n",address,machineCodeReadFromTarget[i],machineCode[i]);
+    if(machineCodeReadFromTarget[i] != machineCode[i])
+    {
+      isIdenticalProgram = 0 ;
+      break ;
+    }
+  }
   
-  _flashWrite(0x08000408,0xF8C0C000,WORD_SIZE);
-  _flashWrite(0x0800040C,0x7806,HALFWORD_SIZE);
-  _flashWrite(0x0800040E,0x2121,HALFWORD_SIZE);
-  _flashWrite(0x08000410,0xE7FE,HALFWORD_SIZE);
-  
-  
-/* ---------------- Watchpoint TestCaseRead LDRH -------------------- */
-// 0x080004F0    F2433644   movw r6,#0x3344
-// 0x080004F4    F2C11622   movt r6,#0x1122
-
-// 0x080004F8    F64C4CDD   movw r12,0xCCDD 
-// 0x080004FC    F6CA2CBB   movt r12,0xAABB
-
-// 0x08000500    F240405C   movw r0,#0x045C
-// 0x08000504    F2C20000   movt r0,#0x2000
-
-// 0x08000508    F8C0C000   str r12,[r0]
-// 0x0800050C    8806       ldrH r6,[r0]
-// 0x0800050E    2121       movs r1,#33
-// 0x08000510    E7FE       b.n	8000410
-
-  _flashWrite(0x080004F0,0xF2433644,WORD_SIZE);
-  _flashWrite(0x080004F4,0xF2C11622,WORD_SIZE);
-  
-  _flashWrite(0x080004F8,0xF64C4CDD,WORD_SIZE);
-  _flashWrite(0x080004FC,0xF6CA2CBB,WORD_SIZE);
-  
-  _flashWrite(0x08000500,0xF240405C,WORD_SIZE);
-  _flashWrite(0x08000504,0xF2C20000,WORD_SIZE);
-  
-  _flashWrite(0x08000508,0xF8C0C000,WORD_SIZE);
-  _flashWrite(0x0800050C,0x8806,HALFWORD_SIZE);
-  _flashWrite(0x0800050E,0x2121,HALFWORD_SIZE);
-  _flashWrite(0x08000510,0xE7FE,HALFWORD_SIZE);
-
-  
-/* ---------------- Watchpoint TestCaseRead LDR -------------------- */
-// 0x080005F0    F2433644   movw r6,#0x3344
-// 0x080005F4    F2C11622   movt r6,#0x1122
-
-// 0x080005F8    F64C4CDD   movw r12,0xCCDD 
-// 0x080005FC    F6CA2CBB   movt r12,0xAABB
-
-// 0x08000600    F240405C   movw r0,#0x045C
-// 0x08000604    F2C20000   movt r0,#0x2000
-
-// 0x08000608    F8C0C000   str r12,[r0]
-// 0x0800060C    6806       ldrb r6,[r0]
-// 0x0800060E    2121       movs r1,#33
-// 0x08000610    E7FE       b.n	8000410
-
-  _flashWrite(0x080005F0,0xF2433644,WORD_SIZE);
-  _flashWrite(0x080005F4,0xF2C11622,WORD_SIZE);
-  
-  _flashWrite(0x080005F8,0xF64C4CDD,WORD_SIZE);
-  _flashWrite(0x080005FC,0xF6CA2CBB,WORD_SIZE);
-  
-  _flashWrite(0x08000600,0xF240405C,WORD_SIZE);
-  _flashWrite(0x08000564,0xF2C20000,WORD_SIZE);
-  
-  _flashWrite(0x08000608,0xF8C0C000,WORD_SIZE);
-  _flashWrite(0x0800060C,0x6806,HALFWORD_SIZE);
-  _flashWrite(0x0800060E,0x2121,HALFWORD_SIZE);
-  _flashWrite(0x08000610,0xE7FE,HALFWORD_SIZE);
-  
-  
-/* ---------------- Watchpoint TestCaseWrite STRB -------------------- */
-// 0x080006A0    F2433644   movw r6,#0x3344
-// 0x080006A4    F2C11622   movt r6,#0x1122
-
-// 0x080006A8    F240405C   movw r0,#0x045C
-// 0x080006AC    F2C20000   movt r0,#0x2000
-
-// 0x080006B0    7006       strb r6,[r0]
-// 0x080006B2    2111       movs r1,#17
-// 0x080006B4    2112       movs r1,#18
-// 0x080006B6    2113       movs r1,#19
-// 0x080006B8    2114       movs r1,#20
-// 0x080006BA    2115       movs r1,#21
-// 0x080006BC    E7FE       b.n	80005bc
-
-  _flashWrite(0x080006A0,0xF2433644,WORD_SIZE);
-  _flashWrite(0x080006A4,0xF2C11622,WORD_SIZE);
-  
-  _flashWrite(0x080006A8,0xF64C4CDD,WORD_SIZE);
-  _flashWrite(0x080006AC,0xF6CA2CBB,WORD_SIZE);
-
-  _flashWrite(0x080006B0,0x7006,HALFWORD_SIZE);
-  _flashWrite(0x080006B2,0x2111,HALFWORD_SIZE);
-  _flashWrite(0x080006B4,0x2112,HALFWORD_SIZE);
-  _flashWrite(0x080006B6,0x2113,HALFWORD_SIZE);
-  _flashWrite(0x080006B8,0x2114,HALFWORD_SIZE);
-  _flashWrite(0x080006BA,0x2115,HALFWORD_SIZE);
-  _flashWrite(0x080006BC,0xE7FE,HALFWORD_SIZE);
-
-/* ---------------- Watchpoint TestCaseWrite STRH -------------------- */
-// 0x080007A0    F2433644   movw r6,#0x3344
-// 0x080007A4    F2C11622   movt r6,#0x1122
-
-// 0x080007A8    F240405C   movw r0,#0x045C
-// 0x080007AC    F2C20000   movt r0,#0x2000
-
-// 0x080007B0    8006       strh r6,[r0]
-// 0x080007B2    2111       movs r1,#17
-// 0x080007B4    2112       movs r1,#18
-// 0x080007B6    2113       movs r1,#19
-// 0x080007B8    2114       movs r1,#20
-// 0x080007BA    2115       movs r1,#21
-// 0x080007BC    E7FE       b.n	80005bc
-
-  _flashWrite(0x080007A0,0xF2433644,WORD_SIZE);
-  _flashWrite(0x080007A4,0xF2C11622,WORD_SIZE);
-  
-  _flashWrite(0x080007A8,0xF64C4CDD,WORD_SIZE);
-  _flashWrite(0x080007AC,0xF6CA2CBB,WORD_SIZE);
-
-  _flashWrite(0x080007B0,0x8006,HALFWORD_SIZE);
-  _flashWrite(0x080007B2,0x2111,HALFWORD_SIZE);
-  _flashWrite(0x080007B4,0x2112,HALFWORD_SIZE);
-  _flashWrite(0x080007B6,0x2113,HALFWORD_SIZE);
-  _flashWrite(0x080007B8,0x2114,HALFWORD_SIZE);
-  _flashWrite(0x080007BA,0x2115,HALFWORD_SIZE);
-  _flashWrite(0x080007BC,0xE7FE,HALFWORD_SIZE);
-  
-/* ---------------- Watchpoint TestCaseWrite STR -------------------- */
-// 0x080008A0    F2433644   movw r6,#0x3344
-// 0x080008A4    F2C11622   movt r6,#0x1122
-
-// 0x080008A8    F240405C   movw r0,#0x045C
-// 0x080008AC    F2C20000   movt r0,#0x2000
-
-// 0x080008B0    6006       str r6,[r0]
-// 0x080008B2    2111       movs r1,#17
-// 0x080008B4    2112       movs r1,#18
-// 0x080008B6    2113       movs r1,#19
-// 0x080008B8    2114       movs r1,#20
-// 0x080008BA    2115       movs r1,#21
-// 0x080008BC    E7FE       b.n	80005bc
-
-  _flashWrite(0x080008A0,0xF2433644,WORD_SIZE);
-  _flashWrite(0x080008A4,0xF2C11622,WORD_SIZE);
-  
-  _flashWrite(0x080008A8,0xF64C4CDD,WORD_SIZE);
-  _flashWrite(0x080008AC,0xF6CA2CBB,WORD_SIZE);
-
-  _flashWrite(0x080008B0,0x6006,HALFWORD_SIZE);
-  _flashWrite(0x080008B2,0x2111,HALFWORD_SIZE);
-  _flashWrite(0x080008B4,0x2112,HALFWORD_SIZE);
-  _flashWrite(0x080008B6,0x2113,HALFWORD_SIZE);
-  _flashWrite(0x080008B8,0x2114,HALFWORD_SIZE);
-  _flashWrite(0x080008BA,0x2115,HALFWORD_SIZE);
-  _flashWrite(0x080008BC,0xE7FE,HALFWORD_SIZE);
-  
-  /* ---------------- Watchpoint TestCaseDoubleWrite -------------------- */
-// 0x080009D0    F240405C   movw r0,#0x045C
-// 0x080009D4    F2C20000   movt r0,#0x2000
-
-// 0x080009D8    210A       movs r1,#10
-// 0x080009DA    6001       str r1,[r0]
-// 0x080009DC    210B       movs r1,#11
-// 0x080009DE    6001       str r1,[r0]
-
-// 0x080009E0    F05F0B11   movw r11,#11
-// 0x080009E4    F05F0B12   movw r11,#12
-// 0x080009E8    F05F0B13   movw r11,#13
-// 0x080009EC    F05F0B14   movw r11,#14
-// 0x080009F0    F05F0B15   movw r11,#15
-
-// 0x080009F4    E7FE       b.n	80006F4
-
-  _flashWrite(0x080009D0,0xF240405C,WORD_SIZE);
-  _flashWrite(0x080009D4,0xF2C20000,WORD_SIZE);
-  
-  _flashWrite(0x080009D8,0x210A,HALFWORD_SIZE);
-  _flashWrite(0x080009DA,0x6001,HALFWORD_SIZE);
-  _flashWrite(0x080009DC,0x210B,HALFWORD_SIZE);
-  _flashWrite(0x080009DE,0x6001,HALFWORD_SIZE);
-  
-  _flashWrite(0x080009E0,0xF05F0B11,WORD_SIZE);
-  _flashWrite(0x080009E4,0xF05F0B12,WORD_SIZE);
-  _flashWrite(0x080009E8,0xF05F0B13,WORD_SIZE);
-  _flashWrite(0x080009EC,0xF05F0B14,WORD_SIZE);
-  _flashWrite(0x080009F0,0xF05F0B15,WORD_SIZE);
-  
-
-  _flashWrite(0x080009F4,0xE7FE,HALFWORD_SIZE);
-  
+  if(isIdenticalProgram == 0)
+  {
+    address = 0x08100000 ;
+    printf("Flashing program\n");
+    for(i = 0 ; i < CODE_SIZE ; i++,address +=2)
+      _flashWrite(address,machineCode[i],HALFWORD_SIZE);
+  }
+  else
+    printf("No Flashing is required\n");
 }
 
 void test_datawatchpoint_TestCase_ReadByte_LDRB()
