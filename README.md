@@ -40,9 +40,9 @@ To flash hardware `release` version, type:
 ```
 rake hw:flash
 ```
-This command is to build the source code from the path stated in 'coproj' and flash it into hardware using ST-LINK. This command relies on `ST-LINK_CLI.exe` program by default. The program can be obtained from [here](http://www.st.com/web/en/catalog/tools/PF258168). You need to include the path to that program into the system path, so that the build system is able to invoke it.
+This command is to build the source code from the path stated in `.coproj` and flash it into hardware using ST-LINK. This command relies on `ST-LINK_CLI.exe` program by default. The program can be obtained from [here](http://www.st.com/web/en/catalog/tools/PF258168). You need to include the path to that program into the system path, so that the build system is able to invoke it.
 
-There is an another way of running this command by specified the 'coproj' name similar with 'probe:release'.
+There is an another way of running this command by specified the `.coproj` name similar with 'probe:release'.
 ```
 rake hw:flash[Blinky02.coproj]
 ```
