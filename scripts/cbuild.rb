@@ -1,4 +1,4 @@
-# Build script for C (ver 0.9)
+# Build script for C (ver 0.10)
 # Copyright (C) 2015-2016 Poh Tze Ven <pohtv@acd.tarc.edu.my>
 #
 # This file is part of C Compiler & Interpreter project.
@@ -19,6 +19,8 @@ require 'mkmf'
 require 'rake/clean' if !(defined? CLEAN)
 require 'rexml/document'
 include REXML
+
+load "#{File.dirname(__FILE__)}/helper.rb"
 
 $programs_found = {}
 
@@ -277,11 +279,6 @@ def get_all_source_files_in_coproj(coIdeProjectFile = nil, default_search_path =
   return list, coproj
 end
 
-def trim_string(str)
-  return nil if str == nil
-  str.gsub!(/^\s*/, "").gsub!(/\s*$/, "")
-end
-
 def match_extensions(name, ext_filter_list)
   exts = [ext_filter_list.each {|n| trim_string(n).gsub!(/^\./, "") }]
   name =~ /#{"\\.(?:#{exts.join("|")})$"}/i
@@ -309,10 +306,6 @@ end
 def program_available?(filename)
   $programs_found[filename] = find_executable(filename) if !$programs_found.key? filename
   return $programs_found[filename]
-end
-
-def get_value_from_env(name, default_value)
-  trim_string((flasher = ENV[name]) ? String.new(flasher):default_value)
 end
 
 def get_all_tests(path)

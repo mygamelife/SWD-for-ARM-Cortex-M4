@@ -116,7 +116,7 @@ namespace :probe do
   namespace :"hw:test" do
     filenames = get_all_tests("test/Hardware/**/test_*.c")
     desc 'Run all hardware-in-the-loop tests'
-    task :all => (['hw:flash'] + filenames)
+    task :all => (['probe:flash'] + filenames)
   end
 end
 

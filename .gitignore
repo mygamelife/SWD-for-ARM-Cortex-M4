@@ -6,9 +6,6 @@ SerialWireDebug/*
 *.cogui
 *.comarker
 *.comemgui
-FlashProgrammer/*.cogui
-FlashProgrammer/*.comarker
-FlashProgrammer/*.comemgui
 FlashProgrammer/FlashProgrammer/*
 FlashProgrammer/*.comarker
 FlashProgrammer/*.comemgui
@@ -19,3 +16,4 @@ FlashProgrammer/*.cogui
 /output/
 debug.log
 mkmf.log
+arm-gcc-link.ld
