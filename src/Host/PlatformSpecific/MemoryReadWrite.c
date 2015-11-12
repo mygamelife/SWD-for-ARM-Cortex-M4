@@ -13,17 +13,21 @@ int cswDataSize = 0;
   ==============================================================================  
   */
 void initMemoryReadWrite(void) {
-  if(_session == NULL)
-    _session = tlvCreateSession();
-  
-  do {
-    tlvService(_session);
-    tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
-  } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);
+  Try {
+    if(_session == NULL)
+      _session = tlvCreateSession();
+    
+    do {
+      tlvService(_session);
+      tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
+    } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
+  } Catch(err) { Throw(err); }
 }
 
 int memoryRead(uint32_t address, uint32_t *dataRead, int size) {
   int i, dataSize = size; uint8_t *data = NULL;
+  
+  if(err != 0) Throw(err);
   
   Try {
     /* Waiting reply from probe */
@@ -42,6 +46,8 @@ int memoryRead(uint32_t address, uint32_t *dataRead, int size) {
 int memoryWrite(uint32_t address, uint32_t dataWrite, int size) {
   uint8_t *data = (uint8_t *)&dataWrite;
 
+  if(err != 0) Throw(err);
+  
   Try {
     /* Waiting reply from probe */
     while(tlvWriteToRam(_session, &data, &address, &size) != PROCESS_DONE) {
@@ -82,6 +88,8 @@ int _flashWrite(uint32_t address, uint32_t writeData, int size) {
   uint8_t *pData = (uint8_t *)&writeData;
   int dataSize = size;
   
+  if(err != 0) Throw(err);
+  
   Try {
     /* Waiting reply from probe */
     while(tlvWriteToFlash(_session, &pData, &address, &dataSize) != PROCESS_DONE) {
@@ -96,6 +104,8 @@ int _flashWrite(uint32_t address, uint32_t writeData, int size) {
 
 int _flashErase(uint32_t address, int size) {
   int status = 0;
+  
+  if(err != 0) Throw(err);
   
   Try {
     while((status = tlvRequestFlashErase(_session, address, size)) == 0) {

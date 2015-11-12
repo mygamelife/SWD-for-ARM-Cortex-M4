@@ -73,7 +73,7 @@ typedef enum
   ERR_SET_COMM_STATE,
   ERR_SET_COMM_TIMEOUTS,
   ERR_NO_COM_PORT,
-  ERR_GET_COMM_STATE, //49
+  ERR_GET_COMM_STATE, //50
 } Handler_ErrorCode;
 
 void displayErrorMessage(CEXCEPTION_T err);
