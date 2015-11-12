@@ -1,11 +1,11 @@
 
 Overview
 ========
-This project is using 'cbuid.scripts' to configure the all neccessary files path and yet provide friendly command to execute specified task.
+This project is using `cbuid.scripts` to configure the all neccessary files path and yet provide friendly command to execute specified task.
 
 Commands
 ========
-All the hard work behind the scene is handled by 'cbuild' and now we only need to type in the command.
+All the hard work behind the scene is handled by `cbuild` and now we only need to type in the command.
 To view all available commands issue:
 ```
 rake -T
@@ -55,4 +55,23 @@ rake hw:flash flasher=/c/STM/stlink/ST_FLASHER
 GCC compiles and links C/C++ files to ELF executable. Unfortunately, `ST-LINK_CLI` lacks the ability to read such file, but only HEX or BIN file. The good news is, the translation can be done by `arm-none-eabi-objcopy`. The `rake hw:flash` command automatically performs this and assumes that the program is in the Bash path. If the name or the path needs to be specified, you can issue:
 ```
 rake hw:flash elf_to_hex="/e/ProgramFiles/GNU Tools ARM Embedded/4.9 2015q1/bin/arm-none-eabi-objcopy"
+```
+
+Tests
+=====
+There is 2 different platform dependent test in this project which is specified in `host` and `probe`.
+To run all `host` test in command :
+```
+rake host:test:all
+```
+There is some different from running `probe` test because there are 2 different type of test one is running on ceedling using mock and the another hand is running on the actual hardware called hardware-in-the-loop test in `test/Hardware`. Therefore we need to load a specified `.yml` in order to run the `probe:test:all`.
+
+To run all `probe` test running on ceedling:
+```
+rake p=probe.yml probe:test:all
+```
+
+To run all `probe` hardware-in-the-loop test:
+```
+rake p=probe.yml probe:hw:test:all
 ```
