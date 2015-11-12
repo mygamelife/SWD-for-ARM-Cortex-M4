@@ -63,7 +63,8 @@ config = {
                     'src/app/Tlv',
                     'src/Host',
                     'src/Host/ElfReader',
-                    'src/Host/StringObject'],
+                    'src/Host/StringObject',
+                    'src/Host/PlatformSpecific'],
   :user_define  => ['HOST='],
 #  :library_path => 'lib',
 #  :library => ['libusb'],
@@ -86,6 +87,7 @@ namespace :host do
     dep_list.merge!(compile_all(['src/app/Tlv',                 # directory of dependee
                                  'src/Host/ElfReader', 
                                  'src/Host/StringObject',
+                                 'src/Host/PlatformSpecific',
                                  'src/Host'],
                                  'build/release/host/c',        # director of .o files
                                   config))                      # config object

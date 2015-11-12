@@ -10,10 +10,10 @@
   :use_test_preprocessor: TRUE
   :use_auxiliary_dependencies: TRUE
   :build_root: build
-  :release_build: TRUE
+  # :release_build: TRUE
   :test_file_prefix: test_
-  :load_scripts: [scripts/host.rb, scripts/target.rb]
-  
+  :load_scripts: [scripts/probe.rb]
+
 :release_build:
   :output: main.exe
 #  :use_assembly: FALSE
@@ -25,14 +25,11 @@
 
 :paths:
   :test:
-    - +:test/**
+    - +:test/Hardware/**
     - -:test/support
   :source:
-    - src/**
-    # - src/Host/**
+    - src/app/**
     - -:src/app/PlatformSpecific/**
-    - +:src/app/Tlv
-    - +:src/app/Drivers
   :support:
     - test/support
 
