@@ -1,6 +1,6 @@
 #include "unity.h"
 #include "Tlv.h"
-#include "uart.h"
+#include "Uart.h"
 #include "TlvEx.h"
 #include "SystemTime.h"
 #include "ErrorCode.h"
@@ -207,7 +207,7 @@ void test_datawatchpoint_TestCase_ReadByte_LDRB()
 
   pc = readCoreRegister(CORE_REG_PC);
 
-  //TEST_ASSERT_EQUAL(0x080003FC,pc);
+  // TEST_ASSERT_EQUAL(0x080003FC,pc);
 }
 
 /*
