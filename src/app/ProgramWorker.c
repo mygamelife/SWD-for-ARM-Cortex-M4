@@ -712,7 +712,6 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_RUN_TARGET                 : runTarget(session);                                                                       break;
     case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                               break;
     case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
-    case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
     case TLV_REMOVE_BREAKPOINT          : removeHardwareBreakpoint(session, get4Byte(&tlv->value[0]));                              break;
     case TLV_REMOVE_ALL_BREAKPOINT      : removeAllHardwareBreakpoint(session);                                                     break;
     case TLV_STOP_REMAP                 : stopFlashPatchRemapping(session, get4Byte(&tlv->value[0]));                               break;
