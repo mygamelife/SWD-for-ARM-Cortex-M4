@@ -60,6 +60,7 @@ rake hw:flash elf_to_hex="/e/ProgramFiles/GNU Tools ARM Embedded/4.9 2015q1/bin/
 Tests
 =====
 There is 2 different platform dependent test in this project which is specified in `host` and `probe`.
+
 To run all `host` test in command :
 ```
 rake host:test:all
