@@ -36,7 +36,7 @@ typedef enum {
         
 /* Read/Write target register */
 uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
-Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data);
+Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
 
 /* Halt target */
 Process_Status tlvHaltTarget(Tlv_Session *session);

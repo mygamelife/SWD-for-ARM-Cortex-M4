@@ -22,7 +22,7 @@ void xtest_getAvailableComPort_should_return_not_null_handler(void)
   CloseHandle((HANDLE)hSerial);
 }
 
-void xtest_uartInit(void)
+void test_uartInit(void)
 {
   void *hSerial;
   

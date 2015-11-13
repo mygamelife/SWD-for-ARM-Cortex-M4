@@ -169,7 +169,7 @@ User_Session *userLoadProgram(String *userInput)  {
 User_Session *userWriteMemory(String *userInput) {
   static User_Session userSession; CEXCEPTION_T err;
   Identifier *memory; Number* data, *address;
-  int i = 0; uint32_t dataBlock[1024];
+  int i = 0;
   
   Try {
     memory = (Identifier *)getToken(userInput);
@@ -178,7 +178,7 @@ User_Session *userWriteMemory(String *userInput) {
     while(userInput->length > 1) {
       data = (Number *)getToken(userInput);
       if(data->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
-      dataBlock[i++] = data->value;
+      userSession.data[i++] = data->value;
     }
   } Catch(err) {
     Throw(ERR_INCOMPLETE_COMMAND);
@@ -191,7 +191,6 @@ User_Session *userWriteMemory(String *userInput) {
   
   userSession.size = i * 4;
   userSession.address = address->value;
-  userSession.data = dataBlock;
   
   return &userSession;
 }
@@ -239,7 +238,7 @@ User_Session *userWriteRegister(String *userInput)  {
   
   Try {
     iden = (Identifier*)getToken(userInput);
-    data = (Number*)getToken(userInput);    
+    data = (Number*)getToken(userInput);
   } Catch(err)  {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
@@ -249,8 +248,10 @@ User_Session *userWriteRegister(String *userInput)  {
   
   regAddress = getRegisterAddress(iden->name);
   userSession.tlvCommand = TLV_WRITE_REGISTER;
-  data32 = (uint32_t)data->value;
-  userSession.data = &data32;
+  // data32 = (uint32_t)data->value;
+  // printf("data32 %x\n", data32);
+  // userSession.data = &data32;
+  userSession.data[0] = (uint32_t)data->value;
   userSession.address = regAddress;
 
   return &userSession;
@@ -331,8 +332,9 @@ User_Session *userStepTarget(String *userInput) {
   if(data->type != NUMBER_TOKEN)  Throw(ERR_EXPECT_NUMBER);
 
   userSession.tlvCommand = TLV_STEP;
-  data32 = (uint32_t)data->value;
-  userSession.data = &data32;
+  // data32 = (uint32_t)data->value;
+  // userSession.data = &data32;
+  userSession.data[0] = (uint32_t)data->value;
   
   return &userSession;
 }
@@ -460,7 +462,7 @@ Command_Code getCommandCode(char *commandName) {
   if(strcmp(commandName, "help") == 0)                return HELP;
   else if(strcmp(commandName, "load") == 0)           return LOAD;
   else if(strcmp(commandName, "write") == 0)          return WRITE_COMMAND;
-  else if(strcmp(commandName, "rmem") == 0)           return READ_MEMORY;
+  else if(strcmp(commandName, "read") == 0)           return READ_MEMORY;
   else if(strcmp(commandName, "wreg") == 0)           return WRITE_REGISTER;
   else if(strcmp(commandName, "reg") == 0)            return READ_REGISTER;
   else if(strcmp(commandName, "halt") == 0)           return HALT;
@@ -488,7 +490,7 @@ void helpMenu(String *userInput) {
   if(userInput->length <= 1) {
     printf("Available commands :\n\n");
     printf(" load     load program into target memory can either ram/flash\n");
-    printf(" rmem     read data from target memory\n");
+    printf(" read     read data from target memory\n");
     printf(" wreg     write data into target register\n");
     printf(" reg      read data from target register\n");
     printf(" halt     halt target\n");
@@ -516,7 +518,7 @@ void helpCommand(Command_Code ccode) {
                                         printf(" <file_path>  Program elf file location                                     \n");
                                         break;
                                         
-    case READ_MEMORY                  : printf(" rmem <address> <size>                                                      \n\n");
+    case READ_MEMORY                  : printf(" read <address> <size>                                                      \n\n");
                                         printf(" <address>    Any valid memory address                                      \n");
                                         printf(" <size>       Size of the memory want to read                               \n");
                                         break;
