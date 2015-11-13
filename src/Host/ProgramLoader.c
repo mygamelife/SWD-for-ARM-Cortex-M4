@@ -23,8 +23,8 @@ Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAdd
   startTask(session->wregState);
   /* Send tlv request */
   tlv = tlvCreatePacket(TLV_WRITE_REGISTER, 8, (uint8_t *)buffer);
-  printf("register address %x\n", get4Byte(&tlv->value[0]));
-  printf("register value %x\n", get4Byte(&tlv->value[4]));
+  // printf("register address %x\n", get4Byte(&tlv->value[0]));
+  // printf("register value %x\n", get4Byte(&tlv->value[4]));
   SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   tlvSend(session, tlv);
   
@@ -83,12 +83,13 @@ uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   /* Verify response reply from probe */
   verifyTlvPacket(response);
-  // printf("register %x\n", get4Byte(&response->value[0]));
   
   /* End tlv request task */
   endTask(session->regState);
   
+  #ifdef HOST
   printf("value %x\n", get4Byte(&response->value[0]));
+  #endif
   
   return get4Byte(&response->value[0]);
 }
@@ -187,8 +188,7 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   Tlv *tlv;
   
   if(session == NULL) Throw(TLV_NULL_SESSION);
-  
-  printf("nInstructions %d\n", nInstructions);
+
   /* Start tlv request task */
   startTask(session->stepState);
   
@@ -215,7 +215,9 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   /* End tlv request task */
   endTask(session->stepState);
   
+  #ifdef HOST
   printf("value %x\n", get4Byte(&response->value[0]));
+  #endif
   
   return get4Byte(&response->value[0]);
 }
