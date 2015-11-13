@@ -14,14 +14,17 @@ static uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
   * return  : 1 successfully write into target register
   *           0 waiting reply from target
   */
-Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t *data) {
-  Tlv *tlv; uint32_t buffer[] = {registerAddress, *data};
+Process_Status tlvWriteTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data) {
+  Tlv *tlv; uint32_t buffer[] = {registerAddress, data};
   
   if(session == NULL) Throw(TLV_NULL_SESSION);
+  
   /* Start tlv request task */
   startTask(session->wregState);
   /* Send tlv request */
   tlv = tlvCreatePacket(TLV_WRITE_REGISTER, 8, (uint8_t *)buffer);
+  printf("register address %x\n", get4Byte(&tlv->value[0]));
+  printf("register value %x\n", get4Byte(&tlv->value[4]));
   SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   tlvSend(session, tlv);
   
@@ -85,7 +88,7 @@ uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
   /* End tlv request task */
   endTask(session->regState);
   
-  //printf("value %x\n", get4Byte(&response->value[0]));
+  printf("value %x\n", get4Byte(&response->value[0]));
   
   return get4Byte(&response->value[0]);
 }
@@ -184,6 +187,8 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   Tlv *tlv;
   
   if(session == NULL) Throw(TLV_NULL_SESSION);
+  
+  printf("nInstructions %d\n", nInstructions);
   /* Start tlv request task */
   startTask(session->stepState);
   
@@ -210,7 +215,7 @@ uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions) {
   /* End tlv request task */
   endTask(session->stepState);
   
-  //printf("value %x\n", get4Byte(&response->value[0]));
+  printf("value %x\n", get4Byte(&response->value[0]));
   
   return get4Byte(&response->value[0]);
 }
@@ -578,7 +583,7 @@ void tlvLoadToRam(Tlv_Session *session, char *file) {
     case TLV_UPDATE_PC :
       /* Update program counter to the entry address 
          of the loaded program */ 
-      tlvWriteTargetRegister(session, PC, &entryAddress);
+      tlvWriteTargetRegister(session, PC, entryAddress);
       if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
         SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->lramState = TLV_RUN_PROGRAM;
@@ -758,7 +763,7 @@ void tlvLoadToFlash(Tlv_Session *session, char *file) {
     case TLV_UPDATE_PC :
       /* Update program counter to the entry address 
          of the loaded program */
-      if(tlvWriteTargetRegister(session, PC, &entryAddress) == PROCESS_DONE) {
+      if(tlvWriteTargetRegister(session, PC, entryAddress) == PROCESS_DONE) {
         SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->flashState = TLV_RUN_PROGRAM;
       }
@@ -848,11 +853,11 @@ void selectCommand(Tlv_Session *session, User_Session *userSession) {
     case TLV_LOAD_RAM           : tlvLoadToRam(session, userSession->fileName);                                                   break;
     case TLV_LOAD_FLASH         : tlvLoadToFlash(session, userSession->fileName);                                                 break;
     case TLV_READ_MEMORY        : tlvReadTargetMemory(session, &userSession->address, &userSession->size);                        break;
-    case TLV_WRITE_REGISTER     : tlvWriteTargetRegister(session, userSession->address, userSession->data);                       break;
+    case TLV_WRITE_REGISTER     : tlvWriteTargetRegister(session, userSession->address, userSession->data[0]);                    break;
     case TLV_READ_REGISTER      : tlvReadTargetRegister(session, userSession->address);                                           break;
     case TLV_HALT_TARGET        : tlvHaltTarget(session);                                                                         break;
     case TLV_RUN_TARGET         : tlvRunTarget(session);                                                                          break;
-    case TLV_STEP               : tlvMultipleStepTarget(session, (int)(*userSession->data));                                      break;
+    case TLV_STEP               : tlvMultipleStepTarget(session, userSession->data[0]);                                           break;
     case TLV_BREAKPOINT         : tlvSetBreakpoint(session, userSession->address);                                                break;
     case TLV_FLASH_ERASE        : tlvEraseTargetFlash(session, userSession->address, userSession->size);                          break;
     case TLV_FLASH_MASS_ERASE   : tlvMassEraseTargetFlash(session, userSession->address);                                         break;
@@ -870,6 +875,7 @@ void hostInterpreter(Tlv_Session *session) {
       userSession = waitUserCommand();
       /* If command is available */
       if(IS_COMMAND_AVAILABLE(userSession)) {
+        // printf("userSession data %x\n", *(userSession->data));
         if(IS_TLV_EXIT(userSession)) HOST_CHANGE_STATE(session, HOST_EXIT);
         else HOST_CHANGE_STATE(session, HOST_INTERPRET_COMMAND);
       }

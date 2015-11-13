@@ -12,7 +12,7 @@
 typedef struct
 {
   int size;
-  uint32_t *data;
+  uint32_t data[1024];
   uint32_t address;
   char *fileName;
   Tlv_Command tlvCommand;

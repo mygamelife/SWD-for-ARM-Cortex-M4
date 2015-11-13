@@ -20,24 +20,30 @@ static int i = 0;
   * in this machine
   */
 int getAvailableComPort(void **handler) {
+  CEXCEPTION_T err = 0;
+  
   DWORD accessdirection = GENERIC_READ | GENERIC_WRITE;
 
   for(i; i < MAXIMUM_PORT_SIZE; i++) {
-    *handler = CreateFile((LPCSTR)comPort[i], 
-                              accessdirection, 
-                              0,
-                              0, 
-                              OPEN_EXISTING,
-                              0,
-                              0);
+    //(LPCSTR)comPort[i],
+    *handler = CreateFile(  (LPCSTR)comPort[i],
+                            accessdirection, 
+                            0,
+                            0, 
+                            OPEN_EXISTING,
+                            0,
+                            0);
     
     if(*handler != INVALID_HANDLE_VALUE) {
-      uartConfig((HANDLE)*handler);
       printf("ComPort In Use %s\n", comPort[i]);
-      return 1;
+      
+      Try {
+        uartConfig((HANDLE)*handler); 
+        if(err == 0) return 1;
+      } Catch(err) { err = 0; /*clear error*/ }
     }
   }
-  
+
   return -1;
 }
 
@@ -45,13 +51,13 @@ int getAvailableComPort(void **handler) {
   * the detail about uart hardware
   */
 void uartConfig(HANDLE handler) {
-  COMMTIMEOUTS timeouts={0};
+  COMMTIMEOUTS timeouts= {0};
   DCB dcbSerialParams = {0};
 
   dcbSerialParams.DCBlength=sizeof(dcbSerialParams);
   
   if (!GetCommState(handler, &dcbSerialParams)) {
-    //could not get the state of the comport
+    // could not get the state of the comport
     Throw(ERR_GET_COMM_STATE);
   }
 
@@ -119,9 +125,8 @@ void uartInit(void **handler) {
 /* Uart Transmit Function */
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
   DWORD dwBytesWrite = 0;
-  HANDLE *hSerial = (HANDLE *)handler;
 
-  if(!WriteFile(hSerial, txBuffer, length, &dwBytesWrite, NULL)){
+  if(!WriteFile((HANDLE)handler, txBuffer, length, &dwBytesWrite, NULL)){
     DWORD errId = GetLastError();
     printf("WriteFile Error: %d\n", errId);
     // printLastError();
@@ -137,9 +142,8 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
 
 uint8_t getByte(void *handler, uint8_t *rxBuffer) {
   DWORD dwBytesRead = 0;
-  HANDLE *hSerial = (HANDLE *)handler;
 
-  if(!ReadFile(hSerial, rxBuffer, 1, &dwBytesRead, NULL)){
+  if(!ReadFile((HANDLE)handler, rxBuffer, 1, &dwBytesRead, NULL)){
     // handle error
     DWORD errId = GetLastError();
     printf("ReadFile Error: %d\n", errId);
@@ -155,9 +159,8 @@ uint8_t getByte(void *handler, uint8_t *rxBuffer) {
 /* Uart Receive Function */
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
   DWORD dwBytesRead = 0;
-  HANDLE *hSerial = (HANDLE *)handler;
   
-  if(!ReadFile(hSerial, rxBuffer, length, &dwBytesRead, NULL)){
+  if(!ReadFile((HANDLE)handler, rxBuffer, length, &dwBytesRead, NULL)){
     // handle error
     DWORD errId = GetLastError();
     printf("ReadFiles Error: %d\n", errId);

@@ -47,7 +47,7 @@ uint16_t machineCode[] =
   
 };
 
-int initFlag = 0;
+static int initFlag = 0;
 static void loadBreakpointTestProgram();
 
 void setUp(void) 
@@ -100,16 +100,16 @@ static void loadBreakpointTestProgram()
     printf("No Flashing is required\n");
 }
 
-// void test_step1Instruction()
-// {
-  // uint32_t pc ,before = 0;
-   // writeCoreRegister(CORE_REG_PC,0x080003BE);
-   // before = readCoreRegister(CORE_REG_PC);
-   // stepOnly(1);
-   // pc = readCoreRegister(CORE_REG_PC);
-   // TEST_ASSERT_EQUAL(0x080003BE,before);
-   // TEST_ASSERT_EQUAL(0x080003C0,PC);
-// }
+void test_step1Instruction()
+{
+  uint32_t pc ,before = 0;
+  writeCoreRegister(CORE_REG_PC,0x080003BE);
+  before = readCoreRegister(CORE_REG_PC);
+  stepOnly(1);
+  pc = readCoreRegister(CORE_REG_PC);
+  TEST_ASSERT_EQUAL(0x080003BE,before);
+  TEST_ASSERT_EQUAL(0x080003C0,pc);
+}
 
 /**
  * 0x080003C0	   ________   <- set lower halfword breakpoint at 0x080003C0
