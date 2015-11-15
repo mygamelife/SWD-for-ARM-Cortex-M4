@@ -1,6 +1,6 @@
 #include "Uart.h"
 
-#define MAXIMUM_PORT_SIZE     21
+#define MAXIMUM_PORT_SIZE     20
 #define RXBUFFER_SIZE         255
 
 /* COM PORT 0 - 20 */
@@ -25,7 +25,6 @@ int getAvailableComPort(void **handler) {
   DWORD accessdirection = GENERIC_READ | GENERIC_WRITE;
 
   for(i; i < MAXIMUM_PORT_SIZE; i++) {
-    //(LPCSTR)comPort[i],
     *handler = CreateFile(  (LPCSTR)comPort[i],
                             accessdirection, 
                             0,
@@ -44,7 +43,7 @@ int getAvailableComPort(void **handler) {
     }
   }
 
-  return -1;
+  Throw(ERR_NO_COM_PORT);
 }
 
 /** uartConfig is a function to configure allocmem
@@ -116,9 +115,10 @@ void uartInit(void **handler) {
   
   while(pStatus == 0) {
     /* Looking for availabe serial port in this machine */
-    if(getAvailableComPort(&(*handler)) == -1) Throw(ERR_NO_COM_PORT);
-    /* Verify if selected port is connecting to probe */
-    pStatus = isComPortAlive(*handler);          
+    if(getAvailableComPort(&(*handler)) == 1) {
+      /* Verify if selected port is connecting to probe */
+      pStatus = isComPortAlive(*handler);                
+    }
   }
 }
 

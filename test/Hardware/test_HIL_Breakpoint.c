@@ -52,18 +52,25 @@ static void loadBreakpointTestProgram();
 
 void setUp(void) 
 {
-  if(initFlag == 0) 
-  {  
-    system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
-    initFlag = 1;
-    initMemoryReadWrite();
-    /* Erase flash space according to size */
-    // _flashErase(0x08000000, 2000);
-    setCoreMode(CORE_DEBUG_HALT);
-    loadBreakpointTestProgram();
+  CEXCEPTION_T err = 0;
+  
+  Try {
+    if(initFlag == 0) 
+    {  
+      system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
+      initFlag = 1;
+      initMemoryReadWrite();
+      /* Erase flash space according to size */
+      // _flashErase(0x08000000, 2000);
+      setCoreMode(CORE_DEBUG_HALT);
+      loadBreakpointTestProgram();
+    }
+    enableFPBUnit();    
   }
-
-  enableFPBUnit();
+  Catch(err) 
+  {
+    displayErrorMessage(err);
+  }
 }
 
 void tearDown(void) 
@@ -111,233 +118,233 @@ void test_step1Instruction()
   TEST_ASSERT_EQUAL(0x080003C0,pc);
 }
 
-/**
- * 0x080003C0	   ________   <- set lower halfword breakpoint at 0x080003C0
- * 0x080003C2 	|________|
- * 0x080003C4 	|________|
- *
- * Result : Breakpoint at 0x080003C0
- */
-void xtest_instructionBreakPointTestCase_2bytes_LowerHalfWord()
-{ 
-  uint32_t PC = 0 ;
-  int i = 0 ;
+// /**
+ // * 0x080003C0	   ________   <- set lower halfword breakpoint at 0x080003C0
+ // * 0x080003C2 	|________|
+ // * 0x080003C4 	|________|
+ // *
+ // * Result : Breakpoint at 0x080003C0
+ // */
+// void xtest_instructionBreakPointTestCase_2bytes_LowerHalfWord()
+// { 
+  // uint32_t PC = 0 ;
+  // int i = 0 ;
   
-  writeCoreRegister(CORE_REG_PC,0x080003BE);
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
+  // writeCoreRegister(CORE_REG_PC,0x080003BE);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
 
   
-  setCoreMode(CORE_DEBUG_MODE);
+  // setCoreMode(CORE_DEBUG_MODE);
   
-  while(!hasBreakpointDebugEventOccured());
+  // while(!hasBreakpointDebugEventOccured());
 
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP0);
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP0);
 
-  TEST_ASSERT_EQUAL(0x080003C1,PC);
-}
+  // TEST_ASSERT_EQUAL(0x080003C1,PC);
+// }
 
-/**
- * 0x080003C0	   ________   <- set upper halfword breakpoint at 0x080003C0
- * 0x080003C2 	|________|
- * 0x080003C4 	|________|
- *
- * Result : Breakpoint at 0x080003C2
- */
-void xtest_instructionBreakPointTestCase_2bytes_UpperHalfWord()
-{
-  uint32_t PC = 0 ;
+// /**
+ // * 0x080003C0	   ________   <- set upper halfword breakpoint at 0x080003C0
+ // * 0x080003C2 	|________|
+ // * 0x080003C4 	|________|
+ // *
+ // * Result : Breakpoint at 0x080003C2
+ // */
+// void xtest_instructionBreakPointTestCase_2bytes_UpperHalfWord()
+// {
+  // uint32_t PC = 0 ;
 
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP1,0x080003C0,MATCH_UPPERHALFWORD);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP1,0x080003C0,MATCH_UPPERHALFWORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003C0);
-  setCoreMode(CORE_DEBUG_MODE);
+  // writeCoreRegister(CORE_REG_PC,0x080003C0);
+  // setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasBreakpointDebugEventOccured());
+  // while(!hasBreakpointDebugEventOccured());
 
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP1);
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP1);
 
-  TEST_ASSERT_EQUAL(0x080003C2,PC);
-}
+  // TEST_ASSERT_EQUAL(0x080003C2,PC);
+// }
 
-/**
- * 0x500	 ________   <- set word breakpoint at 0x080003C0
- * 0x502 	|________|
- * 0x504 	|________|
- *
- * Result : Breakpoint at 0x080003C2
- */
-void xtest_instructionBreakPointTestCase_2bytes_Word()
-{
-  uint32_t PC = 0 ;
+// /**
+ // * 0x500	 ________   <- set word breakpoint at 0x080003C0
+ // * 0x502 	|________|
+ // * 0x504 	|________|
+ // *
+ // * Result : Breakpoint at 0x080003C2
+ // */
+// void xtest_instructionBreakPointTestCase_2bytes_Word()
+// {
+  // uint32_t PC = 0 ;
 
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C0,MATCH_WORD);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C0,MATCH_WORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003C0);
-  setCoreMode(CORE_DEBUG_MODE);
+  // writeCoreRegister(CORE_REG_PC,0x080003C0);
+  // setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasBreakpointDebugEventOccured());
+  // while(!hasBreakpointDebugEventOccured());
 
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
-  TEST_ASSERT_EQUAL(0x080003C0,PC);
-}
+  // TEST_ASSERT_EQUAL(0x080003C0,PC);
+// }
 
 
-/**
- * 0x080003B0	   ________    <---set upper halfword breakpoint at 0x080003B0
- *  		        |        |
- * 0x080003B4   |________|
- * 0x080003B6	  |________|
- *
- * Result : Breakpoint will never occur
- */
-void xtest_instructionBreakPointTestCase_4bytes_UpperHalfWord()
-{
-  uint32_t PC = 0 , data = 0;
-  int fail = 0 ;
+// /**
+ // * 0x080003B0	   ________    <---set upper halfword breakpoint at 0x080003B0
+ // *  		        |        |
+ // * 0x080003B4   |________|
+ // * 0x080003B6	  |________|
+ // *
+ // * Result : Breakpoint will never occur
+ // */
+// void xtest_instructionBreakPointTestCase_4bytes_UpperHalfWord()
+// {
+  // uint32_t PC = 0 , data = 0;
+  // int fail = 0 ;
     
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C6,MATCH_UPPERHALFWORD);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C6,MATCH_UPPERHALFWORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003C6);
-  setCoreMode(CORE_DEBUG_MODE);
+  // writeCoreRegister(CORE_REG_PC,0x080003C6);
+  // setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasBreakpointDebugEventOccured())
-  {
-    PC = readCoreRegister(CORE_REG_PC);
-    if(PC == 0x080003CA)
-    {
-      fail = 1;
-      break;
-    }
-    setCoreMode(CORE_DEBUG_MODE);
-  }
+  // while(!hasBreakpointDebugEventOccured())
+  // {
+    // PC = readCoreRegister(CORE_REG_PC);
+    // if(PC == 0x080003CA)
+    // {
+      // fail = 1;
+      // break;
+    // }
+    // setCoreMode(CORE_DEBUG_MODE);
+  // }
 
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
-  TEST_ASSERT_EQUAL(1,fail); 
-  TEST_ASSERT_EQUAL(0x080003C6,PC);
-}
-
-
-/**
- * 0x080003B0	   ________    <---set word breakpoint at 0x080003B0
- *  		        |        |
- * 0x080003B4   |________|
- * 0x080003B6	  |________|
- *
- * Result : Breakpoint at 0x080003B0
- */
-void xtest_instructionBreakPointTestCase_4bytes_Word()
-{
-  uint32_t PC = 0 ;
-
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C6,MATCH_WORD);
-
-  writeCoreRegister(CORE_REG_PC,0x080003C6);
-  setCoreMode(CORE_DEBUG_MODE);
-
-  while(!hasBreakpointDebugEventOccured());
-
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
-
-  TEST_ASSERT_EQUAL(0x080003C6,PC);
-}
+  // TEST_ASSERT_EQUAL(1,fail); 
+  // TEST_ASSERT_EQUAL(0x080003C6,PC);
+// }
 
 
-/**
- * 0x080003D0	   ________
- * 0x080003D2 	|________|
- * 		 	        |        | <----set lower halfword breakpoint at 0x080003D4
- * 0x080003D6   |________|
- *              |        |
- * 0x080003DA	  |________|
- * 0x080003DC
- *
- * Result : Breakpoint will never occur
- */
-void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
-{
-  uint32_t PC = 0 ;
-  int fail ;
+// /**
+ // * 0x080003B0	   ________    <---set word breakpoint at 0x080003B0
+ // *  		        |        |
+ // * 0x080003B4   |________|
+ // * 0x080003B6	  |________|
+ // *
+ // * Result : Breakpoint at 0x080003B0
+ // */
+// void xtest_instructionBreakPointTestCase_4bytes_Word()
+// {
+  // uint32_t PC = 0 ;
 
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D2,MATCH_LOWERHALFWORD);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP2,0x080003C6,MATCH_WORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003CE);
-  setCoreMode(CORE_DEBUG_MODE);
+  // writeCoreRegister(CORE_REG_PC,0x080003C6);
+  // setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasBreakpointDebugEventOccured())
-    {
-      PC = readCoreRegister(CORE_REG_PC);
-      if(PC == 0x080003D8)
-      {
-        fail = 1;
-        break ;
-      }
-      setCoreMode(CORE_DEBUG_MODE);
-    }
+  // while(!hasBreakpointDebugEventOccured());
 
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
-  TEST_ASSERT_EQUAL(0x080003D8,PC);
-  TEST_ASSERT_EQUAL(1,fail);
-}
+  // TEST_ASSERT_EQUAL(0x080003C6,PC);
+// }
 
 
-/**
- * 0x080003D0	   ________
- * 0x080003D2 	|________|
- * 		 	        |        | <----set word breakpoint at 0x080003D4
- * 0x080003D6   |________|
- *              |        |
- * 0x080003DA	  |________|
- * 0x080003DC
- *
- * Result : Breakpoint at 0x506
- */
-void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
-{
-  uint32_t PC = 0 ;
+// /**
+ // * 0x080003D0	   ________
+ // * 0x080003D2 	|________|
+ // * 		 	        |        | <----set lower halfword breakpoint at 0x080003D4
+ // * 0x080003D6   |________|
+ // *              |        |
+ // * 0x080003DA	  |________|
+ // * 0x080003DC
+ // *
+ // * Result : Breakpoint will never occur
+ // */
+// void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
+// {
+  // uint32_t PC = 0 ;
+  // int fail ;
+
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D2,MATCH_LOWERHALFWORD);
+
+  // writeCoreRegister(CORE_REG_PC,0x080003CE);
+  // setCoreMode(CORE_DEBUG_MODE);
+
+  // while(!hasBreakpointDebugEventOccured())
+    // {
+      // PC = readCoreRegister(CORE_REG_PC);
+      // if(PC == 0x080003D8)
+      // {
+        // fail = 1;
+        // break ;
+      // }
+      // setCoreMode(CORE_DEBUG_MODE);
+    // }
+
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
+
+  // TEST_ASSERT_EQUAL(0x080003D8,PC);
+  // TEST_ASSERT_EQUAL(1,fail);
+// }
+
+
+// /**
+ // * 0x080003D0	   ________
+ // * 0x080003D2 	|________|
+ // * 		 	        |        | <----set word breakpoint at 0x080003D4
+ // * 0x080003D6   |________|
+ // *              |        |
+ // * 0x080003DA	  |________|
+ // * 0x080003DC
+ // *
+ // * Result : Breakpoint at 0x506
+ // */
+// void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
+// {
+  // uint32_t PC = 0 ;
   
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D2,MATCH_WORD);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D2,MATCH_WORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003CE);
-  setCoreMode(CORE_DEBUG_MODE);
+  // writeCoreRegister(CORE_REG_PC,0x080003CE);
+  // setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasBreakpointDebugEventOccured());
+  // while(!hasBreakpointDebugEventOccured());
 
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
-  TEST_ASSERT_EQUAL(0x080003D4,PC);
-}
+  // TEST_ASSERT_EQUAL(0x080003D4,PC);
+// }
 
-/**
- * 0x080003E0	   ________
- * 0x080003E2 	|________|
- * 		 	        | 		   | <----set word breakpoint at 0x080003E4
- * 0x080003E6 	|________|
- * 0x080003E8	  |________|
- *
- * Result : Breakpoint at 0x080003E6
- */
-void xtest_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
-{
-  uint32_t PC = 0 ;
+// /**
+ // * 0x080003E0	   ________
+ // * 0x080003E2 	|________|
+ // * 		 	        | 		   | <----set word breakpoint at 0x080003E4
+ // * 0x080003E6 	|________|
+ // * 0x080003E8	  |________|
+ // *
+ // * Result : Breakpoint at 0x080003E6
+ // */
+// void xtest_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
+// {
+  // uint32_t PC = 0 ;
 
-  manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003DF,MATCH_WORD);
+  // manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003DF,MATCH_WORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003DC);
-  setCoreMode(CORE_DEBUG_MODE);
+  // writeCoreRegister(CORE_REG_PC,0x080003DC);
+  // setCoreMode(CORE_DEBUG_MODE);
 
-  while(!hasBreakpointDebugEventOccured());
+  // while(!hasBreakpointDebugEventOccured());
 
-  PC = readCoreRegister(CORE_REG_PC);
-  disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
+  // PC = readCoreRegister(CORE_REG_PC);
+  // disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
-  TEST_ASSERT_EQUAL(0x080003E6,PC);
-}
+  // TEST_ASSERT_EQUAL(0x080003E6,PC);
+// }

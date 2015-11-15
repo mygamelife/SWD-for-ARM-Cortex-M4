@@ -1,6 +1,7 @@
 require 'mkmf'
 # Load cbuild script to help build C program
 load "scripts/cbuild.rb"
+load "scripts/target.rb"
 
 FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_CLI") unless defined? FLASHER
 ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
@@ -117,6 +118,8 @@ namespace :probe do
     filenames = get_all_tests("test/Hardware/**/test_*.c")
     desc 'Run all hardware-in-the-loop tests'
     task :all => (['probe:flash'] + filenames)
+    # task :all => "target:release[FlashProgrammer/FlashProgrammer.coproj]"
+    # task :all => (['probe:flash'] + ['target:release[FlashProgrammer/FlashProgrammer.coproj]'] + filenames)
   end
 end
 
