@@ -214,9 +214,7 @@ int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode
     dataRead = dataRead << 16 ;
     machineCode = swapHalfword(machineCode+dataRead);
   }
-  
   memoryWriteWord((REMAP_BASE + (4*comparatorToUse)),machineCode);
-  
   manualSetInstructionRemapping(comparatorToUse,instructionAddress,REMAP_BASE);
   
   return comparatorToUse;
