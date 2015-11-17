@@ -15,11 +15,11 @@ int main(void)
   hardResetTarget();
   /* Initialize SWD Protocol */
   swdInit();
-  //0000000000000000000000000000000itmConfig();
+  //itmConfig();
   /* Power Up AHB Port */
   readAhbIDR(&idr);
 
-  uint32_t readData;
+  //uint32_t readData;
   //int high = 0, low = 0;
 
   // memoryReadWord((uint32_t)&ITM->LSR, &readData);
@@ -27,7 +27,7 @@ int main(void)
 
   //memoryReadWord((uint32_t)&ITM->PORT[0].u32, &readData);
 
-0  Tlv_Session *session = tlvCreateSession();
+  Tlv_Session *session = tlvCreateSession();
 
   while(1)
   {
