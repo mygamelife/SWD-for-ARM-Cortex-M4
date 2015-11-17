@@ -1,4 +1,4 @@
-# Build script for C (ver 0.10)
+# Build script for C (ver 0.11)
 # Copyright (C) 2015-2016 Poh Tze Ven <pohtv@acd.tarc.edu.my>
 #
 # This file is part of C Compiler & Interpreter project.
@@ -14,13 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with C Compiler & Interpreter.  If not, see <http://www.gnu.org/licenses/>.
 
-require 'pathname'
-require 'mkmf'
 require 'rake/clean' if !(defined? CLEAN)
 require 'rexml/document'
 include REXML
 
-load "#{File.dirname(__FILE__)}/helper.rb"
+load File.join(File.dirname(__FILE__), 'helper.rb')
 
 $programs_found = {}
 
@@ -106,16 +104,14 @@ def compile_list(list, src_path, obj_path, exe_path, config)
   raise ArgumentError,                                                  \
         "Error: Missing ':compiler' in the config"                      \
                 if (compiler = trim_string(config[:compiler])) == nil
-  raise ArgumentError,                                                  \
-        "Error: Cannot find #{compiler} to compile."                    \
-                if program_available?(compiler) == nil
+  compiler = ensure_program_available(compiler,                         \
+                          "Error: Cannot find #{compiler} to compile files.")
   # Get linker
   raise ArgumentError,                                                  \
         "Error: Missing ':linker' in the config"                        \
                 if (linker = trim_string(config[:linker])) == nil
-  raise ArgumentError,                                                  \
-        "Error: Cannot find #{linker} to link files."                   \
-                if program_available?(linker) == nil
+  linker = ensure_program_available(linker,                             \
+                          "Error: Cannot find #{linker} to link files.")
 
   list.each do |obj|
     # Append path to depender
@@ -269,7 +265,7 @@ def get_all_source_files_in_coproj(coIdeProjectFile = nil, default_search_path =
   root = xmldoc.root
 #  puts "Root element : " + root.attributes["version"]
 
-  path = Pathname.new(coproj).dirname
+  path = File.dirname(coproj)
   xmldoc.elements.each("Project/Files/File") { |e|
     name = e.attributes["path"]
 #    puts "File name : " + name if e.attributes["type"] == "1"  && name =~ /\.(?:c|cc|cpp|c++|s|asm)$/i
@@ -294,18 +290,6 @@ def createCompilationDependencyList(list, ext_filter_list, out_path, out_ext)
   }
   dependers.zip(list) { |key, val| dependency_list[key] = val }
   dependency_list
-end
-
-def up_to_date?(new, old)
-  if File.exist?(new) && File.exist?(old)
-    return true if File.mtime(new) > File.mtime(old)
-  end
-  return false
-end
-
-def program_available?(filename)
-  $programs_found[filename] = find_executable(filename) if !$programs_found.key? filename
-  return $programs_found[filename]
 end
 
 def get_all_tests(path)

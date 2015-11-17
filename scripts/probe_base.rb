@@ -1,7 +1,6 @@
 require 'mkmf'
 # Load cbuild script to help build C program
 load "scripts/cbuild.rb"
-load "scripts/target.rb"
 
 FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_CLI") unless defined? FLASHER
 ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
@@ -100,27 +99,6 @@ namespace :probe do
     sys_cli "#{FLASHER} -ME"
   end  
   
-  desc "Just duplicating .gitignore"
-  task :ignore do
-    src = ".gitignore"
-    target = ".gitignoreXXX"
-    if !up_to_date?(target, src)
-      p "duplicating .gitignore"
-      sh "cp #{src} #{target}"
-    else
-      p "already have the latest copy..."
-    end
-  end
-end
-
-namespace :probe do
-  namespace :"hw:test" do
-    filenames = get_all_tests("test/Hardware/**/test_*.c")
-    desc 'Run all hardware-in-the-loop tests'
-    task :all => (['probe:flash'] + filenames)
-    # task :all => "target:release[FlashProgrammer/FlashProgrammer.coproj]"
-    # task :all => (['probe:flash'] + ['target:release[FlashProgrammer/FlashProgrammer.coproj]'] + filenames)
-  end
 end
 
 namespace :probe do

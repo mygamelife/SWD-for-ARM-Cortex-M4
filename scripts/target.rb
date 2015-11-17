@@ -1,5 +1,4 @@
 #FLASHER = "\"/C/Program Files (x86)/STMicroelectronics/STM32 ST-LINK Utility/ST-LINK Utility/ST-LINK_CLI\" "
-FLASHER = "ST-LINK_CLI " unless defined? FLASHER
 
 # Load build script to help build C program
 load "scripts/cbuild.rb"
@@ -38,7 +37,7 @@ namespace :target do
   ouput_elf = nil
   ouput_hex = nil
   task :prepare_release, [:coproj] do |t, args|
-    filenames, coproj = get_all_source_files_in_coproj(args[:coproj])
+    filenames, coproj = get_all_source_files_in_coproj(args[:coproj], './FlashProgrammer')
     file = File.basename(coproj, '.coproj')
     ouput_elf = File.join(TARGET_OUTPUT_PATH, file + '.elf')
     ouput_hex = File.join(TARGET_OUTPUT_PATH, file + '.hex')
@@ -60,17 +59,5 @@ namespace :target do
   desc 'Build probe hardware release code'
   task :release, [:coproj] => :prepare_release do |t, args|
     Rake::Task[ouput_elf].invoke(args)
-  end
-
-  desc "Just duplicating .gitignore"
-  task :ignore do
-    src = ".gitignore"
-    target = ".gitignoreXXX"
-    if !up_to_date?(target, src)
-      p "duplicating .gitignore"
-      sh "cp #{src} #{target}"
-    else
-      p "already have the latest copy..."
-    end
   end
 end
