@@ -502,14 +502,16 @@ void watchpointEventHandler(Tlv_Session *session)
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   int i; uint8_t chksum = 0;
   uint8_t readData = 0;
-  
+  uint32_t dataRead = 0;
   Tlv *tlv = tlvCreatePacket(TLV_OK, size + 4, NULL);
   
   /* store destAddress checksum */
   chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&destAddress, 4);
-  
+  if(destAddress == DHCSR_REG)
+  		  memoryReadWord(destAddress,&dataRead);
   /* Read from RAM using swd */
   for(i = 0; i < size; i++, destAddress++)  {
+
     readData = memoryReadAndReturnByte(destAddress);
     /* Data start at position 4 */
     chksum += tlvPackIntoBuffer(&tlv->value[4 + i], &readData, 1);

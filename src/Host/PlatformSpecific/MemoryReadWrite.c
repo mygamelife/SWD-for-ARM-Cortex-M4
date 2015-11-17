@@ -18,7 +18,8 @@ void initMemoryReadWrite(void) {
     
   do {
     tlvService(_session);
-    tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
+    // tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
+    tlvLoadToRam(_session,"c:/Users/c_she/CoIDE/workspace/SWD-for-ARM-Cortex-M4/build/release/target/FlashProgrammer.elf");
   } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
 }
 

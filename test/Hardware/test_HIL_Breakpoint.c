@@ -22,6 +22,7 @@
 #include "CoreDebugEx.h"
 #include "FPBUnit.h"
 #include "FPBUnitEx.h"
+#include "CodeStepping.h"
 
 #define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
 
@@ -52,23 +53,24 @@ static void loadBreakpointTestProgram();
 
 void setUp(void) 
 {
+  
   if(initFlag == 0) 
   {  
-    system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
+    // system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
     initFlag = 1;
     initMemoryReadWrite();
-    /* Erase flash space according to size */
+    // /* Erase flash space according to size */
     // _flashErase(0x08000000, 2000);
     setCoreMode(CORE_DEBUG_HALT);
     loadBreakpointTestProgram();
   }
 
-  enableFPBUnit();
+  // enableFPBUnit();
 }
 
 void tearDown(void) 
 {
-  clearBreakpointDebugEvent();
+  // clearBreakpointDebugEvent();
 }
 
 static void loadBreakpointTestProgram()
@@ -102,13 +104,27 @@ static void loadBreakpointTestProgram()
 
 void test_step1Instruction()
 {
-  uint32_t pc ,before = 0;
+  CoreMode mode ;
+  uint32_t pc ,before = 0, after = 0 ,dataRead =0 ;
+  
+  while(tlvHardReset(_session) != PROCESS_DONE);
+  
   writeCoreRegister(CORE_REG_PC,0x080003BE);
   before = readCoreRegister(CORE_REG_PC);
   stepOnly(1);
   pc = readCoreRegister(CORE_REG_PC);
+  memoryWriteWord(DHCSR_REG,CORE_DEBUG_HALT);
+  memoryReadWord(DHCSR_REG, &dataRead);
+  after = readCoreRegister(CORE_REG_PC);
+  
+  printf("Before %x\n",before);
+  printf("PC %x\n",pc);
+  printf("DHCSR data %x\n",dataRead);
+  printf("After %x\n",after);
+  
   TEST_ASSERT_EQUAL(0x080003BE,before);
   TEST_ASSERT_EQUAL(0x080003C0,pc);
+  TEST_ASSERT_EQUAL(0x080003C2,after);
 }
 
 /**

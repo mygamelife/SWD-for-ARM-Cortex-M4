@@ -24,10 +24,10 @@ int main(void)
 
   // memoryReadWord((uint32_t)&ITM->LSR, &readData);
   // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x31);
-
+  memoryReadWord(DHCSR_REG, &readData);
   //memoryReadWord((uint32_t)&ITM->PORT[0].u32, &readData);
 
-0  Tlv_Session *session = tlvCreateSession();
+  Tlv_Session *session = tlvCreateSession();
 
   while(1)
   {
