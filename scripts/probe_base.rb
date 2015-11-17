@@ -99,25 +99,6 @@ namespace :probe do
     sys_cli "#{FLASHER} -ME"
   end  
   
-  desc "Just duplicating .gitignore"
-  task :ignore do
-    src = ".gitignore"
-    target = ".gitignoreXXX"
-    if !up_to_date?(target, src)
-      p "duplicating .gitignore"
-      sh "cp #{src} #{target}"
-    else
-      p "already have the latest copy..."
-    end
-  end
-end
-
-namespace :probe do
-  namespace :"hw:test" do
-    filenames = get_all_tests("test/Hardware/**/test_*.c")
-    desc 'Run all hardware-in-the-loop tests'
-    task :all => (['probe:flash'] + filenames)
-  end
 end
 
 namespace :probe do
