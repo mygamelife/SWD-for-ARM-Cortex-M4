@@ -1,4 +1,5 @@
 #include "unity.h"
+#include <string.h>
 #include <malloc.h>
 #include "Tlv.h"
 #include "TlvEx.h"
@@ -21,9 +22,8 @@ void test_tlvWriteTargetRegister_should_send_register_address_0x12345678_data_0x
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t data = 0xDEADBEEF;
-  int result = tlvWriteTargetRegister(session, 0x12345678, &data);
+
+  int result = tlvWriteTargetRegister(session, 0x12345678, 0xDEADBEEF);
   
   TEST_ASSERT_EQUAL(0, result);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
@@ -37,10 +37,9 @@ void test_tlvWriteTargetRegister_should_send_request_and_receive_reply(void)
 	Tlv_Session *session = tlvCreateSession();
   
   int result;
-  uint32_t data = 0xDEADBEEF;
   
   /* Send request */
-  result = tlvWriteTargetRegister(session, 0x12345678, &data);
+  result = tlvWriteTargetRegister(session, 0x12345678, 0xDEADBEEF);
   TEST_ASSERT_EQUAL(0, result);
   
   /* Received reply */
@@ -49,7 +48,7 @@ void test_tlvWriteTargetRegister_should_send_request_and_receive_reply(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
-  result = tlvWriteTargetRegister(session, 0x12345678, &data);
+  result = tlvWriteTargetRegister(session, 0x12345678, 0xDEADBEEF);
   
   TEST_ASSERT_EQUAL(1, result);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
@@ -315,10 +314,13 @@ void test_tlvWriteTargetMemory_should_request_and_write_data_into_target_RAM(voi
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  uint32_t data[] = {0x12345678, 0xDEADBEEF, 0xBEEFDEAD, 0xDEADDEAD};
-  
   User_Session userSession;
-  userSession.data = data;
+  
+  userSession.data[0] = 0x12345678;
+  userSession.data[1] = 0xDEADBEEF;
+  userSession.data[2] = 0xBEEFDEAD;
+  userSession.data[3] = 0xDEADDEAD;
+
   userSession.address = 0x20000000;
   userSession.size = 20;
 
@@ -349,10 +351,13 @@ void test_tlvWriteTargetMemory_should_stop_request_when_size_is_0(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  uint32_t data[] = {0x12345678, 0xDEADBEEF, 0xBEEFDEAD, 0xDEADDEAD};
-  
   User_Session userSession;
-  userSession.data = data;
+  
+  userSession.data[0] = 0x12345678;
+  userSession.data[1] = 0xDEADBEEF;
+  userSession.data[2] = 0xBEEFDEAD;
+  userSession.data[3] = 0xDEADDEAD;
+  
   userSession.address = 0x20000000;
   userSession.size = 500;
 
@@ -862,12 +867,15 @@ void test_hostInterpreter_by_requesting_tlv_write_ram_memory(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t data32[] = {0x11111111, 0x222222, 0x3333, 0x44444};
-  
   User_Session userSession;
+  
   userSession.tlvCommand = TLV_WRITE_RAM;
-  userSession.data = data32;
+  
+  userSession.data[0] = 0x11111111;
+  userSession.data[1] = 0x222222;
+  userSession.data[2] = 0x3333;
+  userSession.data[3] = 0x44444;
+  
   userSession.address = 0x20000000;
   userSession.size = 16;
 
@@ -908,12 +916,10 @@ void test_hostInterpreter_by_requesting_tlv_write_register(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  
-  uint32_t data32 = 0x11111111;
-  
   User_Session userSession;
+  
   userSession.tlvCommand = TLV_WRITE_REGISTER;
-  userSession.data = &data32;
+  userSession.data[0] = 0x11111111;
   userSession.address = 0x20000000;
   userSession.size = 8;
 

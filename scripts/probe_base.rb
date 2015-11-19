@@ -1,11 +1,10 @@
-require 'mkmf'
+# require 'mkmf'
 # Load cbuild script to help build C program
-load "scripts/cbuild.rb"
-load "scripts/target.rb"
+load File.join(File.dirname(__FILE__), 'cbuild.rb')
 
-FLASHER = trim_string((flasher = ENV['flasher']) ? String.new(flasher):"ST-LINK_CLI") unless defined? FLASHER
-ELF_TO_HEX = trim_string((elf_to_hex = ENV['elf_to_hex']) ? String.new(elf_to_hex):"arm-none-eabi-objcopy") unless defined? ELF_TO_HEX
-C_EXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib " unless defined? C_EXCEPTION_PATH
+flasher = get_value_from_env("flasher", "ST-LINK_CLI")
+elf_to_hex = get_value_from_env("elf_to_hex", "arm-none-eabi-objcopy")
+c_exception_path = "vendor/ceedling/vendor/c_exception/lib"
 
 # ST-LINK_CLI error code. They can be found in [1].
 ERR_ST_LINK_ARGS = 1
@@ -24,7 +23,7 @@ config = {
   :compiler     => 'arm-none-eabi-gcc',
   :linker       => 'arm-none-eabi-gcc',
 # -IC:\Users\user26\CoIDE\workspace\RTOS
-  :include_path => [C_EXCEPTION_PATH,
+  :include_path => [c_exception_path,
                     'src/app/Drivers',
                     'src/app/Stub',
                     'src/app/Tlv',
@@ -62,12 +61,12 @@ namespace :probe do
     link_all(getDependers(dep_list), ouput_elf, config)
 
     file ouput_hex => ouput_elf do |n|
-      if(program_available?(ELF_TO_HEX) == nil)
-        puts "Error: Cannot find #{ELF_TO_HEX} program to turn ELF to HEX."
+      if(program_available?(elf_to_hex) == nil)
+        puts "Error: Cannot find #{elf_to_hex} program to turn ELF to HEX."
         exit
       end
       puts "converting #{n.prerequisites[0]} to hex..."
-      sys_cli "#{ELF_TO_HEX} -O ihex #{n.prerequisites[0]} #{n.name}"
+      sys_cli "#{elf_to_hex} -O ihex #{n.prerequisites[0]} #{n.name}"
     end
   end
 #  CLEAN.include('build/release/hw') if File.exist? 'build/release/hw'
@@ -83,43 +82,22 @@ namespace :probe do
   desc 'Flash program and run test'
   task :flash, [:coproj] => :prepare_release do |t, args|
     Rake::Task[ouput_hex].invoke(args)
-    if(program_available?(FLASHER) == nil)
-      puts "Error: Cannot find #{FLASHER} program to flash ARM processor."
+    if(program_available?(flasher) == nil)
+      puts "Error: Cannot find #{flasher} program to flash ARM processor."
       exit
     end
     # First check if there is any differences between current Hex file with
     # the one on the MCU Flash. Download if there is, otherwise do nothing.
-    if (!system "#{FLASHER} -CmpFile #{ouput_hex}") && ($?.exitstatus != ERR_ST_LINK_CONNECTION)
+    if (!system "#{flasher} -CmpFile #{ouput_hex}") && ($?.exitstatus != ERR_ST_LINK_CONNECTION)
       # Flash the Hex file into the MCU Flash
-      sys_cli "#{FLASHER} -P #{ouput_hex} -V while_programming -Rst -Run"
+      sys_cli "#{flasher} -P #{ouput_hex} -V while_programming -Rst -Run"
     end
   end
 
   desc 'Erase all Flash sectors'
   task :full_erase do
-    sys_cli "#{FLASHER} -ME"
+    sys_cli "#{flasher} -ME"
   end  
-  
-  desc "Just duplicating .gitignore"
-  task :ignore do
-    src = ".gitignore"
-    target = ".gitignoreXXX"
-    if !up_to_date?(target, src)
-      p "duplicating .gitignore"
-      sh "cp #{src} #{target}"
-    else
-      p "already have the latest copy..."
-    end
-  end
-end
-
-namespace :probe do
-  namespace :"hw:test" do
-    filenames = get_all_tests("test/Hardware/**/test_*.c")
-    desc 'Run all hardware-in-the-loop tests'
-    task :all => (['probe:flash'] + filenames)
-    # task :all => (['probe:flash'] + ['target:release[C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/FlashProgrammer.coproj]'] + filenames)
-  end
 end
 
 namespace :probe do
