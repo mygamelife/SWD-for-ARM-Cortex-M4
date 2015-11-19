@@ -118,8 +118,7 @@ namespace :probe do
     filenames = get_all_tests("test/Hardware/**/test_*.c")
     desc 'Run all hardware-in-the-loop tests'
     task :all => (['probe:flash'] + filenames)
-    # task :all => "target:release[FlashProgrammer/FlashProgrammer.coproj]"
-    # task :all => (['probe:flash'] + ['target:release[FlashProgrammer/FlashProgrammer.coproj]'] + filenames)
+    # task :all => (['probe:flash'] + ['target:release[C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/FlashProgrammer/FlashProgrammer.coproj]'] + filenames)
   end
 end
 
