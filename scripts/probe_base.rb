@@ -7,15 +7,15 @@ elf_to_hex = get_value_from_env("elf_to_hex", "arm-none-eabi-objcopy")
 c_exception_path = "vendor/ceedling/vendor/c_exception/lib"
 
 # ST-LINK_CLI error code. They can be found in [1].
-err_st_link_args = 1
-err_st_link_connection = 2
-err_st_link_command = 3
-err_st_link_reset = 7
-err_st_link_halt = 8
-err_st_link_step = 9
-err_st_link_breakpoint = 10
-err_st_link_erase_flash = 11
-err_st_link_prog_verify = 12
+ERR_ST_LINK_ARGS = 1            unless defined? ERR_ST_LINK_ARGS
+ERR_ST_LINK_CONNECTION = 2      unless defined? ERR_ST_LINK_CONNECTION
+ERR_ST_LINK_COMMAND = 3         unless defined? ERR_ST_LINK_COMMAND
+ERR_ST_LINK_RESET = 7           unless defined? ERR_ST_LINK_RESET
+ERR_ST_LINK_HALT = 8            unless defined? ERR_ST_LINK_HALT
+ERR_ST_LINK_STEP = 9            unless defined? ERR_ST_LINK_STEP
+ERR_ST_LINK_BREAKPOINT = 10     unless defined? ERR_ST_LINK_BREAKPOINT
+ERR_ST_LINK_ERASE_FLASH = 11    unless defined? ERR_ST_LINK_ERASE_FLASH
+ERR_ST_LINK_PROG_VERIFY = 12    unless defined? ERR_ST_LINK_PROG_VERIFY
 
 # Configuration parameters
 config = {
