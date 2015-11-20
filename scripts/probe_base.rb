@@ -7,15 +7,15 @@ elf_to_hex = get_value_from_env("elf_to_hex", "arm-none-eabi-objcopy")
 c_exception_path = "vendor/ceedling/vendor/c_exception/lib"
 
 # ST-LINK_CLI error code. They can be found in [1].
-ERR_ST_LINK_ARGS = 1
-ERR_ST_LINK_CONNECTION = 2
-ERR_ST_LINK_COMMAND = 3
-ERR_ST_LINK_RESET = 7
-ERR_ST_LINK_HALT = 8
-ERR_ST_LINK_STEP = 9
-ERR_ST_LINK_BREAKPOINT = 10
-ERR_ST_LINK_ERASE_FLASH = 11
-ERR_ST_LINK_PROG_VERIFY = 12
+err_st_link_args = 1
+err_st_link_connection = 2
+err_st_link_command = 3
+err_st_link_reset = 7
+err_st_link_halt = 8
+err_st_link_step = 9
+err_st_link_breakpoint = 10
+err_st_link_erase_flash = 11
+err_st_link_prog_verify = 12
 
 # Configuration parameters
 config = {
@@ -100,10 +100,10 @@ namespace :probe do
   end  
 end
 
-namespace :probe do
-  namespace :test do
-    filenames = get_all_tests("test/Probe/**/test_*.c")
-    desc 'Run all probe tests'
-    task :all => filenames
-  end
-end
+# namespace :probe do
+  # namespace :test do
+    # filenames = get_all_tests("test/Probe/**/test_*.c")
+    # desc 'Run all probe tests'
+    # task :all => filenames
+  # end
+# end
