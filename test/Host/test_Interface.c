@@ -103,7 +103,7 @@ void test_userReadMemory_should_throw_error_when_address_is_not_in_number(void)
   CEXCEPTION_T err;
   
   Try {
-    String *str = stringNew("rmem abcdabcd 14");
+    String *str = stringNew("read abcdabcd 14");
     User_Session *session = InterpreteCommand(str);
   }
   Catch(err)  {
