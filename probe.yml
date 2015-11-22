@@ -13,6 +13,7 @@
   :release_build: TRUE
   :test_file_prefix: test_
   :load_scripts: [scripts/probe_base.rb, scripts/probe_host.rb]
+  # :load_scripts: [scripts/probe_base.rb]
 
 :release_build:
   :output: main.exe

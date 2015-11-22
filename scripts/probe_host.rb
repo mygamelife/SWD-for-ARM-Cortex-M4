@@ -1,4 +1,3 @@
-load File.join(File.dirname(__FILE__), 'probe_base.rb')
 
 namespace :probe do
   namespace :test do
