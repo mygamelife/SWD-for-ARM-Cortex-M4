@@ -4,5 +4,5 @@
 #include <stdint.h>
 #include "Tpiu.h"
 
-void itmConfig(void);
+void configItm(void);
 #endif // Itm_H
