@@ -21,6 +21,8 @@ SwdError memoryWriteByte(uint32_t address, uint8_t writeData);
 SwdError memoryWriteHalfword(uint32_t address, uint16_t writeData);
 SwdError memoryWriteWord(uint32_t address, uint32_t writeData);
 
+int memoryWriteData(uint32_t address, uint8_t *data, int size);
+
 uint32_t memoryWriteDataAlignment(uint32_t address, uint16_t writeData);
 
 #endif // MemoryReadWrite_H

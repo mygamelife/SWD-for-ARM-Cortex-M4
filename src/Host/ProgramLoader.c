@@ -643,7 +643,7 @@ Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int 
   *
   * Return  : NONE
   */
-void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
+Process_Status tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   switch(session->eraseState) {
     case TLV_LOAD_FLASH_PROGRAMMER :
       tlvLoadToRam(session, FLASH_PROGRAMMER_FILE_PATH);
@@ -654,8 +654,10 @@ void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
     break;
     
     case TLV_REQUEST_ERASE :
-      if(tlvRequestFlashErase(session, address, size) == PROCESS_DONE)
+      if(tlvRequestFlashErase(session, address, size) == PROCESS_DONE) {
         session->eraseState = TLV_LOAD_FLASH_PROGRAMMER;
+        return PROCESS_DONE;
+      }
     break;
   }
 }
@@ -840,6 +842,7 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
   return response->value[0];
 }
 
+
 /** selectCommand is a function to select instruction 
   * base on userSession
   *
@@ -889,4 +892,20 @@ void hostInterpreter(Tlv_Session *session) {
         HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
     break;
   }
+}
+
+
+Process_Status _tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
+  startTask(session->state);
+  
+  else if(tlvEraseTargetFlash(session, destAddress, size) == PROCESS_DONE) {
+      
+  }
+  
+  /* End tlv request task */
+  endTask(session->state);
+  
+  // tlvWriteTargetMemory(session, &dataAddress, &destAddress, &size, TLV_WRITE_FLASH);
 }

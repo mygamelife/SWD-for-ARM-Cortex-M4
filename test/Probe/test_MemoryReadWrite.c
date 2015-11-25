@@ -166,3 +166,17 @@ void test_memoryWriteDataAlignment_given_address_6_data_0xABCD_should_return_0xA
 {
   TEST_ASSERT_EQUAL(0xABCD0000,memoryWriteDataAlignment(6,0xABCD));
 }
+
+void test_memoryWriteData_should_write_data()
+{
+  uint8_t data[] = {0x78, 0x56, 0x34, 0x12, 0xFF};
+  
+  cswDataSize = CSW_WORD_SIZE;
+  // Write memory address to TAR
+	emulateSwdRegisterWrite(TAR_REG, SWD_AP, 4, 0x20000000);
+	// Write data to DRW
+	emulateSwdRegisterWrite(DRW_REG, SWD_AP, 4, 0x12345678);
+  
+  memoryWriteData(0x20000000, data, 9);
+  // TEST_ASSERT_EQUAL(0xABCD0000, );
+}

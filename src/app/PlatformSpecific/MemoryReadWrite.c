@@ -146,6 +146,23 @@ SwdError memoryWriteWord(uint32_t address, uint32_t writeData)
   return error;
 }
 
+int memoryWriteData(uint32_t address, uint8_t *data, int size) {
+  int i = 0, tsize = address + size;
+  
+  if((address & 0x3) == 0) {
+    memoryWriteWord(address, *((uint32_t *)data));
+    data += 4;
+  }
+  
+  printf("data %x\n", *data);
+  
+  printf("tsize %x\n", tsize);
+  printf("address half %d\n", (0x20000002 & 0x3));
+  printf("address word %d\n", (0x20000004 & 0x3));
+  printf("address half %d\n", (0x20000006 & 0x3));
+  printf("address word %d\n", (0x20000008 & 0x3));
+}
+
 /**
  * Perform data alignment when performing byte or halfword memory write access
  *
