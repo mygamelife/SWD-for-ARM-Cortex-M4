@@ -15,12 +15,11 @@ int cswDataSize = 0;
 void initMemoryReadWrite(void) {
   if(_session == NULL)
     _session = tlvCreateSession();
-    
   do {
-    tlvService(_session);
-    // tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
-    tlvLoadToRam(_session,"c:/Users/c_she/CoIDE/workspace/SWD-for-ARM-Cortex-M4/build/release/target/FlashProgrammer.elf");
-  } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
+      tlvService(_session);
+      tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
+    } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET); 
+       
 }
 
 int memoryRead(uint32_t address, uint32_t *dataRead, int size) {

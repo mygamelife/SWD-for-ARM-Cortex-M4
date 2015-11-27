@@ -651,6 +651,7 @@ void getElfSection(char *elfFile) {
   finiArray = getElfSectionInfo(elfData, ".fini_array");
 
   entryAddress = (*(uint32_t *)(&isr->dataAddress[4]));
+  printf("entry address in GetHeaders %x\n",entryAddress);
 }
 
 int getProgramSize(char *elfFile) {

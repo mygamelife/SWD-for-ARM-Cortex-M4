@@ -24,7 +24,7 @@ int main(void)
 
   // memoryReadWord((uint32_t)&ITM->LSR, &readData);
   // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x31);
-  memoryReadWord(DHCSR_REG, &readData);
+
   //memoryReadWord((uint32_t)&ITM->PORT[0].u32, &readData);
 
   Tlv_Session *session = tlvCreateSession();

@@ -585,17 +585,17 @@ void tlvLoadToRam(Tlv_Session *session, char *file) {
     case TLV_UPDATE_PC :
       /* Update program counter to the entry address 
          of the loaded program */ 
-      tlvWriteTargetRegister(session, PC, entryAddress);
-      if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR) {
+      if(tlvWriteTargetRegister(session, PC, entryAddress) == PROCESS_DONE)
+      {
         SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->lramState = TLV_RUN_PROGRAM;
       }
+      printf("entry address %x\n",entryAddress);
     break;
     
     case TLV_RUN_PROGRAM :
       /* Run program on target */
-      tlvRunTarget(session);
-      if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
+       if(tlvRunTarget(session) == PROCESS_DONE)
         session->lramState = TLV_LOAD_PROGRAM;
     break;
   }

@@ -1141,3 +1141,97 @@ void test_probeTaskManager_given_TLV_DEBUG_EVENTS_should_call_checkDebugEvent(vo
   TEST_ASSERT_EQUAL_HEX8(BREAKPOINT_EVENT, session->txBuffer[2]);
   TEST_ASSERT_EQUAL_HEX8(0xFF, session->txBuffer[3]); //chksum
 }
+
+/*---------selectAppropriateMethodToWriteRAM----------------------*/
+void test_selectAppropriateMethodToWriteRAM_given_0xE0000000_size_10_should_write_4bytes_4bytes_2bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteWord_ExpectAndReturn(0xE0000000,0x44332211,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0xE0000004,0x88776655,SWD_NO_ERROR);
+  memoryWriteHalfword_ExpectAndReturn(0xE0000008,0xAA99,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0xE0000000, 10);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0xE0000001_size_10_should_write_2bytes_1bytes_4bytes_2bytes_1bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteHalfword_ExpectAndReturn(0xE0000001,0x2211,SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0xE0000003,0x33,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0xE0000004,0x77665544,SWD_NO_ERROR);
+  memoryWriteHalfword_ExpectAndReturn(0xE0000008,0x9988,SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0xE000000A,0xAA,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0xE0000001, 10);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0xE0000002_size_10_should_write_2bytes_4bytes_4bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteHalfword_ExpectAndReturn(0xE0000002,0x2211,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0xE0000004,0x66554433,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0xE0000008,0xAA998877,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0xE0000002, 10);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0xE0000003_size_10_should_write_1bytes_4bytes_4bytes_1bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteByte_ExpectAndReturn(0xE0000003,0x11,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0xE0000004,0x55443322,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0xE0000008,0x99887766,SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0xE000000C,0xAA,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0xE0000003, 10);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0x20000004_size_9_should_write_4bytes_4bytes_1bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteWord_ExpectAndReturn(0x20000004,0x44332211,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000008,0x88776655,SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000000C,0x99,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0x20000004, 9);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0x20000005_size_9_should_write_2bytes_1bytes_4bytes_2bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteHalfword_ExpectAndReturn(0x20000005,0x2211,SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x20000007,0x33,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000008,0x77665544,SWD_NO_ERROR);
+  memoryWriteHalfword_ExpectAndReturn(0x2000000C,0x9988,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0x20000005, 9);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0x20000006_size_9_should_write_2bytes_4bytes_2bytes_1bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteHalfword_ExpectAndReturn(0x20000006,0x2211,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000008,0x66554433,SWD_NO_ERROR);
+  memoryWriteHalfword_ExpectAndReturn(0x2000000C,0x8877,SWD_NO_ERROR);
+  memoryWriteByte_ExpectAndReturn(0x2000000E,0x99,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0x20000006, 9);
+}
+
+void test_selectAppropriateMethodToWriteRAM_given_0x20000007_size_9_should_write_1bytes_4bytes_4bytes()
+{
+  uint8_t buffer[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0xAA};
+  
+  memoryWriteByte_ExpectAndReturn(0x20000007,0x11,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000008,0x55443322,SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x2000000C,0x99887766,SWD_NO_ERROR);
+  
+  selectAppropriateMethodToWriteRAM(buffer, 0x20000007, 9);
+}

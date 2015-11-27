@@ -502,13 +502,12 @@ void watchpointEventHandler(Tlv_Session *session)
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   int i; uint8_t chksum = 0;
   uint8_t readData = 0;
-  uint32_t dataRead = 0;
+
   Tlv *tlv = tlvCreatePacket(TLV_OK, size + 4, NULL);
   
   /* store destAddress checksum */
   chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&destAddress, 4);
-  if(destAddress == DHCSR_REG)
-  		  memoryReadWord(destAddress,&dataRead);
+
   /* Read from RAM using swd */
   for(i = 0; i < size; i++, destAddress++)  {
 
@@ -532,14 +531,24 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   * return  : NONE
   */
 void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-  int i;
+  int i, j ;
+  uint32_t data32 = 0 ;
+  
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
   /* Write to RAM using swd */
-  for(i = 0; i < size; i ++, dataAddress++, destAddress++) {
-    memoryWriteByte(destAddress, *dataAddress);
-  }
-  
+    for(i = 0; i < size; i ++, dataAddress++, destAddress++) 
+   {
+     // if(destAddress == DHCSR_REG || destAddress == AIRCR_REG || destAddress == DCRDR_REG || destAddress == DCRSR_REG)
+     // {
+       // for(j = 0 ; j < 4 ; dataAddress ++, j ++)
+         // data32 += (*dataAddress << j*8);
+       
+       // memoryWriteWord(destAddress,data32);
+       // break ;
+     // }
+     memoryWriteByte(destAddress, *dataAddress);
+   }
+ 
   tlvSend(session, tlv);
 }
 
@@ -759,4 +768,44 @@ void probeTaskManager(Tlv_Session *session)  {
       }
     break;
   }
+}
+
+
+/** Select the best method (Word,Halfword or Byte) to write into RAM
+  * Input   : data is the address of the buffer storing the data to be written
+  *           destAddress is the starting address where the data is going to be written
+  *           size is total amount of data to be written
+  */
+void selectAppropriateMethodToWriteRAM(uint8_t *data, uint32_t destAddress, int size)
+{
+  uint32_t data32 = 0 , data16 = 0;
+  int i ;
+  
+  while(size !=0)
+  {
+    if((destAddress %4 == 0) && (size >=4))
+    {
+      data32 = 0 ;
+      for(i = 0 ; i < 4 ; data++ ,i ++)
+        data32 += (*data << i*8);
+
+      memoryWriteWord(destAddress,data32);
+      size -= 4 ;
+      destAddress +=4;
+    }
+    else if((destAddress % 4 <= 2) && (size >=2))
+    {
+      data16 = 0 ;
+      for(i = 0 ; i < 2 ; data++ ,i ++)
+        data16 += (*data << i*8);
+      
+      memoryWriteHalfword(destAddress,data16);
+      size -=2 ; destAddress +=2 ;
+    }
+    else
+    {
+      memoryWriteByte(destAddress,*data);
+      size --;  destAddress ++; data ++;
+    }
+  };
 }

@@ -74,4 +74,5 @@ void loopBack(Tlv_Session *session, Tlv *packet);
 
 void comPortVerification(Tlv_Session *session);
 
+void selectAppropriateMethodToWriteRAM(uint8_t *data, uint32_t destAddress, int size);
 #endif // ProgramWorker_H
