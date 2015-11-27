@@ -11,7 +11,7 @@
 ElfData *elfData;
 uint32_t entryAddress = 0;
 int fileStatus = FILE_CLOSED;
-
+                          
 /* Elf section needs to load */
 ElfSection *isr,
            *text,

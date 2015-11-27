@@ -56,14 +56,15 @@ Process_Status tlvVectReset(Tlv_Session *session);
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size, Tlv_Command memorySelect);
 Process_Status tlvWriteTargetMemory(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
 
-/* Load Flash/RAM */
+/* Write/Load Flash and RAM */
 void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
 void tlvLoadToRam(Tlv_Session *session, char *file);
 void tlvLoadToFlash(Tlv_Session *session, char *file);
+Process_Status _tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 
 /* Flash Erase */
 Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size);
-void tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
+Process_Status tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
 Process_Status tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks);
 void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
 

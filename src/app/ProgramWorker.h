@@ -16,6 +16,24 @@
 #define ENABLE_SVC          0x80
 #define PROBE_CHANGE_STATE(__SESSION__, __STATE__)      ((__SESSION__)->probeState = __STATE__)
 
+/* Data type mask */
+#define BOUNDARY_MASK       0x3
+#define WORD_BOUNDARY       0
+#define HALFWORD_BOUNDARY   2
+
+#define WORD_SIZE           4
+#define WORD_ADDRESS        4
+#define HALFWORD_SIZE       2
+#define HALFWORD_ADDRESS    2
+#define BYTE_SIZE           1
+#define BYTE_ADDRESS        1
+
+typedef enum {
+  BYTE_TYPE       = 1,
+  HALFWORD_TYPE   = 2,
+  WORD_TYPE       = 4,
+} DataType;
+
 /** swdStub request function
   */
 int IsStubBusy(void);
@@ -29,6 +47,8 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
 int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
 
 /*############################################### RAM ###############################################*/
+DataType getDataType(uint32_t address, int size);
+void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size);
 void writeRamInChunk(uint8_t *dataAddress, uint32_t destAddress, int size);
 void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 

@@ -520,6 +520,75 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   tlvSend(session, tlv);
 }
 
+/** getDataType is a function to determine the suitable data type
+  * to write into the correct address boundary
+  *
+  * Input   : address is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : WORD_TYPE       if address is 4byte boundary and size >= 4
+  *           HALFWORD_TYPE   if address is 2byte boundary and size >= 2
+  *           BYTE_TYPE       if address is 1byte boundary
+  */
+DataType getDataType(uint32_t address, int size) {
+  int boundary = (address & BOUNDARY_MASK);
+  int dataType = 0;
+  
+  /* Case 1 */
+  if(boundary == WORD_BOUNDARY) {
+    if(size >= WORD_SIZE) 
+      dataType = WORD_TYPE;
+    else if(size > BYTE_SIZE && size < WORD_SIZE)
+      dataType = HALFWORD_TYPE;
+    else
+      dataType = BYTE_TYPE;
+  }
+  /* Case 2 */
+  else if(boundary == HALFWORD_BOUNDARY) {
+    if(size >= HALFWORD_SIZE)
+      dataType = HALFWORD_TYPE;
+    else dataType = BYTE_TYPE;
+  }
+  /* Case 3 */
+  else dataType = BYTE_TYPE;
+  
+  return dataType;
+}
+
+/** writeDataWithCorrectDataType is a function to write data 
+  * into correct address boundary
+  *
+  * Input   : data is the pointer-to-pointer contain address of the data need to write
+  *           address is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) {
+  DataType type = 0;
+  uint8_t *dataAddress = *data;
+  uint32_t destAddress = *address;
+  
+  type = getDataType(destAddress, *size);
+  
+  if(type == WORD_TYPE) {
+    // printf("word %x\n", get4Byte(dataAddress));
+    memoryWriteWord(destAddress, get4Byte(dataAddress));
+  }
+  else if(type == HALFWORD_TYPE) {
+    // printf("halfword %x\n", get2Byte(dataAddress));
+    memoryWriteHalfword(destAddress, get2Byte(dataAddress));
+  }
+  else if(type == BYTE_TYPE) {
+    // printf("byte %x\n", *dataAddress);
+    memoryWriteByte(destAddress, *dataAddress);
+  }
+  
+  *data += type;
+  *address += type;
+  *size -= type;
+}
+
 /** writeTargetRam is a function to write target RAM using swd
   *
   * Input   : session contain a element/handler used by tlv protocol
@@ -533,9 +602,9 @@ void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAdd
   int i;
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   
-  /* Write to RAM using swd */
-  for(i = 0; i < size; i ++, dataAddress++, destAddress++) {
-    memoryWriteByte(destAddress, *dataAddress);
+  /* Write data into correct address boundary */
+  while(size > 0) {
+    writeDataWithCorrectDataType(&dataAddress, &destAddress, &size);
   }
   
   tlvSend(session, tlv);
@@ -673,7 +742,6 @@ void checkDebugEvent(Tlv_Session *session, EventType event) {
 }
 
 void loopBack(Tlv_Session *session, Tlv *packet) {
-
   Tlv *tlv;
   int i = 0;
 
