@@ -222,7 +222,7 @@ void tlvService(Tlv_Session *session) {
   */
 void tlvSendRequest(Tlv_Session *session, Tlv_Command command, int size, uint8_t *data) {
   /* Create tlv packet consist of command, siza and data */
-  Tlv *tlv = tlvCreatePacket(TLV_WRITE_REGISTER, size, data);
+  Tlv *tlv = tlvCreatePacket(command, size, data);
   
   tlvSend(session, tlv);
 }

@@ -9,6 +9,9 @@
 #include "CException.h"
 
 #define ONE_SECOND          1000
+#define TWO_SECOND          2000
+#define THREE_SECOND        3000
+#define FOUR_SECOND         4000
 #define FIVE_SECOND         5000
 #define FORTY_SECOND        40000
 #define ONE_MINUTE          60000

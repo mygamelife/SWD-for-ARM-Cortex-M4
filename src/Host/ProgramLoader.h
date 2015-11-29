@@ -33,16 +33,22 @@ typedef enum {
 
 #define tlvWriteToFlash(session, dataAddress, destAddress, size)                  \
         tlvWriteTargetMemory(session, dataAddress, destAddress, size, TLV_WRITE_FLASH)
-        
+
+#define isProbeAlive(timeout, x)      do {  if(timeout)                     \
+                                            {                               \
+                                              resetTask(x);                 \
+                                              Throw(PROBE_NOT_RESPONDING);  \
+                                            }                               \
+                                         } while(0)
 /* Read/Write target register */
 Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
-uint32_t tlvReadTargetRegister(Tlv_Session *session, uint32_t registerAddress);
+uint32_t readRegister(Tlv_Session *session, uint32_t registerAddress);
 
 /* Halt target */
-Process_Status tlvHaltTarget(Tlv_Session *session);
+Process_Status halt(Tlv_Session *session);
 
 /* Run target */
-Process_Status tlvRunTarget(Tlv_Session *session);
+Process_Status run(Tlv_Session *session);
 
 /* Step target */
 uint32_t tlvMultipleStepTarget(Tlv_Session *session, int nInstructions);
