@@ -149,7 +149,7 @@ void test_tlvMultipleStepTarget_should_receive_response_and_return_current_progr
   int result; uint32_t data = 0x20000010;
   
   /* Send request */
-  result = tlvMultipleStepTarget(session, 10);
+  result = multipleStep(session, 10);
   TEST_ASSERT_EQUAL(0, result);
   TEST_ASSERT_EQUAL(1, isYielding);
   
@@ -159,7 +159,7 @@ void test_tlvMultipleStepTarget_should_receive_response_and_return_current_progr
   session->rxBuffer[1] = 5;
   session->rxBuffer[6] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 4);
   
-  result = tlvMultipleStepTarget(session, 10);
+  result = multipleStep(session, 10);
   TEST_ASSERT_EQUAL_HEX32(0x20000010, result);
   TEST_ASSERT_EQUAL(0, isYielding);
 }
@@ -168,7 +168,7 @@ void test_tlvSoftReset_should_return_1_after_request_and_received_OK_reply(void)
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   
-  TEST_ASSERT_EQUAL(0, tlvSoftReset(session));
+  TEST_ASSERT_EQUAL(0, softReset(session));
   TEST_ASSERT_EQUAL(1, isYielding);
   
   /* Received reply */
@@ -177,7 +177,7 @@ void test_tlvSoftReset_should_return_1_after_request_and_received_OK_reply(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
-  TEST_ASSERT_EQUAL(1, tlvSoftReset(session));
+  TEST_ASSERT_EQUAL(1, softReset(session));
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
@@ -185,7 +185,7 @@ void test_tlvHardReset_should_return_1_after_request_and_received_OK_reply(void)
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   
-  TEST_ASSERT_EQUAL(0, tlvHardReset(session));
+  TEST_ASSERT_EQUAL(0, hardReset(session));
   TEST_ASSERT_EQUAL(1, isYielding);
   
   /* Received reply */
@@ -194,7 +194,7 @@ void test_tlvHardReset_should_return_1_after_request_and_received_OK_reply(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
-  TEST_ASSERT_EQUAL(1, tlvHardReset(session));
+  TEST_ASSERT_EQUAL(1, hardReset(session));
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
@@ -202,7 +202,7 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   
-  TEST_ASSERT_EQUAL(0, tlvVectReset(session));
+  TEST_ASSERT_EQUAL(0, vectorReset(session));
   TEST_ASSERT_EQUAL(1, isYielding);
   
   /* Received reply */
@@ -211,130 +211,62 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
-  TEST_ASSERT_EQUAL(1, tlvVectReset(session));
+  TEST_ASSERT_EQUAL(1, vectorReset(session));
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
-// void test_tlvReadDataChunk_should_send_request_read_data_in_chunk(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
+void test_tlvReadTargetMemory_should_request_read_memory_and_return_data_block(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  uint32_t data[] = {0x11111111, 0x22222222, 0x33333333, 0x44444444};
+  uint8_t *dataBlock;
   
-  // tlvReadDataChunk(session, 0x20001000, 255);
+  int size  = 16;
+  uint32_t address = 0x20000000;
   
-  // TEST_ASSERT_EQUAL_HEX32(0x20001000, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX32(0xFF, get4Byte(&session->txBuffer[6]));
-// }
+  dataBlock = readMemory(session, &address, &size);
 
-// void test_tlvReadTargetMemory_should_request_read_memory_and_return_data_block(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
+  TEST_ASSERT_NULL(dataBlock);
+  TEST_ASSERT_EQUAL_HEX32(0x20000010, address);
+  TEST_ASSERT_EQUAL(0, size);
 
-  // uint32_t data[] = {0x11111111, 0x22222222, 0x33333333, 0x44444444};
-  // uint32_t address = 0x20000000; uint8_t *dataBlock;
-  // int size = 16;
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 17;
+  session->rxBuffer[18] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 16);
   
-  // tlvReadTargetMemory(session, &address, &size);
+  dataBlock = readMemory(session, &address, &size);
 
-  // TEST_ASSERT_EQUAL(true, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL_HEX32(0x200000F8, address);
-  // TEST_ASSERT_EQUAL(-232, size);
+  TEST_ASSERT_NOT_NULL(dataBlock);
+  TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&dataBlock[0]));
+  TEST_ASSERT_EQUAL_HEX32(0x22222222, get4Byte(&dataBlock[4]));
+  TEST_ASSERT_EQUAL_HEX32(0x33333333, get4Byte(&dataBlock[8]));
+  TEST_ASSERT_EQUAL_HEX32(0x44444444, get4Byte(&dataBlock[12]));
+}
 
-  // /* Received reply */
-  // SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 17;
-  // session->rxBuffer[18] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 16);
+void test_tlvWriteTargetMemory_should_request_and_write_data_into_target_RAM(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  User_Session userSession;
   
-  // dataBlock = tlvReadTargetMemory(session, &address, &size);
+  userSession.data[0] = 0x12345678;
+  userSession.data[1] = 0xDEADBEEF;
+  userSession.data[2] = 0xBEEFDEAD;
+  userSession.data[3] = 0xDEADDEAD;
 
-  // TEST_ASSERT_EQUAL(false, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&dataBlock[0]));
-  // TEST_ASSERT_EQUAL_HEX32(0x22222222, get4Byte(&dataBlock[4]));
-  // TEST_ASSERT_EQUAL_HEX32(0x33333333, get4Byte(&dataBlock[8]));
-  // TEST_ASSERT_EQUAL_HEX32(0x44444444, get4Byte(&dataBlock[12]));
-// }
+  userSession.address = 0x20000000;
+  userSession.size = 20;
 
-// void test_tlvReadTargetMemory_should_stop_request_tlv_read_register_when_size_is_0(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
-
-  // uint32_t address = 0x20000000;
-  // int size = 400;
+  uint8_t *pData = (uint8_t *)userSession.data;
+  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
   
-  // uint8_t *result = tlvReadTargetMemory(session, &address, &size);
-
-  // TEST_ASSERT_NULL(result);
-  // TEST_ASSERT_EQUAL_HEX32(0x200000F8, address);
-  // TEST_ASSERT_EQUAL(152, size);
-// }
-
-// void test_tlvWriteDataChunk_should_send_data_in_chunk_to_ram(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
-  
-  // uint32_t address = 0x11111111;
-  // uint32_t data[] = {0xDEADBEEF};
-  // tlvWriteDataChunk(session, (uint8_t *)data, address, 4, TLV_WRITE_RAM);
-  
-  // TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_RAM, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
-  // TEST_ASSERT_EQUAL_HEX8(0x84, session->txBuffer[10]); //chksum
-// }
-
-// void test_tlvWriteDataChunk_should_send_data_in_chunk_to_flash(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
-  
-  // uint32_t address = 0x22222222;
-  // uint32_t data[] = {0xDEADBEEF};
-  // tlvWriteDataChunk(session, (uint8_t *)data, address, 4, TLV_WRITE_FLASH);
-  
-  // TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_FLASH, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(0x22222222, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
-  // TEST_ASSERT_EQUAL_HEX8(0x40, session->txBuffer[10]); //chksum
-// }
-
-// void test_tlvWriteDataChunk_should_send_data_in_chunk_with_specific_size(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
-  
-  // uint32_t address = 0x12345678;
-  // uint32_t data[] = {0x12345678, 0xDEADBEEF, 0xBEEFDEAD, 0xDEADDEAD};
-  // tlvWriteDataChunk(session, (uint8_t *)data, address, 20, TLV_WRITE_RAM);
-  
-  // TEST_ASSERT_EQUAL_TLV(TLV_WRITE_RAM, 25, address, (uint8_t *)data, (Tlv *)session->txBuffer);	
-// }
-
-// void test_tlvWriteTargetMemory_should_request_and_write_data_into_target_RAM(void)
-// {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
-  // User_Session userSession;
-  
-  // userSession.data[0] = 0x12345678;
-  // userSession.data[1] = 0xDEADBEEF;
-  // userSession.data[2] = 0xBEEFDEAD;
-  // userSession.data[3] = 0xDEADDEAD;
-
-  // userSession.address = 0x20000000;
-  // userSession.size = 20;
-
-  // uint8_t *pData = (uint8_t *)userSession.data;
-  // tlvWriteTargetMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
-  
-  // TEST_ASSERT_EQUAL_HEX32(0x200000F8, userSession.address);
-  // TEST_ASSERT_EQUAL(-228, userSession.size);
-// }
+  TEST_ASSERT_EQUAL_HEX32(0x20000014, userSession.address);
+  TEST_ASSERT_EQUAL(0, userSession.size);
+  TEST_ASSERT_EQUAL(1, isYielding);
+}
 
 // void test_tlvWriteTargetMemory_write_isr_vector_section_into_RAM(void)
 // {
@@ -347,7 +279,7 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   // uint32_t destAddress = getSectionHeaderAddrUsingIndex(elfData, index);
   // int size = getSectionSize(elfData, index);
 
-  // tlvWriteTargetMemory(session, &dataAddress, &destAddress, &size, TLV_WRITE_RAM);
+  // writeMemory(session, &dataAddress, &destAddress, &size, TLV_WRITE_RAM);
   // TEST_ASSERT_EQUAL_HEX32(0x200000F8, destAddress);
   // TEST_ASSERT_EQUAL(180, size);
 // }
@@ -367,7 +299,7 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   // userSession.size = 500;
 
   // uint8_t *pData = (uint8_t *)userSession.data;
-  // tlvWriteTargetMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  // writeMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
   
   // TEST_ASSERT_EQUAL_HEX32(0x200000F8, userSession.address);
   // TEST_ASSERT_EQUAL(252, userSession.size);
@@ -379,10 +311,10 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   // session->rxBuffer[1] = 1;
   // session->rxBuffer[2] = 0;
   
-  // tlvWriteTargetMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  // writeMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
   // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
   
-  // tlvWriteTargetMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  // writeMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
   // TEST_ASSERT_EQUAL_HEX32(0x200001F0, userSession.address);
   // TEST_ASSERT_EQUAL(4, userSession.size);
   
@@ -393,10 +325,10 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   // session->rxBuffer[1] = 1;
   // session->rxBuffer[2] = 0;
   
-  // tlvWriteTargetMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  // writeMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
   // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
   
-  // tlvWriteTargetMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  // writeMemory(session, &pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
   // TEST_ASSERT_EQUAL_HEX32(0x200002E8, userSession.address);
   // TEST_ASSERT_EQUAL(-244, userSession.size);
 // }
@@ -1098,3 +1030,52 @@ void test_tlvVectReset_should_return_1_after_request_and_received_OK_reply(void)
   // TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
   // TEST_ASSERT_EQUAL_HEX32(BOTH_BANK, session->txBuffer[2]);
 // }
+
+void test_hostInterpreter_should_readMemory_and_stop_when_size_reached_0(void) {
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  User_Session us;
+  
+  us.tlvCommand = TLV_READ_MEMORY;
+  us.address = 0x20000000;
+  us.size = 400;
+  
+  waitUserCommand_ExpectAndReturn(&us);
+  
+  hostInterpreter(session);
+
+  TEST_ASSERT_EQUAL(1, isYielding);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  TEST_ASSERT_EQUAL_HEX32(0x20000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(248, session->txBuffer[6]);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  hostInterpreter(session);
+  
+  TEST_ASSERT_EQUAL(1, isYielding);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  TEST_ASSERT_EQUAL_HEX32(0x200000F8, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(152, session->txBuffer[6]);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+  
+  deleteUserSession_Expect(&us);
+  
+  hostInterpreter(session);
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+}

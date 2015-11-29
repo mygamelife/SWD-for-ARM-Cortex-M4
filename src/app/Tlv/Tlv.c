@@ -105,16 +105,16 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
 void tlvSend(Tlv_Session *session, Tlv *tlv) {
   /* If flag TLV_DATA_TRANSMIT_FLAG is set means uart is busy 
      with previous transmition */
-  if(GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG) == FLAG_SET) {
-    Throw(TLV_TRANSMISSION_BUSY);
-  }
+  // if(GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG) == FLAG_SET) {
+    // Throw(TLV_TRANSMISSION_BUSY);
+  // }
   /* Set TLV_DATA_TRANSMIT_FLAG and copy data into TxBuffer */
-  else {
+  // else {
     SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
     session->txBuffer[0] = tlv->type;
     session->txBuffer[1] = tlv->length;
     memcpy(&session->txBuffer[2], tlv->value, tlv->length);
-  }
+  // }
 }
 
 /** tlvSendService is a state machine to handle the tlvSend
@@ -223,6 +223,76 @@ void tlvService(Tlv_Session *session) {
 void tlvSendRequest(Tlv_Session *session, Tlv_Command command, int size, uint8_t *data) {
   /* Create tlv packet consist of command, siza and data */
   Tlv *tlv = tlvCreatePacket(command, size, data);
+  
+  tlvSend(session, tlv);
+}
+
+/** tlvReadDataChunk is a function used to read data in chunk
+  * by using tlv protocol
+  *
+  * input   : session contain a element/handler used by tlv protocol
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void tlvReadDataChunk(Tlv_Session *session, uint32_t *destAddress, int *size) {
+  uint32_t buffer[2] = {0};
+  buffer[0] = *destAddress;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  if(*size > TLV_DATA_SIZE) {
+    buffer[1] = TLV_DATA_SIZE;
+    tlvSendRequest(session, TLV_READ_MEMORY, 5, (uint8_t *)buffer);
+  }
+  else {
+    buffer[1] = *size;
+    tlvSendRequest(session, TLV_READ_MEMORY, 5, (uint8_t *)buffer);
+  } 
+
+  *destAddress += buffer[1];
+  *size -= buffer[1];
+}
+
+/** tlvWriteDataChunk is a function used to send data in chunk
+  * by using tlv protocol
+  *
+  * input   : session contain a element/handler used by tlv protocol
+  *           dataAddress is the address of the data need to send
+  *           destAddress is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *           memorySelect can be one of the following value :
+  *             TLV_WRITE_RAM
+  *             TLV_WRITE_FLASH
+  *
+  * return  : NONE
+  */
+void tlvWriteDataChunk(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect) {
+  Tlv *tlv; 
+  uint8_t chksum = 0, *tempData;
+  uint32_t tempAddress;
+  int tempSize = 0;
+  
+  tempData = *dataAddress;
+  tempAddress = *destAddress;
+  
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+  
+  if(*size > TLV_DATA_SIZE)
+    tempSize = TLV_DATA_SIZE;
+  else tempSize = *size;
+  
+  /* create tlv packet with register address */
+  tlv = tlvCreatePacket(memorySelect, tempSize + 4, NULL);
+  chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&tempAddress, 4);
+  chksum += tlvPackIntoBuffer(&tlv->value[4], tempData, tempSize);
+  /* Update checksum with destAddress */
+  tlv->value[tlv->length - 1] = chksum;
+
+  *dataAddress += tempSize;
+  *destAddress += tempSize;
+  *size -= tempSize;
   
   tlvSend(session, tlv);
 }

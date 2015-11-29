@@ -507,3 +507,66 @@ void test_tlvSendRequest_should_receive_write_target_register_size_8_address_0x1
   TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
   TEST_ASSERT_EQUAL_HEX8(0xB4, session->txBuffer[10]); //chksum
 }
+
+void test_tlvReadDataChunk_should_send_request_read_data_in_chunk(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  int size = 255;
+  uint32_t address = 0x20001000;
+  
+  tlvReadDataChunk(session, &address, &size);
+  
+  TEST_ASSERT_EQUAL_HEX32(0x200010F8, address);
+  TEST_ASSERT_EQUAL(0x7, size);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_READ_MEMORY, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(6, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL(0x20001000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(248, session->txBuffer[6]);
+  TEST_ASSERT_EQUAL_HEX8(0xD8, session->txBuffer[7]); //chksum
+}
+
+void test_tlvWriteDataChunk_should_send_data_in_chunk_to_ram_and_update_data_address_and_size(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  int size = 4;
+  uint32_t address = 0x10000000, data[] = {0xDEADBEEF, 0xAAAAAAAA};
+  uint8_t *dataPtr = (uint8_t *)data;
+  
+  tlvWriteDataChunk(session, &dataPtr, &address, &size, TLV_WRITE_RAM);
+  
+  TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_RAM, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x10000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xB8, session->txBuffer[10]); //chksum
+  
+  TEST_ASSERT_EQUAL(0, size);
+  TEST_ASSERT_EQUAL_HEX32(0x10000004, address);
+  TEST_ASSERT_EQUAL_HEX32(0xAAAAAAAA, get4Byte(dataPtr));
+}
+
+void test_tlvWriteDataChunk_should_send_data_in_chunk_to_flash_and_update_data_address_and_size(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  int size = 255;
+  uint32_t address = 0x10000000, data[] = {0xDEADBEEF, 0xAAAAAAAA};
+  uint8_t *dataPtr = (uint8_t *)data;
+  
+  tlvWriteDataChunk(session, &dataPtr, &address, &size, TLV_WRITE_FLASH);
+  
+  TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_FLASH, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(253, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x10000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX32(0xAAAAAAAA, get4Byte(&session->txBuffer[10]));
+  
+  TEST_ASSERT_EQUAL(7, size);
+  TEST_ASSERT_EQUAL_HEX32(0x100000F8, address);
+}

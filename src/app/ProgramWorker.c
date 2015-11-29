@@ -622,29 +622,29 @@ void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAdd
 int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
 	int i; Tlv *tlv; uint32_t temp = tempAddress;
   
-  startTask(session->state);
+  // startTask(session->state);
   
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
-  /* Write to RAM using swd */
-  for(i = 0; i < size; i ++, dataAddress++, temp++)
-    memoryWriteByte(temp, *dataAddress);
+  // /* Write to RAM using swd */
+  // for(i = 0; i < size; i ++, dataAddress++, temp++)
+    // memoryWriteByte(temp, *dataAddress);
 
-  /* Yield if stub is busy */
-  while(IsStubBusy() == 0) {
-    yield(session->state);
-  } 
+  // /* Yield if stub is busy */
+  // while(IsStubBusy() == 0) {
+    // yield(session->state);
+  // } 
 
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
 
-  /* Request flashProgrammer to copy data in 
-    tempAddress into flash */
-  requestStubCopy(tempAddress, destAddress, size);
-  /* Reply tlv acknowledge */
-  tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session, tlv);
+  // /* Request flashProgrammer to copy data in 
+    // tempAddress into flash */
+  // requestStubCopy(tempAddress, destAddress, size);
+  // /* Reply tlv acknowledge */
+  // tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  // tlvSend(session, tlv);
   
-  endTask(session->state); 
+  // endTask(session->state); 
 
   return 1;
 }
@@ -661,24 +661,24 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
 int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   Tlv *tlv;
   
-  startTask(session->state);
-  /* Set process flag to indicate erase flash is on-going */
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  // startTask(session->state);
+  // /* Set process flag to indicate erase flash is on-going */
+  // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
-  /* Yield if stub is busy */
-  while(IsStubBusy() == 0) {
-    yield(session->state);
-  }
+  // /* Yield if stub is busy */
+  // while(IsStubBusy() == 0) {
+    // yield(session->state);
+  // }
   
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
-  /* Request flashProgrammer to erase target flash */
-  requestStubErase(address, size);
-  /* Reply tlv acknowledge */
-  tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session, tlv);
+  // /* Request flashProgrammer to erase target flash */
+  // requestStubErase(address, size);
+  // /* Reply tlv acknowledge */
+  // tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  // tlvSend(session, tlv);
   
-  endTask(session->state);
+  // endTask(session->state);
 
   return 1;
 }
@@ -694,24 +694,24 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
 int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
   Tlv *tlv;
   
-  startTask(session->state);
-  /* Set process flag to indicate erase flash is on-going */
-  SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  // startTask(session->state);
+  // /* Set process flag to indicate erase flash is on-going */
+  // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
-  /* Yield if stub is busy */
-  while(IsStubBusy() == 0) {
-    yield(session->state);
-  }
+  // /* Yield if stub is busy */
+  // while(IsStubBusy() == 0) {
+    // yield(session->state);
+  // }
   
-  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   
-  /* Request flashProgrammer to erase target flash */
-  requestStubMassErase(bankSelect);
-  /* Reply tlv acknowledge */
-  tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session, tlv);
+  // /* Request flashProgrammer to erase target flash */
+  // requestStubMassErase(bankSelect);
+  // /* Reply tlv acknowledge */
+  // tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  // tlvSend(session, tlv);
   
-  endTask(session->state);
+  // endTask(session->state);
 
   return 1;
 }
@@ -773,7 +773,7 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
 
     case TLV_WRITE_RAM                  : writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);       break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);     break;
-    case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
+    case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), tlv->value[4]);			            break;
     case TLV_WRITE_REGISTER             : writeTargetRegister(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));         break;
     case TLV_READ_REGISTER              : readTargetRegister(session, get4Byte(&tlv->value[0]));                                    break;
     case TLV_HALT_TARGET                : haltTarget(session);                                                                      break;

@@ -27,7 +27,7 @@ int memoryRead(uint32_t address, uint32_t *dataRead, int size) {
   
   Try {
     /* Waiting reply from probe */
-    while((data = tlvReadTargetMemory(_session, &address, &dataSize)) == NULL) {
+    while((data = readMemory(_session, &address, &dataSize)) == NULL) {
       tlvService(_session);
     };
   } Catch(err) { Throw(err); }

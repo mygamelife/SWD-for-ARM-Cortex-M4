@@ -10,15 +10,18 @@ int main(void) {
   
   Try {
     if(session == NULL) session = tlvCreateSession();
-    while(!IS_HOST_EXIT(session)) {
+    
+    while(!isExit(session)) {
       Try {
+        // printf("tlvService\n");
         tlvService(session);
+        // printf("hostInterpreter\n");
         hostInterpreter(session);
         // 
         // Receive packet and handle it here
         //
       } Catch(err) {
-        HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
+        // HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
         displayErrorMessage(err);
       }
     }

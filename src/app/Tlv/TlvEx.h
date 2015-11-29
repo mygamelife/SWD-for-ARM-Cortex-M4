@@ -3,7 +3,6 @@
 
 #define TLV_DATA_SIZE   248
 
-#define get1Byte(__DATA__)        (* (uint8_t  *)(__DATA__))
 #define get2Byte(__DATA__)        (* (uint16_t *)(__DATA__))
 #define get4Byte(__DATA__)        (* (uint32_t *)(__DATA__))
 

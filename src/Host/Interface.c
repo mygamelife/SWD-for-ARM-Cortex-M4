@@ -656,5 +656,6 @@ User_Session *createNewUserSession(void) {
 void deleteUserSession(User_Session *us) {
   if(us != NULL) {
     free(us);
+    us = NULL;
   }
 }
