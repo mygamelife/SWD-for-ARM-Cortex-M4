@@ -18,16 +18,18 @@
 #include "OperatorToken.h"
 #include "FileToken.h"
 #include "MemoryReadWrite.h"
+#include "CoreDebugEx.h"
+#include "CoreDebug.h"
 
 int initFlag = 0;
 
 void setUp(void) {
   if(initFlag == 0) {
-     system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
+    // system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
     initFlag = 1;
     initMemoryReadWrite();
     /* Erase flash space according to size */
-    _flashErase(0x080E0000, 2000);
+    // _flashErase(0x080E0000, 2000);
   }
 }
 

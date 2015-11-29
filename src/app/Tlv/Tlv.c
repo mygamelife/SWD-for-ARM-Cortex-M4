@@ -158,6 +158,8 @@ Tlv *tlvReceive(Tlv_Session *session) {
     tlv.type = session->rxBuffer[0];
     tlv.length = session->rxBuffer[1];
     memcpy(tlv.value, &session->rxBuffer[2], tlv.length);
+    
+    verifyTlvPacket(&tlv);
     return &tlv;    
   }
 
@@ -207,6 +209,22 @@ void tlvReceiveService(Tlv_Session *session) {
 void tlvService(Tlv_Session *session) {
   tlvSendService(session);
   tlvReceiveService(session);
+}
+
+/** tlvSendRequest is a function to create a tlv packet
+  * a send to target to request speficied task
+  *
+  * input   : session contain a element/handler used by tlv protocol
+  *           size is the data size can be any number
+  *           data is the data need to write into the target register
+  *
+  * return  : NONE
+  */
+void tlvSendRequest(Tlv_Session *session, Tlv_Command command, int size, uint8_t *data) {
+  /* Create tlv packet consist of command, siza and data */
+  Tlv *tlv = tlvCreatePacket(TLV_WRITE_REGISTER, size, data);
+  
+  tlvSend(session, tlv);
 }
 
 /**

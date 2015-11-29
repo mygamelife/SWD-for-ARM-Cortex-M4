@@ -171,18 +171,20 @@ void test_tlvReceive_should_receive_tlv_packet_send_by_others(void)  {
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
 
   session->rxBuffer[0] = TLV_WRITE_RAM;
-  session->rxBuffer[1] = 6;
+  session->rxBuffer[1] = 5;
   session->rxBuffer[2] = 0x44;
   session->rxBuffer[3] = 0x33;
   session->rxBuffer[4] = 0x22;
   session->rxBuffer[5] = 0x11;
+  session->rxBuffer[6] = 0x56;
   
   Tlv *tlv = tlvReceive(session);
   
   TEST_ASSERT_NOT_NULL(tlv);
   TEST_ASSERT_EQUAL(TLV_WRITE_RAM, tlv->type);
-  TEST_ASSERT_EQUAL(6, tlv->length);
+  TEST_ASSERT_EQUAL(5, tlv->length);
   TEST_ASSERT_EQUAL_HEX32(0x11223344, get4Byte(&tlv->value[0]));
+  TEST_ASSERT_EQUAL_HEX8(0x56, tlv->value[4]); //chksum
 }
 
 void test_tlvReceiveService_should_receive_type_at_the_first_state(void)
@@ -488,4 +490,20 @@ void test_tlvReportError_is_to_create_a_packet_contain_errorCode_to_report_the_e
   Tlv_Session *session = tlvCreateSession();
   
   tlvErrorReporter(session, PROBE_TLV_CHECKSUM_ERROR);
+}
+
+void test_tlvSendRequest_should_receive_write_target_register_size_8_address_0x12345678_and_data_0xDEADBEEF(void)
+{
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t data[] = {0x12345678, 0xDEADBEEF};
+  tlvSendRequest(session, TLV_WRITE_REGISTER, 8, (uint8_t *)data);
+  
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_WRITE_REGISTER, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xB4, session->txBuffer[10]); //chksum
 }

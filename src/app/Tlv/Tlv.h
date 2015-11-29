@@ -90,6 +90,7 @@ uint8_t tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int len
 uint8_t tlvUpdateChecksum(uint8_t oldChecksum, uint8_t newChecksum);
 
 void tlvSend(Tlv_Session *session, Tlv *tlv);
+void tlvSendRequest(Tlv_Session *session, Tlv_Command command, int size, uint8_t *data);
 Tlv *tlvReceive(Tlv_Session *session);
 
 /* Tlv service state machine */
