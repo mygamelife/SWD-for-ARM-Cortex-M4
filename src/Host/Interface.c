@@ -1,6 +1,6 @@
 #include "Interface.h"
 
-char InputBuffer[BUFFER_SIZE];
+char InputBuffer[INPUT_BUFFER_SIZE];
 
 void displayOptionMenu(void)  {
   printf("\n");
@@ -630,7 +630,7 @@ User_Session *waitUserCommand(void) {
 
   else {
     display = 0;
-    fgets(InputBuffer, BUFFER_SIZE, stdin);
+    fgets(InputBuffer, INPUT_BUFFER_SIZE, stdin);
   }
 
   str = stringNew(InputBuffer);

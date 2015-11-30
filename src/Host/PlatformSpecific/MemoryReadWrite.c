@@ -9,7 +9,7 @@ CEXCEPTION_T err = 0;
 int cswDataSize = 0;
 /**
   ==============================================================================
-            ################ Used To Testing TDD Purpose ################
+            ################ Used For TDD Purpose ################
   ==============================================================================  
   */
 void initMemoryReadWrite(void) {
@@ -18,7 +18,7 @@ void initMemoryReadWrite(void) {
     
   do {
     tlvService(_session);
-    tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
+    loadRam(_session, FLASH_PROGRAMMER_FILE_PATH);
   } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
 }
 
@@ -44,7 +44,7 @@ int memoryWrite(uint32_t address, uint32_t dataWrite, int size) {
 
   Try {
     /* Waiting reply from probe */
-    while(tlvWriteToRam(_session, &data, &address, &size) != PROCESS_DONE) {
+    while(writeRam(_session, data, &address, &size) != PROCESS_DONE) {
       tlvService(_session);
     }; 
   } Catch(err) { Throw(err); }
@@ -52,39 +52,12 @@ int memoryWrite(uint32_t address, uint32_t dataWrite, int size) {
   return 1;
 }
 
-/* ########################## Mock ############################ */
-int memoryReadByte(uint32_t address, uint32_t *dataRead) {
-  return memoryRead(address, dataRead, BYTE_SIZE);
-}
-
-int memoryReadHalfword(uint32_t address, uint32_t *dataRead) {
-  return memoryRead(address, dataRead, HALFWORD_SIZE);
-}
-
-int memoryReadWord(uint32_t address, uint32_t *dataRead) {
-  return memoryRead(address, dataRead, WORD_SIZE);
-}
-
-int memoryWriteByte(uint32_t address, uint32_t dataWrite) {
-  return memoryWrite(address, dataWrite, BYTE_SIZE);
-}
-
-int memoryWriteHalfword(uint32_t address, uint32_t dataWrite) {
-  return memoryWrite(address, dataWrite, HALFWORD_SIZE);
-}
-
-int memoryWriteWord(uint32_t address, uint32_t dataWrite) {
-  return memoryWrite(address, dataWrite, WORD_SIZE);
-}
-/* ########################## Mock ############################ */
-
 int _flashWrite(uint32_t address, uint32_t writeData, int size) {
   uint8_t *pData = (uint8_t *)&writeData;
-  int dataSize = size;
   
   Try {
     /* Waiting reply from probe */
-    while(tlvWriteToFlash(_session, &pData, &address, &dataSize) != PROCESS_DONE) {
+    while(writeFlash(_session, pData, &address, &size) != PROCESS_DONE) {
       tlvService(_session);
     };
   } Catch(err) { Throw(err); }
@@ -94,9 +67,10 @@ int _flashWrite(uint32_t address, uint32_t writeData, int size) {
 
 int _flashErase(uint32_t address, int size) {
   int status = 0;
+  uint32_t buffer[] = {address, size};
   
   Try {
-    while((status = tlvRequestFlashErase(_session, address, size)) == 0) {
+    while(eraseSection(_session, address, size) != PROCESS_DONE) {
       tlvService(_session);
     };
   } Catch(err) { Throw(err); }

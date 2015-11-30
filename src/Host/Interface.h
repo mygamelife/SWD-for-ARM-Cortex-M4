@@ -10,12 +10,12 @@
 #include "Tlv.h"
 #include "ErrorCode.h"
 
-#define BUFFER_SIZE 2048
+#define INPUT_BUFFER_SIZE 2048
 
 typedef struct
 {
   int size;
-  uint32_t data[BUFFER_SIZE];
+  uint32_t data[INPUT_BUFFER_SIZE];
   uint32_t address;
   char *fileName;
   Tlv_Command tlvCommand;

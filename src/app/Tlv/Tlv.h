@@ -25,39 +25,8 @@ typedef struct
   Tlv_State receiveState;
   /* ###### Tlv state ###### */
   int state;
-  Tlv_State wregState;
-  Tlv_State regState;
-  Tlv_State haltState;
-  Tlv_State runState;
-  Tlv_State stepState;
-  Tlv_State sresetState;
-  Tlv_State hresetState;
-  Tlv_State vresetState;
-  Tlv_State wramState;
-  Tlv_State wflashState;
-  Tlv_State lflashState;
-  Tlv_State rmemState;
-  Tlv_State rEraseState;                       /* Request section erase state              */
-  Tlv_State rMassEraseState;                   /* Request mass erase state                 */
-  Tlv_State wDataInWordState;                  /* Write data in word state                 */
-  Tlv_State wDataInHalfWordState;              /* Write data in halfword state             */
-  Tlv_State wDataInByteState;                  /* Write data in byte state                 */
-  Tlv_State memoryRwState;                     /* memory read write state                  */
-  Tlv_State breakpointHandlerState;
-  Tlv_State rmBreakpointState;
-  Tlv_State rmAllBreakpointState;
-  Tlv_State stopRemapState;
-  Tlv_State stopAllRemapState;
   /* Host and Probe state */
-  Host_State hostState;
   Probe_State probeState;
-  /* Load Program state */
-  Tlv_State loadProgramState;
-  Tlv_State lramState;
-  /* Host flash state */
-  Tlv_State flashState;
-  Tlv_State eraseState;
-  Tlv_State mEraseState;
   /* Probe flash state */
   Tlv_State pFlashState;
   /* Flags */

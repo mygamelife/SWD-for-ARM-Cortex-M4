@@ -16,41 +16,11 @@ Tlv_Session *tlvCreateSession(void) {
   session.receiveState = TLV_RECEIVE_TYPE;
   
   session.state               = 0;
-  /* ###### Tlv state ###### */
-  session.wregState           = 0;
-  session.regState            = 0;
-  session.haltState           = 0;
-  session.runState            = 0;
-  session.stepState           = 0;
-  session.sresetState         = 0;
-  session.hresetState         = 0;
-  session.wramState           = 0;
-  session.wflashState         = 0;
-  session.lflashState         = 0;
-  session.rmemState           = 0;
-  session.rEraseState         = 0;
-  session.rMassEraseState     = 0;
-  session.wDataInWordState    = 0;
-  session.memoryRwState       = 0;
-  session.breakpointHandlerState = 0;
-  
-  /* Initialize load program state */
-  session.loadProgramState = TLV_LOAD_ISR_VECTOR;
-  session.lramState = TLV_LOAD_PROGRAM;
-  
-  /* host flash state */
-  session.flashState = TLV_REQUEST_ERASE;
-  session.eraseState = TLV_LOAD_FLASH_PROGRAMMER;
-  session.mEraseState = TLV_LOAD_FLASH_PROGRAMMER;
-  
   /* probe flash state */
   session.pFlashState = WRITE_TO_RAM;
-  
   /* Initialize TLV flag */
   session.flags = FLAG_CLEAR;
-  
-  /* Initialize host and probe state */
-  session.hostState = HOST_WAIT_USER_COMMAND;
+
   session.probeState = PROBE_RECEIVE_PACKET;
   
   return &session;

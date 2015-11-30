@@ -93,15 +93,6 @@ typedef enum
 
 typedef enum
 {
-  HOST_WAIT_USER_COMMAND,
-  HOST_RECEIVE_COMMAND,
-  HOST_INTERPRET_COMMAND,
-  HOST_WAITING_RESPONSE,
-  HOST_EXIT,
-} Host_State;
-
-typedef enum
-{
   PROBE_RECEIVE_PACKET,
   PROBE_INTERPRET_PACKET,
 } Probe_State;

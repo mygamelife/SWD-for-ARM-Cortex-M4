@@ -17,29 +17,25 @@ typedef enum {
 } Process_Status;
 
 #if defined(TEST)
-#define FLASH_PROGRAMMER_FILE_PATH            "build/release/target/FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH    "build/target/FlashProgrammer.elf"
 #else
-#define FLASH_PROGRAMMER_FILE_PATH            "target/FlashProgrammer.elf"
+#define FLASH_PROGRAMMER_FILE_PATH    "target/FlashProgrammer.elf"
 #endif
 
 /* ##### Host Interpreter Macros ##### */
-#define systemExit(__SESSION__)                         ((__SESSION__)->exit = 1)
-#define isExit(__SESSION__)                             (((__SESSION__)->exit == 1) ? 1 : 0  )
-#define IS_TLV_EXIT(__SESSION__)                        (((__SESSION__)->tlvCommand == TLV_EXIT) ? 1 : 0  )
-#define HOST_CHANGE_STATE(__SESSION__, __STATE__)       ((__SESSION__)->hostState = __STATE__             )
-
-#define tlvWriteToRam(session, dataAddress, destAddress, size)                    \
-        writeMemory(session, dataAddress, destAddress, size, TLV_WRITE_RAM)
-
-#define tlvWriteToFlash(session, dataAddress, destAddress, size)                  \
-        writeMemory(session, dataAddress, destAddress, size, TLV_WRITE_FLASH)
-
 #define isProbeAlive(timeout, x)      do {  if(timeout)                     \
                                             {                               \
                                               resetTask(x);                 \
                                               Throw(PROBE_NOT_RESPONDING);  \
                                             }                               \
-                                         } while(0)
+                                         } while(0)                         \
+                                           
+#define systemExit(__SESSION__)       ((__SESSION__)->exit = 1)
+#define isExit(__SESSION__)           (((__SESSION__)->exit == 1) ? 1 : 0  )
+
+#define writeRam(session, data, address, size)     writeMemory(session, data, address, size, TLV_WRITE_RAM)
+#define writeFlash(session, data, address, size)   writeMemory(session, data, address, size, TLV_WRITE_FLASH)
+
 /* Read/Write target register */
 Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
 uint32_t readRegister(Tlv_Session *session, uint32_t registerAddress);
@@ -62,16 +58,14 @@ Process_Status vectorReset(Tlv_Session *session);
 Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t *address, int *size, Tlv_Command memory);
 
 /* Write/Load Flash and RAM */
-void tlvLoadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
-void tlvLoadToRam(Tlv_Session *session, char *file);
-void tlvLoadToFlash(Tlv_Session *session, char *file);
-Process_Status _tlvWriteToFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
+int loadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
+int loadRam(Tlv_Session *session, char *file);
+int loadFlash(Tlv_Session *session, char *file);
+Process_Status _writeFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 
 /* Flash Erase */
-Process_Status tlvRequestFlashErase(Tlv_Session *session, uint32_t address, int size);
-Process_Status tlvEraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
-Process_Status tlvRequestFlashMassErase(Tlv_Session *session, uint32_t banks);
-void tlvMassEraseTargetFlash(Tlv_Session *session, uint32_t banks);
+Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size);
+Process_Status eraseAll(Tlv_Session *session, uint32_t banks);
 
 /* Read Memory */
 uint8_t *readMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
@@ -87,7 +81,7 @@ void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
 /* Wait Debug Events */
 EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event);
 
-int selectCommand(Tlv_Session *session, User_Session *userSession);
+int selectCommand(Tlv_Session *session, User_Session *us);
 int hostInterpreter(Tlv_Session *session);
 
 #endif // ProgramLoader_H
