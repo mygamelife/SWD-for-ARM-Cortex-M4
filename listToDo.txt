@@ -1,0 +1,4 @@
+GPIO base address = 0x4002 1000
+1. mode register = alternate function
+2. alternate function = pin 2 and 3 is (AFRL)
+3. unreset the reset register

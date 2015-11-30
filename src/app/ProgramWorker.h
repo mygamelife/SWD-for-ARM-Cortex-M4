@@ -44,7 +44,7 @@ void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size);
 /*############################################### FLASH ###############################################*/
 int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size);
-int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect);
+int massEraseTargetFlash(Tlv_Session *session, uint32_t bank);
 
 /*############################################### RAM ###############################################*/
 DataType getDataType(uint32_t address, int size);
@@ -63,7 +63,7 @@ void performHardResetOnTarget(Tlv_Session *session);
 void performVectorResetOnTarget(Tlv_Session *session);
 
 void selectTask(Tlv_Session *session, Tlv *tlv);
-void probeTaskManager(Tlv_Session *session);
+int taskManager(Tlv_Session *session);
 
 void haltTarget(Tlv_Session *session);
 void runTarget(Tlv_Session *session);

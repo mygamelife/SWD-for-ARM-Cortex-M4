@@ -53,6 +53,8 @@ typedef enum {
 #define SET_FLAG_STATUS(__SESSION__, __FLAG__)          ((__SESSION__)->flags |= (__FLAG__))
 #define CLEAR_FLAG_STATUS(__SESSION__, __FLAG__)        ((__SESSION__)->flags &= ~(__FLAG__))
 
+#define tlvReply(session, command, size, data)          tlvSendRequest(session, command, size, data)
+
 Tlv_Session *tlvCreateSession(void);
 
 Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data);

@@ -2,6 +2,7 @@
 
 /* temp SRAM address 0x20005000 */
 static uint32_t tempAddress = 0x20005000;
+static Tlv *packet;
 
 /** IsStubBusy is a function to check if stub
   * is busy with the last operation
@@ -95,9 +96,7 @@ void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_
   
   writeCoreRegister(registerAddress, data);
   
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
-  tlvSend(session, tlv);
+  tlvReply(session, TLV_OK, 0, NULL);
 }
 
 /** readTargetRegister is a function to read value from target register using swd
@@ -108,13 +107,10 @@ void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_
   * return    : NONE
   */
 void readTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
-  uint32_t data = 0;
   
-  data = readCoreRegister(registerAddress);
+  uint32_t data = readCoreRegister(registerAddress);
   
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&data);
-  
-  tlvSend(session, tlv);
+  tlvReply(session, TLV_OK, 4, (uint8_t *)&data);
 }
 
 /** readAllTargetRegister is a function to read value from all target register using swd
@@ -599,15 +595,11 @@ void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) 
   * return  : NONE
   */
 void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-  int i;
-  Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   
   /* Write data into correct address boundary */
-  while(size > 0) {
-    writeDataWithCorrectDataType(&dataAddress, &destAddress, &size);
-  }
+  while(size > 0) { writeDataWithCorrectDataType(&dataAddress, &destAddress, &size); }
   
-  tlvSend(session, tlv);
+  tlvReply(session, TLV_OK, 0, NULL);
 }
 
 /** writeTargetFlash is a function to write target flash (require flashLoader/flashProgrammer)
@@ -620,33 +612,22 @@ void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAdd
   * return  : NONE
   */
 int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-	int i; Tlv *tlv; uint32_t temp = tempAddress;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+	uint32_t tempAddr = tempAddress;
   
-  // startTask(session->state);
-  
-  // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  
-  // /* Write to RAM using swd */
-  // for(i = 0; i < size; i ++, dataAddress++, temp++)
-    // memoryWriteByte(temp, *dataAddress);
+  startTask(tb);
+  /* Write to RAM using swd */
+  while(size > 0) { writeDataWithCorrectDataType(&dataAddress, &tempAddr, &size); }
+  /* Wait if stub is busy */
+  while(IsStubBusy() == 0) { yield(tb); }
+  /* Request flashProgrammer to copy data in tempAddress into flash */
+  requestStubCopy(tempAddress, destAddress, size);
+  /* Reply tlv acknowledge */
+  tlvReply(session, TLV_OK, 0, NULL);
 
-  // /* Yield if stub is busy */
-  // while(IsStubBusy() == 0) {
-    // yield(session->state);
-  // } 
-
-  // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-
-  // /* Request flashProgrammer to copy data in 
-    // tempAddress into flash */
-  // requestStubCopy(tempAddress, destAddress, size);
-  // /* Reply tlv acknowledge */
-  // tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  // tlvSend(session, tlv);
-  
-  // endTask(session->state); 
-
-  return 1;
+  endTask(tb);
+  returnThis(1, tb);
 }
 
 /** eraseTargetFlash is a function to erase target flash by section 
@@ -659,28 +640,19 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
   * return  : NONE
   */
 int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
-  Tlv *tlv;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
   
-  // startTask(session->state);
-  // /* Set process flag to indicate erase flash is on-going */
-  // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  startTask(tb);
+  /* Wait if stub is busy */
+  while(IsStubBusy() == 0) { yield(tb); }
+  /* Request flashProgrammer to erase target flash */
+  requestStubErase(address, size);
+  /* Reply tlv acknowledge */
+  tlvReply(session, TLV_OK, 0, NULL);
   
-  // /* Yield if stub is busy */
-  // while(IsStubBusy() == 0) {
-    // yield(session->state);
-  // }
-  
-  // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  
-  // /* Request flashProgrammer to erase target flash */
-  // requestStubErase(address, size);
-  // /* Reply tlv acknowledge */
-  // tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  // tlvSend(session, tlv);
-  
-  // endTask(session->state);
-
-  return 1;
+  endTask(tb);
+  returnThis(1, tb);
 }
 
 /** massEraseTargetFlash is a function erase flash by bank
@@ -691,29 +663,20 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   *
   * return  : NONE
   */
-int massEraseTargetFlash(Tlv_Session *session, uint32_t bankSelect) {
-  Tlv *tlv;
+int massEraseTargetFlash(Tlv_Session *session, uint32_t bank) {
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
   
-  // startTask(session->state);
-  // /* Set process flag to indicate erase flash is on-going */
-  // SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  startTask(tb);
+  /* Wait if stub is busy */
+  while(IsStubBusy() == 0) { yield(tb); }
+  /* Request flashProgrammer to erase target flash */
+  requestStubMassErase(bank);
+  /* Reply tlv acknowledge */
+  tlvReply(session, TLV_OK, 0, NULL);
   
-  // /* Yield if stub is busy */
-  // while(IsStubBusy() == 0) {
-    // yield(session->state);
-  // }
-  
-  // CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  
-  // /* Request flashProgrammer to erase target flash */
-  // requestStubMassErase(bankSelect);
-  // /* Reply tlv acknowledge */
-  // tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  // tlvSend(session, tlv);
-  
-  // endTask(session->state);
-
-  return 1;
+  endTask(tb);
+  returnThis(1, tb);
 }
 
 void eventOccured(Tlv_Session *session, EventType event) {
@@ -770,7 +733,6 @@ void comPortVerification(Tlv_Session *session) {
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
   
   switch(tlv->type) {
-
     case TLV_WRITE_RAM                  : writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);       break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);     break;
     case TLV_READ_MEMORY                : readTargetMemory(session, get4Byte(&tlv->value[0]), tlv->value[4]);			            break;
@@ -796,33 +758,49 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
   }
 }
 
-/** probeTaskManager
+/** taskManager
   */
-void probeTaskManager(Tlv_Session *session)  {
-  static Tlv *packet;
+int taskManager(Tlv_Session *session)  {
   CEXCEPTION_T err;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
   
-  switch(session->probeState)  {
-    case PROBE_RECEIVE_PACKET :
-      Try {
-        packet = tlvReceive(session);
-        if(verifyTlvPacket(packet)) {
-          PROBE_CHANGE_STATE(session, PROBE_INTERPRET_PACKET);
-        }
-      } Catch(err) {
-        tlvErrorReporter(session, err);
-      }
-    break;
-      
-    case PROBE_INTERPRET_PACKET :
-      Try {
-        selectTask(session, packet);
-        if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
-          PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
-      } Catch(err) {
-        tlvErrorReporter(session, err);
-        PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
-      }
-    break;
+  Try {
+    startTask(tb);
+    /* Wait packet to arrive */
+    while((packet = tlvReceive(session)) == NULL) { yield(tb); }
+    /* Wait for task to complete */
+    await(selectTask(session, packet), tb);
+    
+    endTask(tb);
+    returnThis(1, tb);    
+  } 
+  Catch(err) {
+    resetTask(tb);
+    tlvErrorReporter(session, err);
   }
+  
+  // switch(session->probeState)  {
+    // case PROBE_RECEIVE_PACKET :
+      // Try {
+        // packet = tlvReceive(session);
+        // if(verifyTlvPacket(packet)) {
+          // PROBE_CHANGE_STATE(session, PROBE_INTERPRET_PACKET);
+        // }
+      // } Catch(err) {
+        // tlvErrorReporter(session, err);
+      // }
+    // break;
+      
+    // case PROBE_INTERPRET_PACKET :
+      // Try {
+        // selectTask(session, packet);
+        // if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
+          // PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
+      // } Catch(err) {
+        // tlvErrorReporter(session, err);
+        // PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
+      // }
+    // break;
+  // }
 }
