@@ -14,14 +14,8 @@ Tlv_Session *tlvCreateSession(void) {
 
   /* Initialize begining state for send and receive */
   session.receiveState = TLV_RECEIVE_TYPE;
-  
-  session.state               = 0;
-  /* probe flash state */
-  session.pFlashState = WRITE_TO_RAM;
   /* Initialize TLV flag */
   session.flags = FLAG_CLEAR;
-
-  session.probeState = PROBE_RECEIVE_PACKET;
   
   return &session;
 }

@@ -14,14 +14,14 @@ static Tlv *packet;
   */
 int IsStubBusy(void)  {
   unsigned int stubStatus = memoryReadAndReturnWord((uint32_t)&STUB->status);
-  
+
   if(stubStatus == STUB_OK) {
     return 1;
   }
-  
+
   else {
     return 0;
-  } 
+  }
 }
 
 /** requestStubErase is a function to load the sector erase
@@ -33,11 +33,11 @@ int IsStubBusy(void)  {
   * output  : NONE
   */
 void requestStubErase(uint32_t address, int size) {
-  
+
   /* load flash start and end address to sram */
   memoryWriteWord((uint32_t)&STUB->flashAddress, (uint32_t)address);
   memoryWriteWord((uint32_t)&STUB->dataSize, (uint32_t)size);
-  
+
   /* load instruction to sram */
   memoryWriteWord((uint32_t)&STUB->instruction, STUB_ERASE);
 }
@@ -53,10 +53,10 @@ void requestStubErase(uint32_t address, int size) {
   * output  : NONE
   */
 void requestStubMassErase(uint32_t bankSelect)  {
-  
+
   /* load bank select to sram */
   memoryWriteWord((uint32_t)&STUB->banks, (uint32_t)bankSelect);
-  
+
   /* load instruction to sram */
   memoryWriteWord((uint32_t)&STUB->instruction, STUB_MASSERASE);
 }
@@ -73,10 +73,10 @@ void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size) {
 
   /* load SRAM start address into sram */
   memoryWriteWord((uint32_t)&STUB->sramAddress, (uint32_t)dataAddress);
-  
+
   /* load Flash start address into sram */
   memoryWriteWord((uint32_t)&STUB->flashAddress, (uint32_t)destAddress);
-  
+
   /* load length into sram */
   memoryWriteWord((uint32_t)&STUB->dataSize, (uint32_t)size);
 
@@ -93,9 +93,9 @@ void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size) {
   * return    : NONE
   */
 void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data) {
-  
+
   writeCoreRegister(registerAddress, data);
-  
+
   tlvReply(session, TLV_OK, 0, NULL);
 }
 
@@ -107,9 +107,9 @@ void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_
   * return    : NONE
   */
 void readTargetRegister(Tlv_Session *session, uint32_t registerAddress) {
-  
+
   uint32_t data = readCoreRegister(registerAddress);
-  
+
   tlvReply(session, TLV_OK, 4, (uint8_t *)&data);
 }
 
@@ -125,17 +125,17 @@ void readAllTargetRegister(Tlv_Session *session)
 
   for (i = 0 ; i < 20 ; i ++)
     data[i] = readCoreRegister(i);
-  
+
   data[i] = readCoreRegister(CORE_REG_FPSCR);
-  
+
   for(j = 64 ; j < 96 ; j++)
   {
     i++ ;
     data[i] = readCoreRegister(j);
   }
-  
+
   Tlv *tlv = tlvCreatePacket(TLV_OK, (4*52), (uint8_t *)&data);
-  
+
   tlvSend(session,tlv);
 }
 
@@ -148,7 +148,7 @@ void performSoftResetOnTarget(Tlv_Session *session)
 {
   softResetTarget();
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
+
   tlvSend(session, tlv);
 }
 
@@ -161,7 +161,7 @@ void performHardResetOnTarget(Tlv_Session *session)
 {
   hardResetTarget();
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
+
   tlvSend(session, tlv);
 }
 
@@ -174,11 +174,11 @@ void performVectorResetOnTarget(Tlv_Session *session)
 {
   vectorResetTarget();
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
+
   tlvSend(session, tlv);
 }
 
-/** Halt the processor of the target device 
+/** Halt the processor of the target device
   *
   * Input     : session contain a element/handler used by tlv protocol
   *
@@ -187,16 +187,16 @@ void haltTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
   setCoreMode(CORE_DEBUG_HALT);
-  
+
   if(getCoreMode() == CORE_DEBUG_HALT)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
   else
     Throw(TLV_NOT_HALTED);
-  
+
   tlvSend(session, tlv);
 }
 
-/** Run the target device 
+/** Run the target device
   *
   * Input     : session contain a element/handler used by tlv protocol
   *
@@ -204,18 +204,18 @@ void haltTarget(Tlv_Session *session)
 void runTarget(Tlv_Session *session)
 {
   Tlv *tlv ;
-  
+
   if(GET_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG) == FLAG_SET)
   {
     stepIntoOnce();
     enableFPBUnit();
     CLEAR_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG);
   }
-  
+
   if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
-    
+
     setCoreMode(CORE_DEBUG_MODE);
-    if(getCoreMode() == CORE_DEBUG_MODE) 
+    if(getCoreMode() == CORE_DEBUG_MODE)
       tlv = tlvCreatePacket(TLV_OK, 0, 0);
     else Throw(TLV_NOT_RUNNING);
       tlvSend(session, tlv);
@@ -226,12 +226,12 @@ void runTarget(Tlv_Session *session)
   }
 
   setCoreMode(CORE_DEBUG_MODE);
-  
+
   if(getCoreMode() == CORE_DEBUG_MODE)
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
+
   else Throw(TLV_NOT_RUNNING);
-  
+
   tlvSend(session, tlv);
 
 }
@@ -245,11 +245,11 @@ void performSingleStepInto(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc = 0 , initialPC = 0 ;
-  
+
   initialPC = readCoreRegister(CORE_REG_PC);
-  
+
   pc = stepIntoOnce();
-  
+
   if(pc == initialPC)
     Throw(TLV_NOT_STEPPED);
   else
@@ -267,12 +267,12 @@ void performSingleStepInto(Tlv_Session *session)
 void performMultipleStepInto(Tlv_Session *session, int nInstructions)
 {
   int i = 0 ;
-  
+
   for(i = 0 ; i < nInstructions ; i ++)
     performSingleStepInto(session);
 }
 
-/** Step over single instruction 
+/** Step over single instruction
   *
   * Input     : session contain a element/handler used by tlv protocol
   *
@@ -281,15 +281,15 @@ void performStepOver(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc = 0 , initialPC = 0  ;
-  
+
   initialPC = readCoreRegister(CORE_REG_PC);
   pc = stepOver();
-  
+
   if(pc == 0 || pc == initialPC)
     Throw(TLV_NOT_STEPOVER);
   else
     tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
-    
+
   tlvSend(session, tlv);
 }
 
@@ -302,21 +302,21 @@ void performStepOut(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc = 0 ;
-  
+
   pc = stepOut();
-  
+
   if(pc == 0)
     Throw(TLV_NOT_STEPOUT);
   else
     tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
-    
+
   tlvSend(session, tlv);
 }
 
 /** Set instruction breakpoint
  *
  * Input : session contain a element/handler used by tlv protocol
- *         instructionAddress is the address that will be breakpointed		
+ *         instructionAddress is the address that will be breakpointed
  *
  */
 void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
@@ -324,7 +324,7 @@ void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   Tlv *tlv ;
   int comparatorUsed = 0;
   comparatorUsed = autoSetInstructionBreakpoint(instructionAddress);
-  
+
   if( comparatorUsed == -1)
     Throw(TLV_BKPT_MAXSET);
   else  {
@@ -334,13 +334,13 @@ void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
   }
 }
 
-/** Set data watchpoint 
+/** Set data watchpoint
  *
  * Input     : session contain a element/handler used by tlv protocol
  *             address is the address to be compared
- *             addressMask is the mask going to be applied to the address 
+ *             addressMask is the mask going to be applied to the address
  *             Possible value :
- *              WATCHPOINT_MASK_NOTHING  		  Compare all 32 bits of address set in DWT_COMPn 
+ *              WATCHPOINT_MASK_NOTHING  		  Compare all 32 bits of address set in DWT_COMPn
  *							WATCHPOINT_MASK_BIT0  			  Ignore Bit 0 of address set in DWT_COMPn during comparison
  *							WATCHPOINT_MASK_BIT1_BIT0,		Ignore Bit1 and Bit 0 of address set in DWT_COMPn during comparison
  *							WATCHPOINT_MASK_BIT2_BIT0,		Ignore Bit2 to Bit 0 of address set in DWT_COMPn during comparison
@@ -361,12 +361,12 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode)
 {
   Tlv *tlv ;
-  
-  setDataWatchpoint_MatchingOneComparator(COMPARATOR_3,address,addressMask,matchedData,dataSize,accessMode); 
+
+  setDataWatchpoint_MatchingOneComparator(COMPARATOR_3,address,addressMask,matchedData,dataSize,accessMode);
 
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  tlvSend(session, tlv);  
-}                   
+  tlvSend(session, tlv);
+}
 
 
 /** Remove single instruction breakpoint
@@ -377,7 +377,7 @@ void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask 
 void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
 {
   Tlv *tlv ;
-  
+
   if(disableFlashPatchComparatorLoadedWithAddress(instructionAddress,INSTRUCTION_TYPE) == -1)
     Throw(TLV_ADDRESS_NOT_FOUND);
   else
@@ -392,9 +392,9 @@ void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
 void removeAllHardwareBreakpoint(Tlv_Session *session)
 {
   Tlv *tlv ;
-  
+
   disableAllFlashPatchComparatorSetToBreakpoint();
-  
+
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 }
@@ -408,15 +408,15 @@ void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
 {
   Tlv *tlv ;
   int found = 0 ;
- 
+
   found = disableFlashPatchComparatorLoadedWithAddress(address,INSTRUCTION_TYPE);
   found += disableFlashPatchComparatorLoadedWithAddress(address,LITERAL_TYPE);
-  
+
   if(found < 0)
     Throw(TLV_ADDRESS_NOT_FOUND);
   else
     tlv = tlvCreatePacket(TLV_OK, 0, 0);
-  
+
   tlvSend(session, tlv);
 }
 
@@ -429,7 +429,7 @@ void stopAllFlashPatchRemapping(Tlv_Session *session)
 {
   Tlv *tlv ;
   disableAllFlashPatchComparatorSetToRemap();
-  
+
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 }
@@ -444,23 +444,23 @@ void breakpointEventHandler(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc =0 ;
-  
+
   if(!hasBreakpointDebugEventOccured())
     return ;
-  else 
+  else
   {
     pc = readCoreRegister(CORE_REG_PC);
     disableFPBUnit();
     SET_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG);
     clearBreakpointDebugEvent();
   }
-  
+
   /* Clear ongoingProcess and breakPoint flag to indicate the breakpoint event is over*/
   CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
   CLEAR_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG);
 
   tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
-  tlvSend(session, tlv);  
+  tlvSend(session, tlv);
 }
 
 /**
@@ -472,7 +472,7 @@ void watchpointEventHandler(Tlv_Session *session)
 {
   Tlv *tlv ;
   uint32_t pc =0 ;
-  
+
   if(!(hasDataWatchpointOccurred())) {
 	  return;
   }
@@ -482,9 +482,9 @@ void watchpointEventHandler(Tlv_Session *session)
     disableDWTComparator(COMPARATOR_1);
     clearDWTTrapDebugEvent() ;
   }
-  
+
   tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
-  tlvSend(session, tlv);  
+  tlvSend(session, tlv);
 }
 
 /** readTargetMemory is a function to read target RAM using swd
@@ -498,21 +498,21 @@ void watchpointEventHandler(Tlv_Session *session)
 void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   int i; uint8_t chksum = 0;
   uint8_t readData = 0;
-  
+
   Tlv *tlv = tlvCreatePacket(TLV_OK, size + 4, NULL);
-  
+
   /* store destAddress checksum */
   chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&destAddress, 4);
-  
+
   /* Read from RAM using swd */
   for(i = 0; i < size; i++, destAddress++)  {
     readData = memoryReadAndReturnByte(destAddress);
     /* Data start at position 4 */
     chksum += tlvPackIntoBuffer(&tlv->value[4 + i], &readData, 1);
   }
-  
+
   tlv->value[tlv->length - 1] = chksum;
-  
+
   tlvSend(session, tlv);
 }
 
@@ -529,10 +529,10 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
 DataType getDataType(uint32_t address, int size) {
   int boundary = (address & BOUNDARY_MASK);
   int dataType = 0;
-  
+
   /* Case 1 */
   if(boundary == WORD_BOUNDARY) {
-    if(size >= WORD_SIZE) 
+    if(size >= WORD_SIZE)
       dataType = WORD_TYPE;
     else if(size > BYTE_SIZE && size < WORD_SIZE)
       dataType = HALFWORD_TYPE;
@@ -547,11 +547,11 @@ DataType getDataType(uint32_t address, int size) {
   }
   /* Case 3 */
   else dataType = BYTE_TYPE;
-  
+
   return dataType;
 }
 
-/** writeDataWithCorrectDataType is a function to write data 
+/** writeDataWithCorrectDataType is a function to write data
   * into correct address boundary
   *
   * Input   : data is the pointer-to-pointer contain address of the data need to write
@@ -564,9 +564,9 @@ void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) 
   DataType type = 0;
   uint8_t *dataAddress = *data;
   uint32_t destAddress = *address;
-  
+
   type = getDataType(destAddress, *size);
-  
+
   if(type == WORD_TYPE) {
     // printf("word %x\n", get4Byte(dataAddress));
     memoryWriteWord(destAddress, get4Byte(dataAddress));
@@ -579,7 +579,7 @@ void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) 
     // printf("byte %x\n", *dataAddress);
     memoryWriteByte(destAddress, *dataAddress);
   }
-  
+
   *data += type;
   *address += type;
   *size -= type;
@@ -595,10 +595,10 @@ void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) 
   * return  : NONE
   */
 void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-  
+
   /* Write data into correct address boundary */
   while(size > 0) { writeDataWithCorrectDataType(&dataAddress, &destAddress, &size); }
-  
+
   tlvReply(session, TLV_OK, 0, NULL);
 }
 
@@ -615,10 +615,11 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 	uint32_t tempAddr = tempAddress;
-  
+	int tempSize = size;
+
   startTask(tb);
   /* Write to RAM using swd */
-  while(size > 0) { writeDataWithCorrectDataType(&dataAddress, &tempAddr, &size); }
+  while(tempSize > 0) { writeDataWithCorrectDataType(&dataAddress, &tempAddr, &tempSize); }
   /* Wait if stub is busy */
   while(IsStubBusy() == 0) { yield(tb); }
   /* Request flashProgrammer to copy data in tempAddress into flash */
@@ -630,7 +631,7 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
   returnThis(1, tb);
 }
 
-/** eraseTargetFlash is a function to erase target flash by section 
+/** eraseTargetFlash is a function to erase target flash by section
   * (require flashLoader/flashProgrammer)
   *
   * Input   : session contain a element/handler used by tlv protocol
@@ -642,7 +643,7 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
 int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
-  
+
   startTask(tb);
   /* Wait if stub is busy */
   while(IsStubBusy() == 0) { yield(tb); }
@@ -650,7 +651,7 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   requestStubErase(address, size);
   /* Reply tlv acknowledge */
   tlvReply(session, TLV_OK, 0, NULL);
-  
+
   endTask(tb);
   returnThis(1, tb);
 }
@@ -666,7 +667,7 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
 int massEraseTargetFlash(Tlv_Session *session, uint32_t bank) {
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
-  
+
   startTask(tb);
   /* Wait if stub is busy */
   while(IsStubBusy() == 0) { yield(tb); }
@@ -674,34 +675,38 @@ int massEraseTargetFlash(Tlv_Session *session, uint32_t bank) {
   requestStubMassErase(bank);
   /* Reply tlv acknowledge */
   tlvReply(session, TLV_OK, 0, NULL);
-  
+
   endTask(tb);
   returnThis(1, tb);
 }
 
 void eventOccured(Tlv_Session *session, EventType event) {
   CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-  
+
   Tlv *tlv = tlvCreatePacket(TLV_OK, 1, (uint8_t *)&event);
-  
+
   tlvSend(session, tlv);
 }
 
-void checkDebugEvent(Tlv_Session *session, EventType event) {
+EventType isDebugEventOccur(EventType event) {
 
-  switch(event) {
-    case BREAKPOINT_EVENT :
-      if(hasBreakpointDebugEventOccured()) {
-        eventOccured(session, event);
-      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-    break;
-    
-    case WATCHPOINT_EVENT :
-      if((hasDataWatchpointOccurred())) {
-        eventOccured(session, event);
-      } else SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-    break;
-  }
+  if(event == BREAKPOINT_EVENT)       { if(hasBreakpointDebugEventOccured())  return event; }
+  else if(event == WATCHPOINT_EVENT)  { if(hasDataWatchpointOccurred())       return event; }
+  
+  return NO_EVENT;
+}
+
+int debugEventHandler(Tlv_Session *session, EventType event) {
+  EventType eventOccured = NO_EVENT;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+  
+  startTask(tb);
+  while((eventOccured = isDebugEventOccur(event)) == NO_EVENT) { yield(tb); }
+  tlvReply(session, TLV_OK, 1, (uint8_t *)&eventOccured);
+  endTask(tb);
+  
+  returnThis(1, tb);
 }
 
 void loopBack(Tlv_Session *session, Tlv *packet) {
@@ -723,7 +728,7 @@ void comPortVerification(Tlv_Session *session) {
   tlvSend(session, tlv);
 }
 
-/** selectTask is a function to select instruction 
+/** selectTask is a function to select instruction
   * base on tlv->type
   *
   * Input   : tlv is pointer pointing to tlv packet
@@ -731,7 +736,7 @@ void comPortVerification(Tlv_Session *session) {
   * Return  : NONE
   */
 void selectTask(Tlv_Session *session, Tlv *tlv)  {
-  
+
   switch(tlv->type) {
     case TLV_WRITE_RAM                  : writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);       break;
     case TLV_WRITE_FLASH                : writeTargetFlash(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);     break;
@@ -751,56 +756,36 @@ void selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
-    case TLV_DEBUG_EVENTS               : checkDebugEvent(session, tlv->value[0]);                                                  break;
+    case TLV_DEBUG_EVENTS               : debugEventHandler(session, tlv->value[0]);                                                  break;
     case TLV_VERIFY_COM_PORT            : comPortVerification(session);                                                             break;
 
     default : break;
   }
 }
 
-/** taskManager
+/** taskManager is a function to handle the coming tlv packet and interpret it
+  *
+  * input     :
+  *
+  * return    :
   */
 int taskManager(Tlv_Session *session)  {
   CEXCEPTION_T err;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
-  
+
   Try {
     startTask(tb);
     /* Wait packet to arrive */
     while((packet = tlvReceive(session)) == NULL) { yield(tb); }
     /* Wait for task to complete */
     await(selectTask(session, packet), tb);
-    
+
     endTask(tb);
-    returnThis(1, tb);    
-  } 
+    returnThis(1, tb);
+  }
   Catch(err) {
     resetTask(tb);
     tlvErrorReporter(session, err);
   }
-  
-  // switch(session->probeState)  {
-    // case PROBE_RECEIVE_PACKET :
-      // Try {
-        // packet = tlvReceive(session);
-        // if(verifyTlvPacket(packet)) {
-          // PROBE_CHANGE_STATE(session, PROBE_INTERPRET_PACKET);
-        // }
-      // } Catch(err) {
-        // tlvErrorReporter(session, err);
-      // }
-    // break;
-      
-    // case PROBE_INTERPRET_PACKET :
-      // Try {
-        // selectTask(session, packet);
-        // if(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_CLEAR)
-          // PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
-      // } Catch(err) {
-        // tlvErrorReporter(session, err);
-        // PROBE_CHANGE_STATE(session, PROBE_RECEIVE_PACKET);
-      // }
-    // break;
-  // }
 }

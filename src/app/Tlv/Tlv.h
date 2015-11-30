@@ -21,16 +21,8 @@ typedef struct
   void *handler;
   uint8_t txBuffer[255];                  /* Tlv transmit buffer used to transfer tlv packet to target                */
   uint8_t rxBuffer[255];                  /* Tlv receive buffer used to receive tlv packet from target                */
-  /* Send and Receive state */
-  Tlv_State receiveState;
-  /* ###### Tlv state ###### */
-  int state;
-  /* Host and Probe state */
-  Probe_State probeState;
-  /* Probe flash state */
-  Tlv_State pFlashState;
-  /* Flags */
-  uint32_t flags;
+  Tlv_State receiveState;                 /* Send and Receive state */
+  uint32_t flags;                         /* Flags */
   bool exit;
 } Tlv_Session;
 

@@ -69,33 +69,7 @@ typedef enum
   TLV_SEND_PACKET,
   TLV_RECEIVE_PACKET,
   TLV_WAIT_RESPONSE,
-  TLV_OPEN_FILE,
-  /*### Load Elf State ###*/
-  TLV_LOAD_ISR_VECTOR,
-  TLV_LOAD_TEXT,
-  TLV_LOAD_RO_DATA,
-  TLV_LOAD_INIT_ARRAY,
-  TLV_LOAD_FINI_ARRAY,
-  TLV_LOAD_DATA,
-  /*### Load Elf State ###*/
-  TLV_LOAD_PROGRAM,
-  TLV_UPDATE_PC,
-  TLV_RUN_PROGRAM,
-  TLV_LOAD_FLASH_PROGRAMMER,
-  TLV_LOAD_ACTUAL_PROGRAM,
-  TLV_REQUEST_ERASE,
-  /* State used by Probe */
-  WRITE_TO_RAM,
-  COPY_TO_FLASH,
-  REQUEST_ERASE,
-  WAIT_OPERATION_COMPLETE,
 } Tlv_State;
-
-typedef enum
-{
-  PROBE_RECEIVE_PACKET,
-  PROBE_INTERPRET_PACKET,
-} Probe_State;
 
 /* Tlv acknowledge */
 typedef enum
@@ -109,6 +83,7 @@ typedef enum
 } Tlv_Nack;
 
 typedef enum {
+  NO_EVENT = 0,
   BREAKPOINT_EVENT = 1,
   WATCHPOINT_EVENT,
 } EventType;
