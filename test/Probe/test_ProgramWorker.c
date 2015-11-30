@@ -102,16 +102,18 @@ void test_writeTargetRam_should_write_data_to_specified_RAM_address(void)
   Tlv *tlv = tlvCreatePacket(TLV_WRITE_RAM, 12, (uint8_t *)buffer);
   
   // 0x12345678
-  memoryWriteByte_ExpectAndReturn(0x20000000, 0x78, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000001, 0x56, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000002, 0x34, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000003, 0x12, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000000,0x12345678,SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000000, 0x78, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000001, 0x56, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000002, 0x34, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000003, 0x12, SWD_NO_ERROR);
   
   // 0xABCDABCD
-  memoryWriteByte_ExpectAndReturn(0x20000004, 0xCD, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000005, 0xAB, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000006, 0xCD, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000007, 0xAB, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000004,0xABCDABCD,SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000004, 0xCD, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000005, 0xAB, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000006, 0xCD, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000007, 0xAB, SWD_NO_ERROR);
   
   writeTargetRam(session, &tlv->value[4], get4Byte(&tlv->value[0]), tlv->length - 5);
 }
@@ -941,10 +943,11 @@ void test_probeTaskManager_should_receive_TLV_WRITE_RAM_and_perform_the_task(voi
   tlvService(session);
   
   // 0x10203040
-  memoryWriteByte_ExpectAndReturn(0x20000000, 0x40, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000001, 0x30, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000002, 0x20, SWD_NO_ERROR);
-  memoryWriteByte_ExpectAndReturn(0x20000003, 0x10, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn(0x20000000,0x10203040,SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000000, 0x40, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000001, 0x30, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000002, 0x20, SWD_NO_ERROR);
+  // memoryWriteByte_ExpectAndReturn(0x20000003, 0x10, SWD_NO_ERROR);
   
   probeTaskManager(session);
   TEST_ASSERT_EQUAL(PROBE_RECEIVE_PACKET, session->probeState);

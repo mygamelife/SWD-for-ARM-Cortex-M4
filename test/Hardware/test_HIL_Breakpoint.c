@@ -23,45 +23,53 @@
 #include "FPBUnit.h"
 #include "FPBUnitEx.h"
 #include "CodeStepping.h"
+#include <direct.h>
+// #include <windows.h>
 
 #define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
+char FlashProgrammerPath[1024];
 
 uint16_t machineCode[] = 
 {
   0xBF00,         //0x080003BE  nop
-  // 0x2117,         //0x080003C0  r1,23
-  // 0xE7FE,         //0x080003C2  b.
-  // 0x8001, 0xF3AF, //0x080003C4  nop.w
-  // 0x01FF, 0xF04F, //0x080003C8  mov r1,#0xFF
-  // 0xE7FE,         //0x080003CC  b.
-  // 0xBF00,         //0x080003CE  nop
-  // 0xBF00,         //0x080003D0  nop
-  // 0x01FF, 0xF04F, //0x080003D2  mov r1,#0xFF
-  // 0xF04F, 0x02FF, //0x080003D6  mov r1,#0xFF
-  // 0xE7FE,         //0x080003DA  b.
-  // 0x8000, 0xF3AF, //0x080003CC  nop.w
-  // 0x210D,         //0x080003E0  movs r1,#13
-//  0x01FF, 0xF04F, //0x080003E2  mov r1,#0xFF
-//  0x2117,         //0x080003E6  movs r1,#23
-//  0xE7FE,         //0x080003E8  b.
-//  0xBF00,         //0x080003EA  nop.
+  0x2117,         //0x080003C0  r1,23
+  0xE7FE,         //0x080003C2  b.
+  0xF3AF, 0x8000, //0x080003C4  nop.w
+  0xF04F, 0x010F, //0x080003C8  mov r1,#0x0F
+  0xE7FE,         //0x080003CC  b.
+  0xF3AF, 0x8000, //0x080003CE  nop.w
+  0xF04F, 0x011F, //0x080003D2  mov r1,#0x1F
+  0xF04F, 0x012F, //0x080003D6  mov r1,#0x2F
+  0xE7FE,         //0x080003DA  b.
+  0xF3AF, 0x8000, //0x080003CC  nop.w
+  0x210D,         //0x080003E0  movs r1,#13
+  0xF04F, 0x013F, //0x080003E2  mov r1,#0x3F
+  0x2117,         //0x080003E6  movs r1,#23
+  0xE7FE,         //0x080003E8  b.
+  0xBF00,         //0x080003EA  nop.
   
 };
 
+
 static int initFlag = 0;
+static int verifyEqualProgram(uint32_t startingAddress,uint16_t *machineCode,int codeSize);
 static void loadBreakpointTestProgram();
+static void replaceBackslashInDirectory();
+static void getFlashProgrammerPath();
 
 void setUp(void) 
 {
   CEXCEPTION_T err = 0;
   
-  Try {
+  Try 
+  {
     if(initFlag == 0) 
     {  
       system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
       initFlag = 1;
-      initMemoryReadWrite();
-      setCoreMode(CORE_DEBUG_HALT);
+       if(_session == NULL)
+	  _session = tlvCreateSession();
+	  setCoreMode(CORE_DEBUG_MODE);
       loadBreakpointTestProgram();
     }
     setCoreMode(CORE_DEBUG_HALT);
@@ -80,7 +88,7 @@ void tearDown(void)
   disableFPBUnit();
 }
 
-int verifyEqualProgram(uint32_t startingAddress,uint16_t *machineCode,int codeSize)
+static int verifyEqualProgram(uint32_t startingAddress,uint16_t *machineCode,int codeSize)
 {
   int i = 0;
   uint32_t machineCodeReadFromTarget[codeSize] ;
@@ -88,6 +96,7 @@ int verifyEqualProgram(uint32_t startingAddress,uint16_t *machineCode,int codeSi
   for(i = 0 ; i < codeSize ; i++, startingAddress+=2)
   {  
     memoryReadHalfword(startingAddress,&machineCodeReadFromTarget[i]);
+	// printf("Address : %x \tMachineCodeRead %x vs MachineCode %x\n",startingAddress,machineCodeReadFromTarget[i],machineCode[i]);
     if(machineCodeReadFromTarget[i] != machineCode[i])
     {
       printf("Difference in program found !\n");
@@ -109,19 +118,12 @@ static void loadBreakpointTestProgram()
     printf("No difference in the program loaded in target device. No flashing is required\n");
   else
   {
+	initMemoryReadWrite();
+     
     printf("Erasing \n");
-
-    /* Erase flash space according to size */
     if(_flashErase(0x08000000, 2000) ==1);
-      printf("Complete erasing\n");
-    
-    // writeCoreRegister(CORE_REG_PC,0x20000000);
-    pc = readCoreRegister(CORE_REG_PC);
-    printf("PC before flashing %x\n",pc);
-    setCoreMode(CORE_DEBUG_MODE);
-    
-    
-    
+      printf("Flash erase complete\n");
+
     printf("Flashing \n");
     Try{
       for(i = 0 ; i < CODE_SIZE ; i++,address +=2)
@@ -131,46 +133,43 @@ static void loadBreakpointTestProgram()
     {
       displayErrorMessage(err);
     }
-  }
-  
 
+  }
 }
 
-void test_nothing()
+static void replaceBackslashInDirectory()
 {
-  uint32_t pc = 0 , afterPC = 0 ,data1 = 0,data2 = 0 , dhcsr1 = 0,dhcsr2 = 0, dhcsr3 = 0 ;
-  
-  // memoryReadWord(DHCSR_REG,&dhcsr1);
-  // printf("Inital DHCSR_REG %x\n",dhcsr1);
-  
-  // writeCoreRegister(CORE_REG_PC,0x080003BE);
-  // pc = readCoreRegister(CORE_REG_PC);
-  
-  // memoryReadHalfword(pc,&data1);
-  // printf("Initial PC %x contains %x\n",pc,data1);
-  
-  // stepOnly(1);
-  
-  // memoryReadWord(DHCSR_REG,&dhcsr2);
-  // printf("Mid DHCSR_REG %x\n",dhcsr2);
-  
-  // afterPC = readCoreRegister(CORE_REG_PC);
-  // memoryReadHalfword(afterPC,&data2);
-  
-  // printf("After PC %x contains %x\n",afterPC,data2);
-  
-  // memoryReadWord(DHCSR_REG,&dhcsr3);
-  // printf("After DHCSR_REG %x\n",dhcsr3);
+	char *backslash ;
+	
+	backslash = strstr(FlashProgrammerPath,"\\");
+	while(backslash != NULL)
+	{
+		strncpy(backslash,"/",1);
+		backslash = strstr(FlashProgrammerPath,"\\");
+	}
+}
+
+static void getFlashProgrammerPath()
+{
+	int i = 0 ;
+	char *answer ;
+	answer = (char *) _getcwd(FlashProgrammerPath,sizeof(FlashProgrammerPath)) ;
+	if(answer != NULL)
+	{
+		replaceBackslashInDirectory();	
+		strcat(FlashProgrammerPath,"/");
+		strcat(FlashProgrammerPath,FLASH_PROGRAMMER_FILE_PATH);
+	}
 }
 
 /**
- * 0x080003C0	   ________   <- set lower halfword breakpoint at 0x080003C0
+ * 0x080003C0	 ________   <- set lower halfword breakpoint at 0x080003C0
  * 0x080003C2 	|________|
  * 0x080003C4 	|________|
  *
  * Result : Breakpoint at 0x080003C0
  */
-void xtest_instructionBreakPointTestCase_2bytes_LowerHalfWord()
+void test_instructionBreakPointTestCase_2bytes_LowerHalfWord()
 { 
   uint32_t PC = 0 ;
   int i = 0 ;
@@ -179,7 +178,7 @@ void xtest_instructionBreakPointTestCase_2bytes_LowerHalfWord()
   manualSetInstructionBreakpoint(INSTRUCTION_COMP0,0x080003C0,MATCH_LOWERHALFWORD);
   setCoreMode(CORE_DEBUG_MODE);
   
-  //while(!hasBreakpointDebugEventOccured());
+  while(!hasBreakpointDebugEventOccured());
 
   PC = readCoreRegister(CORE_REG_PC);
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP0);
@@ -194,7 +193,7 @@ void xtest_instructionBreakPointTestCase_2bytes_LowerHalfWord()
  *
  * Result : Breakpoint at 0x080003C2
  */
-void xtest_instructionBreakPointTestCase_2bytes_UpperHalfWord()
+void test_instructionBreakPointTestCase_2bytes_UpperHalfWord()
 {
   uint32_t PC = 0 ;
 
@@ -218,7 +217,7 @@ void xtest_instructionBreakPointTestCase_2bytes_UpperHalfWord()
  *
  * Result : Breakpoint at 0x080003C2
  */
-void xtest_instructionBreakPointTestCase_2bytes_Word()
+void test_instructionBreakPointTestCase_2bytes_Word()
 {
   uint32_t PC = 0 ;
 
@@ -235,16 +234,15 @@ void xtest_instructionBreakPointTestCase_2bytes_Word()
   TEST_ASSERT_EQUAL(0x080003C0,PC);
 }
 
-
 /**
  * 0x080003C8	   ________    <---set upper halfword breakpoint at 0x080003C8
- *  		        |        |
- * 0x080003CC   |________|
+ *  		      |        |
+ * 0x080003CC     |________|
  * 0x080003CE	  |________|
  *
  * Result : Breakpoint will never occur
  */
-void xtest_instructionBreakPointTestCase_4bytes_UpperHalfWord()
+void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
 {
   uint32_t PC = 0 , data = 0;
   int fail = 0 ;
@@ -272,10 +270,10 @@ void xtest_instructionBreakPointTestCase_4bytes_UpperHalfWord()
 
 
 /**
- * 0x080003C8	   ________    <---set word breakpoint at 0x080003C8
- *  		        |        |
+ * 0x080003C8	 ________    <---set word breakpoint at 0x080003C8
+ *  		    |        |
  * 0x080003CC   |________|
- * 0x080003CE	  |________|
+ * 0x080003CE	|________|
  *
  * Result : Breakpoint at 0x080003C8
  */
@@ -299,16 +297,16 @@ void xtest_instructionBreakPointTestCase_4bytes_Word()
 
 
 /**
- * 0x080003D2	   ________
+ * 0x080003D2	 ________
  * 0x080003D4 	|________|
- * 		 	        |        | <----set lower halfword breakpoint at 0x080003D6
+ * 		 	    |        | <----set lower halfword breakpoint at 0x080003D6
  * 0x080003D8   |________|
  *              |        |
- * 0x080003DC	  |________|
+ * 0x080003DC	|________|
  *
  * Result : Breakpoint will never occur
  */
-void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
+void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
 {
   uint32_t PC = 0 ;
   int fail ;
@@ -337,64 +335,52 @@ void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
 
 
 /**
- * 0x080003D0	   ________
+ * 0x080003D0	  ________
  * 0x080003D2 	|________|
- * 		 	        |        | <----set word breakpoint at 0x080003D4
+ * 		 	    |        | <----set word breakpoint at 0x080003D4
  * 0x080003D6   |________|
  *              |        |
- * 0x080003DA	  |________|
+ * 0x080003DA	|________|
  * 0x080003DC
  *
- * Result : Breakpoint at 0x080003D6
+ * Result : Breakpoint will never occur
  */
-void xtest_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
+void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
 {
   uint32_t PC = 0 ;
   int fail = 0 ;
-  uint32_t data = 0 ;
   manualSetInstructionBreakpoint(INSTRUCTION_COMP3,0x080003D4,MATCH_WORD);
 
-  writeCoreRegister(CORE_REG_PC,0x080003D0);
-  PC = readCoreRegister(CORE_REG_PC);
-  printf("Initial PC %x\n",PC);
-  printf("Data %x\n",data);
-  stepOnly(1);
-    PC = readCoreRegister(CORE_REG_PC);
-  printf("Stepped PC %x\n",PC);
-  stepOnly(1);
-    memoryReadWord(PC,&data);
-  printf("Data %x\n",data);
+  writeCoreRegister(CORE_REG_PC,0x080003D2);
   setCoreMode(CORE_DEBUG_MODE);
+
 
   while(!hasBreakpointDebugEventOccured())
     {
       PC = readCoreRegister(CORE_REG_PC);
-      if(fail < 10)
+      if(PC > 0x080003D4)
       {
-        printf("PC %x\n",PC);
-        fail  ++;
+        fail = 1;
+        break ;
       }
-        else
-          break ;
       setCoreMode(CORE_DEBUG_MODE);
     }
 
-  PC = readCoreRegister(CORE_REG_PC);
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
-  TEST_ASSERT_EQUAL(0x080003D6,PC);
+  TEST_ASSERT_EQUAL(1,fail);
 }
 
 /**
  * 0x080003E0	   ________
- * 0x080003E2 	|________|
- * 		 	        | 		   | <----set word breakpoint at 0x080003E4
- * 0x080003E6 	|________|
+ * 0x080003E2 	  |________|
+ * 		 	      | 	   | <----set word breakpoint at 0x080003E4
+ * 0x080003E6 	  |________|
  * 0x080003E8	  |________|
  *
- * Result : Breakpoint at 0x080003E6
+ * Result : Breakpoint will never occur
  */
-void xtest_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
+void test_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
 {
   uint32_t PC = 0 ;
   int fail = 0 ;
@@ -406,18 +392,15 @@ void xtest_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
   while(!hasBreakpointDebugEventOccured())
     {
       PC = readCoreRegister(CORE_REG_PC);
-      if(fail < 10)
+      if(PC > 0x080003E0)
       {
-        printf("PC %x\n",PC);
-        fail  ++;
-      }
-        else
-          break ;
+		fail = 1;
+		break ;
+	  }
       setCoreMode(CORE_DEBUG_MODE);
     }
 
-  PC = readCoreRegister(CORE_REG_PC);
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
-  TEST_ASSERT_EQUAL(0x080003E6,PC);
+  TEST_ASSERT_EQUAL(1,fail);
 }

@@ -531,24 +531,14 @@ void readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   * return  : NONE
   */
 void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size) {
-  int i, j ;
-  uint32_t data32 = 0 ;
-  
+  int i ;
   Tlv *tlv = tlvCreatePacket(TLV_OK, 0, 0);
   /* Write to RAM using swd */
-    for(i = 0; i < size; i ++, dataAddress++, destAddress++) 
-   {
-     // if(destAddress == DHCSR_REG || destAddress == AIRCR_REG || destAddress == DCRDR_REG || destAddress == DCRSR_REG)
-     // {
-       // for(j = 0 ; j < 4 ; dataAddress ++, j ++)
-         // data32 += (*dataAddress << j*8);
-       
-       // memoryWriteWord(destAddress,data32);
-       // break ;
-     // }
-     memoryWriteByte(destAddress, *dataAddress);
-   }
- 
+  //for(i = 0; i < size; i ++, dataAddress++, destAddress++)
+    //  memoryWriteByte(destAddress, *dataAddress);
+
+  selectAppropriateMethodToWriteRAM(dataAddress,destAddress,size);
+
   tlvSend(session, tlv);
 }
 

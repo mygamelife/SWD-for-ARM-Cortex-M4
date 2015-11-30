@@ -1,5 +1,5 @@
 #include "MemoryReadWrite.h"
-
+#include "string.h"
 /* Global Tlv Session */
 Tlv_Session *_session = NULL;
 
@@ -13,9 +13,11 @@ int cswDataSize = 0;
   ==============================================================================  
   */
 void initMemoryReadWrite(void) {
+	
   if(_session == NULL)
-    _session = tlvCreateSession();
-  do {
+	  _session = tlvCreateSession();
+  
+  do{	  
       tlvService(_session);
       tlvLoadToRam(_session, FLASH_PROGRAMMER_FILE_PATH);
     } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET); 

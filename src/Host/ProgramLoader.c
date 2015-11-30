@@ -590,7 +590,7 @@ void tlvLoadToRam(Tlv_Session *session, char *file) {
         SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
         session->lramState = TLV_RUN_PROGRAM;
       }
-      printf("entry address %x\n",entryAddress);
+      // printf("entry address %x\n",entryAddress);
     break;
     
     case TLV_RUN_PROGRAM :
