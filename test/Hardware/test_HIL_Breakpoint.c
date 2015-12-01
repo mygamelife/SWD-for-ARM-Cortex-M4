@@ -236,8 +236,8 @@ void test_instructionBreakPointTestCase_2bytes_Word()
 
 /**
  * 0x080003C8	   ________    <---set upper halfword breakpoint at 0x080003C8
- *  		      |        |
- * 0x080003CC     |________|
+ *  		        |        |
+ * 0x080003CC   |________|
  * 0x080003CE	  |________|
  *
  * Result : Breakpoint will never occur

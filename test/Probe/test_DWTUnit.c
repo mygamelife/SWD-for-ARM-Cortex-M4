@@ -62,10 +62,6 @@ void test_setAddressWatchpoint_given_DWT_COMP0_address_0x12345677_mask_WATCHPOIN
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
-  // Set CORE_DEBUG_MODE
-  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DHCSR_REG);
-	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0xA05F0001);
-  
   // Disable comparator first
 	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,(uint32_t)(&DWT_COMP[0].FUNCTION));
 	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0);
@@ -103,10 +99,6 @@ void test_setDataWatchpoint_MatchingOneComparator()
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
-  
-  //Set CORE_DEBUG_MODE
-  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DHCSR_REG);
-	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0xA05F0001);
   
   //Disable matching comparator
 	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,(uint32_t)(&DWT_COMP[2].FUNCTION));
@@ -157,10 +149,6 @@ void test_setDataWatchpoint_MatchingTwoComparator()
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
   
-  //Set CORE_DEBUG_MODE
-  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DHCSR_REG);
-	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0xA05F0001);
-  
   //Disable 1st matching comparator
 	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,(uint32_t)(&DWT_COMP[2].FUNCTION));
 	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0);
@@ -184,10 +172,7 @@ void test_setDataWatchpoint_MatchingTwoComparator()
   //Set CSW to Word Size
 	emulateSwdRegisterWrite(SELECT_REG, SWD_DP, OK, SELECT_BANK0);
 	emulateSwdRegisterWrite(CSW_REG, SWD_AP, OK, (CSW_DEFAULT_MASK | CSW_WORD_SIZE));
-  
-  //Set CORE_DEBUG_MODE
-  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,DHCSR_REG);
-	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0xA05F0001);
+
   
   //Disable 2nd matching comparator
 	emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,(uint32_t)(&DWT_COMP[3].FUNCTION));
