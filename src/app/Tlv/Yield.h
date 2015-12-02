@@ -14,6 +14,6 @@ extern int isYielding;
 #define endTask(x)                (x)->state = 0; }
 
 #define await(func, x)            do { case __LINE__:; (x)->state = __LINE__; func; if(isYielding) return 0;} while(0)
-#define returnThis(result, x)     do {isYielding = 0; (x)->state = 0; return result;} while(0)
+#define returnThis(result)        do {isYielding = 0; return result;} while(0)
   
 #endif // Yield_H

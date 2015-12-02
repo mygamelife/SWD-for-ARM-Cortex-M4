@@ -70,4 +70,5 @@ int verifyTlvPacket(Tlv *tlv);
 void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode);
 void tlvReadDataChunk(Tlv_Session *session, uint32_t *destAddress, int *size);
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
+
 #endif // Tlv_H

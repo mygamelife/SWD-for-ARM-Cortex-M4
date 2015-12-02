@@ -220,16 +220,14 @@ void test_tlvReadTargetMemory_should_request_read_memory_and_return_data_block(v
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   uint32_t data[] = {0x11111111, 0x22222222, 0x33333333, 0x44444444};
-  uint8_t *dataBlock;
+  uint8_t *db;
 
   int size  = 16;
   uint32_t address = 0x20000000;
 
-  dataBlock = readMemory(session, &address, &size);
+  db = readMemory(session, address, size);
 
-  TEST_ASSERT_NULL(dataBlock);
-  TEST_ASSERT_EQUAL_HEX32(0x20000010, address);
-  TEST_ASSERT_EQUAL(0, size);
+  TEST_ASSERT_NULL(db);
 
   /* Received reply */
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
@@ -237,16 +235,18 @@ void test_tlvReadTargetMemory_should_request_read_memory_and_return_data_block(v
   session->rxBuffer[1] = 17;
   session->rxBuffer[18] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 16);
 
-  dataBlock = readMemory(session, &address, &size);
+  db = readMemory(session, address, size);
 
-  TEST_ASSERT_NOT_NULL(dataBlock);
-  TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&dataBlock[0]));
-  TEST_ASSERT_EQUAL_HEX32(0x22222222, get4Byte(&dataBlock[4]));
-  TEST_ASSERT_EQUAL_HEX32(0x33333333, get4Byte(&dataBlock[8]));
-  TEST_ASSERT_EQUAL_HEX32(0x44444444, get4Byte(&dataBlock[12]));
+  TEST_ASSERT_NOT_NULL(db);
+  TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&db[0]));
+  TEST_ASSERT_EQUAL_HEX32(0x22222222, get4Byte(&db[4]));
+  TEST_ASSERT_EQUAL_HEX32(0x33333333, get4Byte(&db[8]));
+  TEST_ASSERT_EQUAL_HEX32(0x44444444, get4Byte(&db[12]));
+  
+  delDataBlock(db);
 }
 
-void test_tlvWriteTargetMemory_should_request_and_write_data_into_target_RAM(void)
+void test_writeMemory_should_request_and_write_data_into_target_RAM(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
@@ -262,10 +262,8 @@ void test_tlvWriteTargetMemory_should_request_and_write_data_into_target_RAM(voi
 
   uint8_t *pData = (uint8_t *)userSession.data;
 
-  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  writeMemory(session, pData, userSession.address, userSession.size, TLV_WRITE_RAM);
 
-  TEST_ASSERT_EQUAL_HEX32(0x20000014, userSession.address);
-  TEST_ASSERT_EQUAL(0, userSession.size);
   TEST_ASSERT_EQUAL(1, isYielding);
 
   /* Received reply */
@@ -274,9 +272,8 @@ void test_tlvWriteTargetMemory_should_request_and_write_data_into_target_RAM(voi
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
-  TEST_ASSERT_EQUAL_HEX32(0x20000014, userSession.address);
-  TEST_ASSERT_EQUAL(0, userSession.size);
+  writeMemory(session, pData, userSession.address, userSession.size, TLV_WRITE_RAM);
+
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
@@ -295,10 +292,8 @@ void test_writeMemory_should_stop_request_when_size_is_0(void)
   userSession.size = 600;
 
   uint8_t *pData = (uint8_t *)userSession.data;
-  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  writeMemory(session, pData, userSession.address, userSession.size, TLV_WRITE_RAM);
 
-  TEST_ASSERT_EQUAL_HEX32(0x200000F8, userSession.address);
-  TEST_ASSERT_EQUAL(352, userSession.size);
   TEST_ASSERT_EQUAL(1, isYielding);
 
   /* Received reply */
@@ -307,10 +302,8 @@ void test_writeMemory_should_stop_request_when_size_is_0(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  writeMemory(session, pData, userSession.address, userSession.size, TLV_WRITE_RAM);
 
-  TEST_ASSERT_EQUAL_HEX32(0x200001F0, userSession.address);
-  TEST_ASSERT_EQUAL(104, userSession.size);
   TEST_ASSERT_EQUAL(1, isYielding);
 
   /* Received reply */
@@ -319,10 +312,8 @@ void test_writeMemory_should_stop_request_when_size_is_0(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  writeMemory(session, pData, userSession.address, userSession.size, TLV_WRITE_RAM);
 
-  TEST_ASSERT_EQUAL_HEX32(0x20000258, userSession.address);
-  TEST_ASSERT_EQUAL(0, userSession.size);
   TEST_ASSERT_EQUAL(1, isYielding);
 
   /* Received reply */
@@ -331,126 +322,53 @@ void test_writeMemory_should_stop_request_when_size_is_0(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  writeMemory(session, pData, &userSession.address, &userSession.size, TLV_WRITE_RAM);
+  writeMemory(session, pData, userSession.address, userSession.size, TLV_WRITE_RAM);
 
-  TEST_ASSERT_EQUAL_HEX32(0x20000258, userSession.address);
-  TEST_ASSERT_EQUAL(0, userSession.size);
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
-void test_loadProgram_should_load_isr_section(void)
+void test_writeMemory_should_write_the_updated_data_instead_of_start_from_starting_position(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
 
-  fileStatus = FILE_CLOSED;
-  /* Load ISR_VECTOR Section */
-  loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
+  uint8_t data[255] = { 0xaa, 0xaa, 0xaa, 0xaa,
+                        0xbb, 0xbb, 0xbb, 0xbb,
+                      };
+  uint32_t address = 0x20000000;
+  
+  data[248] = 0xcc; data[249] = 0xcc; data[250] = 0xcc; data[251] = 0xcc;
+  int size = 250;
+  
+  writeMemory(session, data, address, size, TLV_WRITE_RAM);
 
   /* Received reply */
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
-  loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
-
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-  loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
+  
+  writeMemory(session, data, address, size, TLV_WRITE_RAM);
 
   TEST_ASSERT_EQUAL(1, isYielding);
 }
 
-void test_loadProgram_should_load_text_section_after_isr_vector(void)
+void test_loadProgram_should_load_all_section_of_the_program(void)
 {
-  int i = 0;
-
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
 
-  for(; i < 16; i++) {
+  int i = 0;
+  
+  printf("###################### LOADING PROGRAM ledRam.elf ######################\n");
+  for(; i < 25; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
     session->rxBuffer[1] = 1;
     session->rxBuffer[2] = 0;
 
-    /* Load Text Section */
-    loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
-  }
-
-  TEST_ASSERT_EQUAL(1, isYielding);
-}
-
-void test_loadProgram_should_load_RODATA_section(void)
-{
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  /* Load RoData Section */
-  loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
-
-  TEST_ASSERT_EQUAL(1, isYielding);
-}
-
-void test_loadProgram_should_load_InitArray_section(void)
-{
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  /* Load InitArray Section */
-  loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
-
-  TEST_ASSERT_EQUAL(1, isYielding);
-}
-
-void test_loadProgram_should_load_finiArray_section(void)
-{
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  /* Load FiniArray Section */
-  loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
-
-  TEST_ASSERT_EQUAL(1, isYielding);
-}
-
-void test_loadProgram_should_load_data_section(void)
-{
-  int i = 0;
-
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  for(; i < 5; i++) {
-    /* Received reply */
-    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-    session->rxBuffer[0] = TLV_OK;
-    session->rxBuffer[1] = 1;
-    session->rxBuffer[2] = 0;
-
-    /* Load Data Section */
+    /* Loading Program */
     loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
   }
 
@@ -788,53 +706,3 @@ void test_hostInterpreter_should_readMemory_and_stop_when_size_reached_0(void) {
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
 }
-
-// void test_hostInterpreter_should_change_state_if_isr_vector_is_finish_transmit(void) {
-  // uartInit_Ignore();
-	// Tlv_Session *session = tlvCreateSession();
-
-  // fileStatus = FILE_CLOSED;
-
-  // User_Session userSession;
-  // userSession.tlvCommand = TLV_LOAD_RAM;
-  // userSession.fileName = "test/ElfFiles/ledRam.elf";
-
-  // waitUserCommand_ExpectAndReturn(&userSession);
-  // hostInterpreter(session);
-
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
-
-  // /* ################## Sending first 248 bytes of ISR_VECTOR ################## */
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_ISR_VECTOR, session->loadProgramState);
-
-  // CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
-  // SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
-
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-
-  // /* ################## Sending last 248 bytes of ISR_VECTOR ################## */
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-  // TEST_ASSERT_EQUAL(TLV_LOAD_TEXT, session->loadProgramState);
-  // TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-
-  // CLEAR_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
-  // SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  // session->rxBuffer[0] = TLV_OK;
-  // session->rxBuffer[1] = 1;
-  // session->rxBuffer[2] = 0;
-
-  // hostInterpreter(session);
-  // TEST_ASSERT_EQUAL(HOST_INTERPRET_COMMAND, session->hostState);
-
-  // closeElfFile();
-// }

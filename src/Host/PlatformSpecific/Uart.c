@@ -86,13 +86,13 @@ void uartConfig(HANDLE handler) {
 /** isComPortCorrect
   */
 int isComPortAlive(void *handler) {
-  uint8_t txBuffer[] = {TLV_VERIFY_COM_PORT, 1, 0};
+  static uint8_t txBuffer[] = {TLV_VERIFY_COM_PORT, 1, 0};
   uint8_t rxBuffer[RXBUFFER_SIZE];
   
-  if(sendBytes(handler, txBuffer, sizeof(txBuffer)) != UART_OK) 
+  if(sendBytes(handler, txBuffer, 3) != UART_OK) 
   {printf("send failed\n");}
 
-  if(getBytes(handler, rxBuffer, RXBUFFER_SIZE) != UART_OK) 
+  if(getBytes(handler, rxBuffer, 3) != UART_OK)
   {printf("receive failed\n");}
 
   /* Should receive response if Com Port is alive */

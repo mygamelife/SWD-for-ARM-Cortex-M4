@@ -2,6 +2,7 @@
 
 int main(void)
 {
+  CEXCEPTION_T err;
   uint32_t idr = 0;
   //SwdError errorCode = 0;
 
@@ -18,12 +19,11 @@ int main(void)
   /* Power Up AHB Port */
   readAhbIDR(&idr);
 
-  uint32_t readData;
+  //uint32_t readData;
   //int high = 0, low = 0;
 
-
-  configItm();
-  memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  //configItm();
+  //memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
 
   //memoryReadWord((uint32_t)&ITM->PORT[0].u32, &readData);
   //memoryReadWord((uint32_t)&ITM->PORT[1].u32, &readData);
@@ -33,11 +33,14 @@ int main(void)
 
   while(1)
   {
-    tlvService(session);
-    probeTaskManager(session);
-	  // if(readSWO() == 1) {
-		  // high++;
-	  // } else low++;
+    Try {
+      tlvService(session);
+      taskManager(session);
+    }
+    Catch(err) {
+      resetSystemTime();
+      tlvErrorReporter(session, err);
+    }
   }
 }
 

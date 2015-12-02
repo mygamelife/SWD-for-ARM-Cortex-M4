@@ -50,48 +50,49 @@ int massEraseTargetFlash(Tlv_Session *session, uint32_t bank);
 DataType getDataType(uint32_t address, int size);
 void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size);
 void writeRamInChunk(uint8_t *dataAddress, uint32_t destAddress, int size);
-void writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
+int writeTargetRam(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
+int readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size);
 
 /*############################################### Register ###############################################*/
-void writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
-void readTargetRegister(Tlv_Session *session, uint32_t registerAddress);
+int writeTargetRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data);
+int readTargetRegister(Tlv_Session *session, uint32_t registerAddress);
 void readAllTargetRegister(Tlv_Session *session);
 
 /*############################################### Reset ###############################################*/
-void performSoftResetOnTarget(Tlv_Session *session);
-void performHardResetOnTarget(Tlv_Session *session);
-void performVectorResetOnTarget(Tlv_Session *session);
+int performSoftResetOnTarget(Tlv_Session *session);
+int performHardResetOnTarget(Tlv_Session *session);
+int performVectorResetOnTarget(Tlv_Session *session);
 
-void selectTask(Tlv_Session *session, Tlv *tlv);
+int selectTask(Tlv_Session *session, Tlv *tlv);
 int taskManager(Tlv_Session *session);
 
-void haltTarget(Tlv_Session *session);
-void runTarget(Tlv_Session *session);
+int haltTarget(Tlv_Session *session);
+int runTarget(Tlv_Session *session);
 
-void performSingleStepInto(Tlv_Session *session);
-void performMultipleStepInto(Tlv_Session *session, int nInstructions);
-void performStepOver(Tlv_Session *session);
-void performStepOut(Tlv_Session *session);
+uint32_t performSingleStepInto(Tlv_Session *session);
+int performMultipleStepInto(Tlv_Session *session, int nInstructions);
+int performStepOver(Tlv_Session *session);
+int performStepOut(Tlv_Session *session);
 
-void setBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
-void setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
+int setBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
+int setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
  
-void removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
-void removeAllHardwareBreakpoint(Tlv_Session *session);
+int removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
+int removeAllHardwareBreakpoint(Tlv_Session *session);
 
-void stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
-void stopAllFlashPatchRemapping(Tlv_Session *session);
+int stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
+int stopAllFlashPatchRemapping(Tlv_Session *session);
                    
-void breakpointEventHandler(Tlv_Session *session);
-void watchpointEventHandler(Tlv_Session *session);
+int breakpointEventHandler(Tlv_Session *session);
+int watchpointEventHandler(Tlv_Session *session);
 
 EventType isDebugEventOccur(EventType event);
 int debugEventHandler(Tlv_Session *session, EventType event);
 
 /* ### Testing Tlv Protocol ## */
-void loopBack(Tlv_Session *session, Tlv *packet);
+int loopBack(Tlv_Session *session, Tlv *packet);
 
-void comPortVerification(Tlv_Session *session);
+int comPortVerification(Tlv_Session *session);
 
 #endif // ProgramWorker_H

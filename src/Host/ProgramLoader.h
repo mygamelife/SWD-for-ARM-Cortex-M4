@@ -54,27 +54,25 @@ Process_Status softReset(Tlv_Session *session);
 Process_Status hardReset(Tlv_Session *session);
 Process_Status vectorReset(Tlv_Session *session);
 
-/* Write target memory */
-Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t *address, int *size, Tlv_Command memory);
+/* Read/Write target memory */
+Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address, int size, Tlv_Command memory);
+uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size);
 
 /* Write/Load Flash and RAM */
 int loadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
 int loadRam(Tlv_Session *session, char *file);
 int loadFlash(Tlv_Session *session, char *file);
+int isProgramExist(Tlv_Session *session, char *file);
 Process_Status _writeFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
 
 /* Flash Erase */
 Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size);
 Process_Status eraseAll(Tlv_Session *session, uint32_t banks);
 
-/* Read Memory */
-uint8_t *readMemory(Tlv_Session *session, uint32_t *destAddress, int *size);
-
 /* Set Breakpoint */
 void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
 
 /* Remove Breakpoint */
-
 
 /* Stop Flash Patch Remap */
 
@@ -83,5 +81,8 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event);
 
 int selectCommand(Tlv_Session *session, User_Session *us);
 int hostInterpreter(Tlv_Session *session);
+
+uint8_t *createDataBlock(int size);
+void delDataBlock(uint8_t *s);
 
 #endif // ProgramLoader_H

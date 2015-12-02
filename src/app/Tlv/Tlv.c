@@ -67,18 +67,11 @@ Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data) {
   * return  : NONE
   */
 void tlvSend(Tlv_Session *session, Tlv *tlv) {
-  /* If flag TLV_DATA_TRANSMIT_FLAG is set means uart is busy 
-     with previous transmition */
-  // if(GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG) == FLAG_SET) {
-    // Throw(TLV_TRANSMISSION_BUSY);
-  // }
   /* Set TLV_DATA_TRANSMIT_FLAG and copy data into TxBuffer */
-  // else {
-    SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
-    session->txBuffer[0] = tlv->type;
-    session->txBuffer[1] = tlv->length;
-    memcpy(&session->txBuffer[2], tlv->value, tlv->length);
-  // }
+  SET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG);
+  session->txBuffer[0] = tlv->type;
+  session->txBuffer[1] = tlv->length;
+  memcpy(&session->txBuffer[2], tlv->value, tlv->length);
 }
 
 /** tlvSendService is a state machine to handle the tlvSend
@@ -154,13 +147,11 @@ void tlvReceiveService(Tlv_Session *session) {
       
     case TLV_RECEIVE_VALUE :
     	if(uartRxReady) {
-    		SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-    		session->receiveState = TLV_RECEIVE_TYPE;
+        resetSystemTime();
+        SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+        session->receiveState = TLV_RECEIVE_TYPE;
     	}
-    	else {
-        if(isTimeOut(ONE_SECOND)) 
-          Throw(TLV_TIME_OUT);
-    	}
+    	else if(isTimeOut(ONE_SECOND)) Throw(TLV_TIME_OUT);
     break;
 
     default : break;
@@ -234,29 +225,26 @@ void tlvReadDataChunk(Tlv_Session *session, uint32_t *destAddress, int *size) {
   */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect) {
   Tlv *tlv; 
-  uint8_t chksum = 0, *tempData;
-  uint32_t tempAddress;
-  int tempSize = 0;
+  uint8_t chksum = 0; uint32_t tempAddress;
+  int tSize = 0;
   
-  tempData = *dataAddress;
-  tempAddress = *destAddress;
-  
+  // printf("address %x, size %d, data %x\n", *destAddress, *size, get4Byte(*dataAddress));
   if(session == NULL) Throw(TLV_NULL_SESSION);
   
   if(*size > TLV_DATA_SIZE)
-    tempSize = TLV_DATA_SIZE;
-  else tempSize = *size;
+    tSize = TLV_DATA_SIZE;
+  else tSize = *size;
   
   /* create tlv packet with register address */
-  tlv = tlvCreatePacket(memorySelect, tempSize + 4, NULL);
-  chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&tempAddress, 4);
-  chksum += tlvPackIntoBuffer(&tlv->value[4], tempData, tempSize);
+  tlv = tlvCreatePacket(memorySelect, tSize + 4, NULL);
+  chksum = tlvPackIntoBuffer(tlv->value, (uint8_t *)&(*destAddress), 4);
+  chksum += tlvPackIntoBuffer(&tlv->value[4], *dataAddress, tSize);
   /* Update checksum with destAddress */
   tlv->value[tlv->length - 1] = chksum;
 
-  *dataAddress += tempSize;
-  *destAddress += tempSize;
-  *size -= tempSize;
+  *dataAddress += tSize;
+  *destAddress += tSize;
+  *size -= tSize;
   
   tlvSend(session, tlv);
 }

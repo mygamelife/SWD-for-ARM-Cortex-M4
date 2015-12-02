@@ -11,39 +11,17 @@ void displayOptionMenu(void)  {
   printf("See 'help' or 'help <command>' to read about a specific user command\n\n");
 }
 
-void displayFourByteInRow(uint8_t *data) {
+void displayMemoryMap(uint8_t *data, uint32_t address, int length) {
   int i;
 
-  for(i = 0; i < 16; i += 4)
-    printf(" 0x%08x", get4Byte(&data[i]));
-}
-
-void displayMemoryMap(uint8_t *data, int length) {
-  int row, col, rowLength, index = 4;
-  uint32_t address = 0;
-
-  rowLength = ((length / 4) - 1)/ 5 + 1;
-  address = get4Byte(&data[0]);
-
-  for(row = 0; row < rowLength; row ++)  {
-    printf("> 0x%08x", address); address += 4;
-    if(length > 4) {
-      displayFourByteInRow(&data[index]);
-      index += 16;
-    }
-    printf("\n");
+  for(i = 0; i < length; i+= 16)  {
+    printf("> 0x%08x ", address); address += 16;
+    printf( "%08x %08x %08x %08x\n",
+            get4Byte(&data[i]), get4Byte(&data[i+4]),
+            get4Byte(&data[i+8]), get4Byte(&data[i+12])
+          );
   }
   printf("\n");
-}
-
-void displayTlvData(Tlv *tlv)  {
-  int i, length = 0, counter = 0;
-  length = tlv->length;
-
-  if(length == 1)
-    printf("> OK\n\n");
-  else
-    displayMemoryMap(tlv->value, length - 1);
 }
 
 /** getRegisterAddress is a function to get user Input

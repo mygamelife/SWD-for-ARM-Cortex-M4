@@ -379,8 +379,7 @@ void test_userExit_should_get_exit_command(void)
 
 void test_displayMemoryMap_given_address_and_value(void)
 {
-  uint32_t data[] = {0x08000000,
-                     0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
+  uint32_t data[] = {0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
                      0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
                      0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
                      0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
@@ -391,5 +390,5 @@ void test_displayMemoryMap_given_address_and_value(void)
                      0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd,
                      0xabcdabcd, 0xabcdabcd, 0xabcdabcd, 0xabcdabcd};
 
-  displayMemoryMap((uint8_t *)data, 164);
+  displayMemoryMap((uint8_t *)data, 0x08000000, 160);
 }

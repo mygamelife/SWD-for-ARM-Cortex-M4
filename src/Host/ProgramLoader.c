@@ -25,7 +25,6 @@ Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uin
   startTask(tb);
   /* Send tlv request */
   tlvSendRequest(session, TLV_WRITE_REGISTER, 8, (uint8_t *)dataBuffer);
-
   /* Waiting reply from probe */
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
@@ -36,7 +35,7 @@ Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uin
   resetSystemTime();
   /* End tlv request task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** readRegister is a function to read target register
@@ -71,7 +70,7 @@ uint32_t readRegister(Tlv_Session *session, uint32_t registerAddress) {
   #ifdef HOST
   printf("value %x\n", get4Byte(&response->value[0]));
   #endif
-  returnThis(get4Byte(&response->value[0]), tb);
+  returnThis(get4Byte(&response->value[0]));
 }
 
 /** halt is a function halt target processor
@@ -103,7 +102,7 @@ Process_Status halt(Tlv_Session *session) {
   resetSystemTime();
   /* End tlv request task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** run is a function run target processor
@@ -135,7 +134,7 @@ Process_Status run(Tlv_Session *session) {
   resetSystemTime();
   /* End tlv request task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** multipleStep is a function send tlv request to
@@ -171,7 +170,7 @@ uint32_t multipleStep(Tlv_Session *session, int nInstructions) {
   #ifdef HOST
   printf("value %x\n", get4Byte(&response->value[0]));
   #endif
-  returnThis(get4Byte(&response->value[0]), tb);
+  returnThis(get4Byte(&response->value[0]));
 }
 
 /** softReset is a function software reset target
@@ -202,7 +201,7 @@ Process_Status softReset(Tlv_Session *session) {
   resetSystemTime();
   /* End tlv request task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** hardReset is a function hardware reset target
@@ -233,7 +232,7 @@ Process_Status hardReset(Tlv_Session *session) {
   resetSystemTime();
   /* End tlv request task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** vectorReset is a function vector reset target
@@ -264,35 +263,48 @@ Process_Status vectorReset(Tlv_Session *session) {
   resetSystemTime();
   /* End tlv request task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** readMemory is a function to read data from target memory
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           destAddress is the address of the data need to be read
+  *           address is the address of the data need to be read
   *           size is the size of the data can be any value
   *
-  * Return  : NONE
+  * Return  : s is a Storage structure pointer contain read data
   */
-uint8_t *readMemory(Tlv_Session *session, uint32_t *destAddress, int *size) {
+uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
   static TaskBlock taskBlock = {.state = 0};
+  static uint8_t *db;
+  static uint32_t tAddress = 0;
+  static int index = 0, tSize = 0;
   TaskBlock *tb = &taskBlock;
+  int i;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
-
   /* Start tlv request task */
   startTask(tb);
+  
+  /* Create temporary storage to store neccessary data
+     to prevent lose track */
+  db = createDataBlock(size);
+  tSize = size;
+  tAddress = address;
 
-  while(*size > 0) {
+  while(tSize > 0) {
     /* Send tlv request */
-    tlvReadDataChunk(session, destAddress, size);
-    /* Waiting reply from probe */
+    tlvReadDataChunk(session, &tAddress, &tSize);
     while((response = tlvReceive(session)) == NULL) {
       /* Check is maximum timeout is reached */
       isProbeAlive(isTimeOut(FIVE_SECOND), tb);
       yield(tb);
     };
+    /* Waiting reply from probe */
+    for(i = 0; i < response->length - 1; i++) {
+      db[index] = response->value[i];
+      index++;
+    }
   }
 
   resetSystemTime();
@@ -300,10 +312,9 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t *destAddress, int *size) {
   endTask(tb);
 
   #ifdef HOST
-  displayMemoryMap(response->value, response->length - 1);
+  displayMemoryMap(db, address, size);
   #endif
-
-  returnThis(response->value, tb);
+  returnThis(db);
 }
 
 /** writeMemory is a function used to write data into target memory
@@ -319,17 +330,26 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t *destAddress, int *size) {
   *
   * return  : NONE
   */
-Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t *address, int *size, Tlv_Command memory) {
+Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address, int size, Tlv_Command memory) {
   static TaskBlock taskBlock = {.state = 0};
+  static uint8_t *pData = NULL;
+  static uint32_t tAddress = 0;
+  static int tSize = 0;
   TaskBlock *tb = &taskBlock;
-
+  
   if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(tb);
-
-  while(*size > 0) {
+  
+  /* pData is a static pointer to keep track the original pointer 
+     this pointer address will be shift after write data chunk */
+  pData = data;
+  tSize = size;
+  tAddress = address;
+  
+  while(tSize > 0) {
     /* Send tlv request */
-    tlvWriteDataChunk(session, &data, address, size, memory);
+    tlvWriteDataChunk(session, &pData, &tAddress, &tSize, memory);
     /* Waiting reply from probe */
     while((response = tlvReceive(session)) == NULL) {
       /* Check is maximum timeout is reached */
@@ -337,11 +357,10 @@ Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t *addres
       yield(tb);
     };
   }
-
   resetSystemTime();
   /* End task */
   endTask(tb);
-  returnThis(PROCESS_DONE, tb);
+  returnThis(PROCESS_DONE);
 }
 
 /** loadProgram is a function to load program into target memory
@@ -367,17 +386,17 @@ int loadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) {
 
     if(fileStatus == FILE_CLOSED) getElfSection(file);
 
-    await(writeMemory(session, isr->dataAddress, &isr->destAddress, &isr->size, memorySelect), tb);
+    await(writeMemory(session, isr->dataAddress, isr->destAddress, isr->size, memorySelect), tb);
     printf("ISR VECTOR...OK\n");
-    await(writeMemory(session, text->dataAddress, &text->destAddress, &text->size, memorySelect), tb);
+    await(writeMemory(session, text->dataAddress, text->destAddress, text->size, memorySelect), tb);
     printf("TEXT.........OK\n");
-    await(writeMemory(session, roData->dataAddress, &roData->destAddress, &roData->size, memorySelect), tb);
+    await(writeMemory(session, roData->dataAddress, roData->destAddress, roData->size, memorySelect), tb);
     printf("RODATA.......OK\n");
-    await(writeMemory(session, initArray->dataAddress, &initArray->destAddress, &initArray->size, memorySelect), tb);
+    await(writeMemory(session, initArray->dataAddress, initArray->destAddress, initArray->size, memorySelect), tb);
     printf("INITARRAY....OK\n");
-    await(writeMemory(session, finiArray->dataAddress, &finiArray->destAddress, &finiArray->size, memorySelect), tb);
+    await(writeMemory(session, finiArray->dataAddress, finiArray->destAddress, finiArray->size, memorySelect), tb);
     printf("FINIARRAY....OK\n");
-    await(writeMemory(session, data->dataAddress, &data->destAddress, &data->size, TLV_WRITE_RAM), tb);
+    await(writeMemory(session, data->dataAddress, data->destAddress, data->size, TLV_WRITE_RAM), tb);
     printf("DATA.........OK\n");
 
     resetSystemTime();
@@ -385,13 +404,70 @@ int loadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) {
     endTask(tb);
 
     closeElfFile();
-    returnThis(PROCESS_DONE, tb);
+    returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
     closeElfFile();
     Throw(err);
   }
+}
+
+int isProgramExist(Tlv_Session *session, char *file) {
+  static TaskBlock taskBlock = {.state = 0};
+  static uint8_t *db;
+  TaskBlock *tb = &taskBlock;
+
+  int i;
+
+  /* Start task */
+  startTask(tb);
+  if(fileStatus == FILE_CLOSED) getElfSection(file);
+  await(db = readMemory(session, isr->destAddress, isr->size), tb);
+
+  /* Compare and verify */
+  printf("Verifying........ISR SECTION\n");
+  for(i = 0; i < isr->size; i++) {
+    if(db[i] != isr->dataAddress[i]) {
+      printf("%d, memoryData %x, actualData %x\n", i, get4Byte(&db[i]), get4Byte(&isr->dataAddress[i]));
+      resetTask(tb);
+      delDataBlock(db);
+      closeElfFile();
+      returnThis(PROCESS_DONE);
+    }
+  }
+
+  await(db = readMemory(session, text->destAddress, text->size), tb);
+
+  printf("Verifying........TEXT SECTION\n");
+  /* Compare and verify */
+  for(i = 0; i < text->size; i++) {
+    if(db[i] != text->dataAddress[i]) {
+      printf("%d, memoryData %x, actualData %x\n", i, db[i], isr->dataAddress[i]);
+      resetTask(tb);
+      delDataBlock(db);
+      closeElfFile();
+      returnThis(PROCESS_DONE);
+    }
+  }
+
+  // await(writeMemory(session, text->dataAddress, &text->destAddress, &text->size, memorySelect), tb);
+  // printf("TEXT.........OK\n");
+  // await(writeMemory(session, roData->dataAddress, &roData->destAddress, &roData->size, memorySelect), tb);
+  // printf("RODATA.......OK\n");
+  // await(writeMemory(session, initArray->dataAddress, &initArray->destAddress, &initArray->size, memorySelect), tb);
+  // printf("INITARRAY....OK\n");
+  // await(writeMemory(session, finiArray->dataAddress, &finiArray->destAddress, &finiArray->size, memorySelect), tb);
+  // printf("FINIARRAY....OK\n");
+  // await(writeMemory(session, data->dataAddress, &data->destAddress, &data->size, TLV_WRITE_RAM), tb);
+  // printf("DATA.........OK\n");
+
+  // printf("isr address %x, size %d\n", isr->destAddress, isr->size);
+  // printf("done reading\n");
+  endTask(tb);
+  delDataBlock(db);
+  closeElfFile();
+  returnThis(PROCESS_DONE);
 }
 
 /** loadRam is a function to load elf file and update PC
@@ -426,7 +502,7 @@ int loadRam(Tlv_Session *session, char *file) {
     /* End task */
     endTask(tb);
     resetSystemTime();
-    returnThis(PROCESS_DONE, tb);
+    returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
@@ -458,6 +534,7 @@ int loadFlash(Tlv_Session *session, char *file) {
 
     /* Erase section */
     await(eraseSection(session, FLASH_BEGIN_ADDRESS, programSize), tb);
+    programSize = 0;
     printf("Done Erase.....\n");
     /* Load actual program to flash */
     await(loadProgram(session, file, TLV_WRITE_FLASH), tb);
@@ -478,7 +555,7 @@ int loadFlash(Tlv_Session *session, char *file) {
 
     endTask(tb);
     resetSystemTime();
-    returnThis(PROCESS_DONE, tb);
+    returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
@@ -520,7 +597,7 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
 
     endTask(tb);
     resetSystemTime();
-    returnThis(PROCESS_DONE, tb);
+    returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
@@ -561,7 +638,7 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
 
     endTask(tb);
     resetSystemTime();
-    returnThis(PROCESS_DONE, tb);
+    returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
@@ -600,7 +677,7 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
 EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
-  
+
   if(session == NULL) Throw(TLV_NULL_SESSION);
 
   /* Start tlv request task */
@@ -615,9 +692,9 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
   };
   /* End task */
   endTask(tb);
-  
+
   resetSystemTime();
-  returnThis(response->value[0], tb);
+  returnThis(response->value[0]);
 }
 
 /** selectCommand is a function to select instruction
@@ -628,12 +705,12 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
   * Return  : NONE
   */
 int selectCommand(Tlv_Session *session, User_Session *us) {
-
+  
   switch(userSession->tlvCommand) {
-    case TLV_WRITE_RAM          : writeRam(session, (uint8_t *)us->data, &us->address, &us->size);  break;
+    case TLV_WRITE_RAM          : writeRam(session, (uint8_t *)us->data, us->address, us->size);    break;
     case TLV_LOAD_RAM           : loadRam(session, us->fileName);                                   break;
     case TLV_LOAD_FLASH         : loadFlash(session, us->fileName);                                 break;
-    case TLV_READ_MEMORY        : readMemory(session, &us->address, &us->size);                     break;
+    case TLV_READ_MEMORY        : readMemory(session, us->address, us->size);                       break;
     case TLV_WRITE_REGISTER     : writeRegister(session, us->address, us->data[0]);                 break;
     case TLV_READ_REGISTER      : readRegister(session, us->address);                               break;
     case TLV_HALT_TARGET        : halt(session);                                                    break;
@@ -662,11 +739,26 @@ int hostInterpreter(Tlv_Session *session) {
     endTask(tb);
 
     deleteUserSession(userSession);
-    returnThis(PROCESS_DONE, tb);
+    returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
     deleteUserSession(userSession);
     Throw(err);
+  }
+}
+
+uint8_t *createDataBlock(int size) {
+  uint8_t *dataBlock;
+  dataBlock = malloc(size * sizeof(uint8_t));
+
+  if(dataBlock == NULL) printf("Failed to create storage\n");
+
+  return dataBlock;
+}
+
+void delDataBlock(uint8_t *dataBlock) {
+  if(dataBlock != NULL) {
+    free(dataBlock);
   }
 }

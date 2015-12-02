@@ -227,7 +227,7 @@ void test_tlvReceiveService_should_receive_value_after_length(void)
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
 }
 
-void test_tlvReceiveService_should_type_length_and_value(void)
+void test_tlvReceiveService_should_get_type_length_and_value(void)
 {
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
@@ -249,6 +249,8 @@ void test_tlvReceiveService_should_type_length_and_value(void)
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00); //received length
   /* Received value */
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00); //received value (interrupt)
+  
+  resetSystemTime_Expect();
   tlvReceiveService(session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
 
@@ -272,8 +274,10 @@ void test_tlvReceiveService_should_set_time_out_flag_if_no_data_arrive_after_fir
   session->rxBuffer[5] = 0xDE;
   session->rxBuffer[6] = 0x8B;//chksum
   
+  resetSystemTime_Expect();
   /* Received Value */
   tlvReceiveService(session);
+  
   TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session->receiveState);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
 }
@@ -310,6 +314,8 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   /* Received length */
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00);
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00);
+  resetSystemTime_Expect();
+
   tlvService(session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
   
@@ -350,6 +356,7 @@ void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00);
   /* Received Value */
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00);
+  
   tlvService(session);
   
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
@@ -372,17 +379,23 @@ void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
   session->rxBuffer[1] = 5;
   
   uartTxReady = 1;
+  
   sendBytes_ExpectAndReturn(session->handler, session->txBuffer, tlv->length + 2, 0x00);
   /* Received Type */
   getByte_ExpectAndReturn(session->handler, session->rxBuffer, 0x00);
+  
   tlvService(session);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   
   uartTxReady = 0;
+  
   /* Received length */
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00);
   /* Received Value */
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x01);
+  
+  resetSystemTime_Expect();
+
   tlvService(session);
   
   tlvService(session);
