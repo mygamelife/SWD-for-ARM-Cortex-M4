@@ -23,28 +23,27 @@ void initMemoryReadWrite(void) {
 }
 
 int memoryRead(uint32_t address, uint32_t *dataRead, int size) {
-  Storage *s = NULL;
+  uint8_t *data = NULL;
   
   Try {
     /* Waiting reply from probe */
-    while((s = readMemory(_session, address, size)) == NULL) {
+    while((data = readMemory(_session, address, size)) == NULL) {
       tlvService(_session);
     };
   } Catch(err) { Throw(err); }
   
-  if(size == WORD_SIZE)           {*dataRead = get4Byte(&s->data[0]);}
-  else if(size == HALFWORD_SIZE)  {*dataRead = get2Byte(&s->data[0]);}
-  else if(size == BYTE_SIZE)      {*dataRead = s->data[0];}
+  if(size == WORD_SIZE)           {*dataRead = get4Byte(data);}
+  else if(size == HALFWORD_SIZE)  {*dataRead = get2Byte(data);}
+  else if(size == BYTE_SIZE)      {*dataRead = *data;}
   
   return 1;
 }
 
-int memoryWrite(uint32_t address, uint32_t dataWrite, int size) {
-  uint8_t *data = (uint8_t *)&dataWrite;
+int memoryWrite(uint32_t address, uint32_t writeData, int size) {
 
   Try {
     /* Waiting reply from probe */
-    while(writeRam(_session, &data, &address, &size) != PROCESS_DONE) {
+    while(writeRam(_session, (uint8_t *)&writeData, address, size) != PROCESS_DONE) {
       tlvService(_session);
     }; 
   } Catch(err) { Throw(err); }
@@ -53,11 +52,10 @@ int memoryWrite(uint32_t address, uint32_t dataWrite, int size) {
 }
 
 int _flashWrite(uint32_t address, uint32_t writeData, int size) {
-  uint8_t *pData = (uint8_t *)&writeData;
   
   Try {
     /* Waiting reply from probe */
-    while(writeFlash(_session, &pData, &address, &size) != PROCESS_DONE) {
+    while(writeFlash(_session, (uint8_t *)&writeData, address, size) != PROCESS_DONE) {
       tlvService(_session);
     };
   } Catch(err) { Throw(err); }

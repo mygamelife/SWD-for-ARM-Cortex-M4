@@ -16,13 +16,10 @@ void test_memoryReadWord_should_continute_wait_until_data_is_return(void)
   int size = WORD_SIZE;
   uint32_t dataRead = 0, address = 0x20000000;
   uint8_t data[] = {0xEF, 0xBE, 0xAD, 0xDE};
-  Storage s;
-  
-  s.data = data;
   
   readMemory_ExpectAndReturn(_session, address, size, 0);
   tlvService_Expect(_session);
-  readMemory_ExpectAndReturn(_session, address, size, &s);
+  readMemory_ExpectAndReturn(_session, address, size, data);
   
 	int result = memoryRead(address, &dataRead, WORD_SIZE);
   
@@ -35,11 +32,8 @@ void test_memoryReadWord_should_read_memory_and_return_data_in_word(void)
   int size = WORD_SIZE;
   uint32_t dataRead = 0, address = 0x20000000;
   uint8_t data[] = {0xEF, 0xBE, 0xAD, 0xDE};
-  Storage s;
   
-  s.data = data;
-  
-  readMemory_ExpectAndReturn(_session, address, size, &s);
+  readMemory_ExpectAndReturn(_session, address, size, data);
   
 	int result = memoryRead(address, &dataRead, WORD_SIZE);
   
@@ -52,11 +46,8 @@ void test_memoryReadHalfword_should_read_memory_and_return_data_in_halfword(void
   int size = HALFWORD_SIZE;
   uint32_t address = 0x20000000, dataRead = 0;
   uint8_t data[] = {0xAA, 0xBB, 0xCC, 0xDD};
-  Storage s;
   
-  s.data = data;
-  
-  readMemory_ExpectAndReturn(_session, address, size, &s);
+  readMemory_ExpectAndReturn(_session, address, size, data);
   
 	int result = memoryRead(address, &dataRead, HALFWORD_SIZE);
   
@@ -69,11 +60,8 @@ void test_memoryReadByte_should_read_memory_and_return_data_in_byte(void)
   int size = BYTE_SIZE;
   uint32_t address = 0x20000000, dataRead = 0;
   uint8_t data[] = {0xAA, 0xBB, 0xCC, 0xDD};
-  Storage s;
   
-  s.data = data;
-  
-  readMemory_ExpectAndReturn(_session, address, size, &s);
+  readMemory_ExpectAndReturn(_session, address, size, data);
   
 	int result = memoryRead(address, &dataRead, BYTE_SIZE);
   
@@ -86,23 +74,23 @@ void test_memoryWriteWord_should_write_memory_in_word_and_return_1_if_success(vo
   int size = WORD_SIZE;
   uint32_t writeData = 0xBEEFCAFE, address = 0x20000000;
 
-  writeMemory_IgnoreAndReturn(PROCESS_DONE);
+  writeMemory_ExpectAndReturn(_session, (uint8_t *)&writeData, address, WORD_SIZE, TLV_WRITE_RAM, PROCESS_DONE);
 	int result = memoryWrite(address, writeData, WORD_SIZE);
   
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
 }
 
-// void test_memoryWriteHalfWord_should_write_memory_in_word_and_return_1_if_success(void)
-// {
-  // int size = HALFWORD_SIZE;
-  // uint32_t writeData = 0xCAFE, address = 0x20000000;
+void test_memoryWriteHalfWord_should_write_memory_in_word_and_return_1_if_success(void)
+{
+  int size = HALFWORD_SIZE;
+  uint32_t writeData = 0xCAFE, address = 0x20000000;
   
-  // uint8_t *p = (uint8_t *)&writeData;
-  // writeMemory_ExpectAndReturn(_session, (uint8_t *)&writeData, &address, &size, TLV_WRITE_RAM, PROCESS_DONE);
-	// int result = memoryWrite(address, writeData, HALFWORD_SIZE);
+  uint8_t *p = (uint8_t *)&writeData;
+  writeMemory_ExpectAndReturn(_session, (uint8_t *)&writeData, address, HALFWORD_SIZE, TLV_WRITE_RAM, PROCESS_DONE);
+	int result = memoryWrite(address, writeData, HALFWORD_SIZE);
   
-  // TEST_ASSERT_EQUAL(PROCESS_DONE, result);
-// }
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+}
 
 // void test_memoryWriteByte_should_write_memory_in_word_and_return_1_if_success(void)
 // {
