@@ -2,8 +2,9 @@
 CEXCEPTION_PATH = "vendor/ceedling/vendor/c_exception/lib"
 
 # Load build script to help build C program
-load "scripts/cbuild.rb"
-  
+load File.join(File.dirname(__FILE__), 'cbuild.rb')
+load File.join(File.dirname(__FILE__), 'target.rb')
+
 # Main dependency list
 main_dependency = {
   # depender                dependees
@@ -82,7 +83,7 @@ config = {
 
 namespace :host do
   desc 'Build brute release code'
-  task :release do
+  task :release => (['target:release']) do
     dep_list = compile_list(exception_dependency, CEXCEPTION_PATH, 'build/release/host/c', '.', config)
     dep_list.merge!(compile_all(['src/app/Tlv',                 # directory of dependee
                                  'src/Host/ElfReader', 
