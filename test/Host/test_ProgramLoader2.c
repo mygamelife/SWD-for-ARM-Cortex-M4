@@ -74,7 +74,6 @@ void test_eraseSection_should_load_flash_programmer_if_it_is_not_loaded_before_s
   
   printf(" ####################### Erase Section #######################\n");
   
-  isProgramExist_IgnoreAndReturn(VERIFY_FAILED);
   for(; i < 78; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
@@ -124,44 +123,6 @@ void test_reactiveProgram_should_update_pc_and_run_the_program(void)
   delProgram(p);
 }
 
-void test_eraseSection_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)
-{
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
-  
-  printf(" ####################### Erase Section #######################\n");
-  
-  isProgramExist_IgnoreAndReturn(VERIFY_PASSED);
-  eraseSection(session, 0x081C0000, 20000);
-  
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  eraseSection(session, 0x081C0000, 20000);
-  
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  eraseSection(session, 0x081C0000, 20000);
-  
-  /* Received reply */
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  eraseSection(session, 0x081C0000, 20000);
-  
-  TEST_ASSERT_EQUAL(0, isYielding);
-}
-
 void test_eraseAll_should_send_reactive_flashProgrammer_instead_of_reload_and_send_request(void)
 {
   int i = 0;
@@ -169,9 +130,7 @@ void test_eraseAll_should_send_reactive_flashProgrammer_instead_of_reload_and_se
 	Tlv_Session *session = tlvCreateSession();
 
   printf(" ####################### Mass Erase #######################\n");
-  isProgramExist_IgnoreAndReturn(VERIFY_PASSED);
-  
-  for(; i < 3; i++) {
+  for(; i < 78; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
@@ -193,8 +152,7 @@ void test_loadFlash_should_request_flash_erase_section_and_program_Size(void)
   Program *p = getLoadableSection("test/ElfFiles/ledFlash.elf");
   
   printf(" ####################### Load Flash #######################\n");
-  isProgramExist_IgnoreAndReturn(VERIFY_PASSED);
-  for(; i < 62; i++) {
+  for(; i < 106; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;

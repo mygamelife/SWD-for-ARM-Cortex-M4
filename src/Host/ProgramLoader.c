@@ -487,10 +487,11 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
     isProbeAlive(isTimeOut(FIVE_SECOND), tb);
     yield(tb);
   };
-    
   endTask(tb);
+  
   delProgram(p);
   resetSystemTime();
+  
   returnThis(PROCESS_DONE);
 }
 
@@ -502,45 +503,31 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   * Return  : NONE
   */
 Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
-  CEXCEPTION_T err;
   static Program *p;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
 
-  Try {
-    /* Start task */
-    startTask(tb);
-    /* Load Flash Programmer(FP) if it does not exist in target memory */
-    p = getLoadableSection(FP_PATH);
-    if(isProgramExist(session, p) == VERIFY_FAILED) {
-      await(loadRam(session, p), tb);
-      printf("Loaded FlashProgrammer.....\n");
-    }
-    else {
-      /* Re-activate flash programmer if it exist in target memory */
-      await(reactiveProgram(session, p), tb);
-    }
-    /* Send mass erase request to flash programmer */
-    tlvSendRequest(session, TLV_FLASH_MASS_ERASE, 1, (uint8_t *)&banks);
-    printf("sent request\n");
-    /* Waiting reply */
-    while((response = tlvReceive(session)) == NULL) {
-      /* Check is maximum timeout is reached */
-      isProbeAlive(isTimeOut(FORTY_SECOND), tb);
-      yield(tb);
-    };
-    delProgram(p);
-    endTask(tb);
-    resetSystemTime();
-    returnThis(PROCESS_DONE);
-  }
-  Catch(err) {
-    delProgram(p);
-    resetTask(tb);
-    Throw(err);
-  }
+  /* Start task */
+  startTask(tb);
+  p = getLoadableSection(FP_PATH);
+  /* Load Flash Programmer(FP) into target */
+  await(loadRam(session, p), tb);
+  /* Send mass erase request to flash programmer */
+  tlvSendRequest(session, TLV_FLASH_MASS_ERASE, 1, (uint8_t *)&banks);
+  /* Waiting reply */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    yield(tb);
+  };
+  endTask(tb);
+  
+  delProgram(p);
+  resetSystemTime();
+  
+  returnThis(PROCESS_DONE);
 }
 
 /** loadFlash is a function to load elf file and update PC

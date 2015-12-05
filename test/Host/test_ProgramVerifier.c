@@ -77,8 +77,6 @@ void test_isProgramExist_should_return_VERIFY_PASSED_if_program_is_same_as_actua
   delDataBlock_Expect(getProgramData(p, 3));
   readMemory_ExpectAndReturn(session, getProgramAddress(p, 4), getProgramSize(p, 4), getProgramData(p, 4));
   delDataBlock_Expect(getProgramData(p, 4));
-  readMemory_ExpectAndReturn(session, getProgramAddress(p, 5), getProgramSize(p, 5), getProgramData(p, 5));
-  delDataBlock_Expect(getProgramData(p, 5));
   
   int result = isProgramExist(session, p);
   
@@ -105,8 +103,6 @@ void test_isProgramExist_load_flash_program_should_return_VERIFY_PASSED_if_progr
   delDataBlock_Expect(getProgramData(p, 3));
   readMemory_ExpectAndReturn(session, getProgramAddress(p, 4), getProgramSize(p, 4), getProgramData(p, 4));
   delDataBlock_Expect(getProgramData(p, 4));
-  readMemory_ExpectAndReturn(session, getProgramAddress(p, 5), getProgramSize(p, 5), getProgramData(p, 5));
-  delDataBlock_Expect(getProgramData(p, 5));
   
   int result = isProgramExist(session, p);
   
