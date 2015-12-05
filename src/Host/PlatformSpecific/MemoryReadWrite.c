@@ -16,10 +16,10 @@ void initMemoryReadWrite(void) {
   if(_session == NULL)
     _session = tlvCreateSession();
     
-  do {
-    tlvService(_session);
-    loadRam(_session, FLASH_PROGRAMMER_FILE_PATH);
-  } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
+  // do {
+    // tlvService(_session);
+    // loadRam(_session, FP_PATH);
+  // } while(GET_FLAG_STATUS(_session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
 }
 
 int memoryRead(uint32_t address, uint32_t *dataRead, int size) {
@@ -65,7 +65,6 @@ int _flashWrite(uint32_t address, uint32_t writeData, int size) {
 
 int _flashErase(uint32_t address, int size) {
   int status = 0;
-  uint32_t buffer[] = {address, size};
   
   Try {
     while(eraseSection(_session, address, size) != PROCESS_DONE) {

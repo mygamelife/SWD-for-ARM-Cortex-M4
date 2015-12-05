@@ -20,6 +20,9 @@
 #include "MemoryReadWrite.h"
 #include "CoreDebugEx.h"
 #include "CoreDebug.h"
+#include "Yield.h"
+#include "LoadElf.h"
+#include "ProgramVerifier.h"
 
 int initFlag = 0;
 

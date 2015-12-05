@@ -3,8 +3,7 @@
 
 int main(void) {
   CEXCEPTION_T err;
-  Tlv_Session *session = NULL;
-  User_Session *userSession = NULL;
+  static Tlv_Session *session = NULL;
   
   displayOptionMenu();
   
@@ -18,9 +17,7 @@ int main(void) {
   
   while(!isExit(session)) {
     Try {
-      // printf("tlvService\n");
       tlvService(session);
-      // printf("hostInterpreter\n");
       hostInterpreter(session);
       // 
       // Receive packet and handle it here

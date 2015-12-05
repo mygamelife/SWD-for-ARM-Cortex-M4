@@ -278,16 +278,17 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
   static TaskBlock taskBlock = {.state = 0};
   static uint8_t *db;
   static uint32_t tAddress = 0;
-  static int index = 0, tSize = 0;
+  static int index, tSize = 0;
   TaskBlock *tb = &taskBlock;
   int i;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(tb);
-  
+
   /* Create temporary storage to store neccessary data
      to prevent lose track */
+  index = 0;
   db = createDataBlock(size);
   tSize = size;
   tAddress = address;
@@ -306,7 +307,6 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
       index++;
     }
   }
-
   resetSystemTime();
   /* End task */
   endTask(tb);
@@ -336,17 +336,17 @@ Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address
   static uint32_t tAddress = 0;
   static int tSize = 0;
   TaskBlock *tb = &taskBlock;
-  
+
   if(session == NULL) Throw(TLV_NULL_SESSION);
   /* Start tlv request task */
   startTask(tb);
-  
-  /* pData is a static pointer to keep track the original pointer 
+
+  /* pData is a static pointer to keep track the original pointer
      this pointer address will be shift after write data chunk */
   pData = data;
   tSize = size;
   tAddress = address;
-  
+
   while(tSize > 0) {
     /* Send tlv request */
     tlvWriteDataChunk(session, &pData, &tAddress, &tSize, memory);
@@ -366,139 +366,76 @@ Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address
 /** loadProgram is a function to load program into target memory
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           file is the file need to be load into target memory
+  *           Program is a structure contain all the loadable data, address and size
   *           memorySelect can be one of the following value :
   *            - TLV_WRITE_RAM
   *            - TLV_WRITE_FLASH
   *
   * Return  : NONE
   */
-int loadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect) {
+int loadProgram(Tlv_Session *session, Program *p, Tlv_Command memorySelect) {
   CEXCEPTION_T err;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
+  static int i = 0;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
+  assert(p != NULL);
 
   Try {
     /* Start tlv request task */
     startTask(tb);
 
-    if(fileStatus == FILE_CLOSED) getElfSection(file);
-
-    await(writeMemory(session, isr->dataAddress, isr->destAddress, isr->size, memorySelect), tb);
-    printf("ISR VECTOR...OK\n");
-    await(writeMemory(session, text->dataAddress, text->destAddress, text->size, memorySelect), tb);
-    printf("TEXT.........OK\n");
-    await(writeMemory(session, roData->dataAddress, roData->destAddress, roData->size, memorySelect), tb);
-    printf("RODATA.......OK\n");
-    await(writeMemory(session, initArray->dataAddress, initArray->destAddress, initArray->size, memorySelect), tb);
-    printf("INITARRAY....OK\n");
-    await(writeMemory(session, finiArray->dataAddress, finiArray->destAddress, finiArray->size, memorySelect), tb);
-    printf("FINIARRAY....OK\n");
-    await(writeMemory(session, data->dataAddress, data->destAddress, data->size, TLV_WRITE_RAM), tb);
-    printf("DATA.........OK\n");
+    for(; i < getProgramSectionSize(p); i++) {
+      // printf("i %d\n", i);
+      await(writeMemory(  session,
+                          getProgramData(p, i),                 /* get program data address */
+                          getProgramAddress(p, i),    /* get program destination address */
+                          getProgramSize(p, i),       /* get program section size */
+                          memorySelect
+                        ), tb);
+    }
+    i = 0;
 
     resetSystemTime();
     /* End task */
     endTask(tb);
-
-    closeElfFile();
     returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
-    closeElfFile();
     Throw(err);
   }
-}
-
-int isProgramExist(Tlv_Session *session, char *file) {
-  static TaskBlock taskBlock = {.state = 0};
-  static uint8_t *db;
-  TaskBlock *tb = &taskBlock;
-
-  int i;
-
-  /* Start task */
-  startTask(tb);
-  if(fileStatus == FILE_CLOSED) getElfSection(file);
-  await(db = readMemory(session, isr->destAddress, isr->size), tb);
-
-  /* Compare and verify */
-  printf("Verifying........ISR SECTION\n");
-  for(i = 0; i < isr->size; i++) {
-    if(db[i] != isr->dataAddress[i]) {
-      printf("%d, memoryData %x, actualData %x\n", i, get4Byte(&db[i]), get4Byte(&isr->dataAddress[i]));
-      resetTask(tb);
-      delDataBlock(db);
-      closeElfFile();
-      returnThis(PROCESS_DONE);
-    }
-  }
-
-  await(db = readMemory(session, text->destAddress, text->size), tb);
-
-  printf("Verifying........TEXT SECTION\n");
-  /* Compare and verify */
-  for(i = 0; i < text->size; i++) {
-    if(db[i] != text->dataAddress[i]) {
-      printf("%d, memoryData %x, actualData %x\n", i, db[i], isr->dataAddress[i]);
-      resetTask(tb);
-      delDataBlock(db);
-      closeElfFile();
-      returnThis(PROCESS_DONE);
-    }
-  }
-
-  // await(writeMemory(session, text->dataAddress, &text->destAddress, &text->size, memorySelect), tb);
-  // printf("TEXT.........OK\n");
-  // await(writeMemory(session, roData->dataAddress, &roData->destAddress, &roData->size, memorySelect), tb);
-  // printf("RODATA.......OK\n");
-  // await(writeMemory(session, initArray->dataAddress, &initArray->destAddress, &initArray->size, memorySelect), tb);
-  // printf("INITARRAY....OK\n");
-  // await(writeMemory(session, finiArray->dataAddress, &finiArray->destAddress, &finiArray->size, memorySelect), tb);
-  // printf("FINIARRAY....OK\n");
-  // await(writeMemory(session, data->dataAddress, &data->destAddress, &data->size, TLV_WRITE_RAM), tb);
-  // printf("DATA.........OK\n");
-
-  // printf("isr address %x, size %d\n", isr->destAddress, isr->size);
-  // printf("done reading\n");
-  endTask(tb);
-  delDataBlock(db);
-  closeElfFile();
-  returnThis(PROCESS_DONE);
 }
 
 /** loadRam is a function to load elf file and update PC
   * to the program entry addresss
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           file is the file need to be load into target memory
+  *           Program is a structure contain all the loadable data, address and size
   *
   * Return  : NONE
   */
-int loadRam(Tlv_Session *session, char *file) {
+int loadRam(Tlv_Session *session, Program *p) {
   CEXCEPTION_T err;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
-  if(session == NULL) Throw(TLV_NULL_SESSION);
+  assert(session != NULL);
+  assert(p != NULL);
 
   Try {
     /* Start task */
     startTask(tb);
-
     /* Load specified program */
-    await(loadProgram(session, file, TLV_WRITE_RAM), tb);
+    await(loadProgram(session, p, TLV_WRITE_RAM), tb);
     printf("Done loading.....\n");
     /* Update program counter */
-    await(writeRegister(session, PC, entryAddress), tb);
+    await(writeRegister(session, PC, getEntryAddress(p)), tb);
     printf("Update PC........\n");
     /* Run the program */
     await(run(session), tb);
     printf("Run Program......\n");
-
     /* End task */
     endTask(tb);
     resetSystemTime();
@@ -510,57 +447,33 @@ int loadRam(Tlv_Session *session, char *file) {
   }
 }
 
-/** loadFlash is a function to load elf file and update PC
-  * to the program entry addresss
+/** reactiveProgram is to re-active the existing program in target
+  * without reload the whole program
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           file is the file need to be load into target memory
+  *           Program is a structure contain all the loadable data, address and size
   *
-  * Return  : NONE
+  * return  : return PROCESS_DONE if the process is done
+  *           return 0 if process is on-going
   */
-int loadFlash(Tlv_Session *session, char *file) {
+Process_Status reactiveProgram(Tlv_Session *session, Program *p) {
   CEXCEPTION_T err;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
 
-  Try {
-    /* Start task */
-    startTask(tb);
-
-    if(programSize == 0)
-      programSize = getProgramSize(file);
-
-    /* Erase section */
-    await(eraseSection(session, FLASH_BEGIN_ADDRESS, programSize), tb);
-    programSize = 0;
-    printf("Done Erase.....\n");
-    /* Load actual program to flash */
-    await(loadProgram(session, file, TLV_WRITE_FLASH), tb);
-    printf("Loaded Actual Program.....\n");
-    /* Update program counter */
-    await(writeRegister(session, PC, entryAddress), tb);
-    printf("Update PC........\n");
-    /* Run the program */
-    await(run(session), tb);
-    printf("Run Program......\n");
-
-    /* Waiting reply */
-    while((response = tlvReceive(session)) == NULL) {
-      /* Check is maximum timeout is reached */
-      isProbeAlive(isTimeOut(FIVE_SECOND), tb);
-      yield(tb);
-    };
-
-    endTask(tb);
-    resetSystemTime();
-    returnThis(PROCESS_DONE);
-  }
-  Catch(err) {
-    resetTask(tb);
-    Throw(err);
-  }
+  /* Start task */
+  startTask(tb);
+  /* Set Program Counter to entry address and run the program */
+  printf("entry %x\n", getEntryAddress(p));
+  await(writeRegister(session, PC, getEntryAddress(p)), tb);
+  await(run(session), tb);
+  printf("Program Successfully re-activate\n");
+  /* End task */
+  endTask(tb);
+  resetSystemTime();
+  returnThis(PROCESS_DONE);
 }
 
 /** eraseSection is a function to erase flash section by section
@@ -574,6 +487,7 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   CEXCEPTION_T err;
   uint32_t data[] = {address, size};
   static TaskBlock taskBlock = {.state = 0};
+  static Program *p;
   TaskBlock *tb = &taskBlock;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
@@ -581,25 +495,31 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   Try {
     /* Start task */
     startTask(tb);
-    /* Load Flash Programmer */
-    await(loadRam(session, FLASH_PROGRAMMER_FILE_PATH), tb);
-    printf("Loaded FlashProgrammer.....\n");
-
+    /* Load Flash Programmer(FP) if it does not exist in target memory */
+    p = getLoadableSection(FP_PATH);
+    if(isProgramExist(session, p) == VERIFY_FAILED) {
+      await(loadRam(session, p), tb);
+      printf("Loaded FlashProgrammer.....\n");
+    }
+    else {
+      /* Re-activate flash programmer if it exist in target memory */
+      await(reactiveProgram(session, p), tb);
+    }
+    /* Send section erase request to flash programmer */
     tlvSendRequest(session, TLV_FLASH_ERASE, 8, (uint8_t *)data);
-    printf("size %d\n", get4Byte(&session->txBuffer[6]));
-    printf("Sent Request.....\n");
     /* Waiting reply */
     while((response = tlvReceive(session)) == NULL) {
       /* Check is maximum timeout is reached */
       isProbeAlive(isTimeOut(FIVE_SECOND), tb);
       yield(tb);
     };
-
+    delProgram(p);
     endTask(tb);
     resetSystemTime();
     returnThis(PROCESS_DONE);
   }
   Catch(err) {
+    delProgram(p);
     resetTask(tb);
     Throw(err);
   }
@@ -608,11 +528,61 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
 /** eraseAll is a function used to erase flash by selecting bank
   *
   * Input   : session contain a element/handler used by tlv protocol
-  *           file is the file need to be load into target memory
+  *           banks is flash memory bank that want to be erase
   *
   * Return  : NONE
   */
 Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
+  CEXCEPTION_T err;
+  static Program *p;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  Try {
+    /* Start task */
+    startTask(tb);
+    /* Load Flash Programmer(FP) if it does not exist in target memory */
+    p = getLoadableSection(FP_PATH);
+    if(isProgramExist(session, p) == VERIFY_FAILED) {
+      await(loadRam(session, p), tb);
+      printf("Loaded FlashProgrammer.....\n");
+    }
+    else {
+      /* Re-activate flash programmer if it exist in target memory */
+      await(reactiveProgram(session, p), tb);
+    }
+    /* Send mass erase request to flash programmer */
+    tlvSendRequest(session, TLV_FLASH_MASS_ERASE, 1, (uint8_t *)&banks);
+    printf("sent request\n");
+    /* Waiting reply */
+    while((response = tlvReceive(session)) == NULL) {
+      /* Check is maximum timeout is reached */
+      isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+      yield(tb);
+    };
+    delProgram(p);
+    endTask(tb);
+    resetSystemTime();
+    returnThis(PROCESS_DONE);
+  }
+  Catch(err) {
+    delProgram(p);
+    resetTask(tb);
+    Throw(err);
+  }
+}
+
+/** loadFlash is a function to load elf file and update PC
+  * to the program entry addresss
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           Program is a structure contain all the loadable data, address and size
+  *
+  * Return  : NONE
+  */
+int loadFlash(Tlv_Session *session, Program *p) {
   CEXCEPTION_T err;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
@@ -622,20 +592,18 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   Try {
     /* Start task */
     startTask(tb);
-    /* Load Flash Programmer */
-    await(loadRam(session, FLASH_PROGRAMMER_FILE_PATH), tb);
-    printf("Loaded FlashProgrammer.....\n");
-
-    tlvSendRequest(session, TLV_FLASH_MASS_ERASE, 1, (uint8_t *)&banks);
-    printf("banks %d\n", session->txBuffer[2]);
-    printf("Sent Request.....\n");
-    /* Waiting reply */
-    while((response = tlvReceive(session)) == NULL) {
-      /* Check is maximum timeout is reached */
-      isProbeAlive(isTimeOut(FORTY_SECOND), tb);
-      yield(tb);
-    };
-
+    /* Erase section */
+    await(eraseSection(session, FLASH_BEGIN_ADDRESS, getTotalProgramSize(p)), tb);
+    printf("Done Erase.....\n");
+    /* Load actual program to flash */
+    await(loadProgram(session, p, TLV_WRITE_FLASH), tb);
+    printf("Loaded Actual Program.....\n");
+    /* Update program counter */
+    await(writeRegister(session, PC, getEntryAddress(p)), tb);
+    printf("Update PC........\n");
+    /* Run the program */
+    await(run(session), tb);
+    printf("Run Program......\n");
     endTask(tb);
     resetSystemTime();
     returnThis(PROCESS_DONE);
@@ -646,21 +614,34 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   }
 }
 
-// /** tlvSetBreakpoint is a function to set breakpoint
-  // * at specified address
-  // *
-  // * Input   : session contain a element/handler used by tlv protocol
-  // *           address is the address want to be stop at
-  // *
-  // * Return  : NONE
-  // */
-// void tlvSetBreakpoint(Tlv_Session *session, uint32_t address) {
-  // if(session == NULL) Throw(TLV_NULL_SESSION);
+/** setBreakpoint is a function to set breakpoint
+  * at specified address
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           address is the address want to be stop at
+  *
+  * Return  : NONE
+  */
+Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
 
-  // Tlv *tlv = tlvCreatePacket(TLV_BREAKPOINT, 4, (uint8_t *)&address);
+  if(session == NULL) Throw(TLV_NULL_SESSION);
 
-  // tlvSend(session, tlv);
-// }
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_BREAKPOINT, 4, (uint8_t *)&address);
+  /* Waiting reply */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  resetSystemTime();
+  returnThis(PROCESS_DONE);
+}
 
 /** tlvWaitDebugEvents is a function to send expected event
   * to probe and wait for event to happen
@@ -705,11 +686,11 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
   * Return  : NONE
   */
 int selectCommand(Tlv_Session *session, User_Session *us) {
-  
+
   switch(userSession->tlvCommand) {
     case TLV_WRITE_RAM          : writeRam(session, (uint8_t *)us->data, us->address, us->size);    break;
-    case TLV_LOAD_RAM           : loadRam(session, us->fileName);                                   break;
-    case TLV_LOAD_FLASH         : loadFlash(session, us->fileName);                                 break;
+    case TLV_LOAD_RAM           : loadRam(session, us->program);                                    break;
+    case TLV_LOAD_FLASH         : loadFlash(session, us->program);                                  break;
     case TLV_READ_MEMORY        : readMemory(session, us->address, us->size);                       break;
     case TLV_WRITE_REGISTER     : writeRegister(session, us->address, us->data[0]);                 break;
     case TLV_READ_REGISTER      : readRegister(session, us->address);                               break;
@@ -718,7 +699,7 @@ int selectCommand(Tlv_Session *session, User_Session *us) {
     case TLV_STEP               : multipleStep(session, us->data[0]);                               break;
     case TLV_FLASH_ERASE        : eraseSection(session, us->address, us->size);                     break;
     case TLV_FLASH_MASS_ERASE   : eraseAll(session, us->address);                                   break;
-    // case TLV_BREAKPOINT         : tlvSetBreakpoint(session, userSession->address);               break;
+    case TLV_BREAKPOINT         : setBreakpoint(session, us->address);                           break;
     case TLV_SOFT_RESET         : softReset(session);                                               break;
     case TLV_HARD_RESET         : hardReset(session);                                               break;
     case TLV_EXIT               : systemExit(session);                                              break;
@@ -738,12 +719,12 @@ int hostInterpreter(Tlv_Session *session) {
     await(selectCommand(session, userSession), tb);
     endTask(tb);
 
-    deleteUserSession(userSession);
+    delUserSession(userSession);
     returnThis(PROCESS_DONE);
   }
   Catch(err) {
     resetTask(tb);
-    deleteUserSession(userSession);
+    delUserSession(userSession);
     Throw(err);
   }
 }
@@ -751,8 +732,7 @@ int hostInterpreter(Tlv_Session *session) {
 uint8_t *createDataBlock(int size) {
   uint8_t *dataBlock;
   dataBlock = malloc(size * sizeof(uint8_t));
-
-  if(dataBlock == NULL) printf("Failed to create storage\n");
+  assert(dataBlock != NULL);
 
   return dataBlock;
 }
@@ -760,5 +740,6 @@ uint8_t *createDataBlock(int size) {
 void delDataBlock(uint8_t *dataBlock) {
   if(dataBlock != NULL) {
     free(dataBlock);
+    dataBlock = NULL;
   }
 }

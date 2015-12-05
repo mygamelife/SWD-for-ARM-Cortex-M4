@@ -12,14 +12,16 @@
 #include "CustomAssertion.h"
 #include "SystemTime.h"
 #include "Yield.h"
+#include "LoadElf.h"
 #include "mock_Uart.h"
 #include "mock_Interface.h"
+#include "mock_ProgramVerifier.h"
 
 void setUp(void)  {}
 
 void tearDown(void) {}
 
-void test_readMemory_should_read_without_pointer_address_and_size(void) {
+void test_readMemory_should_read_store_the_finished_read_block_and_cont_until_size_is_0(void) {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
   
@@ -63,28 +65,146 @@ void test_readMemory_should_read_without_pointer_address_and_size(void) {
   delDataBlock(db);
 }
 
-void Xtest_isProgramExit(void)
+void test_eraseSection_should_load_flash_programmer_if_it_is_not_loaded_before_sending_request(void)
+{
+  int i = 0;
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
+  
+  printf(" ####################### Erase Section #######################\n");
+  
+  isProgramExist_IgnoreAndReturn(VERIFY_FAILED);
+  for(; i < 78; i++) {
+    /* Received reply */
+    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+    session->rxBuffer[0] = TLV_OK;
+    session->rxBuffer[1] = 1;
+    session->rxBuffer[2] = 0;
+
+    eraseSection(session, 0x081C0000, 20000);
+  }
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+}
+
+void test_reactiveProgram_should_update_pc_and_run_the_program(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-
+  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
+  
+  int result = reactiveProgram(session, p);
+  
+  TEST_ASSERT_EQUAL(0, result);
+  TEST_ASSERT_EQUAL(1, isYielding);
+  
   /* Received reply */
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
+  /* Set PC to entry Address */
+  result = reactiveProgram(session, p);
   
-  isProgramExist(session, "test/ElfFiles/ledRam.elf");
-
+  TEST_ASSERT_EQUAL(0, result);
+  TEST_ASSERT_EQUAL(1, isYielding);
+  
   /* Received reply */
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
+  /* Send request to run the program */
+  result = reactiveProgram(session, p);
   
-  isProgramExist(session, "test/ElfFiles/ledRam.elf");
+  TEST_ASSERT_EQUAL(1, result);
+  TEST_ASSERT_EQUAL(0, isYielding);
+  
+  delProgram(p);
+}
+
+void test_eraseSection_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
+  
+  printf(" ####################### Erase Section #######################\n");
+  
+  isProgramExist_IgnoreAndReturn(VERIFY_PASSED);
+  eraseSection(session, 0x081C0000, 20000);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+
+  eraseSection(session, 0x081C0000, 20000);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+
+  eraseSection(session, 0x081C0000, 20000);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
+
+  eraseSection(session, 0x081C0000, 20000);
   
   TEST_ASSERT_EQUAL(0, isYielding);
-  // TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+}
+
+void test_eraseAll_should_send_reactive_flashProgrammer_instead_of_reload_and_send_request(void)
+{
+  int i = 0;
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+
+  printf(" ####################### Mass Erase #######################\n");
+  isProgramExist_IgnoreAndReturn(VERIFY_PASSED);
+  
+  for(; i < 3; i++) {
+    /* Received reply */
+    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+    session->rxBuffer[0] = TLV_OK;
+    session->rxBuffer[1] = 1;
+    session->rxBuffer[2] = 0;
+
+    eraseAll(session, BOTH_BANK);
+  }
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+}
+
+void test_loadFlash_should_request_flash_erase_section_and_program_Size(void)
+{
+  int i = 0;
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+
+  Program *p = getLoadableSection("test/ElfFiles/ledFlash.elf");
+  
+  printf(" ####################### Load Flash #######################\n");
+  isProgramExist_IgnoreAndReturn(VERIFY_PASSED);
+  for(; i < 62; i++) {
+    /* Received reply */
+    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+    session->rxBuffer[0] = TLV_OK;
+    session->rxBuffer[1] = 1;
+    session->rxBuffer[2] = 0;
+
+    loadFlash(session, p);    
+  }
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+  
+  delProgram(p);
 }

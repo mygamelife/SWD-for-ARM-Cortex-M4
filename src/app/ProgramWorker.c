@@ -455,7 +455,7 @@ int breakpointEventHandler(Tlv_Session *session)
   uint32_t pc =0 ;
 
   if(!hasBreakpointDebugEventOccured())
-    return ;
+    return 0;
   else
   {
     pc = readCoreRegister(CORE_REG_PC);
@@ -485,7 +485,7 @@ int watchpointEventHandler(Tlv_Session *session)
   uint32_t pc =0 ;
 
   if(!(hasDataWatchpointOccurred())) {
-	  return;
+	  return 0;
   }
   else
   {
@@ -764,11 +764,12 @@ int selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
-    case TLV_DEBUG_EVENTS               : debugEventHandler(session, tlv->value[0]);                                                  break;
+    case TLV_DEBUG_EVENTS               : debugEventHandler(session, tlv->value[0]);                                                break;
     case TLV_VERIFY_COM_PORT            : comPortVerification(session);                                                             break;
 
     default : break;
   }
+  return 0;
 }
 
 /** taskManager is a function to handle the coming tlv packet and interpret it
@@ -782,17 +783,17 @@ int taskManager(Tlv_Session *session)  {
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
+  startTask(tb);
   Try {
-    startTask(tb);
     /* Wait packet to arrive */
     while((packet = tlvReceive(session)) == NULL) { yield(tb); }
     /* Wait for task to complete */
     await(selectTask(session, packet), tb);
-    endTask(tb);
-    returnThis(1);
   }
   Catch(err) {
     resetTask(tb);
     Throw(err);
   }
+  endTask(tb);
+  returnThis(1);
 }

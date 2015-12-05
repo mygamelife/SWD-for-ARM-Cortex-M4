@@ -130,7 +130,7 @@ void userLoadProgram(User_Session *us, String *userInput)  {
   else if(strcmp(memory->name, "flash") == 0)   us->tlvCommand = TLV_LOAD_FLASH;
   else Throw(ERR_INVALID_MEMORY_SELECTION);
 
-  us->fileName = iden->name;
+  us->program = getLoadableSection(iden->name);
 }
 
 /** userWriteMemory is a function to get write data into
@@ -623,7 +623,7 @@ User_Session *createNewUserSession(void) {
 
   us->size        = 0;
   us->address     = 0;
-  us->fileName    = NULL;
+  us->program     = NULL;
   us->tlvCommand  = 0;
 
   memset(us->data, 0, sizeof(us->data));
@@ -631,8 +631,9 @@ User_Session *createNewUserSession(void) {
   return us;
 }
 
-void deleteUserSession(User_Session *us) {
+void delUserSession(User_Session *us) {
   if(us != NULL) {
+    delProgram(us->program);
     free(us);
     us = NULL;
   }

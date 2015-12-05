@@ -3,13 +3,14 @@
 
 #include <malloc.h>
 #include <string.h>
+#include <assert.h>
 #include "Tlv.h"
 #include "Yield.h"
-#include "GetHeaders.h"
 #include "ErrorCode.h"
 #include "CException.h"
 #include "Interface.h"
 #include "SystemTime.h"
+#include "ProgramVerifier.h"
 
 typedef enum {
   PROCESS_BUSY = 0,
@@ -17,9 +18,10 @@ typedef enum {
 } Process_Status;
 
 #if defined(TEST)
-#define FLASH_PROGRAMMER_FILE_PATH    "test/ElfFiles/FlashProgrammer.elf"
+/* Flash Programmer File Path */
+#define FP_PATH    "test/ElfFiles/FlashProgrammer.elf"
 #else
-#define FLASH_PROGRAMMER_FILE_PATH    "target/FlashProgrammer.elf"
+#define FP_PATH    "target/FlashProgrammer.elf"
 #endif
 
 /* ##### Host Interpreter Macros ##### */
@@ -59,18 +61,17 @@ Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address
 uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size);
 
 /* Write/Load Flash and RAM */
-int loadProgram(Tlv_Session *session, char *file, Tlv_Command memorySelect);
-int loadRam(Tlv_Session *session, char *file);
-int loadFlash(Tlv_Session *session, char *file);
-int isProgramExist(Tlv_Session *session, char *file);
+int loadProgram(Tlv_Session *session, Program *p, Tlv_Command memorySelect);
+int loadRam(Tlv_Session *session, Program *p);
+int loadFlash(Tlv_Session *session, Program *p);
+Process_Status reactiveProgram(Tlv_Session *session, Program *p);
 Process_Status _writeFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
-
 /* Flash Erase */
 Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size);
 Process_Status eraseAll(Tlv_Session *session, uint32_t banks);
 
 /* Set Breakpoint */
-void tlvSetBreakpoint(Tlv_Session *session, uint32_t address);
+Process_Status setBreakpoint(Tlv_Session *session, uint32_t address);
 
 /* Remove Breakpoint */
 

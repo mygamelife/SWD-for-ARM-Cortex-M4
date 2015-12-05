@@ -8,6 +8,9 @@
 #include "FileToken.h"
 #include "Interface.h"
 #include "ErrorCode.h"
+#include "LoadElf.h"
+#include "GetHeaders.h"
+#include "Read_File.h"
 
 void setUp(void)  {}
 
@@ -20,7 +23,7 @@ void test_createNewUserSession_should_initialize_all_neccessary_information(void
   User_Session *us = createNewUserSession();
 
   TEST_ASSERT_NOT_NULL(us);
-  TEST_ASSERT_NULL(us->fileName);
+  TEST_ASSERT_NULL(us->program);
   TEST_ASSERT_EQUAL(0, us->size);
   TEST_ASSERT_EQUAL(0, us->address);
   TEST_ASSERT_EQUAL(0, us->tlvCommand);
@@ -42,7 +45,7 @@ void test_userWriteRegister_user_should_enter_wreg_register_address_and_value(vo
   TEST_ASSERT_EQUAL_HEX32(0xabcd, us->data[0]);
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userWriteRegister_should_throw_error_if_user_didnt_enter_register_address(void)
@@ -59,7 +62,7 @@ void test_userWriteRegister_should_throw_error_if_user_didnt_enter_register_addr
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userWriteRegister_should_throw_error_if_user_didnt_enter_anything(void)
@@ -76,7 +79,7 @@ void test_userWriteRegister_should_throw_error_if_user_didnt_enter_anything(void
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userReadRegister_should_throw_error_if_user_didnt_enter_register_address(void)
@@ -93,7 +96,7 @@ void test_userReadRegister_should_throw_error_if_user_didnt_enter_register_addre
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userReadRegister_should_acquire_info_enter_by_user(void)
@@ -107,7 +110,7 @@ void test_userReadRegister_should_acquire_info_enter_by_user(void)
   TEST_ASSERT_EQUAL(R0, us->address);
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userReadRegister_given_invalid_register_address_should_throw_an_error(void)
@@ -124,7 +127,7 @@ void test_userReadRegister_given_invalid_register_address_should_throw_an_error(
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userStepTarget_should_throw_error_when_number_of_step_is_not_number(void)
@@ -141,7 +144,7 @@ void test_userStepTarget_should_throw_error_when_number_of_step_is_not_number(vo
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userStepTarget_should_get_step_insturction_and_number_of_step(void)
@@ -155,7 +158,7 @@ void test_userStepTarget_should_get_step_insturction_and_number_of_step(void)
   TEST_ASSERT_EQUAL(1000, us->data[0]);
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userReadMemory_should_throw_error_when_address_is_not_in_number(void)
@@ -172,7 +175,7 @@ void test_userReadMemory_should_throw_error_when_address_is_not_in_number(void)
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userReadMemory_should_get_address_and_size(void)
@@ -187,21 +190,7 @@ void test_userReadMemory_should_get_address_and_size(void)
   TEST_ASSERT_EQUAL(255, us->size);
 
   stringDel(str);
-  deleteUserSession(us);
-}
-
-void test_userLoadProgram_should_get_load_instruction_memory_selection_and_file_path(void)
-{
-  String *str = stringNew("load ram C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test");
-  User_Session *us = createNewUserSession();
-
-  InterpreteCommand(us, str);
-
-  TEST_ASSERT_EQUAL(TLV_LOAD_RAM, us->tlvCommand);
-  TEST_ASSERT_EQUAL_STRING("C:/Users/susan_000/Projects/SWD-for-ARM-Cortex-M4/Host/test", us->fileName);
-
-  stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userLoadProgram_should_throw_an_error_if_path_name_is_invalid(void)
@@ -217,7 +206,7 @@ void test_userLoadProgram_should_throw_an_error_if_path_name_is_invalid(void)
   }
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userRunTarget_should_get_run_command(void)
@@ -230,7 +219,7 @@ void test_userRunTarget_should_get_run_command(void)
   TEST_ASSERT_EQUAL(TLV_RUN_TARGET, us->tlvCommand);
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userHaltTarget_should_get_halt_command(void)
@@ -243,7 +232,7 @@ void test_userHaltTarget_should_get_halt_command(void)
   TEST_ASSERT_EQUAL(TLV_HALT_TARGET, us->tlvCommand);
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userWriteMemory_should_get_data_address_and_size(void)
@@ -261,7 +250,7 @@ void test_userWriteMemory_should_get_data_address_and_size(void)
   TEST_ASSERT_EQUAL_HEX32(0xbeef, us->data[3]);
 
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userSetBreakpoint_should_get_address_need_to_be_set_break_point(void)
@@ -275,7 +264,7 @@ void test_userSetBreakpoint_should_get_address_need_to_be_set_break_point(void)
   TEST_ASSERT_EQUAL(0x20000000, us->address);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userErase_should_get_erase_section_option(void)
@@ -290,7 +279,7 @@ void test_userErase_should_get_erase_section_option(void)
   TEST_ASSERT_EQUAL(20, us->size);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userErase_should_get_erase_bank_1_option(void)
@@ -304,7 +293,7 @@ void test_userErase_should_get_erase_bank_1_option(void)
   TEST_ASSERT_EQUAL(BANK_1, us->address);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userErase_should_get_erase_bank_2_option(void)
@@ -318,7 +307,7 @@ void test_userErase_should_get_erase_bank_2_option(void)
   TEST_ASSERT_EQUAL(BANK_2, us->address);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userErase_should_get_erase_full_option(void)
@@ -332,7 +321,7 @@ void test_userErase_should_get_erase_full_option(void)
   TEST_ASSERT_EQUAL(BOTH_BANK, us->address);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userErase_should_throw_error(void)
@@ -348,7 +337,7 @@ void test_userErase_should_throw_error(void)
   }
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userReset_should_get_reset_option(void)
@@ -361,7 +350,7 @@ void test_userReset_should_get_reset_option(void)
   TEST_ASSERT_EQUAL(TLV_HARD_RESET, us->tlvCommand);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_userExit_should_get_exit_command(void)
@@ -374,7 +363,7 @@ void test_userExit_should_get_exit_command(void)
   TEST_ASSERT_EQUAL(TLV_EXIT, us->tlvCommand);
   
   stringDel(str);
-  deleteUserSession(us);
+  delUserSession(us);
 }
 
 void test_displayMemoryMap_given_address_and_value(void)

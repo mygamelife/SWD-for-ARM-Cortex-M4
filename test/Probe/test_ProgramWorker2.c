@@ -4,6 +4,7 @@
 #include "ProgramWorker.h"
 #include "ErrorCode.h"
 #include "CoreDebugEx.h"
+#include "Yield.h"
 #include "mock_IoOperations.h"
 #include "mock_Uart.h"
 #include "mock_CoreDebug.h"

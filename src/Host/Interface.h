@@ -8,6 +8,7 @@
 #include <malloc.h>
 #include "Token.h"
 #include "Tlv.h"
+#include "LoadElf.h"
 #include "ErrorCode.h"
 
 #define INPUT_BUFFER_SIZE 2048
@@ -17,7 +18,7 @@ typedef struct
   int size;
   uint32_t data[INPUT_BUFFER_SIZE];
   uint32_t address;
-  char *fileName;
+  Program *program;
   Tlv_Command tlvCommand;
 } User_Session;
 
@@ -126,5 +127,5 @@ void userSectionErase(User_Session *us, String *userInput);
 void userReset(User_Session *us, String *userInput);
 void userExit(User_Session *us);
 
-void deleteUserSession(User_Session *us);
+void delUserSession(User_Session *us);
 #endif // Interface_H

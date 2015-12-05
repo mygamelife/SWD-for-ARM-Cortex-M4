@@ -225,7 +225,7 @@ void tlvReadDataChunk(Tlv_Session *session, uint32_t *destAddress, int *size) {
   */
 void tlvWriteDataChunk(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect) {
   Tlv *tlv; 
-  uint8_t chksum = 0; uint32_t tempAddress;
+  uint8_t chksum = 0;
   int tSize = 0;
   
   // printf("address %x, size %d, data %x\n", *destAddress, *size, get4Byte(*dataAddress));

@@ -12,8 +12,10 @@
 #include "CustomAssertion.h"
 #include "SystemTime.h"
 #include "Yield.h"
+#include "LoadElf.h"
 #include "mock_Uart.h"
 #include "mock_Interface.h"
+#include "mock_ProgramVerifier.h"
 
 void setUp(void)  {}
 
@@ -226,7 +228,8 @@ void test_tlvReadTargetMemory_should_request_read_memory_and_return_data_block(v
   uint32_t address = 0x20000000;
 
   db = readMemory(session, address, size);
-
+  
+  TEST_ASSERT_EQUAL(1, isYielding);
   TEST_ASSERT_NULL(db);
 
   /* Received reply */
@@ -237,6 +240,7 @@ void test_tlvReadTargetMemory_should_request_read_memory_and_return_data_block(v
 
   db = readMemory(session, address, size);
 
+  TEST_ASSERT_EQUAL(0, isYielding);
   TEST_ASSERT_NOT_NULL(db);
   TEST_ASSERT_EQUAL_HEX32(0x11111111, get4Byte(&db[0]));
   TEST_ASSERT_EQUAL_HEX32(0x22222222, get4Byte(&db[4]));
@@ -340,6 +344,10 @@ void test_writeMemory_should_write_the_updated_data_instead_of_start_from_starti
   data[248] = 0xcc; data[249] = 0xcc; data[250] = 0xcc; data[251] = 0xcc;
   int size = 250;
   
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 1;
+  session->rxBuffer[2] = 0;
   writeMemory(session, data, address, size, TLV_WRITE_RAM);
 
   /* Received reply */
@@ -350,18 +358,20 @@ void test_writeMemory_should_write_the_updated_data_instead_of_start_from_starti
   
   writeMemory(session, data, address, size, TLV_WRITE_RAM);
 
-  TEST_ASSERT_EQUAL(1, isYielding);
+  TEST_ASSERT_EQUAL(0, isYielding);
 }
 
 void test_loadProgram_should_load_all_section_of_the_program(void)
 {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-
+  
   int i = 0;
   
   printf("###################### LOADING PROGRAM ledRam.elf ######################\n");
-  for(; i < 25; i++) {
+  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
+  
+  for(; i < 26; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
@@ -369,10 +379,12 @@ void test_loadProgram_should_load_all_section_of_the_program(void)
     session->rxBuffer[2] = 0;
 
     /* Loading Program */
-    loadProgram(session, "test/ElfFiles/ledRam.elf", TLV_WRITE_RAM);
+    loadProgram(session, p, TLV_WRITE_RAM);
   }
 
   TEST_ASSERT_EQUAL(0, isYielding);
+  
+  delProgram(p);
 }
 
 void test_loadRam_should_load_program_update_pc_and_run_the_program(void)
@@ -381,8 +393,8 @@ void test_loadRam_should_load_program_update_pc_and_run_the_program(void)
 
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
+  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
 
-  printf("Load to Ram\n");
   for(; i < 28; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
@@ -391,77 +403,12 @@ void test_loadRam_should_load_program_update_pc_and_run_the_program(void)
     session->rxBuffer[2] = 0;
 
     /* Load Data Section */
-    loadRam(session, "test/ElfFiles/ledRam.elf");
+    loadRam(session, p);
   }
 
   TEST_ASSERT_EQUAL(0, isYielding);
-}
-
-void test_eraseSection_should_send_flash_erase_request_if_flash_programmer_is_loaded(void)
-{
-  int i = 0;
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
   
-  fileStatus = FILE_CLOSED;
-  
-  printf(" ####################### Erase Section #######################\n");
-  
-  for(; i < 78; i++) {
-    /* Received reply */
-    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-    session->rxBuffer[0] = TLV_OK;
-    session->rxBuffer[1] = 1;
-    session->rxBuffer[2] = 0;
-
-    eraseSection(session, 0x081C0000, 20000);
-  }
-  
-  TEST_ASSERT_EQUAL(0, isYielding);
-}
-
-void test_loadFlash_should_request_flash_erase_section_and_program_Size(void)
-{
-  int i = 0;
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  fileStatus = FILE_CLOSED;
-
-  printf(" ####################### Load Flash #######################\n");
-  for(; i < 107; i++) {
-    /* Received reply */
-    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-    session->rxBuffer[0] = TLV_OK;
-    session->rxBuffer[1] = 1;
-    session->rxBuffer[2] = 0;
-
-    loadFlash(session, "test/ElfFiles/ledFlash.elf");    
-  }
-  
-  TEST_ASSERT_EQUAL(0, isYielding);
-}
-
-void test_eraseAll_should_send_flash_mass_erase_request(void)
-{
-  int i = 0;
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  fileStatus = FILE_CLOSED;
-
-  printf(" ####################### Mass Erase #######################\n");
-  for(; i < 78; i++) {
-    /* Received reply */
-    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-    session->rxBuffer[0] = TLV_OK;
-    session->rxBuffer[1] = 1;
-    session->rxBuffer[2] = 0;
-
-    eraseAll(session, BOTH_BANK);
-  }
-  
-  TEST_ASSERT_EQUAL(0, isYielding);
+  delProgram(p);
 }
 
 void test_tlvWaitDebugEvents_by_sending_specific_event_and_wait_for_reply(void) {
@@ -491,19 +438,29 @@ void test_tlvWaitDebugEvents_by_sending_specific_event_and_wait_for_reply(void) 
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
-// void test_tlvSetBreakpoint_should_send_tlv_set_breakpoint_request(void)
-// {
-  // HANDLE hSerial;
-  // uartInit_IgnoreAndReturn(hSerial);
-	// Tlv_Session *session = tlvCreateSession();
+void test_setBreakpoint_should_send_tlv_set_breakpoint_request(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
 
-  // tlvSetBreakpoint(session, 0xabcdabcd);
-
-  // TEST_ASSERT_EQUAL(TLV_BREAKPOINT, session->txBuffer[0]);
-  // TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
-  // TEST_ASSERT_EQUAL_HEX32(0xabcdabcd, get4Byte(&session->txBuffer[2]));
-  // TEST_ASSERT_EQUAL_HEX8(0x10, session->txBuffer[6]);
-// }
+  setBreakpoint(session, 0xabcdabcd);
+  TEST_ASSERT_EQUAL(1, isYielding);
+  
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 2;
+  session->rxBuffer[2] = BREAKPOINT_EVENT;
+  session->rxBuffer[3] = 0xFF;
+  
+  setBreakpoint(session, 0xabcdabcd);
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+  TEST_ASSERT_EQUAL(TLV_BREAKPOINT, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(5, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0xabcdabcd, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX8(0x10, session->txBuffer[6]);
+}
 
 /** ==============================================================================
                       ######## Test For Host Interpreter ########
@@ -548,7 +505,7 @@ void test_hostInterpreter_by_requesting_tlv_write_ram_memory(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  deleteUserSession_Expect(&userSession);
+  delUserSession_Expect(&userSession);
   hostInterpreter(session);
 
   TEST_ASSERT_EQUAL(0, isYielding);
@@ -582,7 +539,7 @@ void test_hostInterpreter_by_requesting_tlv_write_register(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  deleteUserSession_Expect(&userSession);
+  delUserSession_Expect(&userSession);
   hostInterpreter(session);
 
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
@@ -614,7 +571,7 @@ void test_hostInterpreter_by_requesting_tlv_read_register(void)
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  deleteUserSession_Expect(&userSession);
+  delUserSession_Expect(&userSession);
   hostInterpreter(session);
 
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
@@ -635,6 +592,7 @@ void test_hostInterpreter_should_call_flash_mass_erase_if_flash_programmer_is_lo
 
   printf("######################## Host interpreter #################### \n");
   
+  isProgramExist_IgnoreAndReturn(VERIFY_FAILED);
   for(; i < 77; i++) {
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
@@ -643,19 +601,20 @@ void test_hostInterpreter_should_call_flash_mass_erase_if_flash_programmer_is_lo
 
     hostInterpreter(session);    
   }
+  TEST_ASSERT_EQUAL(1, isYielding);
   
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
   session->rxBuffer[0] = TLV_OK;
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
   
-  deleteUserSession_Expect(&userSession);
+  delUserSession_Expect(&userSession);
   hostInterpreter(session);
   
+  TEST_ASSERT_EQUAL(0, isYielding);
   TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
   TEST_ASSERT_EQUAL(2, session->txBuffer[1]);
   TEST_ASSERT_EQUAL_HEX32(BOTH_BANK, session->txBuffer[2]);
-  TEST_ASSERT_EQUAL(0, isYielding);
 }
 
 void test_hostInterpreter_should_readMemory_and_stop_when_size_reached_0(void) {
@@ -698,7 +657,7 @@ void test_hostInterpreter_should_readMemory_and_stop_when_size_reached_0(void) {
   session->rxBuffer[1] = 1;
   session->rxBuffer[2] = 0;
 
-  deleteUserSession_Expect(&us);
+  delUserSession_Expect(&us);
 
   hostInterpreter(session);
 
