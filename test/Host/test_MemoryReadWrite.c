@@ -105,20 +105,6 @@ void test_memoryWriteByte_should_write_memory_in_word_and_return_1_if_success(vo
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
 }
 
-void test_flashWrite_should_write_data_into_specified_flash_address(void)
-{
-  int size = BYTE_SIZE;
-  uint32_t writeData = 0xBEAFBABA, address = 0x8000000;
-  
-  writeMemory_ExpectAndReturn(_session, (uint8_t *)&writeData, address, BYTE_SIZE, TLV_WRITE_FLASH, 0);
-  tlvService_Expect(_session);
-  writeMemory_ExpectAndReturn(_session, (uint8_t *)&writeData, address, BYTE_SIZE, TLV_WRITE_FLASH, PROCESS_DONE);
-
-	int result = _flashWrite(address, writeData, BYTE_SIZE);
-  
-  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
-}
-
 void test_flashErase_should_erase_according_to_size_and_address(void)
 {
   int size = 20000;
@@ -129,6 +115,20 @@ void test_flashErase_should_erase_according_to_size_and_address(void)
   eraseSection_ExpectAndReturn(_session, address, size, PROCESS_DONE);
 
 	int result = _flashErase(address, size);
+  
+  TEST_ASSERT_EQUAL(PROCESS_DONE, result);
+}
+
+void test_flashWrite_should_write_data_into_specified_flash_address(void)
+{
+  uint8_t data[] = {0xba, 0xba, 0xef, 0xbe};
+  
+  eraseSection_ExpectAndReturn(_session, 0x8000000, 4, PROCESS_DONE);
+  writeMemory_ExpectAndReturn(_session, data, 0x8000000, 4, TLV_WRITE_FLASH, 0);
+  tlvService_Expect(_session);
+  writeMemory_ExpectAndReturn(_session, data, 0x8000000, 4, TLV_WRITE_FLASH, PROCESS_DONE);
+
+	int result = _flashWrite(0x8000000, data, 4);
   
   TEST_ASSERT_EQUAL(PROCESS_DONE, result);
 }
