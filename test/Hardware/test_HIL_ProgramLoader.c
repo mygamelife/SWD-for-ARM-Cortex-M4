@@ -123,47 +123,86 @@ void test_loadRam_should_load_program_into_target_SRAM_and_run(void) {
   delProgram(p);
   
   /* #################### Hard reset should remove program in Ram #################### */
-  // Try {
-    // while((result = isProgramExist(session, p)) == 0)
-    // { tlvService(session); }
-  // } Catch(err) {
-    // displayErrorMessage(err);
-  // }
+  Try {
+    while(hardReset(session) != PROCESS_DONE)
+    { tlvService(session); }
+  } Catch(err) {
+    displayErrorMessage(err);
+  }
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+}
+
+void test_loadFlash_should_load_program_into_target_flash(void) {
+  CEXCEPTION_T err;
+  int status = 0;
+  Program *p = getLoadableSection("test/ElfFiles/ledFlash.elf");
+  
+  /* #################### Load Program Into Flash #################### */
+  while(status == PROCESS_BUSY)
+  { 
+    Try {
+      tlvService(session); 
+      status = loadFlash(session, p);
+    } Catch(err) {
+      displayErrorMessage(err);
+      break;
+    }
+  }
+  status = 0;
+  TEST_ASSERT_EQUAL(0, isYielding);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  
+  /* #################### Verify is loaded program is correct #################### */
+  while(status == PROCESS_BUSY)
+  { 
+    Try {
+      tlvService(session); 
+      status = isProgramExist(session, p);
+    } Catch(err) {
+      displayErrorMessage(err);
+      break;
+    }
+  }
+  TEST_ASSERT_EQUAL(0, isYielding);
+  TEST_ASSERT_EQUAL(VERIFY_PASSED, status);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  
+  status = 0;
+  delProgram(p);
+  /* #################### Erase target flash should remove the loaded program #################### */
+  while(status == PROCESS_BUSY)
+  { 
+    Try {
+      tlvService(session); 
+      status = eraseSection(session, 0x08000000, 10000);
+    } Catch(err) {
+      displayErrorMessage(err);
+      break;
+    }
+  }
+  status = 0;
+  TEST_ASSERT_EQUAL(0, isYielding);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
+  
+  /* #################### Hard reset target #################### */
+  while(status == PROCESS_BUSY)
+  { 
+    Try {
+      tlvService(session); 
+      status = hardReset(session);
+    } Catch(err) {
+      displayErrorMessage(err);
+      break;
+    }
+  }
+  
+  TEST_ASSERT_EQUAL(0, isYielding);
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   
   closePort(session);
 }
-
-// void test_tlvLoadToFlash_should_load_program_into_target_flash(void) {
-  // Tlv_Session *session = tlvCreateSession();
-  // CEXCEPTION_T err;
-  // int result = 0;
-  
-  // Try {
-    // do {
-      // tlvService(session);
-      // tlvLoadToFlash(session, "test/ElfFiles/ledFlash.elf");
-    // } while(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);
-  // } Catch(err) {
-    // displayErrorMessage(err);
-  // }
-  
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
-  
-  // Try {
-    // do {
-      // tlvService(session);
-      // tlvMassEraseTargetFlash(session, BANK_1);
-    // } while(GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG) == FLAG_SET);    
-  // } Catch(err) {
-    // displayErrorMessage(err);
-  // }
-  
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG));
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
-  // TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
-  
-  // TEST_ASSERT_EQUAL(0, session->hresetState);
-  // closePort(session);
-// }

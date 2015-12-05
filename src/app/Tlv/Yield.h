@@ -8,7 +8,8 @@ typedef struct
 
 extern int isYielding;
 
-#define resetTask(x)              (x)->state = 0;
+#define resetTask(x)              (x)->state = 0; isYielding = 0;
+// #define resetTask(x)              (x)->state = 0;
 #define startTask(x)              switch((x)->state) { case 0 :
 #define yield(x)                  do {(x)->state = __LINE__; isYielding = 1; return 0; case __LINE__:;} while(0)
 #define endTask(x)                (x)->state = 0; }

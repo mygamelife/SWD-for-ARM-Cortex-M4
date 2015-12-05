@@ -5,7 +5,7 @@ int verifyLoadedProgram(uint8_t *loadedProgram, uint8_t *actualProgram, int size
 
   for(i = 0; i < size; i++) {
     if(loadedProgram[i] != actualProgram[i]) {
-      // printf("lp %x, ap %x\n", get4Byte(&loadedProgram[i]), get4Byte(&actualProgram[i]));
+      printf("i %d, lp %x, ap %x\n", i, get4Byte(&loadedProgram[i]), get4Byte(&actualProgram[i]));
       return 0;
     }
   }
@@ -23,15 +23,19 @@ int isProgramExist(Tlv_Session *session, Program *p) {
   /* Initialize static variable */
   i = 0;
   verifyStatus = VERIFY_PASSED;
+  lProgram = NULL;
   /* Read and verify */
   printf("Verifying........\n");
   for(; i < getProgramSectionSize(p); i++) {
-    await((lProgram = readMemory(session, getProgramAddress(p, i), getProgramSize(p, i))), tb);
-    if(!verifyLoadedProgram(lProgram, getProgramData(p, i), getProgramSize(p, i))) {
-      delDataBlock(lProgram); /* free the data block used to store program read from memory */
-      verifyStatus = VERIFY_FAILED; break;
+    if(strcmp(getProgramName(p, i), ".data") != 0) {
+      await((lProgram = readMemory(session, getProgramAddress(p, i), getProgramSize(p, i))), tb);
+      if(!verifyLoadedProgram(lProgram, getProgramData(p, i), getProgramSize(p, i))) {
+        printf("i %d\n", i);
+        delDataBlock(lProgram); /* free the data block used to store program read from memory */
+        verifyStatus = VERIFY_FAILED; break;
+      }
+      delDataBlock(lProgram); /* free previous data block before re-use */
     }
-    delDataBlock(lProgram); /* free previous data block before re-use */
   }
   endTask(tb);
   returnThis(verifyStatus);

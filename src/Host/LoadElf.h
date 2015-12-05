@@ -33,6 +33,7 @@ typedef struct
 
 #define getProgramSectionSize(__PROGRAM__)  ((__PROGRAM__)->ssize)
 #define getTotalProgramSize(__PROGRAM__)    ((__PROGRAM__)->tpsize)
+#define getProgramName(__PROGRAM__, i)      ((__PROGRAM__)->ps[i].name)
 #define getProgramData(__PROGRAM__, i)      ((__PROGRAM__)->ps[i].data)
 #define getProgramAddress(__PROGRAM__, i)   ((__PROGRAM__)->ps[i].address)
 #define getProgramSize(__PROGRAM__, i)      ((__PROGRAM__)->ps[i].size)
