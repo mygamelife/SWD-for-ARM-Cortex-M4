@@ -25,8 +25,11 @@
 #include "Yield.h"
 #include "LoadElf.h"
 #include "ProgramVerifier.h"
+#include "CodeStepping.h"
+#include <direct.h>
 
 #define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
+char FlashProgrammerPath[1024];
 
 uint16_t machineCode[] = 
 {
@@ -48,9 +51,12 @@ uint16_t machineCode[] =
   0xBF00,         //0x080003EA  nop.
 };
 
+
 static int initFlag = 0;
 static int verifyEqualProgram(uint32_t startingAddress,uint16_t *machineCode,int codeSize);
 static void loadBreakpointTestProgram();
+static void replaceBackslashInDirectory();
+static void getFlashProgrammerPath();
 
 void setUp(void) 
 {
@@ -90,7 +96,7 @@ static int verifyEqualProgram(uint32_t startingAddress,uint16_t *machineCode,int
   for(i = 0 ; i < codeSize ; i++, startingAddress+=2)
   {  
     memoryReadHalfword(startingAddress,&machineCodeReadFromTarget[i]);
-    
+	// printf("Address : %x \tMachineCodeRead %x vs MachineCode %x\n",startingAddress,machineCodeReadFromTarget[i],machineCode[i]);
     if(machineCodeReadFromTarget[i] != machineCode[i])
     {
       printf("Difference in program found !\n");
@@ -107,8 +113,8 @@ static void loadBreakpointTestProgram()
   CEXCEPTION_T err = 0;
   int i = 0;
   uint32_t address = 0x080003BE ;
-  
   uint32_t pc = 0 ;
+  
   if(verifyEqualProgram(address,machineCode,CODE_SIZE))
     printf("No difference in the program loaded in target device. No flashing is required\n");
   else
@@ -121,6 +127,31 @@ static void loadBreakpointTestProgram()
       displayErrorMessage(err);
     }
   }
+}
+
+static void replaceBackslashInDirectory()
+{
+	char *backslash ;
+	
+	backslash = strstr(FlashProgrammerPath,"\\");
+	while(backslash != NULL)
+	{
+		strncpy(backslash,"/",1);
+		backslash = strstr(FlashProgrammerPath,"\\");
+	}
+}
+
+static void getFlashProgrammerPath()
+{
+	int i = 0 ;
+	char *answer ;
+	answer = (char *) _getcwd(FlashProgrammerPath,sizeof(FlashProgrammerPath)) ;
+	if(answer != NULL)
+	{
+		replaceBackslashInDirectory();	
+		strcat(FlashProgrammerPath,"/");
+		strcat(FlashProgrammerPath, FP_PATH);
+	}
 }
 
 /**
@@ -321,7 +352,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
       }
       setCoreMode(CORE_DEBUG_MODE);
     }
-
+    
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(1,fail);
@@ -346,16 +377,16 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
   setCoreMode(CORE_DEBUG_MODE);
 
   while(!hasBreakpointDebugEventOccured())
+  {
+    PC = readCoreRegister(CORE_REG_PC);
+    if(PC > 0x080003E0)
     {
-      PC = readCoreRegister(CORE_REG_PC);
-      if(PC > 0x080003E0)
-      {
-		fail = 1;
-		break ;
-	  }
-      setCoreMode(CORE_DEBUG_MODE);
-    }
-
+  fail = 1;
+  break ;
+  }
+    setCoreMode(CORE_DEBUG_MODE);
+  }
+  
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(1,fail);

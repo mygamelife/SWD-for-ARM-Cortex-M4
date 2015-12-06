@@ -453,7 +453,7 @@ Process_Status reactiveProgram(Tlv_Session *session, Program *p) {
   printf("Program Successfully re-activate\n");
   /* End task */
   endTask(tb);
-  // resetSystemTime();
+  
   returnThis(PROCESS_DONE);
 }
 

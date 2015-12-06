@@ -65,7 +65,6 @@ int setAddressWatchpoint(int dwtCompNumber,uint32_t address,Watchpoint_AddressMa
     return -1 ;
   
   enableDWTandITM(); //enable global enable for DWT (Needed for reading & writing DWT Register)
-  setCoreMode(CORE_DEBUG_MODE);
   
   memoryWriteWord((uint32_t)(&DWT_COMP[dwtCompNumber].FUNCTION),DISABLE_DWTCOMPARATOR); //disable selected comparator first
 
@@ -128,7 +127,7 @@ int setDataWatchpoint_MatchingOneComparator(int matchingCompNumber,uint32_t addr
   valid = checkForValidDWTComparator(matchingCompNumber);
   if(matchingCompNumber == 1 || valid == -1)
     return -1 ;
-  
+
   configData = (matchingCompNumber << 16) + (matchingCompNumber << 12) + (dataSize << 10) + (DATA_COMPARISON << 8) + accessMode ;
  
   setAddressWatchpoint(matchingCompNumber,address,addressMask,DISABLE_DWTCOMPARATOR);

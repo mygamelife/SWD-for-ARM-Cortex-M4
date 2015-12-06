@@ -1,5 +1,5 @@
 #include "MemoryReadWrite.h"
-
+#include "string.h"
 /* Global Tlv Session */
 Tlv_Session *_session = NULL;
 

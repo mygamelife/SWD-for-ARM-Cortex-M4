@@ -510,7 +510,7 @@ int watchpointEventHandler(Tlv_Session *session)
   */
 int readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   int i;
-  uint8_t dataBlock[255] = {0};
+  uint8_t dataBlock[size];
   
   /* Read from RAM using swd */
   for(i = 0; i < size; i++, destAddress++)
@@ -519,75 +519,6 @@ int readTargetMemory(Tlv_Session *session, uint32_t destAddress, int size) {
   tlvReply(session, TLV_OK, size, dataBlock);
   
   returnThis(1);
-}
-
-/** getDataType is a function to determine the suitable data type
-  * to write into the correct address boundary
-  *
-  * Input   : address is the address of the data need to be store
-  *           size is the size of the data can be any value
-  *
-  * return  : WORD_TYPE       if address is 4byte boundary and size >= 4
-  *           HALFWORD_TYPE   if address is 2byte boundary and size >= 2
-  *           BYTE_TYPE       if address is 1byte boundary
-  */
-DataType getDataType(uint32_t address, int size) {
-  int boundary = (address & BOUNDARY_MASK);
-  int dataType = 0;
-
-  /* Case 1 */
-  if(boundary == WORD_BOUNDARY) {
-    if(size >= WORD_SIZE)
-      dataType = WORD_TYPE;
-    else if(size > BYTE_SIZE && size < WORD_SIZE)
-      dataType = HALFWORD_TYPE;
-    else
-      dataType = BYTE_TYPE;
-  }
-  /* Case 2 */
-  else if(boundary == HALFWORD_BOUNDARY) {
-    if(size >= HALFWORD_SIZE)
-      dataType = HALFWORD_TYPE;
-    else dataType = BYTE_TYPE;
-  }
-  /* Case 3 */
-  else dataType = BYTE_TYPE;
-
-  return dataType;
-}
-
-/** writeDataWithCorrectDataType is a function to write data
-  * into correct address boundary
-  *
-  * Input   : data is the pointer-to-pointer contain address of the data need to write
-  *           address is the address of the data need to be store
-  *           size is the size of the data can be any value
-  *
-  * return  : NONE
-  */
-void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) {
-  DataType type = 0;
-  uint8_t *dataAddress = *data;
-  uint32_t destAddress = *address;
-
-  type = getDataType(destAddress, *size);
-
-  if(type == WORD_TYPE) {
-    // printf("word %x\n", get4Byte(dataAddress));
-    memoryWriteWord(destAddress, get4Byte(dataAddress));
-  }
-  else if(type == HALFWORD_TYPE) {
-    // printf("halfword %x\n", get2Byte(dataAddress));
-    memoryWriteHalfword(destAddress, get2Byte(dataAddress));
-  }
-  else if(type == BYTE_TYPE) {
-    // printf("byte %x\n", *dataAddress);
-    memoryWriteByte(destAddress, *dataAddress);
-  }
-
-  *data += type;
-  *address += type;
-  *size -= type;
 }
 
 /** writeTargetRam is a function to write target RAM using swd
@@ -796,4 +727,117 @@ int taskManager(Tlv_Session *session)  {
   }
   endTask(tb);
   returnThis(1);
+}
+
+
+/** Select the best method (Word,Halfword or Byte) to write into RAM
+  * Input   : data is the address of the buffer storing the data to be written
+  *           destAddress is the starting address where the data is going to be written
+  *           size is total amount of data to be written
+  */
+void selectAppropriateMethodToWriteRAM(uint8_t *data, uint32_t destAddress, int size)
+{
+  uint32_t data32 = 0 , data16 = 0;
+  int i ;
+  
+  while(size !=0)
+  {
+    if((destAddress %4 == 0) && (size >=4))
+    {
+      data32 = 0 ;
+      for(i = 0 ; i < 4 ; data++ ,i ++)
+        data32 += (*data << i*8);
+
+      memoryWriteWord(destAddress,data32);
+      size -= 4 ;
+      destAddress +=4;
+    }
+    else if((destAddress % 4 <= 2) && (size >=2))
+    {
+      data16 = 0 ;
+      for(i = 0 ; i < 2 ; data++ ,i ++)
+        data16 += (*data << i*8);
+      
+      memoryWriteHalfword(destAddress,data16);
+      size -=2 ; destAddress +=2 ;
+    }
+    else
+    {
+      memoryWriteByte(destAddress,*data);
+      size --;  destAddress ++; data ++;
+    }
+  };
+}
+
+/**==============================================================================
+                     ########## Write Ram internal function ##########
+   ==============================================================================*/
+  
+/** getDataType is a function to determine the suitable data type
+  * to write into the correct address boundary
+  *
+  * Input   : address is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : WORD_TYPE       if address is 4byte boundary and size >= 4
+  *           HALFWORD_TYPE   if address is 2byte boundary and size >= 2
+  *           BYTE_TYPE       if address is 1byte boundary
+  */
+DataType getDataType(uint32_t address, int size) {
+  int boundary = (address & BOUNDARY_MASK);
+  int dataType = 0;
+
+  /* Case 1 */
+  if(boundary == WORD_BOUNDARY) {
+    if(size >= WORD_SIZE)
+      dataType = WORD_TYPE;
+    else if(size > BYTE_SIZE && size < WORD_SIZE)
+      dataType = HALFWORD_TYPE;
+    else
+      dataType = BYTE_TYPE;
+  }
+  /* Case 2 */
+  else if(boundary == HALFWORD_BOUNDARY) {
+    if(size >= HALFWORD_SIZE)
+      dataType = HALFWORD_TYPE;
+    else dataType = BYTE_TYPE;
+  }
+  /* Case 3 */
+  else dataType = BYTE_TYPE;
+
+  return dataType;
+}
+
+/** writeDataWithCorrectDataType is a function to write data
+  * into correct address boundary
+  *
+  * Input   : data is the pointer-to-pointer contain address of the data need to write
+  *           address is the address of the data need to be store
+  *           size is the size of the data can be any value
+  *
+  * return  : NONE
+  */
+void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) {
+  DataType type = 0;
+  uint8_t *dataAddress = *data;
+  uint32_t destAddress = *address;
+
+  type = getDataType(destAddress, *size);
+
+  if(type == WORD_TYPE) {
+    // printf("word %x\n", get4Byte(dataAddress));
+    memoryWriteWord(destAddress, get4Byte(dataAddress));
+  }
+  else if(type == HALFWORD_TYPE) {
+    // printf("halfword %x\n", get2Byte(dataAddress));
+    memoryWriteHalfword(destAddress, get2Byte(dataAddress));
+  }
+  else if(type == BYTE_TYPE) {
+    // printf("byte %x\n", *dataAddress);
+    memoryWriteByte(destAddress, *dataAddress);
+  }
+
+  *data += type;
+  *address += type;
+  *size -= type;
 }
