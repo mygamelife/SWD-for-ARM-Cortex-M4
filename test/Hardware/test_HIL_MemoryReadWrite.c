@@ -130,7 +130,6 @@ void test_tlvWriteToFlash_write_0xDEADBEEF_into_0x8000000_and_should_read_back_t
   int result = 0;
   uint32_t dataRead = 0;
   
-  //0xdeadbeef 0xabcdcafe
   uint8_t data[] = {0xef, 0xbe, 0xad, 0xde, 
                     0xfe, 0xca, 0xcd, 0xab};
                     
@@ -144,4 +143,24 @@ void test_tlvWriteToFlash_write_0xDEADBEEF_into_0x8000000_and_should_read_back_t
   result = memoryReadWord(0x080E0004, &dataRead);
   TEST_ASSERT_EQUAL(1, result);
   TEST_ASSERT_EQUAL_HEX32(0xABCDCAFE, dataRead);
+}
+
+void test_flashWrite_write_multiple_halfword_should_read_back_same_result(void) {
+  int i, result = 0;
+  uint32_t dataRead = 0;
+  uint32_t address = 0x080003BE;
+  
+  uint16_t data[] = { 0xaaaa, 0xbbbb, 0xcccc, 0xdddd,
+                      0xeeee, 0xffff, 0x1111, 0x2222,
+                      0x3333, 0x4444, 0x5555, 0x6666
+                    };
+  
+  result = _flashWrite(0x080003BE, (uint8_t *)data, sizeof(data));
+  TEST_ASSERT_EQUAL(1, result);
+  
+  for(i = 0; i < 12; i++, address += 2) {
+    result = memoryReadHalfword(address, &dataRead);
+    TEST_ASSERT_EQUAL(1, result);
+    TEST_ASSERT_EQUAL_HEX16(data[i], dataRead);
+  }
 }
