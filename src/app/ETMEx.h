@@ -1,6 +1,8 @@
 #ifndef ETMEx_H
 #define ETMEx_H
 
+#include <stdint.h>
+
 #ifdef __cplusplus
   #define   __I     volatile             /*!< Defines 'read only' permissions                 */
 #else
@@ -116,4 +118,5 @@ typedef struct
 #define ETM_TRACE_REGISTER_UNLOCK  0
 #define ETM_TRACE_REGISTER_LOCK    0xC5ACCE55
 
+#define CORESIGHT_ETM_M4_ID        0x4114F250
 #endif // ETMEx_H

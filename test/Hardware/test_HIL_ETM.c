@@ -18,7 +18,7 @@
 #include "OperatorToken.h"
 #include "FileToken.h"
 #include "MemoryReadWrite.h"
-//#include "ETM.h"
+#include "ETM_M4.h"
 #include "ETMEx.h"
 
 static int initFlag = 0;
@@ -33,11 +33,44 @@ void tearDown(void)
 {
 }
 
-void test_read_ETMIDR_should_return_ID()
+/*----------unlockETM------------*/
+void test_unlockETM_should_get_0x1_when_reading_from_ETMLSR()
 {
-  uint32_t id = 0 ;
+  uint32_t etmlsr = 0 ;
   
-  memoryReadWord((uint32_t)&(ETM->ETMIDR),&id);
+  unlockETM();
+  memoryReadWord((uint32_t)&(ETM->ETMLSR),&etmlsr);
   
-  printf("ID : %x\n",id);
+  TEST_ASSERT_EQUAL(0x1,etmlsr);
+}
+
+/*----------lockETM------------*/
+void test_lockETM_should_get_0x3_when_reading_from_ETMLSR()
+{ 
+  uint32_t etmlsr = 0 ;
+  
+  lockETM();
+  memoryReadWord((uint32_t)&(ETM->ETMLSR),&etmlsr);
+  
+  TEST_ASSERT_EQUAL(0x3,etmlsr);
+}
+
+/*----------isETMLocked------------*/
+void test_isETMLocked_should_return_2_if_locked()
+{
+  lockETM();
+  TEST_ASSERT_EQUAL(2,isETMLocked());
+}
+
+void test_isETMLocked_should_return_0_if_not_locked()
+{
+  unlockETM();
+  TEST_ASSERT_EQUAL(0,isETMLocked());
+}
+
+/*----------getETMID------------*/
+//CORESIGHT ETM M4 0x4114F250
+void test_getETMID_should_return_etm_id_of_the_device()
+{
+  TEST_ASSERT_EQUAL(0x4114F250,getETMID());
 }

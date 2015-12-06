@@ -277,7 +277,7 @@ void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
  *
  * Result : Breakpoint at 0x080003C8
  */
-void xtest_instructionBreakPointTestCase_4bytes_Word()
+void test_instructionBreakPointTestCase_4bytes_Word()
 {
   uint32_t PC = 0 ;
   uint32_t dataRead = 0 ;
