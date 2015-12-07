@@ -2,11 +2,11 @@
 
 /* Initialize Instrumentation Trace Macrocell (ITM)
  */
-void configItm(void) {
+void itmInit(void) {
 	uint32_t readData = 0;
   /* Configure Trace Port Interface Unit TPIU 
      before using debug blocks */
-  configTpiu();
+  tpiuInit();
   
   /* Unlock write access to ITM register */
   memoryWriteWord((uint32_t)&ITM->LAR, 0xC5ACCE55);

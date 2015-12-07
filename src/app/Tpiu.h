@@ -1,7 +1,12 @@
 #ifndef Tpiu_H
 #define Tpiu_H
 
+#include "Gpio.h"
 #include "CoreDebug.h"
+
+#define TRACE_PORT                  PORTE
+#define TRACE_CLOCK_PIN             PIN_2
+#define TRACE_DATA0_PIN             PIN_3
 
 /* TPIU trace port size selection
  */
@@ -31,6 +36,6 @@
 #define enableAndSelectTraceMode(__TRACE_MODE__)    \
         memoryWriteWord((uint32_t)&DBGMCU->CR, DBGMCU_CR_TRACE_IOEN | __TRACE_MODE__) /* Enable trace I/O (SWO) and select Trace Mode */
                                           
-void configTpiu(void);
-void configTracePort(void);
+void tpiuInit(void);
+void tpiuConfigPort(void);
 #endif // Tpiu_H

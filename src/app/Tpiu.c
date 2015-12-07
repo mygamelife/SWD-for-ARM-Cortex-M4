@@ -1,11 +1,27 @@
 #include "Tpiu.h"
 
-/* TPIU configuration function to configure Trace Port I/O 
-  ITM_BASE            (0xE0000000UL)
-  DWT_BASE            (0xE0001000UL)
-  TPI_BASE            (0xE0040000UL) 
+/** configTpiu is a function to configure TPIU
  */
-void configTpiu(void) {
+void tpiuConfigPort(void) {
+  GPIO_Init init;
+  
+  init.mode = ALTFUNC_MODE;
+  init.pin = TRACE_CLOCK_PIN;
+  init.af = AF0;
+  
+  /* Configure Trace Port Clock */
+  gpioConfigPort(TRACE_PORT, &init);
+  
+  /* Configure Trace Port Data0 */
+  init.pin = TRACE_DATA0_PIN;
+  gpioConfigPort(TRACE_PORT, &init);
+}
+
+/** configTpiu is a function to configure TPIU
+  */
+void tpiuInit(void) {
+  /* Configure TraceClock and TraceData0 */
+  tpiuConfigPort();
   /* Current trace port size is 2 */
   tpiuPortSize(TPIU_PORT_SIZE_2);
   
