@@ -31,15 +31,15 @@ void setUp(void) {
   if(flag == 0) {
     flag = 1;
     initMemoryReadWrite();
-    itmInit();
+    // itmInitx();
   }
 }
 
 void tearDown(void) {}
 
 void test_ITM_configure_and_write_data_into_simulus_register_0(void) {
-  
-  memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  int a = 0;
+  // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
   
   // /* PORTE clock should enable */
   // memoryReadWord((uint32_t)&rcc->RCC_AHB1ENR, &result);

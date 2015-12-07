@@ -5,4 +5,6 @@
 #include "Tpiu.h"
 
 void itmInit(void);
+void itmInitx(void);
+
 #endif // Itm_H

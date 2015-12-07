@@ -4,6 +4,9 @@
 #include "Gpio.h"
 #include "CoreDebug.h"
 
+#define SWO_TRACE_PORT              PORTB /* Physical pin is beside PG15*/
+#define SWO_TRACE_PIN               PIN_3 
+
 #define TRACE_PORT                  PORTE
 #define TRACE_CLOCK_PIN             PIN_2
 #define TRACE_DATA0_PIN             PIN_3
@@ -38,4 +41,7 @@
                                           
 void tpiuInit(void);
 void tpiuConfigPort(void);
+void tpiuInitx(void);
+void tpiuConfigPortx(void);
+
 #endif // Tpiu_H
