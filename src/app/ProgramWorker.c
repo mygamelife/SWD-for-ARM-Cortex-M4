@@ -662,7 +662,9 @@ int loopBack(Tlv_Session *session, Tlv *packet) {
 
 int comPortVerification(Tlv_Session *session) {
 
-  tlvReply(session, TLV_OK, 0, NULL);
+  uint8_t reply[] = {"Hello From The Other Side"};
+
+  tlvReply(session, TLV_OK, sizeof(reply), reply);
   
   returnThis(1);
 }

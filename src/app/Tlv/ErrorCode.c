@@ -4,11 +4,11 @@ void displayErrorMessage(CEXCEPTION_T err) {
   
 	switch(err) {
     /* ####################################### Host error ################################################### */
-    case TLV_TIME_OUT                   : printf("Err : Host time out                               \n"); break;
-    case TLV_CORRUPTED_DATA             : printf("Err : Host received data corrupted                \n"); break;
-    case TLV_INVALID_COMMAND            : printf("Err : Host received invalid command               \n"); break;
-    case TLV_CHECKSUM_ERROR             : printf("Err : Host received checksum error                \n"); break;
-    case TLV_TRANSMISSION_BUSY          : printf("Err : Host previous transmission is not done yet  \n"); break;
+    case TLV_TIME_OUT                   : printf("Err : Host time out\n                               "); break;
+    case TLV_CORRUPTED_DATA             : printf("Err : Host received data corrupted\n"); break;
+    case TLV_INVALID_COMMAND            : printf("Err : Host received invalid command\n"); break;
+    case TLV_CHECKSUM_ERROR             : printf("Err : Host received checksum error\n"); break;
+    case TLV_TRANSMISSION_BUSY          : printf("Err : Host previous transmission is not done yet\n"); break;
     /* #################################### Debug features error ############################################ */
     case TLV_NOT_RUNNING                : printf("Err : Run command not responding                  \n"); break;
     case TLV_NOT_HALTED                 : printf("Err : Halt command not responding                 \n"); break;
@@ -43,7 +43,11 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case ERR_SET_COMM_STATE             : printf("Err : Handler failed to SetCommState              \n"); break;
     case ERR_SET_COMM_TIMEOUTS          : printf("Err : Handler failed to SetCommTimeouts           \n"); break;
     case ERR_GET_COMM_STATE             : printf("Err : Handler failed to GetCommState              \n"); break;
-    case ERR_NO_COM_PORT                : printf("Err : Can't find any available Serial Comm Port   \n"); break;
+    case ERR_INVALID_PASSKEY            : printf("Err : Received unexpected passkey from probe      \n"); break;
+    case ERR_NO_COM_PORT                : printf("Err : Can't find any available COM Port\n");
+                                          printf("There are several reasons can cause this issues, for example :\n");
+                                          printf("- Serial cable is disconnected\n");
+                                          printf("- Serial comm driver is corrupted or not installed\n"); break;
     /* ###################################### Undefine Error Code ########################################### */
     default                             : printf("Err : Undefine error code %d\n", err);                  break;
   }
