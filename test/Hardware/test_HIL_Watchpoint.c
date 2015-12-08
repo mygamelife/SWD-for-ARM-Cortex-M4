@@ -31,6 +31,7 @@
 uint16_t machineCode[] = 
 {
   /* ---------------- Watchpoint TestCase Read LDRB -------------------- */
+  0xBF00,          //0x080FFFFE  nop
   0xF243,0x3644,   //0x08100000  movw r6,#0x3344
   0xF2C1,0x1622,   //0x08100004  movt r6,#0x1122
 
@@ -165,9 +166,13 @@ void setUp(void)
       setCoreMode(CORE_DEBUG_MODE);
       loadWatchpointTestProgram();
     }
+    while(hardReset(_session)!= PROCESS_DONE)
+    {
+      tlvService(_session);
+    }
     setCoreMode(CORE_DEBUG_HALT);
-    enableDWTandITM();
     clearDWTTrapDebugEvent(); 
+    enableDWTandITM();
   }
   Catch(err) 
   {
@@ -177,6 +182,7 @@ void setUp(void)
 
 void tearDown(void)
 {
+  setCoreMode(CORE_DEBUG_HALT);
   disableDWTComparator(COMPARATOR_1);
   clearDWTTrapDebugEvent();
   disableDWTandITM();
@@ -206,7 +212,7 @@ static void loadWatchpointTestProgram()
 {
   CEXCEPTION_T err = 0;
   int i = 0;
-  uint32_t address = 0x08100000 ;
+  uint32_t address = 0x080FFFFE ;
   uint32_t pc = 0 ;
   if(verifyEqualProgram(address,machineCode,CODE_SIZE))
     printf("No difference in the program loaded in target device. No flashing is required\n");
@@ -220,8 +226,8 @@ static void loadWatchpointTestProgram()
 
     printf("Flashing \n");
     Try{
-      for(i = 0 ; i < CODE_SIZE ; i++,address +=2)
-      _flashWrite(address,machineCode[i],HALFWORD_SIZE);
+
+      _flashWrite(address,(uint8_t *)machineCode,CODE_SIZE*2);
     }
     Catch(err)
     {
@@ -231,17 +237,21 @@ static void loadWatchpointTestProgram()
   }
 }
 
+
 void test_datawatchpoint_TestCase_ReadByte_LDRB()
 {
-  uint32_t pc = 0 ;
+  uint32_t pc = 0;
+  
+  writeCoreRegister(CORE_REG_PC,0x080FFFFE);
 
-  writeCoreRegister(CORE_REG_PC,0x08100000);
-  setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0XAABBCCDD,WATCHPOINT_BYTE,WATCHPOINT_READ);
+  setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0XDD,WATCHPOINT_BYTE,WATCHPOINT_READ);
+
   setCoreMode(CORE_DEBUG_MODE);
 
   while(!hasDWTTrapDebugEventOccured());
 
   pc = readCoreRegister(CORE_REG_PC);
+
   TEST_ASSERT_EQUAL(0x08100020,pc);
 }
 
@@ -495,7 +505,6 @@ void test_datawatchpoint_TestCase_WriteHalfword_STRH()
   TEST_ASSERT_EQUAL(0x081000A4,pc);
 }
 
-// Test fail
 // void test_datawatchpoint_TestCase_WriteWord_STRH()
 // {
   // uint32_t pc = 0 ;
@@ -509,7 +518,7 @@ void test_datawatchpoint_TestCase_WriteHalfword_STRH()
   // while(!hasDWTTrapDebugEventOccured())
   // {
     // pc = readCoreRegister(CORE_REG_PC);
-    // if(pc == 0x081000A8)
+    // if(pc >= 0x081000A8)
     // {
       // fail = 1; 
       // break ;
@@ -552,34 +561,34 @@ void test_datawatchpoint_TestCase_WriteHalfword_STR()
   TEST_ASSERT_EQUAL(0x081000C4,pc);
 }
 
-// void test_datawatchpoint_TestCase_WriteWord_STR()
-// {
-  // uint32_t pc = 0 ;
+void test_datawatchpoint_TestCase_WriteWord_STR()
+{
+  uint32_t pc = 0 ;
   
-  // setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0x11223344,WATCHPOINT_WORD,WATCHPOINT_WRITE);
+  setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0x11223344,WATCHPOINT_WORD,WATCHPOINT_WRITE);
 
-  // writeCoreRegister(CORE_REG_PC,0x081000AC);
-  // setCoreMode(CORE_DEBUG_MODE);
+  writeCoreRegister(CORE_REG_PC,0x081000AC);
+  setCoreMode(CORE_DEBUG_MODE);
 
-  // while(!hasDWTTrapDebugEventOccured());
+  while(!hasDWTTrapDebugEventOccured());
 
-  // pc = readCoreRegister(CORE_REG_PC);
+  pc = readCoreRegister(CORE_REG_PC);
 
-  // TEST_ASSERT_EQUAL(0x081000C4,pc);
-// }
+  TEST_ASSERT_EQUAL(0x081000C4,pc);
+}
 
-// void test_datawatchpoint_TestCase_DoubleWrite()
-// {
-	// uint32_t pc = 0 ;
+void test_datawatchpoint_TestCase_DoubleWrite()
+{
+	uint32_t pc = 0 ;
 
-	// setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0xA,WATCHPOINT_WORD,WATCHPOINT_WRITE);
+	setDataWatchpoint_MatchingOneComparator(COMPARATOR_0,0x2000045C,WATCHPOINT_MASK_NOTHING,0xA,WATCHPOINT_WORD,WATCHPOINT_WRITE);
 
-	// writeCoreRegister(CORE_REG_PC,0x081000CC);
-	// setCoreMode(CORE_DEBUG_MODE);
+	writeCoreRegister(CORE_REG_PC,0x081000CC);
+	setCoreMode(CORE_DEBUG_MODE);
 
-	// while(!hasDWTTrapDebugEventOccured());
+	while(!hasDWTTrapDebugEventOccured());
 
-	// pc = readCoreRegister(CORE_REG_PC);
+	pc = readCoreRegister(CORE_REG_PC);
 
-	// TEST_ASSERT_EQUAL(0x081000E0,pc);
-// }
+	TEST_ASSERT_EQUAL(0x081000E0,pc);
+}
