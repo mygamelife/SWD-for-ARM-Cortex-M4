@@ -5,16 +5,20 @@
 #include <stdio.h>
 #include <conio.h>
 #include <windows.h>
+#include <malloc.h>
 #include "Token.h"
 #include "Tlv.h"
+#include "LoadElf.h"
 #include "ErrorCode.h"
+
+#define INPUT_BUFFER_SIZE 2048
 
 typedef struct
 {
   int size;
-  uint32_t data[1024];
+  uint32_t data[INPUT_BUFFER_SIZE];
   uint32_t address;
-  char *fileName;
+  Program *program;
   Tlv_Command tlvCommand;
 } User_Session;
 
@@ -98,31 +102,30 @@ typedef enum {
 } Command_Code;
 
 void displayOptionMenu(void);
+User_Session *createNewUserSession(void);
 User_Session *waitUserCommand(void);
-User_Session *InterpreteCommand(String *userInput);
+void InterpreteCommand(User_Session *us, String *userInput);
 int getRegisterAddress(char *name);
 int getFlashBank(char *name);
-void displayTlvData(Tlv *tlv);
-void displayMemoryMap(uint8_t *data, int length);
-void displayFourByteInRow(uint8_t *data);
+void displayMemoryMap(uint8_t *data, uint32_t address, int length);
 void helpMenu(String *userInput);
 void helpCommand(Command_Code ccode);
 Command_Code getCommandCode(char *commandName);
 
 /* User Instruction */
-User_Session *userLoadProgram(String *userInput);
-User_Session *userWriteMemory(String *userInput);
-User_Session *userReadMemory(String *userInput);
-User_Session *userWriteRegister(String *userInput);
-User_Session *userReadRegister(String *userInput);
-User_Session *userStepTarget(String *userInput);
-User_Session *userHaltTarget(void);
-User_Session *userRunTarget(void);
-User_Session *userSetBreakpoint(String *userInput);
-User_Session *userErase(String *userInput);
-User_Session *userSectionErase(String *userInput);
-User_Session *userMassErase(String *userInput);
-User_Session *userReset(String *userInput);
-User_Session *userExit(void);
+void userLoadProgram(User_Session *us, String *userInput);
+void userWriteMemory(User_Session *us, String *userInput);
+void userReadMemory(User_Session *us, String *userInput);
+void userWriteRegister(User_Session *us, String *userInput);
+void userReadRegister(User_Session *us, String *userInput);
+void userStepTarget(User_Session *us, String *userInput);
+void userHaltTarget(User_Session *us);
+void userRunTarget(User_Session *us);
+void userSetBreakpoint(User_Session *us, String *userInput);
+void userErase(User_Session *us, String *userInput);
+void userSectionErase(User_Session *us, String *userInput);
+void userReset(User_Session *us, String *userInput);
+void userExit(User_Session *us);
 
+void delUserSession(User_Session *us);
 #endif // Interface_H

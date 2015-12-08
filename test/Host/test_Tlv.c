@@ -171,18 +171,20 @@ void test_tlvReceive_should_receive_tlv_packet_send_by_others(void)  {
   SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
 
   session->rxBuffer[0] = TLV_WRITE_RAM;
-  session->rxBuffer[1] = 6;
+  session->rxBuffer[1] = 5;
   session->rxBuffer[2] = 0x44;
   session->rxBuffer[3] = 0x33;
   session->rxBuffer[4] = 0x22;
   session->rxBuffer[5] = 0x11;
+  session->rxBuffer[6] = 0x56;
   
   Tlv *tlv = tlvReceive(session);
   
   TEST_ASSERT_NOT_NULL(tlv);
   TEST_ASSERT_EQUAL(TLV_WRITE_RAM, tlv->type);
-  TEST_ASSERT_EQUAL(6, tlv->length);
+  TEST_ASSERT_EQUAL(5, tlv->length);
   TEST_ASSERT_EQUAL_HEX32(0x11223344, get4Byte(&tlv->value[0]));
+  TEST_ASSERT_EQUAL_HEX8(0x56, tlv->value[4]); //chksum
 }
 
 void test_tlvReceiveService_should_receive_type_at_the_first_state(void)
@@ -225,7 +227,7 @@ void test_tlvReceiveService_should_receive_value_after_length(void)
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
 }
 
-void test_tlvReceiveService_should_type_length_and_value(void)
+void test_tlvReceiveService_should_get_type_length_and_value(void)
 {
   uartInit_Ignore();
   Tlv_Session *session = tlvCreateSession();
@@ -247,6 +249,8 @@ void test_tlvReceiveService_should_type_length_and_value(void)
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00); //received length
   /* Received value */
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00); //received value (interrupt)
+  
+  resetSystemTime_Expect();
   tlvReceiveService(session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
 
@@ -270,8 +274,10 @@ void test_tlvReceiveService_should_set_time_out_flag_if_no_data_arrive_after_fir
   session->rxBuffer[5] = 0xDE;
   session->rxBuffer[6] = 0x8B;//chksum
   
+  resetSystemTime_Expect();
   /* Received Value */
   tlvReceiveService(session);
+  
   TEST_ASSERT_EQUAL(TLV_RECEIVE_TYPE, session->receiveState);
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
 }
@@ -308,6 +314,8 @@ void test_tlvService_should_able_to_receive_while_sending(void)
   /* Received length */
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00);
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00);
+  resetSystemTime_Expect();
+
   tlvService(session);
   TEST_ASSERT_EQUAL(TLV_RECEIVE_VALUE, session->receiveState);
   
@@ -348,6 +356,7 @@ void test_tlvService_should_receive_while_wating_uart_to_ready_send(void)
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00);
   /* Received Value */
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x00);
+  
   tlvService(session);
   
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
@@ -370,17 +379,23 @@ void test_tlvService_should_set_time_out_flag_when_timeout_occur(void)
   session->rxBuffer[1] = 5;
   
   uartTxReady = 1;
+  
   sendBytes_ExpectAndReturn(session->handler, session->txBuffer, tlv->length + 2, 0x00);
   /* Received Type */
   getByte_ExpectAndReturn(session->handler, session->rxBuffer, 0x00);
+  
   tlvService(session);
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   
   uartTxReady = 0;
+  
   /* Received length */
   getByte_ExpectAndReturn(session->handler, &session->rxBuffer[1], 0x00);
   /* Received Value */
   getBytes_ExpectAndReturn(session->handler, &session->rxBuffer[2], 5, 0x01);
+  
+  resetSystemTime_Expect();
+
   tlvService(session);
   
   tlvService(session);
@@ -488,4 +503,83 @@ void test_tlvReportError_is_to_create_a_packet_contain_errorCode_to_report_the_e
   Tlv_Session *session = tlvCreateSession();
   
   tlvErrorReporter(session, PROBE_TLV_CHECKSUM_ERROR);
+}
+
+void test_tlvSendRequest_should_receive_write_target_register_size_8_address_0x12345678_and_data_0xDEADBEEF(void)
+{
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  uint32_t data[] = {0x12345678, 0xDEADBEEF};
+  tlvSendRequest(session, TLV_WRITE_REGISTER, 8, (uint8_t *)data);
+  
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_WRITE_REGISTER, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x12345678, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xB4, session->txBuffer[10]); //chksum
+}
+
+void test_tlvReadDataChunk_should_send_request_read_data_in_chunk(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  int size = 255;
+  uint32_t address = 0x20001000;
+  
+  tlvReadDataChunk(session, &address, &size);
+  
+  TEST_ASSERT_EQUAL_HEX32(0x200010F8, address);
+  TEST_ASSERT_EQUAL(0x7, size);
+  TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
+  TEST_ASSERT_EQUAL(TLV_READ_MEMORY, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(6, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL(0x20001000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL(248, session->txBuffer[6]);
+  TEST_ASSERT_EQUAL_HEX8(0xD8, session->txBuffer[7]); //chksum
+}
+
+void test_tlvWriteDataChunk_should_send_data_in_chunk_to_ram_and_update_data_address_and_size(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  int size = 4;
+  uint32_t address = 0x10000000, data[] = {0xDEADBEEF, 0xAAAAAAAA};
+  uint8_t *dataPtr = (uint8_t *)data;
+  
+  tlvWriteDataChunk(session, &dataPtr, &address, &size, TLV_WRITE_RAM);
+  
+  TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_RAM, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(9, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x10000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX8(0xB8, session->txBuffer[10]); //chksum
+  
+  TEST_ASSERT_EQUAL(0, size);
+  TEST_ASSERT_EQUAL_HEX32(0x10000004, address);
+  TEST_ASSERT_EQUAL_HEX32(0xAAAAAAAA, get4Byte(dataPtr));
+}
+
+void test_tlvWriteDataChunk_should_send_data_in_chunk_to_flash_and_update_data_address_and_size(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  
+  int size = 255;
+  uint32_t address = 0x10000000, data[] = {0xDEADBEEF, 0xAAAAAAAA};
+  uint8_t *dataPtr = (uint8_t *)data;
+  
+  tlvWriteDataChunk(session, &dataPtr, &address, &size, TLV_WRITE_FLASH);
+  
+  TEST_ASSERT_EQUAL_HEX8(TLV_WRITE_FLASH, session->txBuffer[0]);
+  TEST_ASSERT_EQUAL(253, session->txBuffer[1]);
+  TEST_ASSERT_EQUAL_HEX32(0x10000000, get4Byte(&session->txBuffer[2]));
+  TEST_ASSERT_EQUAL_HEX32(0xDEADBEEF, get4Byte(&session->txBuffer[6]));
+  TEST_ASSERT_EQUAL_HEX32(0xAAAAAAAA, get4Byte(&session->txBuffer[10]));
+  
+  TEST_ASSERT_EQUAL(7, size);
+  TEST_ASSERT_EQUAL_HEX32(0x100000F8, address);
 }

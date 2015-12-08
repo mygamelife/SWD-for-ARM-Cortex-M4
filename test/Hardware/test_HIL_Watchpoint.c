@@ -22,6 +22,9 @@
 #include "CoreDebugEx.h"
 #include "DWTUnit.h"
 #include "DwTUnitEx.h"
+#include "Yield.h"
+#include "LoadElf.h"
+#include "ProgramVerifier.h"
 
 #define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
 

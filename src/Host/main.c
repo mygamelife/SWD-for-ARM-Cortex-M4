@@ -3,27 +3,28 @@
 
 int main(void) {
   CEXCEPTION_T err;
-  Tlv_Session *session = NULL;
-  User_Session *userSession = NULL;
+  static Tlv_Session *session = NULL;
   
   displayOptionMenu();
   
   Try {
-    if(session == NULL) session = tlvCreateSession();
-    while(!IS_HOST_EXIT(session)) {
-      Try {
-        tlvService(session);
-        hostInterpreter(session);
-        // 
-        // Receive packet and handle it here
-        //
-      } Catch(err) {
-        HOST_CHANGE_STATE(session, HOST_WAIT_USER_COMMAND);
-        displayErrorMessage(err);
-      }
-    }
+    if(session == NULL) 
+      session = tlvCreateSession();
   } Catch(err) {
     displayErrorMessage(err);
+    return 0;
+  }
+  
+  while(!isExit(session)) {
+    Try {
+      tlvService(session);
+      hostInterpreter(session);
+      // 
+      // Receive packet and handle it here
+      //
+    } Catch(err) {
+      displayErrorMessage(err);
+    }
   }
   
   printf("Closing port\n");

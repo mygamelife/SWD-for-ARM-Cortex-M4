@@ -18,16 +18,18 @@
 #include "OperatorToken.h"
 #include "FileToken.h"
 #include "MemoryReadWrite.h"
+#include "CoreDebugEx.h"
+#include "CoreDebug.h"
+#include "Yield.h"
+#include "LoadElf.h"
+#include "ProgramVerifier.h"
 
 int initFlag = 0;
 
 void setUp(void) {
   if(initFlag == 0) {
-     system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
     initFlag = 1;
     initMemoryReadWrite();
-    /* Erase flash space according to size */
-    _flashErase(0x080E0000, 2000);
   }
 }
 
@@ -97,10 +99,10 @@ void test_write_halfword_0xBEEF_should_read_back_the_same_data(void) {
   int result = 0;
   uint32_t dataRead;
   
-  result = memoryWriteHalfword(0x20000000, 0xBEEF);
+  result = memoryWriteHalfword(0x20010000, 0xBEEF);
   TEST_ASSERT_EQUAL(1, result);
   
-  result = memoryReadHalfword(0x20000000, &dataRead);
+  result = memoryReadHalfword(0x20010000, &dataRead);
   TEST_ASSERT_EQUAL_HEX16(0xBEEF, dataRead);
 }
 
@@ -128,18 +130,11 @@ void test_tlvWriteToFlash_write_0xDEADBEEF_into_0x8000000_and_should_read_back_t
   int result = 0;
   uint32_t dataRead = 0;
   
-  result = _flashWrite(0x080E0000, 0xBEEF, HALFWORD_SIZE);
+  uint8_t data[] = {0xef, 0xbe, 0xad, 0xde, 
+                    0xfe, 0xca, 0xcd, 0xab};
+                    
+  result = _flashWrite(0x080E0000, data, sizeof(data));
   TEST_ASSERT_EQUAL(1, result);
-  result = _flashWrite(0x080E0002, 0xDEAD, HALFWORD_SIZE);
-  TEST_ASSERT_EQUAL(1, result);
-  
-  result = _flashWrite(0x080E0004, 0xCAFE, HALFWORD_SIZE);
-  TEST_ASSERT_EQUAL(1, result);
-  result = _flashWrite(0x080E0006, 0xABCD, HALFWORD_SIZE);
-  TEST_ASSERT_EQUAL(1, result);
-  
-  /** Error occur when re-load flashProgrammer and called memoryReadWord 
-    in this test code **/
     
   result = memoryReadWord(0x080E0000, &dataRead);
   TEST_ASSERT_EQUAL(1, result);
@@ -148,4 +143,24 @@ void test_tlvWriteToFlash_write_0xDEADBEEF_into_0x8000000_and_should_read_back_t
   result = memoryReadWord(0x080E0004, &dataRead);
   TEST_ASSERT_EQUAL(1, result);
   TEST_ASSERT_EQUAL_HEX32(0xABCDCAFE, dataRead);
+}
+
+void test_flashWrite_write_multiple_halfword_should_read_back_same_result(void) {
+  int i, result = 0;
+  uint32_t dataRead = 0;
+  uint32_t address = 0x080003BE;
+  
+  uint16_t data[] = { 0xaaaa, 0xbbbb, 0xcccc, 0xdddd,
+                      0xeeee, 0xffff, 0x1111, 0x2222,
+                      0x3333, 0x4444, 0x5555, 0x6666
+                    };
+  
+  result = _flashWrite(0x080003BE, (uint8_t *)data, sizeof(data));
+  TEST_ASSERT_EQUAL(1, result);
+  
+  for(i = 0; i < 12; i++, address += 2) {
+    result = memoryReadHalfword(address, &dataRead);
+    TEST_ASSERT_EQUAL(1, result);
+    TEST_ASSERT_EQUAL_HEX16(data[i], dataRead);
+  }
 }

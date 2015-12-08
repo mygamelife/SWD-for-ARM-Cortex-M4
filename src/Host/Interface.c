@@ -1,7 +1,6 @@
 #include "Interface.h"
 
-#define BUFFER_SIZE 2000
-char InputBuffer[BUFFER_SIZE];
+char InputBuffer[INPUT_BUFFER_SIZE];
 
 void displayOptionMenu(void)  {
   printf("\n");
@@ -12,39 +11,17 @@ void displayOptionMenu(void)  {
   printf("See 'help' or 'help <command>' to read about a specific user command\n\n");
 }
 
-void displayFourByteInRow(uint8_t *data) {
+void displayMemoryMap(uint8_t *data, uint32_t address, int length) {
   int i;
-  
-  for(i = 0; i < 16; i += 4)
-    printf(" 0x%08x", get4Byte(&data[i]));
-}
 
-void displayMemoryMap(uint8_t *data, int length) {
-  int row, col, rowLength, index = 4;
-  uint32_t address = 0;
-  
-  rowLength = ((length / 4) - 1)/ 5 + 1;
-  address = get4Byte(&data[0]);
-  
-  for(row = 0; row < rowLength; row ++)  {
-    printf("> 0x%08x", address); address += 4;
-    if(length > 4) {
-      displayFourByteInRow(&data[index]);
-      index += 16;      
-    }
-    printf("\n");
+  for(i = 0; i < length; i+= 16)  {
+    printf("> 0x%08x ", address); address += 16;
+    printf( "%08x %08x %08x %08x\n",
+            get4Byte(&data[i]), get4Byte(&data[i+4]),
+            get4Byte(&data[i+8]), get4Byte(&data[i+12])
+          );
   }
   printf("\n");
-}
-
-void displayTlvData(Tlv *tlv)  {
-  int i, length = 0, counter = 0;
-  length = tlv->length;
-  
-  if(length == 1) 
-    printf("> OK\n\n");
-  else 
-    displayMemoryMap(tlv->value, length - 1);
 }
 
 /** getRegisterAddress is a function to get user Input
@@ -55,7 +32,7 @@ void displayTlvData(Tlv *tlv)  {
   * return  : Register_Address in enum
   */
 int getRegisterAddress(char *name)  {
-  
+
   if(strcmp(name, "R0") == 0)                 return R0;
   else if(strcmp(name, "R1") == 0)            return R1;
   else if(strcmp(name, "R2") == 0)            return R2;
@@ -109,7 +86,7 @@ int getRegisterAddress(char *name)  {
   else if(strcmp(name, "FPREGS29") == 0)      return FPREGS29;
   else if(strcmp(name, "FPREGS30") == 0)      return FPREGS30;
   else if(strcmp(name, "FPREGS31") == 0)      return FPREGS31;
-  
+
   else Throw(ERR_INVALID_REGISTER_ADDRESS);
 }
 
@@ -121,11 +98,11 @@ int getRegisterAddress(char *name)  {
   * return  : Register_Address in enum
   */
 int getFlashBank(char *name) {
-  
+
   if(strcmp(name, "bank1") == 0)              return BANK_1;
   else if(strcmp(name, "bank2") == 0)         return BANK_2;
   else if(strcmp(name, "full") == 0)          return BOTH_BANK;
-  
+
   else Throw(ERR_INVALID_BANK_SELECTION);
 }
 
@@ -136,27 +113,24 @@ int getFlashBank(char *name) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userLoadProgram(String *userInput)  {
-  static User_Session userSession;  int regAddress = 0;
-  CEXCEPTION_T err;   
+void userLoadProgram(User_Session *us, String *userInput)  {
+  CEXCEPTION_T err;
   Identifier *iden, *memory;
-  
+
   Try {
     memory = (Identifier*)getToken(userInput);
     iden = (Identifier*)getToken(userInput);
   } Catch(err) {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
-  
+
   if(iden->type != FILE_TOKEN)                  Throw(ERR_EXPECT_FILE_PATH);
   else if(memory->type != IDENTIFIER_TOKEN)     Throw(ERR_EXPECT_MEMORY_SELECTION);
-  else if(strcmp(memory->name, "ram") == 0)     userSession.tlvCommand = TLV_LOAD_RAM;
-  else if(strcmp(memory->name, "flash") == 0)   userSession.tlvCommand = TLV_LOAD_FLASH;
+  else if(strcmp(memory->name, "ram") == 0)     us->tlvCommand = TLV_LOAD_RAM;
+  else if(strcmp(memory->name, "flash") == 0)   us->tlvCommand = TLV_LOAD_FLASH;
   else Throw(ERR_INVALID_MEMORY_SELECTION);
-  
-  userSession.fileName = iden->name;
-  
-  return &userSession;
+
+  us->program = getLoadableSection(iden->name);
 }
 
 /** userWriteMemory is a function to get write data into
@@ -166,11 +140,11 @@ User_Session *userLoadProgram(String *userInput)  {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userWriteMemory(String *userInput) {
-  static User_Session userSession; CEXCEPTION_T err;
+void userWriteMemory(User_Session *us, String *userInput) {
+  CEXCEPTION_T err;
   Identifier *memory; Number* data, *address;
   int i = 0;
-  
+
   Try {
     memory = (Identifier *)getToken(userInput);
     address = (Number *)getToken(userInput);
@@ -178,21 +152,19 @@ User_Session *userWriteMemory(String *userInput) {
     while(userInput->length > 1) {
       data = (Number *)getToken(userInput);
       if(data->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
-      userSession.data[i++] = data->value;
+      us->data[i++] = data->value;
     }
   } Catch(err) {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
-  
+
   if(memory->type != IDENTIFIER_TOKEN)          Throw(ERR_EXPECT_MEMORY_SELECTION);
-  else if(strcmp(memory->name, "ram") == 0)     userSession.tlvCommand = TLV_WRITE_RAM;
-  else if(strcmp(memory->name, "flash") == 0)   userSession.tlvCommand = TLV_WRITE_FLASH;
+  else if(strcmp(memory->name, "ram") == 0)     us->tlvCommand = TLV_WRITE_RAM;
+  else if(strcmp(memory->name, "flash") == 0)   us->tlvCommand = TLV_WRITE_FLASH;
   else Throw(ERR_INVALID_MEMORY_SELECTION);
-  
-  userSession.size = i * 4;
-  userSession.address = address->value;
-  
-  return &userSession;
+
+  us->size = i * 4;
+  us->address = address->value;
 }
 
 /** userReadMemory is a function to get read memory instruction
@@ -202,10 +174,10 @@ User_Session *userWriteMemory(String *userInput) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userReadMemory(String *userInput) {
-  static User_Session userSession;  int regAddress = 0;
-  CEXCEPTION_T err;   Number *address, *size;
-  
+void userReadMemory(User_Session *us, String *userInput) {
+  CEXCEPTION_T err;
+  Number *address, *size;
+
   Try {
     address = (Number*)getToken(userInput);
     size = (Number*)getToken(userInput);
@@ -215,12 +187,10 @@ User_Session *userReadMemory(String *userInput) {
 
   if(address->type != NUMBER_TOKEN)     Throw(ERR_EXPECT_NUMBER);
   else if(size->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
-    
-  userSession.tlvCommand = TLV_READ_MEMORY;
-  userSession.address = address->value;
-  userSession.size = size->value;
-  
-  return &userSession;
+
+  us->tlvCommand = TLV_READ_MEMORY;
+  us->address = address->value;
+  us->size = size->value;
 }
 
 /** userWriteRegister is a function to get register address
@@ -230,31 +200,25 @@ User_Session *userReadMemory(String *userInput) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userWriteRegister(String *userInput)  {
-  static User_Session userSession;  int regAddress = 0;
+void userWriteRegister(User_Session *us, String *userInput)  {
+  int regAddress = 0;
   CEXCEPTION_T err;
   Identifier* iden; Number* data;
   uint32_t data32;
-  
+
   Try {
     iden = (Identifier*)getToken(userInput);
     data = (Number*)getToken(userInput);
   } Catch(err)  {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
-  
+
   if(iden->type != IDENTIFIER_TOKEN)    Throw(ERR_EXPECT_REGISTER_ADDRESS);
   else if(data->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
-  
-  regAddress = getRegisterAddress(iden->name);
-  userSession.tlvCommand = TLV_WRITE_REGISTER;
-  // data32 = (uint32_t)data->value;
-  // printf("data32 %x\n", data32);
-  // userSession.data = &data32;
-  userSession.data[0] = (uint32_t)data->value;
-  userSession.address = regAddress;
 
-  return &userSession;
+  us->tlvCommand = TLV_WRITE_REGISTER;
+  us->data[0] = (uint32_t)data->value;
+  us->address = getRegisterAddress(iden->name);
 }
 
 /** userReadRegister is a function to get register address
@@ -264,23 +228,20 @@ User_Session *userWriteRegister(String *userInput)  {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userReadRegister(String *userInput) {
-  static User_Session userSession;  int regAddress = 0;
+void userReadRegister(User_Session *us, String *userInput) {
+  int regAddress = 0;
   CEXCEPTION_T err; Identifier* iden;
-  
+
   Try {
     iden = (Identifier*)getToken(userInput);
   } Catch(err)  {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
-  
-  if(iden->type != IDENTIFIER_TOKEN)  Throw(ERR_EXPECT_REGISTER_ADDRESS);
-  
-  regAddress = getRegisterAddress(iden->name);
-  userSession.tlvCommand = TLV_READ_REGISTER;
-  userSession.address = regAddress;
 
-  return &userSession;
+  if(iden->type != IDENTIFIER_TOKEN)  Throw(ERR_EXPECT_REGISTER_ADDRESS);
+
+  us->tlvCommand = TLV_READ_REGISTER;
+  us->address = getRegisterAddress(iden->name);
 }
 
 /** userHaltTarget is a function to get halt instruction from user
@@ -289,12 +250,9 @@ User_Session *userReadRegister(String *userInput) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userHaltTarget(void) {
-  static User_Session userSession;
-  
-  userSession.tlvCommand = TLV_HALT_TARGET;
-  
-  return &userSession;
+void userHaltTarget(User_Session *us) {
+
+  us->tlvCommand = TLV_HALT_TARGET;
 }
 
 /** userRunTarget is a function to get run instruction from user
@@ -303,26 +261,22 @@ User_Session *userHaltTarget(void) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userRunTarget(void) {
-  static User_Session userSession;
-  
-  userSession.tlvCommand = TLV_RUN_TARGET;
-  
-  return &userSession;
+void userRunTarget(User_Session *us) {
+
+  us->tlvCommand = TLV_RUN_TARGET;
 }
 
-/** userStepTarget is a function to get step instruction 
+/** userStepTarget is a function to get step instruction
   * and number of step required from user
   *
   * Input   : userInput is the string enter by user
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userStepTarget(String *userInput) {
-  static User_Session userSession;
+void userStepTarget(User_Session *us, String *userInput) {
   Number *data; CEXCEPTION_T err;
   uint32_t data32;
-  
+
   Try {
     data = (Number*)getToken(userInput);
   } Catch(err) {
@@ -331,12 +285,8 @@ User_Session *userStepTarget(String *userInput) {
 
   if(data->type != NUMBER_TOKEN)  Throw(ERR_EXPECT_NUMBER);
 
-  userSession.tlvCommand = TLV_STEP;
-  // data32 = (uint32_t)data->value;
-  // userSession.data = &data32;
-  userSession.data[0] = (uint32_t)data->value;
-  
-  return &userSession;
+  us->tlvCommand = TLV_STEP;
+  us->data[0] = data->value;
 }
 
 /** userSetBreakpoint is a function to get address need
@@ -346,10 +296,9 @@ User_Session *userStepTarget(String *userInput) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userSetBreakpoint(String *userInput) {
-  static User_Session userSession;
+void userSetBreakpoint(User_Session *us, String *userInput) {
   CEXCEPTION_T err; Number *address;
-  
+
   Try {
     address = (Number*)getToken(userInput);
   } Catch(err)  {
@@ -357,17 +306,15 @@ User_Session *userSetBreakpoint(String *userInput) {
   }
 
   if(address->type != NUMBER_TOKEN)     Throw(ERR_EXPECT_NUMBER);
-  
-  userSession.tlvCommand = TLV_BREAKPOINT;
-  userSession.address = address->value;
 
-  return &userSession;
+  us->tlvCommand = TLV_BREAKPOINT;
+  us->address = address->value;
 }
 
-User_Session *userSectionErase(String *userInput) {
-  static User_Session userSession;
-  CEXCEPTION_T err;   Number *address, *size;
-  
+void userSectionErase(User_Session *us, String *userInput) {
+  CEXCEPTION_T err;
+  Number *address, *size;
+
   Try {
     address = (Number*)getToken(userInput);
     size = (Number*)getToken(userInput);
@@ -377,70 +324,64 @@ User_Session *userSectionErase(String *userInput) {
 
   if(address->type != NUMBER_TOKEN)     Throw(ERR_EXPECT_NUMBER);
   else if(size->type != NUMBER_TOKEN)   Throw(ERR_EXPECT_NUMBER);
-    
-  userSession.tlvCommand = TLV_FLASH_ERASE;
-  userSession.address = address->value;
-  userSession.size = size->value;
-  
-  return &userSession;
+
+  us->tlvCommand = TLV_FLASH_ERASE;
+  us->address = address->value;
+  us->size = size->value;
 }
 
-/** userErase is a function to retrieve erase option 
+/** userErase is a function to retrieve erase option
   * enter by user
   *
   * Input   : userInput is the string enter by user
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userErase(String *userInput) {
-  static User_Session userSession;
-  CEXCEPTION_T err; Identifier* iden;
+void userErase(User_Session *us, String *userInput) {
+  CEXCEPTION_T err;
+  Identifier* iden;
   int eraseSection = 0;
-  
+
   Try {
     iden = (Identifier*)getToken(userInput);
   } Catch(err)  {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
-  
+
   if(iden->type != IDENTIFIER_TOKEN)  Throw(ERR_EXPECT_ERASE_SECTION);
-  
+
   else {
     if(strcmp(iden->name, "section") == 0) {
-      return userSectionErase(userInput);
+      return userSectionErase(us, userInput);
     }
     else {
-      userSession.tlvCommand = TLV_FLASH_MASS_ERASE;
-      userSession.address = (uint32_t)getFlashBank(iden->name);
+      us->tlvCommand = TLV_FLASH_MASS_ERASE;
+      us->address = (uint32_t)getFlashBank(iden->name);
     }
   }
-
-  return &userSession;
 }
 
-/** userReset is a function to retrieve reset option 
+/** userReset is a function to retrieve reset option
   * enter by user
   *
   * Input   : userInput is the string enter by user
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userReset(String *userInput) {
-  static User_Session userSession;
-  CEXCEPTION_T err; Identifier *option;
-  
+void userReset(User_Session *us, String *userInput) {
+  CEXCEPTION_T err;
+  Identifier *option;
+
   Try {
     option = (Identifier*)getToken(userInput);
   } Catch(err) {
     Throw(ERR_INCOMPLETE_COMMAND);
   }
-  
+
   if(option->type != IDENTIFIER_TOKEN)          Throw(ERR_OPTION_NOT_FOUND);
-  else if(strcmp(option->name, "soft") == 0)    userSession.tlvCommand = TLV_SOFT_RESET;
-  else if(strcmp(option->name, "hard") == 0)    userSession.tlvCommand = TLV_HARD_RESET;
+  else if(strcmp(option->name, "soft") == 0)    us->tlvCommand = TLV_SOFT_RESET;
+  else if(strcmp(option->name, "hard") == 0)    us->tlvCommand = TLV_HARD_RESET;
   else Throw(ERR_INVALID_COMMAND);
-  
-  return &userSession;
 }
 
 /** userExit is a function to exit instruction
@@ -449,12 +390,9 @@ User_Session *userReset(String *userInput) {
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *userExit(void) {
-  static User_Session userSession;
-  
-  userSession.tlvCommand = TLV_EXIT;
-  
-  return &userSession;
+void userExit(User_Session *us) {
+
+  us->tlvCommand = TLV_EXIT;
 }
 
 Command_Code getCommandCode(char *commandName) {
@@ -472,7 +410,7 @@ Command_Code getCommandCode(char *commandName) {
   else if(strcmp(commandName, "erase") == 0)          return ERASE;
   else if(strcmp(commandName, "reset") == 0)          return RESET_COMMAND;
   else if(strcmp(commandName, "exit") == 0)           return EXIT;
-  
+
   else Throw(ERR_INVALID_USER_COMMAND);
 }
 
@@ -486,7 +424,7 @@ Command_Code getCommandCode(char *commandName) {
 void helpMenu(String *userInput) {
   Identifier *command;
   Command_Code ccode;
-  
+
   if(userInput->length <= 1) {
     printf("Available commands :\n\n");
     printf(" load     load program into target memory can either ram/flash\n");
@@ -510,20 +448,20 @@ void helpMenu(String *userInput) {
 }
 
 void helpCommand(Command_Code ccode) {
-  
+
   switch(ccode) {
     case LOAD                         : printf(" load <memory> <file_path>                                                \n\n");
                                         printf(" <memory>     Target memory location that program will be                   \n");
                                         printf("              load into (ram/flash)                                         \n");
                                         printf(" <file_path>  Program elf file location                                     \n");
                                         break;
-                                        
+
     case READ_MEMORY                  : printf(" read <address> <size>                                                      \n\n");
                                         printf(" <address>    Any valid memory address                                      \n");
                                         printf(" <size>       Size of the memory want to read                               \n");
                                         break;
-    
-    case WRITE_REGISTER               : printf(" wreg <reg_address> <value>                                               \n\n");                                       
+
+    case WRITE_REGISTER               : printf(" wreg <reg_address> <value>                                               \n\n");
                                         printf(" <reg_address>    Register address can be one of the following value :      \n");
                                         printf("                      =======================================               \n");
                                         printf("                      | Core Register 0 - 12 |   R0 - R12   |               \n");
@@ -553,8 +491,8 @@ void helpCommand(Command_Code ccode) {
                                         printf("                      =======================================               \n");
                                         printf(" <value>          Data write into register in byte format                   \n");
                                         break;
-                                        
-    case READ_REGISTER                : printf(" reg <reg_address>                                                        \n\n");    
+
+    case READ_REGISTER                : printf(" reg <reg_address>                                                        \n\n");
                                         printf(" <reg_address>    Register address can be one of the following value :      \n");
                                         printf("                      =======================================               \n");
                                         printf("                      | Core Register 0 - 12 |   R0 - R12   |               \n");
@@ -583,21 +521,21 @@ void helpCommand(Command_Code ccode) {
                                         printf("                      | Register 0 - 31      | FPSCR 0 - 31 |               \n");
                                         printf("                      =======================================               \n");
                                         break;
-                                        
+
     case HALT                         : printf(" halt <empty>                                                             \n\n");
                                         break;
-    
+
     case RUN                          : printf(" run <empty>                                                              \n\n");
                                         break;
-    
+
     case STEP                         : printf(" step <number_of_step>                                                    \n\n");
                                         printf(" <number_of_step>   Number of statement can be executes at a time           \n");
                                         break;
-                                        
+
     case BREAKPOINT                   : printf(" brkpt <address>                                                          \n\n");
                                         printf(" <address>   Any valid code region address 0x00000000 - 0x1FFFFFFF          \n");
                                         break;
-                                        
+
     case ERASE                        : printf(" Section Erase                                                              \n");
                                         printf(" erase <section> <address> <size>                                         \n\n");
                                         printf(" <address>        Any valid flash address 0x08000000 - 0x081FFFFF           \n");
@@ -609,47 +547,46 @@ void helpCommand(Command_Code ccode) {
                                         printf("                    bank2   :: Flash Bank 2 0x08100000 - 0x081FFFFF         \n");
                                         printf("                    full    :: Both Flash Bank 1 and 2                      \n");
                                         break;
-    
-    case RESET_COMMAND                        : printf(" reset <reset_option>                                                     \n\n");
+
+    case RESET_COMMAND                : printf(" reset <reset_option>                                                     \n\n");
                                         printf(" <reset_option>  Type of reset can be one of the following value :          \n");
                                         printf("                    hard    :: hardware reset                               \n");
                                         printf("                    soft    :: software reset                               \n");
                                         printf("                    vector  :: vector reset                                 \n");
                                         break;
-                                        
+
     case EXIT                         : printf(" exit <empty>                                                             \n\n");
                                         break;
   }
 }
 
-/** InterpreteCommand is a function to interpreter user input to 
+/** InterpreteCommand is a function to interpreter user input to
   * a meaningful information to machine
   *
   * Input   : ccode is a Command code can be one of the following value
   *
   * return  : userSession contain all the information from the user input
   */
-User_Session *InterpreteCommand(String *userInput) {
+void InterpreteCommand(User_Session *us, String *userInput) {
   Identifier *command; Command_Code ccode;
-  
+
   command = (Identifier*)getToken(userInput);
   ccode = getCommandCode(command->name);
-  
-  if(ccode == HELP) {                         helpMenu(userInput); 
-                                              return NULL;}
-  else if(ccode == LOAD)                      return userLoadProgram(userInput);
-  else if(ccode == WRITE_COMMAND)             return userWriteMemory(userInput);
-  else if(ccode == READ_MEMORY)               return userReadMemory(userInput);
-  else if(ccode == WRITE_REGISTER)            return userWriteRegister(userInput);
-  else if(ccode == READ_REGISTER)             return userReadRegister(userInput);
-  else if(ccode == HALT)                      return userHaltTarget();
-  else if(ccode == RUN)                       return userRunTarget();
-  else if(ccode == STEP)                      return userStepTarget(userInput);
-  else if(ccode == BREAKPOINT)                return userSetBreakpoint(userInput);
-  else if(ccode == ERASE)                     return userErase(userInput);
-  else if(ccode == RESET_COMMAND)             return userReset(userInput);
-  else if(ccode == EXIT)                      return userExit();
-  
+
+  if(ccode == HELP)                           helpMenu(userInput);
+  else if(ccode == LOAD)                      userLoadProgram(us, userInput);
+  else if(ccode == WRITE_COMMAND)             userWriteMemory(us, userInput);
+  else if(ccode == READ_MEMORY)               userReadMemory(us, userInput);
+  else if(ccode == WRITE_REGISTER)            userWriteRegister(us, userInput);
+  else if(ccode == READ_REGISTER)             userReadRegister(us, userInput);
+  else if(ccode == HALT)                      userHaltTarget(us);
+  else if(ccode == RUN)                       userRunTarget(us);
+  else if(ccode == STEP)                      userStepTarget(us, userInput);
+  else if(ccode == BREAKPOINT)                userSetBreakpoint(us, userInput);
+  else if(ccode == ERASE)                     userErase(us, userInput);
+  else if(ccode == RESET_COMMAND)             userReset(us, userInput);
+  else if(ccode == EXIT)                      userExit(us);
+
   else Throw(ERR_INVALID_USER_COMMAND);
 }
 
@@ -659,20 +596,45 @@ User_Session *InterpreteCommand(String *userInput) {
 User_Session *waitUserCommand(void) {
   static int display = 0;
   Number *num; String *str;
-  
+
+  User_Session *us = createNewUserSession();
+
   if(display == 0) {
     display = 1;
     printf("> ");
-  } 
-  
+  }
+
   if(!kbhit()) return NULL;
-  
+
   else {
     display = 0;
-    fgets(InputBuffer, BUFFER_SIZE, stdin);
+    fgets(InputBuffer, INPUT_BUFFER_SIZE, stdin);
   }
-  
+
   str = stringNew(InputBuffer);
-  
-  return InterpreteCommand(str);
+  InterpreteCommand(us, str);
+
+  stringDel(str);
+  return us;
+}
+
+User_Session *createNewUserSession(void) {
+  User_Session *us = malloc(sizeof(User_Session));
+
+  us->size        = 0;
+  us->address     = 0;
+  us->program     = NULL;
+  us->tlvCommand  = 0;
+
+  memset(us->data, 0, sizeof(us->data));
+
+  return us;
+}
+
+void delUserSession(User_Session *us) {
+  if(us != NULL) {
+    delProgram(us->program);
+    free(us);
+    us = NULL;
+  }
 }

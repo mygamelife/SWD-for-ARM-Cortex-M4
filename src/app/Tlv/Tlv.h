@@ -21,47 +21,9 @@ typedef struct
   void *handler;
   uint8_t txBuffer[255];                  /* Tlv transmit buffer used to transfer tlv packet to target                */
   uint8_t rxBuffer[255];                  /* Tlv receive buffer used to receive tlv packet from target                */
-  /* Send and Receive state */
-  Tlv_State receiveState;
-  /* ###### Tlv state ###### */
-  int state;
-  Tlv_State wregState;
-  Tlv_State regState;
-  Tlv_State haltState;
-  Tlv_State runState;
-  Tlv_State stepState;
-  Tlv_State sresetState;
-  Tlv_State hresetState;
-  Tlv_State vresetState;
-  Tlv_State wramState;
-  Tlv_State wflashState;
-  Tlv_State lflashState;
-  Tlv_State rmemState;
-  Tlv_State rEraseState;                       /* Request section erase state              */
-  Tlv_State rMassEraseState;                   /* Request mass erase state                 */
-  Tlv_State wDataInWordState;                  /* Write data in word state                 */
-  Tlv_State wDataInHalfWordState;              /* Write data in halfword state             */
-  Tlv_State wDataInByteState;                  /* Write data in byte state                 */
-  Tlv_State memoryRwState;                     /* memory read write state                  */
-  Tlv_State breakpointHandlerState;
-  Tlv_State rmBreakpointState;
-  Tlv_State rmAllBreakpointState;
-  Tlv_State stopRemapState;
-  Tlv_State stopAllRemapState;
-  /* Host and Probe state */
-  Host_State hostState;
-  Probe_State probeState;
-  /* Load Program state */
-  Tlv_State loadProgramState;
-  Tlv_State lramState;
-  /* Host flash state */
-  Tlv_State flashState;
-  Tlv_State eraseState;
-  Tlv_State mEraseState;
-  /* Probe flash state */
-  Tlv_State pFlashState;
-  /* Flags */
-  uint32_t flags;
+  Tlv_State receiveState;                 /* Send and Receive state */
+  uint32_t flags;                         /* Flags */
+  bool exit;
 } Tlv_Session;
 
 typedef enum {
@@ -83,6 +45,8 @@ typedef enum {
 #define SET_FLAG_STATUS(__SESSION__, __FLAG__)          ((__SESSION__)->flags |= (__FLAG__))
 #define CLEAR_FLAG_STATUS(__SESSION__, __FLAG__)        ((__SESSION__)->flags &= ~(__FLAG__))
 
+#define tlvReply(session, command, size, data)          tlvSendRequest(session, command, size, data)
+
 Tlv_Session *tlvCreateSession(void);
 
 Tlv *tlvCreatePacket(uint8_t command, uint8_t size, uint8_t *data);
@@ -90,6 +54,7 @@ uint8_t tlvPackIntoBuffer(uint8_t *targetBuffer, uint8_t *currentBuffer, int len
 uint8_t tlvUpdateChecksum(uint8_t oldChecksum, uint8_t newChecksum);
 
 void tlvSend(Tlv_Session *session, Tlv *tlv);
+void tlvSendRequest(Tlv_Session *session, Tlv_Command command, int size, uint8_t *data);
 Tlv *tlvReceive(Tlv_Session *session);
 
 /* Tlv service state machine */
@@ -103,5 +68,7 @@ int isTlvCommand(uint8_t command);
 int isTlvAck(Tlv *tlv);
 int verifyTlvPacket(Tlv *tlv);
 void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode);
+void tlvReadDataChunk(Tlv_Session *session, uint32_t *destAddress, int *size);
+void tlvWriteDataChunk(Tlv_Session *session, uint8_t **dataAddress, uint32_t *destAddress, int *size, Tlv_Command memorySelect);
 
 #endif // Tlv_H

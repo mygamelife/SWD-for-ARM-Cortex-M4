@@ -20,6 +20,9 @@
 #include "MemoryReadWrite.h"
 #include "ETM_M4.h"
 #include "ETMEx.h"
+#include "Yield.h"
+#include "LoadElf.h"
+#include "ProgramVerifier.h"
 
 static int initFlag = 0;
 

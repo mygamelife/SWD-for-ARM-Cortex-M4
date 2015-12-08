@@ -14,8 +14,6 @@ typedef enum
   UART_ERROR
 } Uart_Status;
 
-
-#define UART_PORT                     "COM3"//"COM7"
 #define UART_BAUD_RATE                128000//9600
 #define closePort(__SESSION__)        CloseHandle(((HANDLE *)((__SESSION__)->handler)))
 
@@ -31,6 +29,9 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
 uint8_t getByte(void *handler, uint8_t *rxBuffer);
 
 int getAvailableComPort(void **handler);
-int isComPortAlive(void *handler);
+
+HANDLE findProbe(void);
+HANDLE openComPort(LPCSTR portname, DWORD baudrate);
+int isComPortAlive(HANDLE handler);
 
 #endif // Uart_H

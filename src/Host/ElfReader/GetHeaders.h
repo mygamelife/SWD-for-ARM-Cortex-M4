@@ -99,4 +99,3 @@ void closeElfData(ElfData *elfData);
 void closeElfSection(ElfSection *elfSection);
 void closeElfFile(void);
 #endif // Get_File_Header_H
-

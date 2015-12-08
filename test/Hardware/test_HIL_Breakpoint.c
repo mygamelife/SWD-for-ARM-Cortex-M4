@@ -22,9 +22,11 @@
 #include "CoreDebugEx.h"
 #include "FPBUnit.h"
 #include "FPBUnitEx.h"
+#include "Yield.h"
+#include "LoadElf.h"
+#include "ProgramVerifier.h"
 #include "CodeStepping.h"
 #include <direct.h>
-// #include <windows.h>
 
 #define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
 char FlashProgrammerPath[1024];
@@ -47,7 +49,6 @@ uint16_t machineCode[] =
   0x2117,         //0x080003E6  movs r1,#23
   0xE7FE,         //0x080003E8  b.
   0xBF00,         //0x080003EA  nop.
-  
 };
 
 
@@ -65,11 +66,10 @@ void setUp(void)
   {
     if(initFlag == 0) 
     {  
-      system("rake target:release[FlashProgrammer/FlashProgrammer.coproj]");
       initFlag = 1;
-       if(_session == NULL)
-	  _session = tlvCreateSession();
-	  setCoreMode(CORE_DEBUG_MODE);
+      initMemoryReadWrite();
+      
+      setCoreMode(CORE_DEBUG_MODE);
       loadBreakpointTestProgram();
     }
     setCoreMode(CORE_DEBUG_HALT);
@@ -114,26 +114,18 @@ static void loadBreakpointTestProgram()
   int i = 0;
   uint32_t address = 0x080003BE ;
   uint32_t pc = 0 ;
+  
   if(verifyEqualProgram(address,machineCode,CODE_SIZE))
     printf("No difference in the program loaded in target device. No flashing is required\n");
   else
   {
-	initMemoryReadWrite();
-     
-    printf("Erasing \n");
-    if(_flashErase(0x08000000, 2000) ==1);
-      printf("Flash erase complete\n");
-
     printf("Flashing \n");
-    Try{
-      for(i = 0 ; i < CODE_SIZE ; i++,address +=2)
-      _flashWrite(address,machineCode[i],HALFWORD_SIZE);
+    Try {
+      _flashWrite(address,(uint8_t *)machineCode,CODE_SIZE*2);
     }
-    Catch(err)
-    {
+    Catch(err) {
       displayErrorMessage(err);
     }
-
   }
 }
 
@@ -158,7 +150,7 @@ static void getFlashProgrammerPath()
 	{
 		replaceBackslashInDirectory();	
 		strcat(FlashProgrammerPath,"/");
-		strcat(FlashProgrammerPath,FLASH_PROGRAMMER_FILE_PATH);
+		strcat(FlashProgrammerPath, FP_PATH);
 	}
 }
 
@@ -262,12 +254,10 @@ void test_instructionBreakPointTestCase_4bytes_UpperHalfWord()
     }
     setCoreMode(CORE_DEBUG_MODE);
   }
-
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP2);
 
   TEST_ASSERT_EQUAL(1,fail); 
 }
-
 
 /**
  * 0x080003C8	 ________    <---set word breakpoint at 0x080003C8
@@ -294,7 +284,6 @@ void test_instructionBreakPointTestCase_4bytes_Word()
 
   TEST_ASSERT_EQUAL(0x080003C8,PC);
 }
-
 
 /**
  * 0x080003D2	 ________
@@ -333,7 +322,6 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_LowerHalfword()
   TEST_ASSERT_EQUAL(1,fail);
 }
 
-
 /**
  * 0x080003D0	  ________
  * 0x080003D2 	|________|
@@ -354,7 +342,6 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
   writeCoreRegister(CORE_REG_PC,0x080003D2);
   setCoreMode(CORE_DEBUG_MODE);
 
-
   while(!hasBreakpointDebugEventOccured())
     {
       PC = readCoreRegister(CORE_REG_PC);
@@ -365,7 +352,7 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_4bytes_Word()
       }
       setCoreMode(CORE_DEBUG_MODE);
     }
-
+    
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(1,fail);
@@ -390,16 +377,16 @@ void test_instructionBreakPointTestCase_2bytes_4bytes_2bytes_Word()
   setCoreMode(CORE_DEBUG_MODE);
 
   while(!hasBreakpointDebugEventOccured())
+  {
+    PC = readCoreRegister(CORE_REG_PC);
+    if(PC > 0x080003E0)
     {
-      PC = readCoreRegister(CORE_REG_PC);
-      if(PC > 0x080003E0)
-      {
-		fail = 1;
-		break ;
-	  }
-      setCoreMode(CORE_DEBUG_MODE);
-    }
-
+  fail = 1;
+  break ;
+  }
+    setCoreMode(CORE_DEBUG_MODE);
+  }
+  
   disableFlashPatchInstructionComparator(INSTRUCTION_COMP3);
 
   TEST_ASSERT_EQUAL(1,fail);

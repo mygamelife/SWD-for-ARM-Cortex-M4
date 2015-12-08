@@ -1,32 +1,47 @@
 #ifndef Tpiu_H
 #define Tpiu_H
 
-#include "stm32f429xx.h"
-#include "core_cm4.h"
-#include "MemoryReadWrite.h"
+#include "Gpio.h"
+#include "CoreDebug.h"
+
+#define SWO_TRACE_PORT              PORTB /* Physical pin is beside PG15*/
+#define SWO_TRACE_PIN               PIN_3 
+
+#define TRACE_PORT                  PORTE
+#define TRACE_CLOCK_PIN             PIN_2
+#define TRACE_DATA0_PIN             PIN_3
 
 /* TPIU trace port size selection
  */
 #define TPIU_PORT_SIZE_1            ((uint32_t) 0x00000001)
 #define TPIU_PORT_SIZE_2            ((uint32_t) 0x00000002)
-#define TPIU_PORT_SIZE_3            ((uint32_t) 0x00000003)
+/* TPIU_PORT_SIZE_3 is not supported */
 #define TPIU_PORT_SIZE_4            ((uint32_t) 0x00000004)
 
 /* TPIU trace port protocol selection
    - The standard UART (NRZ) capture mechanism, 5% accuracy is needed.
    - The Manchester encoded version is tolerant up to 10%.
  */
-#define SYNC_TRACE_PORT_MODE        ((uint32_t) 0x00000000)
-#define SWO_MANCHESTER_MODE         ((uint32_t) 0x00000001)
-#define SWO_NRZ_MODE                ((uint32_t) 0x00000002)
+#define SYNC_MODE                   ((uint32_t) 0x00000000)
+#define MANCHESTER_MODE             ((uint32_t) 0x00000001)
+#define NRZ_MODE                    ((uint32_t) 0x00000002)
 
-/* Enable trace and debug features to allow
-   stm32f429xx to use the debug blocks such as ITM/ETM/DWT/TPIU
- */
-#define enableTrace()               (CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk)  /* Enable use of the trace and debug blocks */
-#define enableTraceIo()             (DBGMCU->CR |= DBGMCU_CR_TRACE_IOEN)  /* Enable Trace I/O features  */
-#define selectTraceAsynMode()       (DBGMCU->CR |= (uint32_t)0x00000000)  /* Select Trace Asynchronous Mode */
+/* ############### Configure target TPIU through Serial Wire Debug (SWD) ############### */
+#define tpiuPortSize(__PORT_SIZE__)                 \
+        memoryWriteWord((uint32_t)&TPI->CSPSR, __PORT_SIZE__)   /* Configure TPIU trace port size */
 
-void tpiuConfig(void);
+#define tpiuFormatter(__CONFIG_BIT__)               \
+        memoryWriteWord((uint32_t)&TPI->FFCR, __CONFIG_BIT__)   /* Configure TPIU output format */
+
+#define tpiuProtocol(__PROTOCOL__)                  \
+        memoryWriteWord((uint32_t)&TPI->SPPR, __PROTOCOL__)     /* Configure TPIU trace port protocol */
+
+#define enableAndSelectTraceMode(__TRACE_MODE__)    \
+        memoryWriteWord((uint32_t)&DBGMCU->CR, DBGMCU_CR_TRACE_IOEN | __TRACE_MODE__) /* Enable trace I/O (SWO) and select Trace Mode */
+                                          
+void tpiuInit(void);
+void tpiuConfigPort(void);
+void tpiuInitx(void);
+void tpiuConfigPortx(void);
 
 #endif // Tpiu_H

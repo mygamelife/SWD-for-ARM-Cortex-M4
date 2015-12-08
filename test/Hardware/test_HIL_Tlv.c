@@ -16,7 +16,7 @@ void test_tlvLoopBack_(void) {
   int i, j, k; CEXCEPTION_T err;
   uint8_t data[252] = {0};
   
-  for(j = 0; j < 500; j++) {
+  for(j = 0; j < 20; j++) {
     for(i = 0, k = j; i < 252; i++, k++) data[i] = k;
 
     tlv = tlvCreatePacket(TLV_LOOP_BACK, 252, data);
