@@ -1,0 +1,46 @@
+#include "unity.h"
+#include "Yield.h"
+#include "Tlv.h"
+#include "TlvEx.h"
+#include "Uart.h"
+#include "SystemTime.h"
+#include "ErrorCode.h"
+#include "Read_File.h"
+#include "GetHeaders.h"
+#include "Interface.h"
+#include "ProgramElf.h"
+#include "ProgramLoader.h"
+#include "CException.h"
+#include "CustomAssertion.h"
+#include "StringObject.h"
+#include "Token.h"
+#include "IdentifierToken.h"
+#include "NumberToken.h"
+#include "OperatorToken.h"
+#include "FileToken.h"
+#include "LoadElf.h"
+#include "ProgramVerifier.h"
+#include "MemoryReadWrite.h"
+#include "CoreDebug.h"
+#include "CoreDebugEx.h"
+#include "Gpio.h"
+#include "Rcc.h"
+#include "Itm.h"
+#include "Tpiu.h"
+
+static int flag = 0;
+
+void setUp(void) {
+  if(flag == 0) {
+    flag = 1;
+    initMemoryReadWrite();
+  }
+}
+
+void tearDown(void) {}
+
+void test_ITM_configure_and_write_data_into_simulus_register_0(void) {
+  
+  itmInit();
+  // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+}

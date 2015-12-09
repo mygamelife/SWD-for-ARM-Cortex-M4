@@ -98,12 +98,12 @@ int isComPortAlive(HANDLE handler) {
     char *reply = &rxBuffer[2];
     
     if(strcmp(reply, PASSKEY) == 0) {
-      printf("passkey reply from probe %s\n", reply);
+      // printf("passkey reply from probe %s\n", reply);
       return 1;
     }
     
     else {
-      printf("passkey reply from probe %s\n", reply);
+      // printf("passkey reply from probe %s\n", reply);
       Throw(ERR_INVALID_PASSKEY);
     }
   }
@@ -136,7 +136,6 @@ HANDLE findProbe(void) {
       if(isComPortAlive(handler))
         return handler;
     }
-    CloseHandle(handler);
   }
 
   return NULL;
