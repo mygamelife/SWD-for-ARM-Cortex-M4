@@ -5,6 +5,6 @@
 #include "Swd.h"
 #include "ProgramWorker.h"
 #include "SystemConfigure.h"
-#include "Itm.h"
+#include "Trace/Itm.h"
 
 #endif // main_H

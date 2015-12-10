@@ -101,7 +101,6 @@ typedef struct {
 
 #define resetTargetClock(x)               memoryWriteWord((uint32_t)&rcc->RCC_APB1RSTR, x)
 #define enableTargetClock(x)              memoryWriteWord((uint32_t)&rcc->RCC_AHB1ENR, x)
-
 #define setPortMode(__PORT__, x)          memoryWriteWord((uint32_t)&(__PORT__)->MODER, x)
 #define setPortSpeed(__PORT__, x)         memoryWriteWord((uint32_t)&(__PORT__)->OSPEED, x)
 #define setPortOutputType(__PORT__, x)    memoryWriteWord((uint32_t)&(__PORT__)->OTYPER, x)

@@ -34,13 +34,20 @@ void setUp(void) {
   if(flag == 0) {
     flag = 1;
     initMemoryReadWrite();
+    itmInit();
   }
 }
 
 void tearDown(void) {}
 
 void test_ITM_configure_and_write_data_into_simulus_register_0(void) {
+  uint32_t data = 0;
   
-  itmInit();
-  // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  // memoryWriteWord((uint32_t)&ITM->PORT[0].u8, 0xF0);
+
+  // memoryReadWord((uint32_t)&ITM->PORT[0].u32, &data);
+  // printf("data 0 %x\n", data);
+  // memoryReadWord((uint32_t)&ITM->PORT[1].u32, &data);
+  // printf("data 1 %x\n", data);
 }

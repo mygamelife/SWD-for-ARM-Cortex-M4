@@ -38,9 +38,6 @@
 #define tpiuPortSize(__PORT_SIZE__)       memoryWriteWord((uint32_t)&TPI->CSPSR, __PORT_SIZE__)           /* Configure TPIU trace port size */
 #define tpiuFormatter(__CONFIG_BIT__)     memoryWriteWord((uint32_t)&TPI->FFCR, __CONFIG_BIT__)           /* Configure TPIU output format */
 #define tpiuProtocol(__PROTOCOL__)        memoryWriteWord((uint32_t)&TPI->SPPR, __PROTOCOL__)             /* Configure TPIU trace port protocol */
-                                          
-void configTpiu(void);
-void configTracePort(void);
 
 void tpiuConfigTracePort(void);
 void tpiuInit(void);

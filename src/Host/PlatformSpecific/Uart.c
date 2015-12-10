@@ -48,7 +48,12 @@ HANDLE openComPort(LPCSTR portname, DWORD baudrate) {
   dcbSerialParams.DCBlength=sizeof(dcbSerialParams);
 
   if (!GetCommState(handler, &dcbSerialParams))
-  { Throw(ERR_GET_COMM_STATE); }
+  {
+    // Throw(ERR_GET_COMM_STATE);
+    printf("Failed to get serial comm state\n");
+    CloseHandle(handler);
+    return NULL;
+  }
 
   dcbSerialParams.BaudRate = baudrate;
   dcbSerialParams.ByteSize = 8;
@@ -56,7 +61,12 @@ HANDLE openComPort(LPCSTR portname, DWORD baudrate) {
   dcbSerialParams.Parity = NOPARITY;
 
   if(!SetCommState(handler, &dcbSerialParams))
-  { Throw(ERR_SET_COMM_STATE); }
+  {
+    // Throw(ERR_SET_COMM_STATE);
+    printf("Failed to set serial comm state\n");
+    CloseHandle(handler);
+    return NULL;
+  }
 
   /* Set internal timeout */
   timeouts.ReadIntervalTimeout = 20;
@@ -66,7 +76,12 @@ HANDLE openComPort(LPCSTR portname, DWORD baudrate) {
   timeouts.WriteTotalTimeoutMultiplier = 20;
 
   if(!SetCommTimeouts(handler, &timeouts))
-  { Throw(ERR_SET_COMM_TIMEOUTS); }
+  {
+    // Throw(ERR_SET_COMM_TIMEOUTS);
+    printf("Failed to set serial comm timeout\n");
+    CloseHandle(handler);
+    return NULL;
+  }
 
   return handler;
 }
@@ -96,12 +111,12 @@ int isComPortAlive(HANDLE handler) {
   if(getBytes(handler, rxBuffer, sizeof(PASSKEY) + 3) == UART_OK)
   {
     char *reply = &rxBuffer[2];
-    
+
     if(strcmp(reply, PASSKEY) == 0) {
       // printf("passkey reply from probe %s\n", reply);
       return 1;
     }
-    
+
     else {
       // printf("passkey reply from probe %s\n", reply);
       Throw(ERR_INVALID_PASSKEY);
@@ -112,7 +127,7 @@ int isComPortAlive(HANDLE handler) {
     printf("There are several reasons can cause this issues, for example :\n");
     printf("- Cable is disconnected\n");
     printf("- Probe did not receive any message\n");
-  }    
+  }
 
   return 0;
 }
@@ -152,7 +167,7 @@ void uartInit(void **handler) {
 
   HANDLE hSerial = findProbe();
 
-  if(hSerial) 
+  if(hSerial)
   { *handler = hSerial; }
 
   else Throw(ERR_NO_COM_PORT);
@@ -187,7 +202,7 @@ uint8_t getByte(void *handler, uint8_t *rxBuffer) {
   }
   if(dwBytesRead != 0) {
     // printf("Byte is Received!\n");
-    return UART_OK;  
+    return UART_OK;
   }
   else return UART_ERROR;
 }
@@ -195,7 +210,7 @@ uint8_t getByte(void *handler, uint8_t *rxBuffer) {
 /* Uart Receive Function */
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
   DWORD dwBytesRead = 0;
-  
+
   if(!ReadFile((HANDLE)handler, rxBuffer, length, &dwBytesRead, NULL)){
     // handle error
     DWORD errId = GetLastError();
@@ -204,7 +219,7 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
   }
   if(dwBytesRead != 0) {
     // printf("Byte is Received!\n");
-    return UART_OK;  
+    return UART_OK;
   }
   else return UART_ERROR;
 }
