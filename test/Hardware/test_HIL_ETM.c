@@ -59,10 +59,10 @@ void test_lockETM_should_get_0x3_when_reading_from_ETMLSR()
 }
 
 /*----------isETMLocked------------*/
-void test_isETMLocked_should_return_2_if_locked()
+void test_isETMLocked_should_return_1_if_locked()
 {
   lockETM();
-  TEST_ASSERT_EQUAL(2,isETMLocked());
+  TEST_ASSERT_EQUAL(1,isETMLocked());
 }
 
 void test_isETMLocked_should_return_0_if_not_locked()
@@ -76,4 +76,60 @@ void test_isETMLocked_should_return_0_if_not_locked()
 void test_getETMID_should_return_etm_id_of_the_device()
 {
   TEST_ASSERT_EQUAL(0x4114F250,getETMID());
+}
+
+/*------------isETMPoweredUp----------*/
+void test_isETMPoweredUp_should_return_1_if_powered_up()
+{
+  memoryWriteByte((uint32_t)&(ETM->ETMCR),0);
+  
+  TEST_ASSERT_EQUAL(1,isETMPoweredUp());
+}
+
+void test_isETMPoweredUp_should_return_0_if_powered_down()
+{
+  memoryWriteByte((uint32_t)&(ETM->ETMCR),1);
+  
+  TEST_ASSERT_EQUAL(0,isETMPoweredUp());
+}
+
+/*---------isETMProgrammingBitSet------*/
+void test_isETMProgrammingBitSet_should_return_1_if_set()
+{
+  memoryWriteWord((uint32_t)&(ETM->ETMCR),0x141E);
+  
+  TEST_ASSERT_EQUAL(1,isETMProgrammingBitSet());
+}
+
+void test_isETMProgrammingBitSet_should_return_0_if_cleared()
+{
+  memoryWriteWord((uint32_t)&(ETM->ETMCR),0x101E);
+  
+  TEST_ASSERT_EQUAL(0,isETMProgrammingBitSet());
+}
+
+/*---------powerUpETM------*/
+void test_powerUpETM_should_powerUpETM()
+{
+  memoryWriteByte((uint32_t)&(ETM->ETMCR),1);
+  TEST_ASSERT_EQUAL(0,isETMPoweredUp());
+  
+  powerUpETM();
+  TEST_ASSERT_EQUAL(1,isETMPoweredUp());
+}
+
+/*---------powerDownETM------*/
+void test_powerDownETM_should_powerDownETM()
+{
+  memoryWriteByte((uint32_t)&(ETM->ETMCR),0);
+  TEST_ASSERT_EQUAL(1,isETMPoweredUp());
+  
+  powerDownETM();
+  TEST_ASSERT_EQUAL(0,isETMPoweredUp());
+}
+
+/*---------getETMConfiguration------*/
+void test_getETMConfiguration_should_printf_ETM_configuration()
+{
+  getETMConfiguration();
 }

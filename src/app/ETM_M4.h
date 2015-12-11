@@ -8,7 +8,17 @@
 #define lockETM()     memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_LOCK)
 
 
-int isETMLocked();
 uint32_t getETMID();
+void getETMConfiguration();
+
+int isETMLocked();
+int isETMPoweredUp();
+int isETMProgrammingBitSet();
+
+void powerUpETM();
+void powerDownETM();
+
+void setETMProgrammingBit();
+void clearETMProgrammingBit();
 
 #endif // ETM-M4_H
