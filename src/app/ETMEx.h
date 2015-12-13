@@ -196,7 +196,16 @@ typedef enum
   NOT_A_OR_NOT_B,
 }ETMEvent_FunctionEncoding;
 
-
+#define ETM_ETMCR_TIMESTAMP_ENABLE_Pos                                        28
+#define ETM_ETMCR_TIMESTAMP_ENABLE_Msk                                        (1UL << ETM_ETMCR_TIMESTAMP_ENABLE_Pos)
+#define ETM_ETMCR_DATAONLY_MODE_Pos                                           20
+#define ETM_ETMCR_DATAONLY_MODE_Msk                                           (1UL << ETM_ETMCR_DATAONLY_MODE_Pos)
+#define ETM_ETMCR_ETMEN_Pos                                                   11
+#define ETM_ETMCR_ETMEN_Msk                                                   (1UL << ETM_ETMCR_ETMEN_Pos)
+#define ETM_ETMCR_BRANCH_OUTPUT_Pos                                           8
+#define ETM_ETMCR_BRANCH_OUTPUT_Msk                                           (1UL << ETM_ETMCR_BRANCH_OUTPUT_Pos)
+#define ETM_ETMCR_STALL_PROCESSOR_Pos                                         7
+#define ETM_ETMCR_STALL_PROCESSOR_Msk                                         (1UL << ETM_ETMCR_STALL_PROCESSOR_Pos)
 #define ETM_ETMCR_ETMPOWERDOWN_Pos                                            0
 #define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
 #define ETM_ETMCR_ETMPROGBIT_Pos                                              10
