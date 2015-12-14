@@ -200,3 +200,70 @@ void clearETMProgrammingBit()
   
   while(isETMProgrammingBitSet()); 
 }
+
+/**
+ *  Configure start/stop logic to assert TraceEnable signal with conditions
+ *  Note : The behavior of the trace start/stop block is UNPREDICTABLE if the same EmbeddedICE watchpoint input is used as both
+ *         the start input and the stop input to the block.
+ *
+ *  Input :  traceStartStopLogicEnable is used to control the trace start/stop logic block
+ *				   Possible value :
+ *					    DISABLE_TRACESTARTSTOP_LOGIC	          Trace start/stop logic block disable
+ *					    ENABLE_TRACESTARTSTOP_LOGIC	            Trace start/stop logic block enable and tracing is affected by start and stop EmbeddedICE watchpoint input
+ *
+ *          startResource is used to select the EmbeddedICE watchpoint input as trace start/stop logic block start resource
+ *				   Possible value : 
+ *					    SELECT_NONE	                            Select none
+ *              RESOURCE_1                              Select EmbeddedICE watchpoint input 1 
+ *              RESOURCE_2                              Select EmbeddedICE watchpoint input 2 
+ *              RESOURCE_3                              Select EmbeddedICE watchpoint input 3 
+ *              RESOURCE_4                              Select EmbeddedICE watchpoint input 4 
+ *              ALL_RESOURCES                           Select all EmbeddedICE watchpoint input
+ *              RESOURCE_1 + RESOURCE_2                 Select EmbeddedICE watchpoint input 1 and EmbeddedICE watchpoint input 2 
+ *              RESOURCE_1 + RESOURCE_2 + RESOURCE_3    Select EmbeddedICE watchpoint input 1, EmbeddedICE watchpoint input 2 and EmbeddedICE watchpoint input 3 
+ *                      "                                                           "
+ *                          
+ *
+ *          stopResource is used to select the EmbeddedICE watchpoint input as trace start/stop logic block stop resource (Refer to possible value for startResource) 
+ *              
+ */
+void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelection startResource,ResourceSelection stopResource)
+{
+  memoryWriteWord((uint32_t)&(ETM->ETMTECR1),(traceStartStopLogicEnable << ETM_ETMTECR1_TRACECONTROL_ENABLE_Pos));
+  memoryWriteWord((uint32_t)&(ETM->ETMTESSEICR),(startResource + (stopResource <<ETM_ETMTESSEICR_STOP_RESOURCE_Pos))) ;
+}
+
+/**
+ *  Configure TraceEnable enabling Event to assert TraceEnable signal for tracing
+ *
+ *  Input :  function is used the boolean logic between Resource A and B that will set logical true for the event
+ *				   Possible value :
+ *              A                     True when Resource A is active
+ *              NOT_A                 True when Resource A is inactive
+ *              A_AND_B               True when Resource A and B are both active
+ *              NOT_A_AND_B           True when Resource A is inactive while Resource B is active
+ *              NOT_A_AND_NOT_B       True when Resource A and B are both inactive
+ *              A_OR_B                True when either Resource A or B is active or both resources are active
+ *              NOT_A_OR_B            True when either Resource A is inactive or Resource B is active 
+ *              NOT_A_OR_NOT_B        True when either Resource A is inactive or Resource B is inactive
+ *
+ *          ResourceA is used to select the resource that will generate logical TRUE signal when it is active
+ *				  Possible value : 
+ *              WATCHPOINT_COMPARATOR_1
+ *              WATCHPOINT_COMPARATOR_2
+ *              WATCHPOINT_COMPARATOR_3
+ *              WATCHPOINT_COMPARATOR_4
+ *              COUNTER_1                          Counter 1 at zero
+ *              TRACE_STARTSTOP_RESOUCE
+ *              EXTERNAL_INPUT_1
+ *              EXTERNAL_INPUT_2
+ *              HARD_WIRED_INPUT                   Always logical TRUE
+ *
+ *          ResourceB is used to select the resource that will generate logical TRUE signal when it is active (Refer to possible value for ResourceA) 
+ *              
+ */
+void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
+{
+  printf("Data %x\n",((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
+  memoryWriteWord((uint32_t)&(ETM->ETMTEEVR), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
+}

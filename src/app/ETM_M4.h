@@ -21,4 +21,7 @@ void powerDownETM();
 void setETMProgrammingBit();
 void clearETMProgrammingBit();
 
+void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelection startResource,ResourceSelection stopResource);
+void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
+
 #endif // ETM-M4_H

@@ -196,6 +196,17 @@ typedef enum
   NOT_A_OR_NOT_B,
 }ETMEvent_FunctionEncoding;
 
+typedef enum
+{
+  SELECT_NONE = 0,
+  RESOURCE_1 = 1,
+  RESOURCE_2 = 2,
+  RESOURCE_3 = 4,
+  RESOURCE_4 = 8,
+  ALL_RESOURCES = 0xF,
+}ResourceSelection;
+
+
 #define ETM_ETMCR_TIMESTAMP_ENABLE_Pos                                        28
 #define ETM_ETMCR_TIMESTAMP_ENABLE_Msk                                        (1UL << ETM_ETMCR_TIMESTAMP_ENABLE_Pos)
 #define ETM_ETMCR_DATAONLY_MODE_Pos                                           20
@@ -210,6 +221,18 @@ typedef enum
 #define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
 #define ETM_ETMCR_ETMPROGBIT_Pos                                              10
 #define ETM_ETMCR_ETMPROGBIT_Msk                                              (1UL << ETM_ETMCR_ETMPROGBIT_Pos)
+
+#define ETM_ETMTEEVR_BOOLEANFUNCTION_Pos                                      14
+#define ETM_ETMTEEVR_BOOLEANFUNCTION_Msk                                      (7UL << ETM_ETMEEVR_BOOLEANFUNCTION_Pos)
+#define ETM_ETMTEEVR_RESOURCE_B_Pos                                           7
+#define ETM_ETMTEEVR_RESOURCE_B_Msk                                           (127UL << ETM_ETMEEVR_RESOURCE_B_Pos)
+#define ETM_ETMTEEVR_RESOURCE_A_Pos                                           0
+#define ETM_ETMTEEVR_RESOURCE_A_Msk                                           (127UL << ETM_ETMEEVR_RESOURCE_A_Pos)
+
+#define ETM_ETMTECR1_TRACECONTROL_ENABLE_Pos                                  25
+#define ETM_ETMTECR1_TRACECONTROL_ENABLE_Msk                                  (1UL << ETM_ETMTECR1_TRACECONTROL_ENABLE_Pos)
+#define ETM_ETMTECR1_INCLUDE_EXCLUEDE_CONTROL_Pos                             24
+#define ETM_ETMTECR1_NCLUDE_EXCLUEDE_CONTROL_Msk                              (1UL << ETM_ETMTECR1_INCLUDE_EXCLUEDE_CONTROL_Pos)
 
 #define ETM_ETMCCR_ETMIDR_PRESENT_Pos                                         31
 #define ETM_ETMCCR_ETMIDR_PRESENT_Msk                                         (1UL << ETM_ETMCCR_ETMIDR_PRESENT_Pos)
@@ -263,6 +286,12 @@ typedef enum
 #define ETM_ETMCCER_NUMBER_OF_EXTENDED_EXTERNAL_INPUT_SELECTORS_Pos           0             
 #define ETM_ETMCCER_NUMBER_OF_EXTENDED_EXTERNAL_INPUT_SELECTORS_Msk           (7UL << ETM_ETMCCER_NUMBER_OF_EXTENDED_EXTERNAL_INPUT_SELECTORS_Pos)                
 
+#define ETM_ETMTESSEICR_STOP_RESOURCE_Pos                                     16
+#define ETM_ETMTESSEICR_STOP_RESOURCE_Msk                                     (255UL <<  ETM_ETMTESSEICR_STOP_RESOURCE_Pos)
+#define ETM_ETMTESSEICR_START_RESOURCE_Pos                                    0
+#define ETM_ETMTESSEICR_START_RESOURCE_Msk                                    (255UL <<  ETM_ETMTESSEICR_START_RESOURCE_Pos)
+
+
 #define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos                    1
 #define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Msk                    (1UL << ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos)
 
@@ -278,6 +307,9 @@ typedef enum
 // #define ETM_TRACE_REGISTER_UNLOCK  0
 // #define ETM_TRACE_REGISTER_LOCK    0xC5ACCE55
 
+
+#define DISABLE_TRACESTARTSTOP_LOGIC  0
+#define ENABLE_TRACESTARTSTOP_LOGIC   1  
 
 #define CORESIGHT_ETM_M4_ID        0x4114F250
 #endif // ETMEx_H
