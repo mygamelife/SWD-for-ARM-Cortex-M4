@@ -45,3 +45,10 @@ int isTimeOut(int timeOut) {
   
   else return 0;
 }
+
+int isTimeout(int timeout, uint32_t previousTime) {
+  if((getSystemTime() - previousTime) > timeout)
+    return 1;
+  
+  return 0;
+}

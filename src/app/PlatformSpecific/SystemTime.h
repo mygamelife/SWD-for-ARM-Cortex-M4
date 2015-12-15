@@ -7,12 +7,18 @@
 #include "stm32f4xx_hal.h"
 #include "CException.h"
 
-#define FIVE_SECOND		5000
-#define ONE_SECOND		1000
+#define ONE_SECOND          1000
+#define TWO_SECOND          2000
+#define THREE_SECOND        3000
+#define FOUR_SECOND         4000
+#define FIVE_SECOND         5000
+#define FORTY_SECOND        40000
+#define ONE_MINUTE          60000
 
 uint16_t getSystemTime(void);
 uint16_t getElapsedTime(void);
 void resetSystemTime(void);
 int isTimeOut(int timeOut);
+int isTimeout(int timeout, uint32_t previousTime);
 
 #endif // SystemTime_H
