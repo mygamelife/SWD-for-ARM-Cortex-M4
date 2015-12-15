@@ -7,6 +7,7 @@
 #define unlockETM()   memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_UNLOCK_KEY)
 #define lockETM()     memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_LOCK)
 
+extern uint32_t maxETMFIFOSize ;
 
 uint32_t getETMID();
 void getETMConfiguration();
@@ -23,5 +24,8 @@ void clearETMProgrammingBit();
 
 void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelection startResource,ResourceSelection stopResource);
 void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
+
+void getETMFIFOSize();
+void selectFIFOFullSize(int numberOfBytes);
 
 #endif // ETM-M4_H

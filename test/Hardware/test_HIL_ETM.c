@@ -194,3 +194,30 @@ void test_configureTraceEnableEnablingEvent_should_configure_etmeevr()
     TEST_ASSERT_EQUAL(0x176EE,etmteevr);
   */
 }
+
+/*-----------getETMFIFOSize------*/
+void test_getETMFIFOSize_should_return_none_zero_value()
+{
+  getETMFIFOSize();
+  TEST_ASSERT_NOT_EQUAL(0,maxETMFIFOSize);
+}
+
+/*----------selectFIFOFullSize------*/
+//In this case here max FIFOSize is 24 bytes
+void test_selectFIFOFullSize_given_larger_than_max_FIFOsize_should_set_to_5bytes()
+{
+  uint32_t dataRead = 0;
+  selectFIFOFullSize(100);
+  memoryReadWord((uint32_t)&(ETM->ETMFFLR),&dataRead);
+  
+  TEST_ASSERT_EQUAL(5,dataRead);
+}
+
+void test_selectFIFOFullSize_given_smaller_than_max_FIFOsize_should_set_to_the_bytes_passed_in()
+{
+  uint32_t dataRead = 0;
+  selectFIFOFullSize(10);
+  memoryReadWord((uint32_t)&(ETM->ETMFFLR),&dataRead);
+  
+  TEST_ASSERT_EQUAL(10,dataRead);
+}

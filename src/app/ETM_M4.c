@@ -1,5 +1,7 @@
 #include "ETM_M4.h"
 
+uint32_t maxETMFIFOSize = 0 ;
+
 /**
  *  Read and return ETM ID which holds the ETM architecture variant
  *
@@ -264,6 +266,33 @@ void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelectio
  */
 void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
 {
-  printf("Data %x\n",((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
   memoryWriteWord((uint32_t)&(ETM->ETMTEEVR), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
+}
+
+/**
+ *  Obtain the size of FIFO implemented for ETM and update global variable maxETMFIFOSize
+ *	
+ */
+void getETMFIFOSize()
+{
+  maxETMFIFOSize = 0 ;
+  
+  memoryWriteWord((uint32_t)&(ETM->ETMFFLR),0xFFFFFFFF);
+  memoryReadWord((uint32_t)&(ETM->ETMFFLR),&maxETMFIFOSize);
+}
+
+/**
+ *  Select the size of the FIFO when dropped below the specified number of bytes will assert the FIFOFULL signal
+ *
+ *  Input   :	numberOfBytes is to specify the number of bytes left in the FIFO  to assert signal FIFOFULL
+ */
+void selectFIFOFullSize(int numberOfBytes)
+{
+  if(maxETMFIFOSize == 0)
+    getETMFIFOSize();
+  
+  if(numberOfBytes >= maxETMFIFOSize)
+    memoryWriteWord((uint32_t)&(ETM->ETMFFLR),BACKUP_FIFOFULL_SIZE);
+  else
+    memoryWriteWord((uint32_t)&(ETM->ETMFFLR),numberOfBytes);
 }

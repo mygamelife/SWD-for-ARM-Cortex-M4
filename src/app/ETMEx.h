@@ -27,8 +27,8 @@ typedef struct
     __IO uint32_t ETMTEEVR;             /*!< Offset: 0x020 (R/W) TraceEnable Event Register                           */
     __IO uint32_t ETMTECR1;             /*!< Offset: 0x024 (R/W) TraceEnable Control 1 Register                       */
     //FIFOFULL configuration
-    __IO uint32_t EMTFFRR;              /*!< Offset: 0x028 (R/W) FIFOFULL Region Register                             */
-    __IO uint32_t EMTFFLR;              /*!< Offset: 0x02C (R/W) FIFOFULL Level Register                              */
+    __IO uint32_t ETMFFRR;              /*!< Offset: 0x028 (R/W) FIFOFULL Region Register                             */
+    __IO uint32_t ETMFFLR;              /*!< Offset: 0x02C (R/W) FIFOFULL Level Register                              */
     //ViewData configuration
     __IO uint32_t ETMVDEVR;             /*!< Offset: 0x030 (R/W) ViewData Event Register*/
     __IO uint32_t ETMVDCR1;             /*!< Offset: 0x034 (R/W) ViewData Control 1 Register                          */
@@ -303,6 +303,8 @@ typedef enum
 
 #define ETM_UNLOCK_KEY 0xC5ACCE55
 #define ETM_LOCK       0
+
+#define BACKUP_FIFOFULL_SIZE              5
 
 // #define ETM_TRACE_REGISTER_UNLOCK  0
 // #define ETM_TRACE_REGISTER_LOCK    0xC5ACCE55
