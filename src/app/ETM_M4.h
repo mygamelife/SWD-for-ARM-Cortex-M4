@@ -22,8 +22,10 @@ void powerDownETM();
 void setETMProgrammingBit();
 void clearETMProgrammingBit();
 
+
 void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelection startResource,ResourceSelection stopResource);
 void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
+void configureETMETriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
 
 void getETMFIFOSize();
 void selectFIFOFullSize(int numberOfBytes);

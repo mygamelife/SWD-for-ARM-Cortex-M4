@@ -172,10 +172,11 @@ void test_configureTraceEnableEnablingEvent_should_configure_etmeevr()
   configureTraceEnableEnablingEvent(NOT_A_OR_NOT_B,COUNTER_1,HARD_WIRED_INPUT);
   memoryReadWord((uint32_t)&(ETM->ETMTEEVR),&etmteevr);
   //Resource A[6:0], Resource B[13:7], Function[17:14]
-  //NOT_A_OR_NOT_B  0b111
-  //Counter_1       0b100 0000
+  //NOT_A_OR_NOT_B    0b111
+  //Counter_1         0b100 0000
+  //HARD_WIRED_INPUT  0b110 1111
   //1 1111 0111 1100 000
-  TEST_ASSERT_EQUAL(0x1F7A0,etmteevr);
+  TEST_ASSERT_EQUAL(0x1F7C0,etmteevr);
   
   /*
     This test failed as both of the resources is not supported for STM32F429
@@ -220,4 +221,20 @@ void test_selectFIFOFullSize_given_smaller_than_max_FIFOsize_should_set_to_the_b
   memoryReadWord((uint32_t)&(ETM->ETMFFLR),&dataRead);
   
   TEST_ASSERT_EQUAL(10,dataRead);
+}
+
+
+/*-----------configureETMETriggerEvent------*/
+void test_configureETMETriggerEvent_should_configure_ETMTrigger()
+{
+  uint32_t etmTrigger = 0 ;
+  
+  configureETMETriggerEvent(A_AND_B,WATCHPOINT_COMPARATOR_1,WATCHPOINT_COMPARATOR_2);
+  memoryReadWord((uint32_t)&(ETM->ETMTRIGGER),&etmTrigger);
+  //Resource A[6:0], Resource B[13:7], Function[16:14]
+  //A_AND_B                 0b010
+  //WATCHPOINT_COMPARATOR_1 0b010 0000
+  //WATCHPOINT_COMPARATOR_2 0b010 0001
+  //0 1001 0000 1010 0000
+  TEST_ASSERT_EQUAL(0x90A0,etmTrigger);
 }

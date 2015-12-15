@@ -204,7 +204,7 @@ void clearETMProgrammingBit()
 }
 
 /**
- *  Configure start/stop logic to assert TraceEnable signal with conditions
+ *  Configure start/stop logic to assert TraceEnable signal with conditions (Used to control when to perform instruction tracing)
  *  Note : The behavior of the trace start/stop block is UNPREDICTABLE if the same EmbeddedICE watchpoint input is used as both
  *         the start input and the stop input to the block.
  *
@@ -236,7 +236,7 @@ void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelectio
 }
 
 /**
- *  Configure TraceEnable enabling Event to assert TraceEnable signal for tracing
+ *  Configure TraceEnable enabling Event to assert TraceEnable signal for tracing (Used to control when to perform instruction tracing)
  *
  *  Input :  function is used the boolean logic between Resource A and B that will set logical true for the event
  *				   Possible value :
@@ -268,6 +268,17 @@ void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEve
 {
   memoryWriteWord((uint32_t)&(ETM->ETMTEEVR), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
 }
+
+/**
+ *  Configure ETM Trigger Event (Used to control when to trigger to trace at your interest)
+ *
+ *  (Refer to configureTraceEnableEnablingEvent for input parameters description)
+ */
+void configureETMETriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
+{
+  memoryWriteWord((uint32_t)&(ETM->ETMTRIGGER), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
+}
+
 
 /**
  *  Obtain the size of FIFO implemented for ETM and update global variable maxETMFIFOSize
