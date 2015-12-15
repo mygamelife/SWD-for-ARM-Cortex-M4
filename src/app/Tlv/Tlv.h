@@ -59,7 +59,7 @@ Tlv *tlvReceive(Tlv_Session *session);
 
 /* Tlv service state machine */
 void tlvSendService(Tlv_Session *session);
-void tlvReceiveService(Tlv_Session *session);
+int tlvReceiveService(Tlv_Session *session);
 void tlvService(Tlv_Session *session);
 
 /* Tlv helper function */

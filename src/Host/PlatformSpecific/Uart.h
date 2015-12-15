@@ -11,8 +11,9 @@
 
 typedef enum 
 {
-  UART_OK = 0,
-  UART_ERROR
+  UART_ERROR  = -1,
+  UART_OK     = 1,
+  UART_BUSY   = 2,
 } Uart_Status;
 
 #define UART_PORT                     "COM3"//"COM7"

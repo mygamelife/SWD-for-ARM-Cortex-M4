@@ -198,13 +198,12 @@ uint8_t getByte(void *handler, uint8_t *rxBuffer) {
     // handle error
     DWORD errId = GetLastError();
     printf("ReadFile Error: %d\n", errId);
-    return UART_ERROR;
   }
   if(dwBytesRead != 0) {
     // printf("Byte is Received!\n");
     return UART_OK;
   }
-  else return UART_ERROR;
+  return UART_BUSY;
 }
 
 /* Uart Receive Function */
@@ -215,11 +214,10 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
     // handle error
     DWORD errId = GetLastError();
     printf("ReadFiles Error: %d\n", errId);
-    return UART_ERROR;
   }
   if(dwBytesRead != 0) {
     // printf("Byte is Received!\n");
     return UART_OK;
   }
-  else return UART_ERROR;
+  return UART_BUSY;
 }

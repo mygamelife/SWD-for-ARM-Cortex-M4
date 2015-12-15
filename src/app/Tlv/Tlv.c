@@ -129,33 +129,42 @@ Tlv *tlvReceive(Tlv_Session *session) {
   *
   * return  : NONE
   */
-void tlvReceiveService(Tlv_Session *session) {
+int tlvReceiveService(Tlv_Session *session) {
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
   
-  switch(session->receiveState)  {
-    case TLV_RECEIVE_TYPE :
-    	if(!getByte(session->handler, &session->rxBuffer[0])) {
-    		session->receiveState = TLV_RECEIVE_LENGTH;
-      }
-    break;
+  startTask(tb);
+  
+  
+  endTask(tb);
+  
+  returnThis(1);
+  // switch(session->receiveState)  {
+    // case TLV_RECEIVE_TYPE :
+    	// if(!getByte(session->handler, &session->rxBuffer[0])) {
+    		// session->receiveState = TLV_RECEIVE_LENGTH;
+      // }
+    // break;
     
-    case TLV_RECEIVE_LENGTH :
-      if(!getByte(session->handler, &session->rxBuffer[1])) {
-        getBytes(session->handler, &session->rxBuffer[2], session->rxBuffer[1]);
-        session->receiveState = TLV_RECEIVE_VALUE;
-      }
-    break;
+    // case TLV_RECEIVE_LENGTH :
+      // if(!getByte(session->handler, &session->rxBuffer[1])) {
+        // getBytes(session->handler, &session->rxBuffer[2], session->rxBuffer[1]);
+        // session->receiveState = TLV_RECEIVE_VALUE;
+      // }
+    // break;
       
-    case TLV_RECEIVE_VALUE :
-    	if(uartRxReady) {
-        resetSystemTime();
-        SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-        session->receiveState = TLV_RECEIVE_TYPE;
-    	}
-    	else if(isTimeOut(ONE_SECOND)) Throw(TLV_TIME_OUT);
-    break;
+    // case TLV_RECEIVE_VALUE :
+    	// if(uartRxReady) {
+        // resetSystemTime();
+        // SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+        // session->receiveState = TLV_RECEIVE_TYPE;
+    	// }
+    	// else if(isTimeOut(ONE_SECOND)) Throw(TLV_TIME_OUT);
+    // break;
 
-    default : break;
-  }
+    // default : break;
+  // }
 }
 
 /** tlvService is a function routine to handle asychronize send and synchronize 

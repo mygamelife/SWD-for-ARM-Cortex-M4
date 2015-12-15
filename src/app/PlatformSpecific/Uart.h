@@ -14,8 +14,12 @@ extern __IO ITStatus uartTxReady;
 extern __IO ITStatus uartRxReady;
 #endif
 
-#define FIVE_SEC    5000
-#define TEN_SEC     10000
+typedef enum 
+{
+  UART_ERROR  = -1,
+  UART_OK     = 1,
+  UART_BUSY   = 2,
+} Uart_Status;
 
 /* Definition for USARTx clock resources */
 #define UART_PORT                        USART1
