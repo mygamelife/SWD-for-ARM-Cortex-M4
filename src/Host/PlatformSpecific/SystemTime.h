@@ -17,9 +17,6 @@
 #define ONE_MINUTE          60000
 
 uint16_t getSystemTime(void);
-uint16_t getElapsedTime(void);
-void resetSystemTime(void);
-int isTimeOut(int timeOut);
 int isTimeout(int timeout, uint32_t previousTime);
 
 #endif // SystemTime_H

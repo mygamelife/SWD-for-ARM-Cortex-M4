@@ -16,10 +16,10 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case TLV_BKPT_MAXSET                : printf("Err : All breakpoint has been used\n                                      "); break;
     case TLV_WATCHPOINT_NOTHIT          : printf("Err : None of the watchpoint hit\n                                        "); break;
     /* ############################################ Probe error ######################################################### */
+    case PROBE_NOT_RESPONDING           : printf("Err : Probe no respond\n                                                  "); break;
     case PROBE_TLV_TIMEOUT              : printf("Err : Probe time out\n                                                    "); break;
     case PROBE_TLV_INVALID_COMMAND      : printf("Err : Probe received invalid command\n                                    "); break;
     case PROBE_TLV_CHECKSUM_ERROR       : printf("Err : Probe received checksum error\n                                     "); break;
-    case PROBE_NOT_RESPONDING           : printf("Err : Probe no respond\n                                                  "); break;
     /* ######################################## User Interface error #################################################### */
     case ERR_INCOMPLETE_COMMAND         : printf("Err : Command is incomplete\n                                             "); break;
     case ERR_INVALID_USER_COMMAND       : printf("Err : Command not found\n                                                 "); break;

@@ -28,7 +28,6 @@ typedef enum {
 #define isProbeAlive(timeout, x)      do {  if(timeout)                     \
                                             {                               \
                                               resetTask(x);                 \
-                                              resetSystemTime();            \
                                               Throw(PROBE_NOT_RESPONDING);  \
                                             }                               \
                                          } while(0)                         \

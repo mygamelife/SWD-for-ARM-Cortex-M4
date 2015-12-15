@@ -16,6 +16,7 @@ static uint32_t FLASH_BEGIN_ADDRESS = 0x08000000;
   */
 Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uint32_t data) {
   uint32_t dataBuffer[] = {registerAddress, data};
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -26,15 +27,15 @@ Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uin
   /* Send tlv request */
   tlvSendRequest(session, TLV_WRITE_REGISTER, 8, (uint8_t *)dataBuffer);
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
-  resetSystemTime();
   /* End tlv request task */
   endTask(tb);
+
   returnThis(PROCESS_DONE);
 }
 
@@ -47,6 +48,7 @@ Process_Status writeRegister(Tlv_Session *session, uint32_t registerAddress, uin
   *           0 if waiting reply from probe
   */
 uint32_t readRegister(Tlv_Session *session, uint32_t registerAddress) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -56,20 +58,19 @@ uint32_t readRegister(Tlv_Session *session, uint32_t registerAddress) {
   startTask(tb);
   /* Send tlv request */
   tlvSendRequest(session, TLV_READ_REGISTER, 4, (uint8_t *)&registerAddress);
-
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
-  resetSystemTime();
   /* End task */
   endTask(tb);
   #ifdef HOST
   printf("value %x\n", get4Byte(&response->value[0]));
   #endif
+
   returnThis(get4Byte(&response->value[0]));
 }
 
@@ -82,6 +83,7 @@ uint32_t readRegister(Tlv_Session *session, uint32_t registerAddress) {
   *           0 if waiting reply from probe
   */
 Process_Status halt(Tlv_Session *session) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -91,17 +93,16 @@ Process_Status halt(Tlv_Session *session) {
   startTask(tb);
   /* Send tlv request */
   tlvSendRequest(session, TLV_HALT_TARGET, 0, NULL);
-
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
-  resetSystemTime();
   /* End tlv request task */
   endTask(tb);
+
   returnThis(PROCESS_DONE);
 }
 
@@ -114,6 +115,7 @@ Process_Status halt(Tlv_Session *session) {
   *           0 if waiting reply from probe
   */
 Process_Status run(Tlv_Session *session) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -123,17 +125,16 @@ Process_Status run(Tlv_Session *session) {
   startTask(tb);
   /* Send tlv request */
   tlvSendRequest(session, TLV_RUN_TARGET, 0, NULL);
-
+  previousTime = getSystemTime();
   /* Waiting reply from probe */
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
-  resetSystemTime();
   /* End tlv request task */
   endTask(tb);
+
   returnThis(PROCESS_DONE);
 }
 
@@ -147,6 +148,7 @@ Process_Status run(Tlv_Session *session) {
   *           0 if waiting reply from probe
   */
 uint32_t multipleStep(Tlv_Session *session, int nInstructions) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -156,20 +158,19 @@ uint32_t multipleStep(Tlv_Session *session, int nInstructions) {
   startTask(tb);
   /* Send tlv request */
   tlvSendRequest(session, TLV_STEP, 4, (uint8_t *)&nInstructions);
-
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
-  resetSystemTime();
   /* End tlv request task */
   endTask(tb);
   #ifdef HOST
   printf("value %x\n", get4Byte(&response->value[0]));
   #endif
+
   returnThis(get4Byte(&response->value[0]));
 }
 
@@ -181,6 +182,7 @@ uint32_t multipleStep(Tlv_Session *session, int nInstructions) {
   *           0 if waiting reply from probe
   */
 Process_Status softReset(Tlv_Session *session) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -190,17 +192,16 @@ Process_Status softReset(Tlv_Session *session) {
   startTask(tb);
   /* Send tlv request */
   tlvSendRequest(session, TLV_SOFT_RESET, 0, NULL);
-
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
-  resetSystemTime();
   /* End tlv request task */
   endTask(tb);
+
   returnThis(PROCESS_DONE);
 }
 
@@ -212,6 +213,7 @@ Process_Status softReset(Tlv_Session *session) {
   *           0 if waiting reply from probe
   */
 Process_Status hardReset(Tlv_Session *session) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -222,15 +224,15 @@ Process_Status hardReset(Tlv_Session *session) {
   /* Send tlv request */
   tlvSendRequest(session, TLV_HARD_RESET, 0, NULL);
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End tlv request task */
   endTask(tb);
-  resetSystemTime();
-  
+
   returnThis(PROCESS_DONE);
 }
 
@@ -242,6 +244,7 @@ Process_Status hardReset(Tlv_Session *session) {
   *           0 if waiting reply from probe
   */
 Process_Status vectorReset(Tlv_Session *session) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -252,16 +255,15 @@ Process_Status vectorReset(Tlv_Session *session) {
   /* Send tlv request */
   tlvSendRequest(session, TLV_VECT_RESET, 0, NULL);
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-
   /* End tlv request task */
   endTask(tb);
-  resetSystemTime();
-  
+
   returnThis(PROCESS_DONE);
 }
 
@@ -276,7 +278,7 @@ Process_Status vectorReset(Tlv_Session *session) {
 uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
   static TaskBlock taskBlock = {.state = 0};
   static uint8_t *db;
-  static uint32_t tAddress = 0;
+  static uint32_t tAddress = 0, previousTime = 0;
   static int index, tSize = 0;
   TaskBlock *tb = &taskBlock;
   int i;
@@ -295,9 +297,11 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
   while(tSize > 0) {
     /* Send tlv request */
     tlvReadDataChunk(session, &tAddress, &tSize);
+    /* Get timestamp to verify if the timeout is occur */
+    previousTime = getSystemTime();
     while((response = tlvReceive(session)) == NULL) {
       /* Check is maximum timeout is reached */
-      isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+      isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
       yield(tb);
     };
     /* Waiting reply from probe */
@@ -308,11 +312,10 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
   }
   /* End task */
   endTask(tb);
-  resetSystemTime();
-
   #ifdef HOST
   displayMemoryMap(db, address, size);
   #endif
+
   returnThis(db);
 }
 
@@ -332,12 +335,12 @@ uint8_t *readMemory(Tlv_Session *session, uint32_t address, int size) {
 Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address, int size, Tlv_Command memory) {
   static TaskBlock taskBlock = {.state = 0};
   static uint8_t *pData = NULL;
-  static uint32_t tAddress = 0;
+  static uint32_t tAddress = 0, previousTime = 0;
   static int tSize = 0;
   TaskBlock *tb = &taskBlock;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
-  
+
   /* Start tlv request task */
   startTask(tb);
   /* pData is a static pointer to keep track the original pointer
@@ -350,15 +353,16 @@ Process_Status writeMemory(Tlv_Session *session, uint8_t *data, uint32_t address
     /* Send tlv request */
     tlvWriteDataChunk(session, &pData, &tAddress, &tSize, memory);
     /* Waiting reply from probe */
+    previousTime = getSystemTime();
     while((response = tlvReceive(session)) == NULL) {
       /* Check is maximum timeout is reached */
-      isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+      isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
       yield(tb);
     };
   }
   /* End task */
   endTask(tb);
-  resetSystemTime();
+
   returnThis(PROCESS_DONE);
 }
 
@@ -392,7 +396,7 @@ int loadProgram(Tlv_Session *session, Program *p, Tlv_Command memorySelect) {
   }
   /* End task */
   endTask(tb);
-  
+
   returnThis(PROCESS_DONE);
 }
 
@@ -424,7 +428,7 @@ int loadRam(Tlv_Session *session, Program *p) {
   printf("Run Program......\n");
   /* End task */
   endTask(tb);
-  
+
   returnThis(PROCESS_DONE);
 }
 
@@ -453,7 +457,7 @@ Process_Status reactiveProgram(Tlv_Session *session, Program *p) {
   printf("Program Successfully re-activate\n");
   /* End task */
   endTask(tb);
-  
+
   returnThis(PROCESS_DONE);
 }
 
@@ -468,10 +472,11 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   CEXCEPTION_T err;
   uint32_t data[] = {address, size};
   static TaskBlock taskBlock = {.state = 0};
+  static uint32_t previousTime = 0;
   static Program *p;
   TaskBlock *tb = &taskBlock;
   Verify_Status verifyStatus = 0;
-  
+
   if(session == NULL) Throw(TLV_NULL_SESSION);
 
   /* Start task */
@@ -482,16 +487,15 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   /* Send section erase request to flash programmer */
   tlvSendRequest(session, TLV_FLASH_ERASE, 8, (uint8_t *)data);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
-  endTask(tb);
-  
   delProgram(p);
-  resetSystemTime();
-  
+  endTask(tb);
+
   returnThis(PROCESS_DONE);
 }
 
@@ -504,6 +508,7 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   */
 Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   static Program *p;
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -517,16 +522,15 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   /* Send mass erase request to flash programmer */
   tlvSendRequest(session, TLV_FLASH_MASS_ERASE, 1, (uint8_t *)&banks);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FORTY_SECOND, previousTime), tb);
     yield(tb);
   };
-  endTask(tb);
-  
   delProgram(p);
-  resetSystemTime();
-  
+  endTask(tb);
+
   returnThis(PROCESS_DONE);
 }
 
@@ -544,7 +548,7 @@ int loadFlash(Tlv_Session *session, Program *p) {
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
   assert(p != NULL);
-  
+
   /* Start task */
   startTask(tb);
   /* Erase section */
@@ -560,7 +564,7 @@ int loadFlash(Tlv_Session *session, Program *p) {
   printf("Run Program......\n");
   /* End task */
   endTask(tb);
-  
+
   returnThis(PROCESS_DONE);
 }
 
@@ -573,6 +577,7 @@ int loadFlash(Tlv_Session *session, Program *p) {
   * Return  : NONE
   */
 Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -582,14 +587,15 @@ Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
   startTask(tb);
   tlvSendRequest(session, TLV_BREAKPOINT, 4, (uint8_t *)&address);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
+
   returnThis(PROCESS_DONE);
 }
 
@@ -606,6 +612,7 @@ Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
   * Return  : NONE
   */
 EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -616,15 +623,15 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
   /* Send tlv request */
   tlvSendRequest(session, TLV_DEBUG_EVENTS, 1, (uint8_t *)&event);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
 
-  resetSystemTime();
   returnThis(response->value[0]);
 }
 
