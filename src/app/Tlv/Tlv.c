@@ -366,7 +366,11 @@ int verifyTlvPacket(Tlv *tlv) {
   */
 void tlvErrorReporter(Tlv_Session *session, uint8_t errorCode)  {
   /* add 100 to indicate that is an erroCode return from probe */
-  errorCode += 100;
+  if( TLV_TIMEOUT           ||
+      TLV_INVALID_COMMAND   ||
+      TLV_CHECKSUM_ERROR
+    )
+    errorCode += 100;
 
   Tlv *tlv = tlvCreatePacket(TLV_NOT_OK, 1, &errorCode);
 
