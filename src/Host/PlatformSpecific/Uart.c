@@ -49,8 +49,6 @@ HANDLE openComPort(LPCSTR portname, DWORD baudrate) {
 
   if (!GetCommState(handler, &dcbSerialParams))
   {
-    // Throw(ERR_GET_COMM_STATE);
-    printf("Failed to get serial comm state\n");
     CloseHandle(handler);
     return NULL;
   }
@@ -62,8 +60,6 @@ HANDLE openComPort(LPCSTR portname, DWORD baudrate) {
 
   if(!SetCommState(handler, &dcbSerialParams))
   {
-    // Throw(ERR_SET_COMM_STATE);
-    printf("Failed to set serial comm state\n");
     CloseHandle(handler);
     return NULL;
   }
@@ -77,8 +73,6 @@ HANDLE openComPort(LPCSTR portname, DWORD baudrate) {
 
   if(!SetCommTimeouts(handler, &timeouts))
   {
-    // Throw(ERR_SET_COMM_TIMEOUTS);
-    printf("Failed to set serial comm timeout\n");
     CloseHandle(handler);
     return NULL;
   }
@@ -178,29 +172,21 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
   DWORD dwBytesWrite = 0;
 
   if(!WriteFile((HANDLE)handler, txBuffer, length, &dwBytesWrite, NULL)){
-    DWORD errId = GetLastError();
-    printf("WriteFile Error: %d\n", errId);
-    // printLastError();
-    return UART_ERROR;
+    printf("WriteFile Error: %d\n", GetLastError());
 	}
   if(dwBytesWrite != 0) {
-    //printf("%d Bytes is Sucessfully Sent!\n", dwBytesWrite);
-    // printf("address %x!\n", (*(uint32_t *)(&txBuffer[2])));
     return UART_OK;
   }
-  else return UART_ERROR;
+  else return UART_BUSY;
 }
 
 uint8_t getByte(void *handler, uint8_t *rxBuffer) {
   DWORD dwBytesRead = 0;
 
   if(!ReadFile((HANDLE)handler, rxBuffer, 1, &dwBytesRead, NULL)){
-    // handle error
-    DWORD errId = GetLastError();
-    printf("ReadFile Error: %d\n", errId);
+    printf("ReadFile Error: %d\n", GetLastError());
   }
   if(dwBytesRead != 0) {
-    // printf("Byte is Received!\n");
     return UART_OK;
   }
   return UART_BUSY;
@@ -211,13 +197,25 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
   DWORD dwBytesRead = 0;
 
   if(!ReadFile((HANDLE)handler, rxBuffer, length, &dwBytesRead, NULL)){
-    // handle error
-    DWORD errId = GetLastError();
-    printf("ReadFiles Error: %d\n", errId);
+    printf("ReadFiles Error: %d\n", GetLastError());
   }
   if(dwBytesRead != 0) {
-    // printf("Byte is Received!\n");
     return UART_OK;
   }
   return UART_BUSY;
+}
+
+/**
+  *
+  */
+int isRxBusy(void) {
+  return 1;
+}
+
+int isTxBusy(void) {
+  return 1;
+}
+
+void cancelRx(void) {
+  return;
 }

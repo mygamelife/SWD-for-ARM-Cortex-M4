@@ -35,4 +35,7 @@ HANDLE findProbe(void);
 HANDLE openComPort(LPCSTR portname, DWORD baudrate);
 int isComPortAlive(HANDLE handler);
 
+int isRxBusy(void);
+int isTxBusy(void);
+void cancelRx(void);
 #endif // Uart_H

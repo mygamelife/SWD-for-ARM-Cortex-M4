@@ -9,11 +9,6 @@
 
 extern UART_HandleTypeDef uartHandle;
 
-#if !defined(TEST) && !defined(HOST)
-extern __IO ITStatus uartTxReady;
-extern __IO ITStatus uartRxReady;
-#endif
-
 typedef enum 
 {
   UART_ERROR  = -1,
@@ -46,6 +41,7 @@ typedef enum
 #define USARTx_IRQHandler                USART1_IRQHandler
 
 void uartInit(void **huart);
+void uartLowLevelInit(void);
 void uartErrorHandler(void);
 
 /* Uart Transmit Function */
@@ -54,5 +50,9 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length);
 /* Uart Receive Function */
 uint8_t getByte(void *handler, uint8_t *rxBuffer);
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
+
+int isRxBusy(void);
+int isTxBusy(void);
+void cancelRx(void);
 
 #endif // Uart_H

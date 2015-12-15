@@ -11,11 +11,6 @@
 #include "SystemTime.h"
 #include "Yield.h"
 
-#if defined(HOST) || defined(TEST)
-extern volatile int uartTxReady;
-extern volatile int uartRxReady;
-#endif
-
 typedef struct
 {
   void *handler;

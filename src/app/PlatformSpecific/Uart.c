@@ -2,8 +2,16 @@
 
 UART_HandleTypeDef uartHandle;
 
-__IO ITStatus uartTxReady = 1;
-__IO ITStatus uartRxReady = 1;
+static __IO ITStatus uartTxReady = 1;
+static __IO ITStatus uartRxReady = 1;
+
+int isRxBusy(void) {
+  return uartRxReady;
+}
+
+int isTxBusy(void) {
+  return uartRxReady;
+}
 
 /**  initUart is a function to configure the UART peripheral
   *
@@ -36,11 +44,13 @@ void uartInit(void **huart) {
 
 /* Uart Transmit Function */
 uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length) {
-  //UART_HandleTypeDef *uartHandle = (UART_HandleTypeDef *)handler;
-  
   turnOnLED3();
-  uartTxReady = 0;
-  return HAL_UART_Transmit_IT((UART_HandleTypeDef *)handler, txBuffer, length);
+  
+  if(HAL_UART_Transmit_IT((UART_HandleTypeDef *)handler, txBuffer, length) == HAL_OK) {
+    uartTxReady = 0;
+    return UART_OK;
+  }
+  return UART_BUSY;
 }
 
 /* Uart Receive Function */
@@ -60,7 +70,6 @@ uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length) {
     uartRxReady = 0;
     return UART_OK;
   }
-  
   return UART_BUSY;
 }
 
@@ -100,7 +109,6 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   /* Set transmission flag: transfer complete*/
-  // SET_UART_TX_READY();
   uartTxReady = 1;
   turnOffLED3();
 }
@@ -108,7 +116,6 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *UartHandle)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
 {
   /* Set receive flag: receive complete*/
-  // SET_UART_RX_READY();
   uartRxReady = 1;
   turnOffLED3();
 }
@@ -127,4 +134,27 @@ void uartErrorHandler(void)
   /* Turn LED4 on */
   turnOnLED4();
   while(1)  {}
+}
+
+void cancelRx(void) {
+  /* Disable the UART Receive Interrupt */
+  __HAL_UART_DISABLE_IT(&uartHandle, UART_IT_RXNE);
+
+  /* Check if a transmit process is ongoing or not */
+  if(uartHandle.State == HAL_UART_STATE_BUSY_TX_RX)
+  {
+    uartHandle.State = HAL_UART_STATE_BUSY_TX;
+  }
+  else
+  {
+    /* Flush Data Register */
+    __HAL_UART_FLUSH_DRREGISTER(&uartHandle);
+    /* Disable the UART Parity Error Interrupt */
+    __HAL_UART_DISABLE_IT(&uartHandle, UART_IT_PE);
+    /* Disable the UART Error Interrupt: (Frame error, noise error, overrun error) */
+    __HAL_UART_DISABLE_IT(&uartHandle, UART_IT_ERR);
+
+    uartHandle.State = HAL_UART_STATE_READY;
+  }
+  HAL_UART_RxCpltCallback(&uartHandle);
 }

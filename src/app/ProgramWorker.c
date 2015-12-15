@@ -716,18 +716,19 @@ int taskManager(Tlv_Session *session)  {
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
-  startTask(tb);
   Try {
+    startTask(tb);
     /* Wait packet to arrive */
     while((packet = tlvReceive(session)) == NULL) { yield(tb); }
     /* Wait for task to complete */
     await(selectTask(session, packet), tb);
+    endTask(tb);
   }
   Catch(err) {
     resetTask(tb);
     Throw(err);
   }
-  endTask(tb);
+  
   returnThis(1);
 }
 
