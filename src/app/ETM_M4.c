@@ -204,6 +204,35 @@ void clearETMProgrammingBit()
 }
 
 /**
+ *  Obtain the size of FIFO implemented for ETM and update global variable maxETMFIFOSize
+ *	
+ */
+void getETMFIFOSize()
+{
+  maxETMFIFOSize = 0 ;
+  
+  memoryWriteWord((uint32_t)&(ETM->ETMFFLR),0xFFFFFFFF);
+  memoryReadWord((uint32_t)&(ETM->ETMFFLR),&maxETMFIFOSize);
+  printf("ETM FIFO Size : %d bytes\n",maxETMFIFOSize);
+}
+
+/**
+ *  Select the size of the FIFO when dropped below the specified number of bytes will assert the FIFOFULL signal
+ *
+ *  Input   :	numberOfBytes is to specify the number of bytes left in the FIFO  to assert signal FIFOFULL
+ */
+void selectFIFOFullSize(int numberOfBytes)
+{
+  if(maxETMFIFOSize == 0)
+    getETMFIFOSize();
+  
+  if(numberOfBytes >= maxETMFIFOSize)
+    memoryWriteWord((uint32_t)&(ETM->ETMFFLR),BACKUP_FIFOFULL_SIZE);
+  else
+    memoryWriteWord((uint32_t)&(ETM->ETMFFLR),numberOfBytes);
+}
+
+/**
  *  Check whether the ETM support Cycle Accurate Tracing
  *
  *  Output  : return 1 if supported
@@ -220,27 +249,6 @@ int checkCycleAccurateTracingSupport()
   
   return (dataRead & ETM_ETMCR_CYCLEACCURATE_TRACING_Msk) >> ETM_ETMCR_CYCLEACCURATE_TRACING_Pos ;
 }
-
-
-
-#define ETM_ETMCR_TIMESTAMP_ENABLE_Pos                                        28
-#define ETM_ETMCR_TIMESTAMP_ENABLE_Msk                                        (1UL << ETM_ETMCR_TIMESTAMP_ENABLE_Pos)
-#define ETM_ETMCR_DATAONLY_MODE_Pos                                           20
-#define ETM_ETMCR_DATAONLY_MODE_Msk                                           (1UL << ETM_ETMCR_DATAONLY_MODE_Pos)
-#define ETM_ETMCR_CYCLEACCURATE_TRACING_Pos                                   12
-#define ETM_ETMCR_CYCLEACCURATE_TRACING_Msk                                   (1UL << ETM_ETMCR_CYCLEACCURATE_TRACING_Pos)
-#define ETM_ETMCR_ETMEN_Pos                                                   11
-#define ETM_ETMCR_ETMEN_Msk                                                   (1UL << ETM_ETMCR_ETMEN_Pos)
-#define ETM_ETMCR_ETMPROGBIT_Pos                                              10
-#define ETM_ETMCR_ETMPROGBIT_Msk                                              (1UL << ETM_ETMCR_ETMPROGBIT_Pos)
-#define ETM_ETMCR_BRANCH_OUTPUT_Pos                                           8
-#define ETM_ETMCR_BRANCH_OUTPUT_Msk                                           (1UL << ETM_ETMCR_BRANCH_OUTPUT_Pos)
-#define ETM_ETMCR_STALL_PROCESSOR_Pos                                         7
-#define ETM_ETMCR_STALL_PROCESSOR_Msk                                         (1UL << ETM_ETMCR_STALL_PROCESSOR_Pos)
-#define ETM_ETMCR_DATA_ACCESS_Pos                                             2
-#define ETM_ETMCR_DATA_ACCESS_Msk                                             (3UL << ETM_ETMCR_DATA_ACCESS_Pos)
-#define ETM_ETMCR_ETMPOWERDOWN_Pos                                            0
-#define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
 
 /**
  *  Configure ETM main control register to enable/disable different options
@@ -360,32 +368,12 @@ void configureETMTriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resour
   memoryWriteWord((uint32_t)&(ETM->ETMTRIGGER), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
 }
 
-
 /**
- *  Obtain the size of FIFO implemented for ETM and update global variable maxETMFIFOSize
- *	
- */
-void getETMFIFOSize()
-{
-  maxETMFIFOSize = 0 ;
-  
-  memoryWriteWord((uint32_t)&(ETM->ETMFFLR),0xFFFFFFFF);
-  memoryReadWord((uint32_t)&(ETM->ETMFFLR),&maxETMFIFOSize);
-  printf("ETM FIFO Size : %d bytes\n",maxETMFIFOSize);
-}
-
-/**
- *  Select the size of the FIFO when dropped below the specified number of bytes will assert the FIFOFULL signal
+ *  Set the reload value for Counter 1 when it decrements to 0
  *
- *  Input   :	numberOfBytes is to specify the number of bytes left in the FIFO  to assert signal FIFOFULL
+ *  Input : reloadValue is the value to be reloaded when counter 1 reaches zero (16bits / 2bytes / Halfword only)
  */
-void selectFIFOFullSize(int numberOfBytes)
+void setReducedFunctionCounterReloadValue(uint16_t reloadValue)
 {
-  if(maxETMFIFOSize == 0)
-    getETMFIFOSize();
-  
-  if(numberOfBytes >= maxETMFIFOSize)
-    memoryWriteWord((uint32_t)&(ETM->ETMFFLR),BACKUP_FIFOFULL_SIZE);
-  else
-    memoryWriteWord((uint32_t)&(ETM->ETMFFLR),numberOfBytes);
+  memoryWriteWord((uint32_t)&(ETM->ETMCNTRLDVR[0]),reloadValue);
 }

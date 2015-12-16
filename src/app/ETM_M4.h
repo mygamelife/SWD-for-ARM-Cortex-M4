@@ -22,14 +22,19 @@ void powerDownETM();
 void setETMProgrammingBit();
 void clearETMProgrammingBit();
 
+void getETMFIFOSize();
+void selectFIFOFullSize(int numberOfBytes);
+
 int checkCycleAccurateTracingSupport();
 
 int configureETMMainControl(int timestampEnable,int branchAllEnable,int stallProcessorEnable);
 void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelection startResource,ResourceSelection stopResource);
 void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
 void configureETMTriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
+//void configureTimeStampInsertionEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB);
 
-void getETMFIFOSize();
-void selectFIFOFullSize(int numberOfBytes);
+void setReducedFunctionCounterReloadValue(uint16_t reloadValue);
+
+
 
 #endif // ETM-M4_H
