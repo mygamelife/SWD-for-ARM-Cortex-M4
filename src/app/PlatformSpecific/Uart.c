@@ -7,7 +7,11 @@ static __IO ITStatus uartTxReady = 1;
 static __IO ITStatus uartRxReady = 1;
 static __IO ITStatus swoReady = 1;
 
-static void uartHighLevelInit(UART_HandleTypeDef *huart, USART_TypeDef *uartPort, uint32_t baudRate);
+static void uartHighLevelInit(  UART_HandleTypeDef *huart, 
+                                USART_TypeDef *uartPort,
+                                uint32_t baudRate,
+                                uint32_t stopBit
+                              );
 
 /* Do not modify isRxBusy and isTxBusy this two function contain
    the important static variable modify by Uart Interrupt and use
@@ -40,7 +44,11 @@ void uartConfigGpio(GPIO_TypeDef *gpiox, uint32_t pin, uint32_t altFunction) {
   HAL_GPIO_Init(gpiox, &GPIO_InitStruct);
 }
 
-static void uartHighLevelInit(UART_HandleTypeDef *huart, USART_TypeDef *uartPort, uint32_t baudRate) {
+static void uartHighLevelInit(  UART_HandleTypeDef *huart, 
+                                USART_TypeDef *uartPort,
+                                uint32_t baudRate,
+                                uint32_t stopBit
+                              ) {
   /* Put the USART peripheral in the Asynchronous mode (UART Mode) */
   /* UART1 configured as follow:
       - Word Length = 8 Bits
@@ -52,7 +60,7 @@ static void uartHighLevelInit(UART_HandleTypeDef *huart, USART_TypeDef *uartPort
 
   huart->Init.BaudRate     = baudRate;
   huart->Init.WordLength   = UART_WORDLENGTH_8B;
-  huart->Init.StopBits     = UART_STOPBITS_1;
+  huart->Init.StopBits     = stopBit;
   huart->Init.Parity       = UART_PARITY_NONE;
   huart->Init.HwFlowCtl    = UART_HWCONTROL_NONE;
   huart->Init.Mode         = UART_MODE_TX_RX;
@@ -74,7 +82,7 @@ void uartInit(void **huart) {
   HAL_NVIC_SetPriority(USART1_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(USART1_IRQn);
   /*##-4- Init Uart structure in high level #################################*/
-  uartHighLevelInit(&uartHandle, UART_PORT, UART_BAUD_RATE);
+  uartHighLevelInit(&uartHandle, UART_PORT, UART_BAUD_RATE, UART_STOPBITS_1);
 
   *huart = &uartHandle;
 }
@@ -182,7 +190,7 @@ void swoInit(void **hswo) {
   HAL_NVIC_SetPriority(SWO_IRQn, 0, 1);
   HAL_NVIC_EnableIRQ(SWO_IRQn);
   /*##-4- Init Uart structure in high level #################################*/
-  uartHighLevelInit(&swoHandle, SWO_PORT, SWO_BAUD_RATE);
+  uartHighLevelInit(&swoHandle, SWO_PORT, SWO_BAUD_RATE, UART_STOPBITS_2);
 
   *hswo = &swoHandle;
 }
@@ -194,5 +202,10 @@ uint8_t getSwoBytes(void *handler, uint8_t *rxBuffer, int length) {
     swoReady = 0;
     return UART_OK;
   }
+
   return UART_BUSY;
+}
+
+int isSwoDataReady(void) {
+  return swoReady;
 }

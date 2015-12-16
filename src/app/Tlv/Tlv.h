@@ -35,7 +35,7 @@ typedef enum {
 #define TLV_SET_BREAKPOINT_FLAG                         ((uint32_t)0x00000010)
 #define TLV_SET_WATCHPOINT_FLAG                         ((uint32_t)0x00000020)
 #define TLV_BREAKPOINT_WAS_SET_FLAG                     ((uint32_t)0x00000040)
- 
+
 /* ##### Tlv Flags Status Macros ##### */
 #define GET_FLAG_STATUS(__SESSION__, __FLAG__)          (((__SESSION__)->flags & (__FLAG__)) == (__FLAG__))
 #define SET_FLAG_STATUS(__SESSION__, __FLAG__)          ((__SESSION__)->flags |= (__FLAG__))

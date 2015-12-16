@@ -22,7 +22,7 @@ typedef enum
 #define SWO_PORT                          UART5
 /* USARTx Baud Rate */
 #define UART_BAUD_RATE                    128000//9600
-#define SWO_BAUD_RATE                     128000//9600
+#define SWO_BAUD_RATE                     2073600
 
 #define UART_CLK_ENABLE()                 do {                                \
                                               __HAL_RCC_USART1_CLK_ENABLE();  \
@@ -74,5 +74,5 @@ void cancelRx(void);
 
 void swoInit(void **hswo);
 uint8_t getSwoBytes(void *handler, uint8_t *rxBuffer, int length);
-
+int isSwoDataReady(void);
 #endif // Uart_H
