@@ -69,13 +69,18 @@ typedef enum
 
 typedef enum
 {
-  ERR_INVALID_HANDLER = 46,
-  ERR_SET_COMM_STATE,
-  ERR_SET_COMM_TIMEOUTS,
-  ERR_NO_COM_PORT,
-  ERR_GET_COMM_STATE,
-  ERR_INVALID_PASSKEY, //51
+  ERR_INVALID_HANDLER   = 46,
+  ERR_SET_COMM_STATE    = 47,
+  ERR_SET_COMM_TIMEOUTS = 48,
+  ERR_NO_COM_PORT       = 49,
+  ERR_GET_COMM_STATE    = 50,
+  ERR_INVALID_PASSKEY   = 51,
 } Handler_ErrorCode;
+
+typedef enum
+{
+  ERR_ITM_UNLOCK_FAILED = 52,
+} Itm_ErrorCode;
 
 void displayErrorMessage(CEXCEPTION_T err);
 #endif // ErrorCode_H

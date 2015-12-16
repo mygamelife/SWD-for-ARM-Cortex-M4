@@ -28,7 +28,6 @@ int main(void)
       taskManager(session);
     }
     Catch(err) {
-      resetSystemTime();
       tlvErrorReporter(session, err);
     }
   }

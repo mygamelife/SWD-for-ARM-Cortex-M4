@@ -31,10 +31,16 @@
 static int flag = 0;
 
 void setUp(void) {
-  if(flag == 0) {
-    flag = 1;
-    initMemoryReadWrite();
-    itmInit();
+  CEXCEPTION_T err;
+  
+  Try {
+    if(flag == 0) {
+      flag = 1;
+      initMemoryReadWrite();
+      itmInit();
+    }    
+  } Catch(err) {
+    displayErrorMessage(err);
   }
 }
 

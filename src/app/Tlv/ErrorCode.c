@@ -38,15 +38,15 @@ void displayErrorMessage(CEXCEPTION_T err) {
     /* ######################################## Open file error ########################################################## */
     case ERR_FILE_NOT_EXIST             : printf("Err : File doesn't exit\n                                                 "); break;
     /* ######################################### Handler error ########################################################### */
-    case ERR_INVALID_HANDLER            : printf("Err : Invalid handle\n                                                    "); break;
-    case ERR_SET_COMM_STATE             : printf("Err : Handler failed to SetCommState\n                                    "); break;
-    case ERR_SET_COMM_TIMEOUTS          : printf("Err : Handler failed to SetCommTimeouts\n                                 "); break;
-    case ERR_GET_COMM_STATE             : printf("Err : Handler failed to GetCommState\n                                    "); break;
-    case ERR_INVALID_PASSKEY            : printf("Err : Received unexpected passkey from probe\n                            "); break;
-    case ERR_NO_COM_PORT                : printf("Err : Can't find any available COM Port\n                                 ");
-                                          printf("There are several reasons can cause this issues, for example :\n          ");
-                                          printf("- Serial cable is disconnected\n                                          ");
-                                          printf("- Serial comm driver is corrupted or not installed\n                      "); break;
+    case ERR_INVALID_HANDLER            : printf("Err : Invalid handle\n"                                                   ); break;
+    case ERR_SET_COMM_STATE             : printf("Err : Handler failed to SetCommState\n"                                   ); break;
+    case ERR_SET_COMM_TIMEOUTS          : printf("Err : Handler failed to SetCommTimeouts\n"                                ); break;
+    case ERR_GET_COMM_STATE             : printf("Err : Handler failed to GetCommState\n"                                   ); break;
+    case ERR_INVALID_PASSKEY            : printf("Err : Received unexpected passkey from probe\n"                           ); break;
+    case ERR_NO_COM_PORT                : printf("Err : Can't find any available COM Port\n"                                );
+                                          printf("There are several reasons can cause this issues, for example :\n"         );
+                                          printf("- Serial cable is disconnected\n"                                         );
+                                          printf("- Serial comm driver is corrupted or not installed\n"                     ); break;
     /* ###################################### Undefine Error Code ######################################################## */
     default                             : printf("Err : Undefine error code %d\n", err);                                        break;
   }

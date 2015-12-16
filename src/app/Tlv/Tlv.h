@@ -13,11 +13,12 @@
 
 typedef struct
 {
-  void *handler;
-  uint8_t txBuffer[255];                  /* Tlv transmit buffer used to transfer tlv packet to target                */
-  uint8_t rxBuffer[255];                  /* Tlv receive buffer used to receive tlv packet from target                */
-  Tlv_State receiveState;                 /* Send and Receive state */
-  uint32_t flags;                         /* Flags */
+  void *handler;            /* Handler to configure and initialize uart */
+  uint8_t txBuffer[255];    /* Tlv transmit buffer used to transfer tlv packet to target */
+  uint8_t rxBuffer[255];    /* Tlv receive buffer used to receive tlv packet from target */
+  uint32_t flags;           /* Tlv flags */
+  void *hswo;               /* SWO handler to configure and initialize uart to capture trace data */
+  uint8_t swoBuffer[255];   /* SWO Buffer to hold all the trace data */
   bool exit;
 } Tlv_Session;
 

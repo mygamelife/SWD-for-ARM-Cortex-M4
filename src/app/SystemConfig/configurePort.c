@@ -43,14 +43,14 @@ void configureTargetResetPin(void)
  */
 void configureSWOPin(void)
 {	
-  GPIO_InitTypeDef GpioInfo;
+  //GPIO_InitTypeDef GpioInfo;
 
-	GpioInfo.Mode = GPIO_MODE_INPUT ;
-	GpioInfo.Pin = SWO_PIN;
-	GpioInfo.Pull = GPIO_PULLUP;
-	GpioInfo.Speed = GPIO_SPEED_FAST ;
+	//GpioInfo.Mode = GPIO_MODE_INPUT ;
+	//GpioInfo.Pin = SWO_PIN;
+	//GpioInfo.Pull = GPIO_PULLUP;
+	//GpioInfo.Speed = GPIO_SPEED_FAST ;
 
-	HAL_GPIO_Init(SWO_PORT,&GpioInfo);
+	//HAL_GPIO_Init(SWO_PORT,&GpioInfo);
 }
 
 /**
@@ -96,7 +96,7 @@ void configureIOPorts(void)
 	configureClock();
 	configureTargetResetPin();
 	setSWDIOOutputMode();
-  configureSWOPin();
+  // configureSWOPin();
 }
 
 /**
