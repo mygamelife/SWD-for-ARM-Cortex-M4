@@ -465,7 +465,7 @@ int removeWatchpoint(Tlv_Session *session)
 {
   Tlv *tlv ;
   
-  disableDWTComparator(COMPARATOR_0);
+  disableDWTComparator(COMPARATOR_1);
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
   
