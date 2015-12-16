@@ -27,8 +27,8 @@ typedef struct
     __IO uint32_t ETMTEEVR;             /*!< Offset: 0x020 (R/W) TraceEnable Event Register                           */
     __IO uint32_t ETMTECR1;             /*!< Offset: 0x024 (R/W) TraceEnable Control 1 Register                       */
     //FIFOFULL configuration
-    __IO uint32_t EMTFFRR;              /*!< Offset: 0x028 (R/W) FIFOFULL Region Register                             */
-    __IO uint32_t EMTFFLR;              /*!< Offset: 0x02C (R/W) FIFOFULL Level Register                              */
+    __IO uint32_t ETMFFRR;              /*!< Offset: 0x028 (R/W) FIFOFULL Region Register                             */
+    __IO uint32_t ETMFFLR;              /*!< Offset: 0x02C (R/W) FIFOFULL Level Register                              */
     //ViewData configuration
     __IO uint32_t ETMVDEVR;             /*!< Offset: 0x030 (R/W) ViewData Event Register*/
     __IO uint32_t ETMVDCR1;             /*!< Offset: 0x034 (R/W) ViewData Control 1 Register                          */
@@ -105,18 +105,241 @@ typedef struct
     __I  uint32_t ETMCIDR3;             /*!< Offset: 0xFF CComponent ID3 Register                                     */
 } ETM_Type;
 
-#define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos  1
-#define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Msk  (1UL << ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos)
+typedef enum
+{
+  SELECT_NONE = 0,
+  SINGLE_ADDRESS_COMPARATOR_1 = 0,
+  SINGLE_ADDRESS_COMPARATOR_2,
+  SINGLE_ADDRESS_COMPARATOR_3,
+  SINGLE_ADDRESS_COMPARATOR_4,
+  SINGLE_ADDRESS_COMPARATOR_5,
+  SINGLE_ADDRESS_COMPARATOR_6,
+  SINGLE_ADDRESS_COMPARATOR_7,
+  SINGLE_ADDRESS_COMPARATOR_8,
+  SINGLE_ADDRESS_COMPARATOR_9,
+  SINGLE_ADDRESS_COMPARATOR_10,
+  SINGLE_ADDRESS_COMPARATOR_11,
+  SINGLE_ADDRESS_COMPARATOR_12,
+  SINGLE_ADDRESS_COMPARATOR_13,
+  SINGLE_ADDRESS_COMPARATOR_14,
+  SINGLE_ADDRESS_COMPARATOR_15,
+  SINGLE_ADDRESS_COMPARATOR_16,
+  ADDRESS_RANGE_COMPARATOR_1,
+  ADDRESS_RANGE_COMPARATOR_2,
+  ADDRESS_RANGE_COMPARATOR_3,
+  ADDRESS_RANGE_COMPARATOR_4,
+  ADDRESS_RANGE_COMPARATOR_5,
+  ADDRESS_RANGE_COMPARATOR_6,
+  ADDRESS_RANGE_COMPARATOR_7,
+  ADDRESS_RANGE_COMPARATOR_8,
+  INSTRUMENTATION_RESOURCE_1 = 24,
+  INSTRUMENTATION_RESOURCE_2,
+  INSTRUMENTATION_RESOURCE_3,
+  INSTRUMENTATION_RESOURCE_4,
+  WATCHPOINT_COMPARATOR_1 = 32,
+  WATCHPOINT_COMPARATOR_2,
+  WATCHPOINT_COMPARATOR_3,
+  WATCHPOINT_COMPARATOR_4,
+  WATCHPOINT_COMPARATOR_5,
+  WATCHPOINT_COMPARATOR_6,
+  WATCHPOINT_COMPARATOR_7,
+  WATCHPOINT_COMPARATOR_8,
+  MEMORY_MAP_DECODES_1 = 48,
+  MEMORY_MAP_DECODES_2,
+  MEMORY_MAP_DECODES_3,
+  MEMORY_MAP_DECODES_4,
+  MEMORY_MAP_DECODES_5,
+  MEMORY_MAP_DECODES_6,
+  MEMORY_MAP_DECODES_7,
+  MEMORY_MAP_DECODES_8,
+  MEMORY_MAP_DECODES_9,
+  MEMORY_MAP_DECODES_10,
+  MEMORY_MAP_DECODES_11,
+  MEMORY_MAP_DECODES_12,
+  MEMORY_MAP_DECODES_13,
+  MEMORY_MAP_DECODES_14,
+  MEMORY_MAP_DECODES_15,
+  MEMORY_MAP_DECODES_16,
+  COUNTER_1 = 64,
+  COUNTER_2,
+  COUNTER_3,
+  COUNTER_4,
+  SEQUENCER_IN_STATE_1 = 80,
+  SEQUENCER_IN_STATE_2,
+  SEQUENCER_IN_STATE_3,
+  CONTEXTID_COMPARATOR_1 = 88,
+  CONTEXTID_COMPARATOR_2,
+  CONTEXTID_COMPARATOR_3,
+  VMID_COMPARATOR,
+  TRACE_STARTSTOP_RESOUCE = 95,
+  EXTERNAL_INPUT_1,
+  EXTERNAL_INPUT_2,
+  EXTERNAL_INPUT_3,
+  EXTERNAL_INPUT_4,
+  EXTENDED_EXTERNAL_INPUT_SELECTOR_1 = 104,
+  EXTENDED_EXTERNAL_INPUT_SELECTOR_2,
+  EXTENDED_EXTERNAL_INPUT_SELECTOR_3,
+  EXTENDED_EXTERNAL_INPUT_SELECTOR_4,
+  PROCESSOR_IN_NON_SECURE_STATE =109,
+  TRACE_PROHIBITED,
+  HARD_WIRED_INPUT,
+}ETMEvent_Resources;
 
+typedef enum
+{
+  A = 0,
+  NOT_A,
+  A_AND_B,
+  NOT_A_AND_B,
+  NOT_A_AND_NOT_B,
+  A_OR_B,
+  NOT_A_OR_B,
+  NOT_A_OR_NOT_B,
+}ETMEvent_FunctionEncoding;
+
+typedef enum
+{
+  SELECT_NONE = 0,
+  RESOURCE_1 = 1,
+  RESOURCE_2 = 2,
+  RESOURCE_3 = 4,
+  RESOURCE_4 = 8,
+  ALL_RESOURCES = 0xF,
+}ResourceSelection;
+
+
+#define ETM_ETMCR_TIMESTAMP_ENABLE_Pos                                        28
+#define ETM_ETMCR_TIMESTAMP_ENABLE_Msk                                        (1UL << ETM_ETMCR_TIMESTAMP_ENABLE_Pos)
+#define ETM_ETMCR_DATAONLY_MODE_Pos                                           20
+#define ETM_ETMCR_DATAONLY_MODE_Msk                                           (1UL << ETM_ETMCR_DATAONLY_MODE_Pos)
+#define ETM_ETMCR_CYCLEACCURATE_TRACING_Pos                                   12
+#define ETM_ETMCR_CYCLEACCURATE_TRACING_Msk                                   (1UL << ETM_ETMCR_CYCLEACCURATE_TRACING_Pos)
+#define ETM_ETMCR_ETMEN_Pos                                                   11
+#define ETM_ETMCR_ETMEN_Msk                                                   (1UL << ETM_ETMCR_ETMEN_Pos)
+#define ETM_ETMCR_ETMPROGBIT_Pos                                              10
+#define ETM_ETMCR_ETMPROGBIT_Msk                                              (1UL << ETM_ETMCR_ETMPROGBIT_Pos)
+#define ETM_ETMCR_BRANCH_OUTPUT_Pos                                           8
+#define ETM_ETMCR_BRANCH_OUTPUT_Msk                                           (1UL << ETM_ETMCR_BRANCH_OUTPUT_Pos)
+#define ETM_ETMCR_STALL_PROCESSOR_Pos                                         7
+#define ETM_ETMCR_STALL_PROCESSOR_Msk                                         (1UL << ETM_ETMCR_STALL_PROCESSOR_Pos)
+#define ETM_ETMCR_DATA_ACCESS_Pos                                             2
+#define ETM_ETMCR_DATA_ACCESS_Msk                                             (3UL << ETM_ETMCR_DATA_ACCESS_Pos)
+#define ETM_ETMCR_ETMPOWERDOWN_Pos                                            0
+#define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
+
+#define ETM_ETMTRIGGER_BOOLEANFUNCTION_Pos                                    14
+#define ETM_ETMTRIGGER_BOOLEANFUNCTION_Msk                                    (7UL << ETM_ETMTRIGGER_BOOLEANFUNCTION_Pos)
+#define ETM_ETMTRIGGER_RESOURCE_B_Pos                                         7
+#define ETM_ETMTRIGGER_RESOURCE_B_Msk                                         (127UL << ETM_ETMTRIGGER_RESOURCE_B_Pos)
+#define ETM_ETMTRIGGER_RESOURCE_A_Pos                                         0
+#define ETM_ETMTRIGGER_RESOURCE_A_Msk                                         (127UL << ETM_ETMTRIGGER_RESOURCE_A_Pos)
+
+#define ETM_ETMTEEVR_BOOLEANFUNCTION_Pos                                      14
+#define ETM_ETMTEEVR_BOOLEANFUNCTION_Msk                                      (7UL << ETM_ETMEEVR_BOOLEANFUNCTION_Pos)
+#define ETM_ETMTEEVR_RESOURCE_B_Pos                                           7
+#define ETM_ETMTEEVR_RESOURCE_B_Msk                                           (127UL << ETM_ETMEEVR_RESOURCE_B_Pos)
+#define ETM_ETMTEEVR_RESOURCE_A_Pos                                           0
+#define ETM_ETMTEEVR_RESOURCE_A_Msk                                           (127UL << ETM_ETMEEVR_RESOURCE_A_Pos)
+
+#define ETM_ETMTECR1_TRACECONTROL_ENABLE_Pos                                  25
+#define ETM_ETMTECR1_TRACECONTROL_ENABLE_Msk                                  (1UL << ETM_ETMTECR1_TRACECONTROL_ENABLE_Pos)
+#define ETM_ETMTECR1_INCLUDE_EXCLUEDE_CONTROL_Pos                             24
+#define ETM_ETMTECR1_NCLUDE_EXCLUEDE_CONTROL_Msk                              (1UL << ETM_ETMTECR1_INCLUDE_EXCLUEDE_CONTROL_Pos)
+
+#define ETM_ETMCCR_ETMIDR_PRESENT_Pos                                         31
+#define ETM_ETMCCR_ETMIDR_PRESENT_Msk                                         (1UL << ETM_ETMCCR_ETMIDR_PRESENT_Pos)
+#define ETM_ETMCCR_COPROCESSOR_MEMORYACCESS_SUPPORT_Pos                       27
+#define ETM_ETMCCR_COPROCESSOR_MEMORYACCESS_SUPPORT_Msk                       (1UL << ETM_ETMCCR_COPROCESSOR_MEMORYACCESS_SUPPORT_Pos)
+#define ETM_ETMCCR_TRACE_STARTSTOP_BLOCK_PRESENT_Pos                          26
+#define ETM_ETMCCR_TRACE_STARTSTOP_BLOCK_PRESENT_Msk                          (1UL << ETM_ETMCCR_TRACE_STARTSTOP_BLOCK_PRESENT_Pos)
+#define ETM_ETMCCR_NUMBER_OF_CONTEXTID_COMPARATOR_Pos                         24
+#define ETM_ETMCCR_NUMBER_OF_CONTEXTID_COMPARATOR_Msk                         (3UL << ETM_ETMCCR_NUMBER_OF_CONTEXTID_COMPARATOR_Pos)
+#define ETM_ETMCCR_FIFOFULL_LOGIC_PRESENT_Pos                                 23
+#define ETM_ETMCCR_FIFOFULL_LOGIC_PRESENT_Msk                                 (1UL << ETM_ETMCCR_FIFOFULL_LOGIC_PRESENT_Pos)
+#define ETM_ETMCCR_NUMBER_OF_EXTERNAL_OUTPUTS_Pos                             20
+#define ETM_ETMCCR_NUMBER_OF_EXTERNAL_OUTPUTS_Msk                             (7UL << ETM_ETMCCR_NUMBER_OF_EXTERNAL_OUTPUTS_Pos)
+#define ETM_ETMCCR_NUMBER_OF_EXTERNAL_INPUTS_Pos                              17
+#define ETM_ETMCCR_NUMBER_OF_EXTERNAL_INPUTS_Msk                              (7UL << ETM_ETMCCR_NUMBER_OF_EXTERNAL_INPUTS_Pos)
+#define ETM_ETMCCR_SEQUENCER_PRESENT_Pos                                      16
+#define ETM_ETMCCR_SEQUENCER_PRESENT_Msk                                      (1UL << ETM_ETMCCR_SEQUENCER_PRESENT_Pos)
+#define ETM_ETMCCR_NUMBER_OF_COUNTERS_Pos                                     13
+#define ETM_ETMCCR_NUMBER_OF_COUNTERS_Msk                                     (7UL << ETM_ETMCCR_NUMBER_OF_COUNTERS_Pos)
+#define ETM_ETMCCR_NUMBER_OF_MEMORYMAP_DECODERS_Pos                           8
+#define ETM_ETMCCR_NUMBER_OF_MEMORYMAP_DECODERS_Msk                           (31UL << ETM_ETMCCR_NUMBER_OF_MEMORYMAP_DECODERS_Pos)
+#define ETM_ETMCCR_NUMBER_OF_DATAVALUE_COMPARATOR_Pos                         4
+#define ETM_ETMCCR_NUMBER_OF_DATAVALUE_COMPARATOR_Msk                         (15UL << ETM_ETMCCR_NUMBER_OF_DATAVALUE_COMPARATOR_Pos)
+#define ETM_ETMCCR_NUMBER_OF_ADDRESS_COMPARATOR_PAIRS_Pos                     0
+#define ETM_ETMCCR_NUMBER_OF_ADDRESS_COMPARATOR_PAIRS_Msk                     (15UL << ETM_ETMCCR_NUMBER_OF_ADDRESS_COMPARATOR_PAIRS_Pos)
+
+#define ETM_ETMCCER_TIMESTAMP_PACKET_SIZE_Pos                                 29
+#define ETM_ETMCCER_TIMESTAMP_PACKET_SIZE_Msk                                 (1UL << ETM_ETMCCER_TIMESTAMP_PACKET_SIZE_Pos) 
+#define ETM_ETMCCER_TIMESTAMP_PACKET_ENCODING_Pos                             28
+#define ETM_ETMCCER_TIMESTAMP_PACKET_ENCODING_Msk                             (1UL << ETM_ETMCCER_TIMESTAMP_PACKET_ENCODING_Pos) 
+#define ETM_ETMCCER_REDUCED_FUNCTION_COUNTER_Pos                              27
+#define ETM_ETMCCER_REDUCED_FUNCTION_COUNTER_Msk                              (1UL << ETM_ETMCCER_REDUCED_FUNCTION_COUNTER_Pos)
+#define ETM_ETMCCER_VIRTUALIZATION_EXTERNSION_Pos                             26
+#define ETM_ETMCCER_VIRTUALIZATION_EXTERNSION_Msk                             (1UL << ETM_ETMCCER_VIRTUALIZATION_EXTERNSION_Pos)
+#define ETM_ETMCCER_TIMESTAMPING_IMPLEMENTATION_Pos                           22
+#define ETM_ETMCCER_TIMESTAMPING_IMPLEMENTATION_Msk                           (1UL << ETM_ETMCCER_TIMESTAMPING_IMPLEMENTATION_Pos) 
+#define ETM_ETMCCER_ETMEIBCR_IMPLEMENTED_Pos                                  21      
+#define ETM_ETMCCER_ETMEIBCR_IMPLEMENTED_Msk                                  (1UL << ETM_ETMCCER_ETMEIBCR_IMPLEMENTED_Pos)
+#define ETM_ETMCCER_TRACE_BLOCK_USE_EMBEDDEDICE_WATCHPOINT_INPUTS_Pos         20
+#define ETM_ETMCCER_TRACE_BLOCK_USE_EMBEDDEDICE_WATCHPOINT_INPUTS_Msk         (1UL << ETM_ETMCCER_TRACE_BLOCK_USE_EMBEDDEDICE_WATCHPOINT_INPUTS_Pos)   
+#define ETM_ETMCCER_NUMBER_OF_EMBEDDEDICE_WATCHPOINT_INPUTS_Pos               16         
+#define ETM_ETMCCER_NUMBER_OF_EMBEDDEDICE_WATCHPOINT_INPUTS_Msk               (15UL << ETM_ETMCCER_NUMBER_OF_EMBEDDEDICE_WATCHPOINT_INPUTS_Pos)
+#define ETM_ETMCCER_NUMBER_OF_INSTRUMENTATION_RESOURCES_Pos                   13         
+#define ETM_ETMCCER_NUMBER_OF_INSTRUMENTATION_RESOURCES_Msk                   (7UL << ETM_ETMCCER_NUMBER_OF_INSTRUMENTATION_RESOURCES_Pos) 
+#define ETM_ETMCCER_DATA_ADDRESS_COMPARISON_SUPPORT_Pos                       12         
+#define ETM_ETMCCER_DATA_ADDRESS_COMPARISON_SUPPORT_Msk                       (1UL << ETM_ETMCCER_DATA_ADDRESS_COMPARISON_SUPPORT_Pos)
+#define ETM_ETMCCER_ALL_REGISTERS_READABLE_Pos                                11         
+#define ETM_ETMCCER_ALL_REGISTERS_READABLE_Msk                                (1UL << ETM_ETMCCER_ALL_REGISTERS_READABLE_Pos)
+#define ETM_ETMCCER_SIZE_OF_EXTENDED_EXTERNAL_INPUT_BUS_Pos                   3                       
+#define ETM_ETMCCER_SIZE_OF_EXTENDED_EXTERNAL_INPUT_BUS_Msk                   (255UL << ETM_ETMCCER_SIZE_OF_EXTENDED_EXTERNAL_INPUT_BUS_Pos)
+#define ETM_ETMCCER_NUMBER_OF_EXTENDED_EXTERNAL_INPUT_SELECTORS_Pos           0             
+#define ETM_ETMCCER_NUMBER_OF_EXTENDED_EXTERNAL_INPUT_SELECTORS_Msk           (7UL << ETM_ETMCCER_NUMBER_OF_EXTENDED_EXTERNAL_INPUT_SELECTORS_Pos)                
+
+#define ETM_ETMTESSEICR_STOP_RESOURCE_Pos                                     16
+#define ETM_ETMTESSEICR_STOP_RESOURCE_Msk                                     (255UL <<  ETM_ETMTESSEICR_STOP_RESOURCE_Pos)
+#define ETM_ETMTESSEICR_START_RESOURCE_Pos                                    0
+#define ETM_ETMTESSEICR_START_RESOURCE_Msk                                    (255UL <<  ETM_ETMTESSEICR_START_RESOURCE_Pos)
+
+#define ETM_ETMTSEVR_BOOLEANFUNCTION_Pos                                      14
+#define ETM_ETMTSEVR_BOOLEANFUNCTION_Msk                                      (7UL << ETM_ETMTSEVR_BOOLEANFUNCTION_Pos)
+#define ETM_ETMTSEVR_RESOURCE_B_Pos                                           7
+#define ETM_ETMTSEVR_RESOURCE_B_Msk                                           (127UL << ETM_ETMTSEVR_RESOURCE_B_Pos)
+#define ETM_ETMTSEVR_RESOURCE_A_Pos                                           0
+#define ETM_ETMTSEVR_RESOURCE_A_Msk                                           (127UL << ETM_ETMTSEVR_RESOURCE_A_Pos)
+
+#define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos                    1
+#define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Msk                    (1UL << ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos)
+
+#define ETM_ETMSR_PROGBIT_Pos                               1
+#define ETM_ETMSR_PROGBIT_Msk                               (1UL << ETM_ETMSR_PROGBIT_Pos)
 
 #define ETM_BASE  (0xE0041000UL)             /*!< ETM Base Address                   */
-#define ETM       ((ETM_Type *)   ETM_BASE) /*!< ETM configuration struct    */
+#define ETM       ((ETM_Type *)   ETM_BASE)  /*!< ETM configuration struct           */
 
 #define ETM_UNLOCK_KEY 0xC5ACCE55
 #define ETM_LOCK       0
 
-#define ETM_TRACE_REGISTER_UNLOCK  0
-#define ETM_TRACE_REGISTER_LOCK    0xC5ACCE55
+#define BACKUP_FIFOFULL_SIZE              5
+
+// #define ETM_TRACE_REGISTER_UNLOCK  0
+// #define ETM_TRACE_REGISTER_LOCK    0xC5ACCE55
+
+#define DISABLE_TRACESTARTSTOP_LOGIC  0
+#define ENABLE_TRACESTARTSTOP_LOGIC   1  
+
+#define DISABLE_TIMESTAMPING          0
+#define ENABLE_TIMESTAMPING           1
+
+#define DISABLE_BRANCH_ALL_ADDRESS    0
+#define ENABLE_BRANCH_ALL_ADDRESS     1
+
+#define DISABLE_STALLING_PROCESSOR    0
+#define ENABLE_STALLING_PROCESSOR     1
+
+#define ETM_TRACEID                   2
 
 #define CORESIGHT_ETM_M4_ID        0x4114F250
 #endif // ETMEx_H

@@ -20,7 +20,7 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case PROBE_TLV_TIMEOUT              : printf("Err : Probe time out\n                                                    "); break;
     case PROBE_TLV_INVALID_COMMAND      : printf("Err : Probe received invalid command\n                                    "); break;
     case PROBE_TLV_CHECKSUM_ERROR       : printf("Err : Probe received checksum error\n                                     "); break;
-    case PROBE_STUB_NOT_RESPONDING      : printf("Err : Probe Flash Programmer is no respond\n                              "); break;
+    case PROBE_STUB_NOT_RESPONDING      : printf("Err : Probe Flash Programmer is not responding\n                              "); break;
     case PROBE_EVENT_NOT_RESPONDING     : printf("Err : Probe Debug Event never occur\n                                     "); break;
     /* ######################################## User Interface error #################################################### */
     case ERR_INCOMPLETE_COMMAND         : printf("Err : Command is incomplete\n                                             "); break;
