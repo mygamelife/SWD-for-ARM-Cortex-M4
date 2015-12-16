@@ -24,7 +24,7 @@ void setETMProgrammingBit();
 void clearETMProgrammingBit();
 
 void getETMFIFOSize();
-void selectFIFOFullSize(int numberOfBytes);
+void setFIFOFullSize(int numberOfBytes);
 
 int checkCycleAccurateTracingSupport();
 
@@ -36,4 +36,5 @@ void configureTimeStampInsertionEvent(ETMEvent_FunctionEncoding function,ETMEven
 
 void setReducedFunctionCounterReloadValue(uint16_t reloadValue);
 
+void setupETMandStartTracing();
 #endif // ETM-M4_H

@@ -221,7 +221,7 @@ void getETMFIFOSize()
  *
  *  Input   :	numberOfBytes is to specify the number of bytes left in the FIFO  to assert signal FIFOFULL
  */
-void selectFIFOFullSize(int numberOfBytes)
+void setFIFOFullSize(int numberOfBytes)
 {
   if(maxETMFIFOSize == 0)
     getETMFIFOSize();
@@ -342,11 +342,12 @@ void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelectio
  *
  *          ResourceA is used to select the resource that will generate logical TRUE signal when it is active
  *				  Possible value : 
+ *              SELECT_NONE                        
  *              WATCHPOINT_COMPARATOR_1
  *              WATCHPOINT_COMPARATOR_2
  *              WATCHPOINT_COMPARATOR_3
  *              WATCHPOINT_COMPARATOR_4
- *              COUNTER_1                          Counter 1 at zero
+ *              COUNTER_1                          TRUE when Counter 1 reaches zero
  *              TRACE_STARTSTOP_RESOUCE
  *              EXTERNAL_INPUT_1
  *              EXTERNAL_INPUT_2
@@ -373,7 +374,8 @@ void configureETMTriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resour
 /**
  *  Configure the event that cause the insertion of timestamp into trace stream
  *  
- *  Do not set to always true as it will probably cause FIFO to overflow, use counter 1 to insert timestamp into trace periodically
+ *  Do not set to always TRUE (HARD_WIRED_INPUT) as it will probably cause FIFO to overflow, 
+ *  recommended to use counter 1 to insert timestamp into trace periodically
  *
  *
  *  (Refer to configureTraceEnableEnablingEvent for input parameters description)
@@ -391,4 +393,27 @@ void configureTimeStampInsertionEvent(ETMEvent_FunctionEncoding function,ETMEven
 void setReducedFunctionCounterReloadValue(uint16_t reloadValue)
 {
   memoryWriteWord((uint32_t)&(ETM->ETMCNTRLDVR[0]),reloadValue);
+}
+
+/**
+ *  Setup ETM and start tracing
+ *  
+ */
+void setupETMandStartTracing()
+{
+  powerUpETM();
+  
+  configureETMMainControl(ENABLE_TIMESTAMPING,ENABLE_BRANCH_ALL_ADDRESS,ENABLE_STALLING_PROCESSOR);
+  //Configure Trigger and Trace event
+  configureETMTriggerEvent(A,HARD_WIRED_INPUT,SELECT_NONE);
+  configureTraceEnableEnablingEvent(A,HARD_WIRED_INPUT,SELECT_NONE);
+  configureTraceStartStopLogic(DISABLE_TRACESTARTSTOP_LOGIC,SELECT_NONE,SELECT_NONE);
+  configureTimeStampInsertionEvent(A,COUNTER_1,SELECT_NONE);
+  
+  setFIFOFullSize(BACKUP_FIFOFULL_SIZE);
+  
+  setReducedFunctionCounterReloadValue(1000);
+  setETMTraceID();
+  
+  clearETMProgrammingBit();
 }
