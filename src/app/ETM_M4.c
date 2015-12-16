@@ -326,6 +326,8 @@ void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelectio
 
 /**
  *  Configure TraceEnable enabling Event to assert TraceEnable signal for tracing (Used to control when to perform instruction tracing)
+ *  
+ *  Sample configuration for always true event , configureTraceEnableEnablingEvent(A,HARD_WIRED_INPUT,(any of the resources))
  *
  *  Input :  function is used the boolean logic between Resource A and B that will set logical true for the event
  *				   Possible value :
@@ -365,7 +367,20 @@ void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEve
  */
 void configureETMTriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
 {
-  memoryWriteWord((uint32_t)&(ETM->ETMTRIGGER), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
+  memoryWriteWord((uint32_t)&(ETM->ETMTRIGGER), ((function << ETM_ETMTRIGGER_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTRIGGER_RESOURCE_B_Pos) + resourceA));
+}
+
+/**
+ *  Configure the event that cause the insertion of timestamp into trace stream
+ *  
+ *  Do not set to always true as it will probably cause FIFO to overflow, use counter 1 to insert timestamp into trace periodically
+ *
+ *
+ *  (Refer to configureTraceEnableEnablingEvent for input parameters description)
+ */
+void configureTimeStampInsertionEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
+{
+  memoryWriteWord((uint32_t)&(ETM->ETMTSEVR), ((function << ETM_ETMTSEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTSEVR_RESOURCE_B_Pos) + resourceA));
 }
 
 /**

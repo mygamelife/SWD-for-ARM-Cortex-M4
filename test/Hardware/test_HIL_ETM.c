@@ -290,3 +290,18 @@ void test_setReducedFunctionCounterReloadValue_given_0x1234_should_read_back_0x1
 
   TEST_ASSERT_EQUAL(0x1234,dataRead);
 }
+
+/*-----------configureTimeStampInsertionEvent------*/
+void test_configureTimeStampInsertionEvent_should_configure_ETMTSEVR()
+{
+  uint32_t etmtsevr = 0 ;
+  
+  configureTimeStampInsertionEvent(A,COUNTER_1,HARD_WIRED_INPUT);
+  memoryReadWord((uint32_t)&(ETM->ETMTSEVR),&etmtsevr);
+  //Resource A[6:0], Resource B[13:7], Function[16:14]
+  //A                 0b000
+  //COUNTER_1         0b100 0000
+  //HARD_WIRED_INPUT  0b110 1111
+  //0 0011 0111 1100  0000
+  TEST_ASSERT_EQUAL(0x37C0,etmtsevr);
+}

@@ -226,6 +226,12 @@ typedef enum
 #define ETM_ETMCR_ETMPOWERDOWN_Pos                                            0
 #define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
 
+#define ETM_ETMTRIGGER_BOOLEANFUNCTION_Pos                                    14
+#define ETM_ETMTRIGGER_BOOLEANFUNCTION_Msk                                    (7UL << ETM_ETMTRIGGER_BOOLEANFUNCTION_Pos)
+#define ETM_ETMTRIGGER_RESOURCE_B_Pos                                         7
+#define ETM_ETMTRIGGER_RESOURCE_B_Msk                                         (127UL << ETM_ETMTRIGGER_RESOURCE_B_Pos)
+#define ETM_ETMTRIGGER_RESOURCE_A_Pos                                         0
+#define ETM_ETMTRIGGER_RESOURCE_A_Msk                                         (127UL << ETM_ETMTRIGGER_RESOURCE_A_Pos)
 
 #define ETM_ETMTEEVR_BOOLEANFUNCTION_Pos                                      14
 #define ETM_ETMTEEVR_BOOLEANFUNCTION_Msk                                      (7UL << ETM_ETMEEVR_BOOLEANFUNCTION_Pos)
@@ -296,6 +302,12 @@ typedef enum
 #define ETM_ETMTESSEICR_START_RESOURCE_Pos                                    0
 #define ETM_ETMTESSEICR_START_RESOURCE_Msk                                    (255UL <<  ETM_ETMTESSEICR_START_RESOURCE_Pos)
 
+#define ETM_ETMTSEVR_BOOLEANFUNCTION_Pos                                      14
+#define ETM_ETMTSEVR_BOOLEANFUNCTION_Msk                                      (7UL << ETM_ETMTSEVR_BOOLEANFUNCTION_Pos)
+#define ETM_ETMTSEVR_RESOURCE_B_Pos                                           7
+#define ETM_ETMTSEVR_RESOURCE_B_Msk                                           (127UL << ETM_ETMTSEVR_RESOURCE_B_Pos)
+#define ETM_ETMTSEVR_RESOURCE_A_Pos                                           0
+#define ETM_ETMTSEVR_RESOURCE_A_Msk                                           (127UL << ETM_ETMTSEVR_RESOURCE_A_Pos)
 
 #define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos                    1
 #define ETM_ETMLSR_ETMLOCKEDUNLOCKED_Msk                    (1UL << ETM_ETMLSR_ETMLOCKEDUNLOCKED_Pos)
@@ -313,7 +325,6 @@ typedef enum
 
 // #define ETM_TRACE_REGISTER_UNLOCK  0
 // #define ETM_TRACE_REGISTER_LOCK    0xC5ACCE55
-
 
 #define DISABLE_TRACESTARTSTOP_LOGIC  0
 #define ENABLE_TRACESTARTSTOP_LOGIC   1  
