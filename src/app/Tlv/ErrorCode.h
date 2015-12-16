@@ -27,6 +27,8 @@ typedef enum
   PROBE_TLV_TIMEOUT           = 102,
   PROBE_TLV_INVALID_COMMAND   = 103,
   PROBE_TLV_CHECKSUM_ERROR    = 104,
+  PROBE_STUB_NOT_RESPONDING   = 105,
+  PROBE_EVENT_NOT_RESPONDING  = 106,
 } Probe_ErrorCode;
 
 typedef enum
