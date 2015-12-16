@@ -108,6 +108,33 @@ void test_isETMProgrammingBitSet_should_return_0_if_cleared()
   TEST_ASSERT_EQUAL(0,isETMProgrammingBitSet());
 }
 
+/*---------setETMProgrammingBit------*/
+void test_setETMProgrammingBit_should_cause_isETMProgrammingBitSet_to_return_1()
+{
+  uint32_t data = 0 ;
+  
+  clearETMProgrammingBit();
+  TEST_ASSERT_EQUAL(0,isETMProgrammingBitSet());
+  setETMProgrammingBit();
+  
+  TEST_ASSERT_EQUAL(1,isETMProgrammingBitSet());
+}
+
+/*---------setETMProgrammingBit------*/
+void test_setETMProgrammingBit_should_set_cause_isETMProgrammingBitSet_to_return_0()
+{
+  uint32_t data = 0 ;
+
+  setETMProgrammingBit();
+  TEST_ASSERT_EQUAL(1,isETMProgrammingBitSet());
+  
+  clearETMProgrammingBit();
+  
+  TEST_ASSERT_EQUAL(0,isETMProgrammingBitSet());
+  
+  setETMProgrammingBit(); // restore back to programming mode
+}
+
 /*---------powerUpETM------*/
 void test_powerUpETM_should_powerUpETM()
 {
@@ -187,11 +214,11 @@ void test_configureTraceEnableEnablingEvent_should_configure_etmeevr()
   
     configureTraceEnableEnablingEvent(A_OR_B,TRACE_PROHIBITED,PROCESSOR_IN_NON_SECURE_STATE);
     memoryReadWord((uint32_t)&(ETM->ETMTEEVR),&etmteevr);
-    //Resource A[6:0], Resource B[13:7], Function[17:14]
-    //A_OR_B                          0b101
-    //TRACE_PROHIBITED                0b110 1110
-    //PROCESSOR_IN_NON_SECURE_STATE   0b110 1101
-    //1 0111 0110 1110 1110
+    // Resource A[6:0], Resource B[13:7], Function[17:14]
+    // A_OR_B                          0b101
+    // TRACE_PROHIBITED                0b110 1110
+    // PROCESSOR_IN_NON_SECURE_STATE   0b110 1101
+    // 1 0111 0110 1110 1110
     TEST_ASSERT_EQUAL(0x176EE,etmteevr);
   */
 }
@@ -224,12 +251,12 @@ void test_selectFIFOFullSize_given_smaller_than_max_FIFOsize_should_set_to_the_b
 }
 
 
-/*-----------configureETMETriggerEvent------*/
-void test_configureETMETriggerEvent_should_configure_ETMTrigger()
+/*-----------configureETMTriggerEvent------*/
+void test_configureETMTriggerEvent_should_configure_ETMTrigger()
 {
   uint32_t etmTrigger = 0 ;
   
-  configureETMETriggerEvent(A_AND_B,WATCHPOINT_COMPARATOR_1,WATCHPOINT_COMPARATOR_2);
+  configureETMTriggerEvent(A_AND_B,WATCHPOINT_COMPARATOR_1,WATCHPOINT_COMPARATOR_2);
   memoryReadWord((uint32_t)&(ETM->ETMTRIGGER),&etmTrigger);
   //Resource A[6:0], Resource B[13:7], Function[16:14]
   //A_AND_B                 0b010
@@ -237,4 +264,18 @@ void test_configureETMETriggerEvent_should_configure_ETMTrigger()
   //WATCHPOINT_COMPARATOR_2 0b010 0001
   //0 1001 0000 1010 0000
   TEST_ASSERT_EQUAL(0x90A0,etmTrigger);
+}
+
+/*-----------checkCycleAccurateTracingSupport------*/
+void test_checkCycleAccurateTracingSupport_should_return_1_if_supported_0_if_not_supported()
+{
+  TEST_ASSERT_EQUAL(0,checkCycleAccurateTracingSupport());
+  
+  // Cycle Accurate Tracing not supported 
+}
+
+/*-----------configureETMMainControl------*/
+void test_configureETMMainControl_should_return_1_for_successful_configuration()
+{
+  TEST_ASSERT_EQUAL(1,configureETMMainControl(ENABLE_TIMESTAMPING,ENABLE_BRANCH_ALL_ADDRESS,ENABLE_STALLING_PROCESSOR));
 }

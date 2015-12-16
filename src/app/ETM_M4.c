@@ -178,9 +178,9 @@ void setETMProgrammingBit()
   if(isETMProgrammingBitSet())
     return ;
   
-  memoryReadByte((uint32_t)&(ETM->ETMCR)+1,&data);
+  memoryReadWord((uint32_t)&(ETM->ETMCR),&data);
   data += ETM_ETMCR_ETMPROGBIT_Msk ;
-  memoryWriteByte((uint32_t)&(ETM->ETMCR)+1,data);
+  memoryWriteWord((uint32_t)&(ETM->ETMCR),data);
   
   while(!isETMProgrammingBitSet()); 
 }
@@ -196,12 +196,93 @@ void clearETMProgrammingBit()
   if(!isETMProgrammingBitSet())
     return ;
   
-  memoryReadByte((uint32_t)&(ETM->ETMCR)+1,&data);
+  memoryReadWord((uint32_t)&(ETM->ETMCR),&data);
   data -= ETM_ETMCR_ETMPROGBIT_Msk ;
-  memoryWriteByte((uint32_t)&(ETM->ETMCR)+1,data);
+  memoryWriteWord((uint32_t)&(ETM->ETMCR),data);
   
   while(isETMProgrammingBitSet()); 
 }
+
+/**
+ *  Check whether the ETM support Cycle Accurate Tracing
+ *
+ *  Output  : return 1 if supported
+ *            return 0 if not supported
+ */
+int checkCycleAccurateTracingSupport()
+{
+  uint32_t dataRead = 0 ;
+  
+  setETMProgrammingBit();
+  memoryReadWord((uint32_t)&(ETM->ETMCR),&dataRead);
+  memoryWriteWord((uint32_t)&(ETM->ETMCR), (dataRead +ETM_ETMCR_CYCLEACCURATE_TRACING_Msk));
+  memoryReadWord((uint32_t)&(ETM->ETMCR),&dataRead);
+  
+  return (dataRead & ETM_ETMCR_CYCLEACCURATE_TRACING_Msk) >> ETM_ETMCR_CYCLEACCURATE_TRACING_Pos ;
+}
+
+
+
+#define ETM_ETMCR_TIMESTAMP_ENABLE_Pos                                        28
+#define ETM_ETMCR_TIMESTAMP_ENABLE_Msk                                        (1UL << ETM_ETMCR_TIMESTAMP_ENABLE_Pos)
+#define ETM_ETMCR_DATAONLY_MODE_Pos                                           20
+#define ETM_ETMCR_DATAONLY_MODE_Msk                                           (1UL << ETM_ETMCR_DATAONLY_MODE_Pos)
+#define ETM_ETMCR_CYCLEACCURATE_TRACING_Pos                                   12
+#define ETM_ETMCR_CYCLEACCURATE_TRACING_Msk                                   (1UL << ETM_ETMCR_CYCLEACCURATE_TRACING_Pos)
+#define ETM_ETMCR_ETMEN_Pos                                                   11
+#define ETM_ETMCR_ETMEN_Msk                                                   (1UL << ETM_ETMCR_ETMEN_Pos)
+#define ETM_ETMCR_ETMPROGBIT_Pos                                              10
+#define ETM_ETMCR_ETMPROGBIT_Msk                                              (1UL << ETM_ETMCR_ETMPROGBIT_Pos)
+#define ETM_ETMCR_BRANCH_OUTPUT_Pos                                           8
+#define ETM_ETMCR_BRANCH_OUTPUT_Msk                                           (1UL << ETM_ETMCR_BRANCH_OUTPUT_Pos)
+#define ETM_ETMCR_STALL_PROCESSOR_Pos                                         7
+#define ETM_ETMCR_STALL_PROCESSOR_Msk                                         (1UL << ETM_ETMCR_STALL_PROCESSOR_Pos)
+#define ETM_ETMCR_DATA_ACCESS_Pos                                             2
+#define ETM_ETMCR_DATA_ACCESS_Msk                                             (3UL << ETM_ETMCR_DATA_ACCESS_Pos)
+#define ETM_ETMCR_ETMPOWERDOWN_Pos                                            0
+#define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
+
+/**
+ *  Configure ETM main control register to enable/disable different options
+ *
+ *  Input :  timestampEnable is used to enable/disable timestamping
+ *				   Possible value :
+ *					    DISABLE_TIMESTAMPING            disable timestamping
+ *					    ENABLE_TIMESTAMPING             enable timestamping
+ *
+ *          branchAllEnable is used to enable/disable output of branching of all address
+ *				   Possible value : 
+ *					    DISABLE_BRANCH_ALL_ADDRESS      disable output of all branch all address
+ *              ENABLE_BRANCH_ALL_ADDRESS       enable output of all branch all address 
+ *
+ *          stallProcessorEnable is used to enable/disable stalling of the processor if FIFO is full.
+ *				   Possible value : 
+ *              DISABLE_STALLING_PROCESSOR      disable stalling of processor (may cause FIFO to overflow)
+ *              ENABLE_STALLING_PROCESSOR       enable stalling of processor to prevent overflow (may affect the performance of the system)
+ *  
+ *  Output : return 1 if configuration is successful
+ *           return 0 if configuration is unsuccessful
+ *
+ */
+int configureETMMainControl(int timestampEnable,int branchAllEnable,int stallProcessorEnable)
+{
+  uint32_t dataRead = 0, checkDataWrote = 0 ;
+  
+  setETMProgrammingBit();
+  memoryReadWord((uint32_t)&(ETM->ETMCR),&dataRead);
+  
+  dataRead += (timestampEnable << ETM_ETMCR_TIMESTAMP_ENABLE_Pos) +  (branchAllEnable << ETM_ETMCR_BRANCH_OUTPUT_Pos) + (stallProcessorEnable << ETM_ETMCR_STALL_PROCESSOR_Pos) + ETM_ETMCR_ETMEN_Msk ;
+  
+  memoryWriteWord((uint32_t)&(ETM->ETMCR), dataRead);
+  
+  memoryReadWord((uint32_t)&(ETM->ETMCR),&checkDataWrote);
+  
+  if(dataRead == checkDataWrote)
+    return 1 ;
+  else
+    return 0 ;
+}
+
 
 /**
  *  Configure start/stop logic to assert TraceEnable signal with conditions (Used to control when to perform instruction tracing)
@@ -274,7 +355,7 @@ void configureTraceEnableEnablingEvent(ETMEvent_FunctionEncoding function,ETMEve
  *
  *  (Refer to configureTraceEnableEnablingEvent for input parameters description)
  */
-void configureETMETriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
+void configureETMTriggerEvent(ETMEvent_FunctionEncoding function,ETMEvent_Resources resourceA,ETMEvent_Resources resourceB)
 {
   memoryWriteWord((uint32_t)&(ETM->ETMTRIGGER), ((function << ETM_ETMTEEVR_BOOLEANFUNCTION_Pos) + (resourceB << ETM_ETMTEEVR_RESOURCE_B_Pos) + resourceA));
 }
@@ -290,6 +371,7 @@ void getETMFIFOSize()
   
   memoryWriteWord((uint32_t)&(ETM->ETMFFLR),0xFFFFFFFF);
   memoryReadWord((uint32_t)&(ETM->ETMFFLR),&maxETMFIFOSize);
+  printf("ETM FIFO Size : %d bytes\n",maxETMFIFOSize);
 }
 
 /**

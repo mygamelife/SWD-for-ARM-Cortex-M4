@@ -211,16 +211,21 @@ typedef enum
 #define ETM_ETMCR_TIMESTAMP_ENABLE_Msk                                        (1UL << ETM_ETMCR_TIMESTAMP_ENABLE_Pos)
 #define ETM_ETMCR_DATAONLY_MODE_Pos                                           20
 #define ETM_ETMCR_DATAONLY_MODE_Msk                                           (1UL << ETM_ETMCR_DATAONLY_MODE_Pos)
+#define ETM_ETMCR_CYCLEACCURATE_TRACING_Pos                                   12
+#define ETM_ETMCR_CYCLEACCURATE_TRACING_Msk                                   (1UL << ETM_ETMCR_CYCLEACCURATE_TRACING_Pos)
 #define ETM_ETMCR_ETMEN_Pos                                                   11
 #define ETM_ETMCR_ETMEN_Msk                                                   (1UL << ETM_ETMCR_ETMEN_Pos)
+#define ETM_ETMCR_ETMPROGBIT_Pos                                              10
+#define ETM_ETMCR_ETMPROGBIT_Msk                                              (1UL << ETM_ETMCR_ETMPROGBIT_Pos)
 #define ETM_ETMCR_BRANCH_OUTPUT_Pos                                           8
 #define ETM_ETMCR_BRANCH_OUTPUT_Msk                                           (1UL << ETM_ETMCR_BRANCH_OUTPUT_Pos)
 #define ETM_ETMCR_STALL_PROCESSOR_Pos                                         7
 #define ETM_ETMCR_STALL_PROCESSOR_Msk                                         (1UL << ETM_ETMCR_STALL_PROCESSOR_Pos)
+#define ETM_ETMCR_DATA_ACCESS_Pos                                             2
+#define ETM_ETMCR_DATA_ACCESS_Msk                                             (3UL << ETM_ETMCR_DATA_ACCESS_Pos)
 #define ETM_ETMCR_ETMPOWERDOWN_Pos                                            0
 #define ETM_ETMCR_ETMPOWERDOWN_Msk                                            (1UL << ETM_ETMCR_ETMPOWERDOWN_Pos)
-#define ETM_ETMCR_ETMPROGBIT_Pos                                              10
-#define ETM_ETMCR_ETMPROGBIT_Msk                                              (1UL << ETM_ETMCR_ETMPROGBIT_Pos)
+
 
 #define ETM_ETMTEEVR_BOOLEANFUNCTION_Pos                                      14
 #define ETM_ETMTEEVR_BOOLEANFUNCTION_Msk                                      (7UL << ETM_ETMEEVR_BOOLEANFUNCTION_Pos)
@@ -312,6 +317,16 @@ typedef enum
 
 #define DISABLE_TRACESTARTSTOP_LOGIC  0
 #define ENABLE_TRACESTARTSTOP_LOGIC   1  
+
+#define DISABLE_TIMESTAMPING          0
+#define ENABLE_TIMESTAMPING           1
+
+#define DISABLE_BRANCH_ALL_ADDRESS    0
+#define ENABLE_BRANCH_ALL_ADDRESS     1
+
+#define DISABLE_STALLING_PROCESSOR    0
+#define ENABLE_STALLING_PROCESSOR     1
+
 
 #define CORESIGHT_ETM_M4_ID        0x4114F250
 #endif // ETMEx_H
