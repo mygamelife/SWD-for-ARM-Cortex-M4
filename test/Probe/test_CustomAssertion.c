@@ -3,9 +3,10 @@
 #include "CustomAssertion.h"
 #include "Tlv.h"
 #include "TlvEx.h"
-#include "mock_Uart.h"
 #include "CException.h"
 #include "ErrorCode.h"
+#include "Yield.h"
+#include "mock_Uart.h"
 #include "mock_SystemTime.h"
 
 void setUp(void)  {}
