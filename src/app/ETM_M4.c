@@ -342,7 +342,7 @@ void configureTraceStartStopLogic(int traceStartStopLogicEnable,ResourceSelectio
  *
  *          ResourceA is used to select the resource that will generate logical TRUE signal when it is active
  *				  Possible value : 
- *              SELECT_NONE                        
+ *              SELECT_NORESOURCE                        
  *              WATCHPOINT_COMPARATOR_1
  *              WATCHPOINT_COMPARATOR_2
  *              WATCHPOINT_COMPARATOR_3
@@ -405,10 +405,10 @@ void setupETMandStartTracing()
   
   configureETMMainControl(ENABLE_TIMESTAMPING,ENABLE_BRANCH_ALL_ADDRESS,ENABLE_STALLING_PROCESSOR);
   //Configure Trigger and Trace event
-  configureETMTriggerEvent(A,HARD_WIRED_INPUT,SELECT_NONE);
-  configureTraceEnableEnablingEvent(A,HARD_WIRED_INPUT,SELECT_NONE);
+  configureETMTriggerEvent(A,HARD_WIRED_INPUT,SELECT_NORESOURCE);
+  configureTraceEnableEnablingEvent(A,HARD_WIRED_INPUT,SELECT_NORESOURCE);
   configureTraceStartStopLogic(DISABLE_TRACESTARTSTOP_LOGIC,SELECT_NONE,SELECT_NONE);
-  configureTimeStampInsertionEvent(A,COUNTER_1,SELECT_NONE);
+  configureTimeStampInsertionEvent(A,COUNTER_1,SELECT_NORESOURCE);
   
   setFIFOFullSize(BACKUP_FIFOFULL_SIZE);
   
