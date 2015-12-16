@@ -338,6 +338,7 @@ typedef enum
 #define DISABLE_STALLING_PROCESSOR    0
 #define ENABLE_STALLING_PROCESSOR     1
 
+#define ETM_TRACEID                   2
 
 #define CORESIGHT_ETM_M4_ID        0x4114F250
 #endif // ETMEx_H

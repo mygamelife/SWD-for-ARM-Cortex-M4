@@ -291,7 +291,7 @@ void test_setReducedFunctionCounterReloadValue_given_0x1234_should_read_back_0x1
   TEST_ASSERT_EQUAL(0x1234,dataRead);
 }
 
-/*-----------configureTimeStampInsertionEvent------*/
+/*---------configureTimeStampInsertionEvent------*/
 void test_configureTimeStampInsertionEvent_should_configure_ETMTSEVR()
 {
   uint32_t etmtsevr = 0 ;
@@ -304,4 +304,15 @@ void test_configureTimeStampInsertionEvent_should_configure_ETMTSEVR()
   //HARD_WIRED_INPUT  0b110 1111
   //0 0011 0111 1100  0000
   TEST_ASSERT_EQUAL(0x37C0,etmtsevr);
+}
+
+/*--------setETMTraceID------*/
+void test_setETMTraceID_should_set_ETM_TRACEID_inside_ETMTRACEIDR()
+{
+  uint32_t etmtraceidr = 0 ;
+  
+  setETMTraceID();
+  memoryReadWord((uint32_t)&(ETM->ETMTRACEIDR),&etmtraceidr);
+  
+  TEST_ASSERT_EQUAL(ETM_TRACEID,etmtraceidr);
 }

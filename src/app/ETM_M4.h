@@ -4,8 +4,9 @@
 #include "ETMEx.h"
 #include "MemoryReadWrite.h"
 
-#define unlockETM()   memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_UNLOCK_KEY)
-#define lockETM()     memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_LOCK)
+#define unlockETM()     memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_UNLOCK_KEY)
+#define lockETM()       memoryWriteWord((uint32_t)&(ETM->ETMLAR),ETM_LOCK)
+#define setETMTraceID() memoryWriteWord((uint32_t)&(ETM->ETMTRACEIDR),ETM_TRACEID);\
 
 extern uint32_t maxETMFIFOSize ;
 
