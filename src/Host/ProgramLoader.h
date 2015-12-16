@@ -74,6 +74,9 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks);
 /* Set Breakpoint */
 Process_Status setBreakpoint(Tlv_Session *session, uint32_t address);
 
+/* Set Watchpoint */
+Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint16_t addressMask,uint32_t matchedData,uint8_t dataSize,uint8_t accessMode);
+
 /* Remove Breakpoint */
 
 /* Stop Flash Patch Remap */

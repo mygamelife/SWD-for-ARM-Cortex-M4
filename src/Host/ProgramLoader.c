@@ -593,6 +593,36 @@ Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
   returnThis(PROCESS_DONE);
 }
 
+/** setWatchpoint is a function to set watchpoint
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           address is the address want to be stop at
+  *
+  * Return  : NONE
+  */
+Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint16_t addressMask,uint32_t matchedData,uint8_t dataSize,uint8_t accessMode) 
+{
+  uint32_t data[] = {address, addressMask,matchedData,dataSize,accessMode};
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_WATCHPOINT, 20, (uint8_t *)data);
+  /* Waiting reply */
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  resetSystemTime();
+  returnThis(PROCESS_DONE);
+}
+
 /** tlvWaitDebugEvents is a function to send expected event
   * to probe and wait for event to happen
   *
