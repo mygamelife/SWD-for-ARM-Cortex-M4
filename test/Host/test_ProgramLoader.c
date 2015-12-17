@@ -166,6 +166,9 @@ void test_tlvstepOver_should_receive_response_and_return_current_program_counter
 	Tlv_Session *session = tlvCreateSession();
   int result; uint32_t data = 0x20000010;
 
+  getSystemTime_ExpectAndReturn(10);
+  isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
+  
   /* Send request */
   result = stepOver(session);
   TEST_ASSERT_EQUAL(0, result);

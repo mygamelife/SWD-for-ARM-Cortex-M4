@@ -184,6 +184,7 @@ uint32_t multipleStep(Tlv_Session *session, int nInstructions) {
   */
 uint32_t stepOver(Tlv_Session *session) 
 {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -195,13 +196,13 @@ uint32_t stepOver(Tlv_Session *session)
   tlvSendRequest(session, TLV_STEPOVER, 0, NULL);
 
   /* Waiting reply from probe */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FIVE_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND,previousTime), tb);
     yield(tb);
   };
 
-  resetSystemTime();
   /* End tlv request task */
   endTask(tb);
   #ifdef HOST
@@ -644,6 +645,7 @@ Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
   */
 Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint32_t addressMask,uint32_t matchedData,int dataSize,uint32_t accessMode)
 {
+  static uint32_t previousTime = 0;
   uint32_t data[] = {address, addressMask,matchedData,dataSize,accessMode};
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
@@ -654,14 +656,14 @@ Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint32_t add
   startTask(tb);
   tlvSendRequest(session, TLV_WATCHPOINT, 20, (uint8_t *)data);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);
 }
 
@@ -675,6 +677,7 @@ Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint32_t add
   */
 Process_Status setInstructionRemapping(Tlv_Session *session,uint32_t instructionAddress,uint32_t machineCode)
 {
+  static uint32_t previousTime = 0;
   uint32_t data[] = {instructionAddress, machineCode};
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
@@ -685,14 +688,14 @@ Process_Status setInstructionRemapping(Tlv_Session *session,uint32_t instruction
   startTask(tb);
   tlvSendRequest(session, TLV_INSTRUCTION_REMAP, 8, (uint8_t *)data);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);
 }
 
@@ -706,6 +709,7 @@ Process_Status setInstructionRemapping(Tlv_Session *session,uint32_t instruction
   */
 Process_Status setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,uint32_t literalData)
 {
+  static uint32_t previousTime = 0;
   uint32_t data[] = {literalAddress, literalData};
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
@@ -716,14 +720,14 @@ Process_Status setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,
   startTask(tb);
   tlvSendRequest(session, TLV_LITERAL_REMAP, 8, (uint8_t *)data);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);
 }
 
@@ -736,6 +740,7 @@ Process_Status setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,
   */
 Process_Status removeBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
 {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -745,14 +750,14 @@ Process_Status removeBreakpoint(Tlv_Session *session, uint32_t instructionAddres
   startTask(tb);
   tlvSendRequest(session, TLV_REMOVE_BREAKPOINT, 4, (uint8_t *)&instructionAddress);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);
 }
 
@@ -764,6 +769,7 @@ Process_Status removeBreakpoint(Tlv_Session *session, uint32_t instructionAddres
   */
 Process_Status removeAllBreakpoint(Tlv_Session *session)
 {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -773,14 +779,14 @@ Process_Status removeAllBreakpoint(Tlv_Session *session)
   startTask(tb);
   tlvSendRequest(session, TLV_REMOVE_ALL_BREAKPOINT, 0, NULL);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);  
 }
 
@@ -792,6 +798,7 @@ Process_Status removeAllBreakpoint(Tlv_Session *session)
   */
 Process_Status removeWatchpoint(Tlv_Session *session)
 {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -801,14 +808,14 @@ Process_Status removeWatchpoint(Tlv_Session *session)
   startTask(tb);
   tlvSendRequest(session, TLV_REMOVE_WATCHPOINT, 0, NULL);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);     
 }
 
@@ -822,6 +829,7 @@ Process_Status removeWatchpoint(Tlv_Session *session)
   */
 Process_Status stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
 {
+  static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -831,14 +839,14 @@ Process_Status stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
   startTask(tb);
   tlvSendRequest(session, TLV_STOP_REMAP, 4, (uint8_t *)&address);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);
 }
 
@@ -851,6 +859,7 @@ Process_Status stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
   */
 Process_Status stopAllFlashPatchRemapping(Tlv_Session *session)
 {
+  static uint32_t previousTime = 0;  
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
 
@@ -860,14 +869,14 @@ Process_Status stopAllFlashPatchRemapping(Tlv_Session *session)
   startTask(tb);
   tlvSendRequest(session, TLV_STOP_ALL_REMAP, 0, NULL);
   /* Waiting reply */
+  previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeOut(FORTY_SECOND), tb);
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
     yield(tb);
   };
   /* End task */
   endTask(tb);
-  resetSystemTime();
   returnThis(PROCESS_DONE);   
 }
 
