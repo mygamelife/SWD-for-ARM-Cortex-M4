@@ -646,6 +646,7 @@ void userReset(User_Session *us, String *userInput) {
   if(option->type != IDENTIFIER_TOKEN)          Throw(ERR_OPTION_NOT_FOUND);
   else if(strcmp(option->name, "soft") == 0)    us->tlvCommand = TLV_SOFT_RESET;
   else if(strcmp(option->name, "hard") == 0)    us->tlvCommand = TLV_HARD_RESET;
+  else if(strcmp(option->name, "vector") == 0)  us->tlvCommand = TLV_VECT_RESET;
   else Throw(ERR_INVALID_COMMAND);
 }
 
