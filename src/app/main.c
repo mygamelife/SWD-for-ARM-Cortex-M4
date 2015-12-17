@@ -20,24 +20,22 @@ int main(void)
 
   Tlv_Session *session = tlvCreateSession();
   
-  swoInit(&session->hswo);
-  
-  getSwoBytes(session->hswo, session->swoBuffer, 5);
-
-  itmInit();
-  memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  // swoInit(&session->hswo);
+  // getSwoBytes(session->hswo, session->swoBuffer, 5);
+  // itmInit();
+  // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
   //memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x0000FACE);
   //memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x000000AA);
 
   while(1)
   {
-    // Try {
-      // tlvService(session);
-      // taskManager(session);
-    // }
-    // Catch(err) {
-      // tlvErrorReporter(session, err);
-    // }
+    Try {
+      tlvService(session);
+      taskManager(session);
+    }
+    Catch(err) {
+      tlvErrorReporter(session, err);
+    }
   }
 }
 

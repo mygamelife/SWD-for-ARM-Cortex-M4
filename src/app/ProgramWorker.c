@@ -561,7 +561,7 @@ int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAd
   /* Wait if stub is busy */
   previousTime = getSystemTime();
   while(IsStubBusy() == 0) {
-    if(isTimeout(TWO_SECOND, previousTime)) {
+    if(isTimeout(FIVE_SECOND, previousTime)) {
       resetTask(tb);
       Throw(PROBE_STUB_NOT_RESPONDING);
     }
@@ -594,7 +594,7 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   /* Wait if stub is busy */
   previousTime = getSystemTime();
   while(IsStubBusy() == 0) {
-    if(isTimeout(TWO_SECOND, previousTime)) {
+    if(isTimeout(FIVE_SECOND, previousTime)) {
       resetTask(tb);
       Throw(PROBE_STUB_NOT_RESPONDING);
     }
@@ -626,7 +626,7 @@ int massEraseTargetFlash(Tlv_Session *session, uint32_t bank) {
   /* Wait if stub is busy */
   previousTime = getSystemTime();
   while(IsStubBusy() == 0) {
-    if(isTimeout(TWO_SECOND, previousTime)) {
+    if(isTimeout(FIVE_SECOND, previousTime)) {
         resetTask(tb);
         Throw(PROBE_STUB_NOT_RESPONDING);
     }
