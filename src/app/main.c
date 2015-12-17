@@ -17,6 +17,8 @@ int main(void)
   swdInit();
   /* Power Up AHB Port */
   readAhbIDR(&idr);
+  /*Initialise FPB Unit*/
+  initialiseFPBUnit();
 
   Tlv_Session *session = tlvCreateSession();
   

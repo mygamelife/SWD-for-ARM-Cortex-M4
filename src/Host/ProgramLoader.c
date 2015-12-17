@@ -945,9 +945,10 @@ int selectCommand(Tlv_Session *session, User_Session *us) {
     case TLV_LITERAL_REMAP          : setLiteralRemapping(session, us->address, us->data[0]);                   break;
     case TLV_SOFT_RESET             : softReset(session);                                                       break;
     case TLV_HARD_RESET             : hardReset(session);                                                       break;
+    case TLV_VECT_RESET             : vectorReset(session);                                                     break;
     case TLV_REMOVE_BREAKPOINT      : removeBreakpoint(session, us->address);                                   break;
     case TLV_REMOVE_ALL_BREAKPOINT  : removeAllBreakpoint(session);                                             break;
-    case TLV_REMOVE_WATCHPOINT      : removeWatchpoint(session);
+    case TLV_REMOVE_WATCHPOINT      : removeWatchpoint(session);                                                break;
     case TLV_STOP_REMAP             : stopFlashPatchRemapping(session,us->address);                             break;
     case TLV_STOP_ALL_REMAP         : stopAllFlashPatchRemapping(session);                                      break;
     case TLV_EXIT                   : systemExit(session);                                                      break;
