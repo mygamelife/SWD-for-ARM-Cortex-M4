@@ -46,10 +46,15 @@ void pullUpDown(GPIO *port, int pinNum, int pull) {
 void gpioSetAltFunction(GPIO *port, int pinNum, int AF) {
   uint32_t temp = 0;
   
-  temp = AF << (pinNum * 4);
-  
-  if(pinNum <= 7)
+  if(pinNum <= 7) {
+    temp = AF << (pinNum * 4);
+    /* GPIOx_AFRL (for pin 0 to 7) */
     memoryWriteWord((uint32_t)&port->AFRL, temp);
+  }
   
-  else memoryWriteWord((uint32_t)&port->AFRH, temp);
+  else {
+    temp = AF << ((pinNum - 8) * 4);
+    /* GPIOx_AFRH (for pin 8 to 15) */
+    memoryWriteWord((uint32_t)&port->AFRH, temp);
+  }
 }
