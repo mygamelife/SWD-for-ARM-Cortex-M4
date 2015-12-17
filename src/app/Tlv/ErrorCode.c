@@ -35,7 +35,12 @@ void displayErrorMessage(CEXCEPTION_T err) {
     case ERR_EXPECT_ERASE_SECTION       : printf("Err : Expect erase section                        \n"); break;
     case ERR_INVALID_BANK_SELECTION     : printf("Err : Flash bank selection not found              \n"); break;
     case ERR_OPTION_NOT_FOUND           : printf("Err : Option not found                            \n"); break;
-    case ERR_INVALID_COMMAND            : printf("Err : Command not found                           \n"); break;
+    case ERR_INVALID_MASK               : printf("Err : Invalid Watchpoint Mask Chosen              \n"); break;
+    case ERR_INVALID_DATASIZE           : printf("Err : Invalid Watchpoint Data Size Chosen         \n"); break;
+    case ERR_INVALID_ACCESSMODE         : printf("Err : Invalid Watchpoint Access Mode Chosen       \n"); break;
+    case ERR_EXPECT_WATCHPOINT_MASK     : printf("Err : Expect Watchpoint Mask                      \n"); break;
+    case ERR_EXPECT_WATCHPOINT_SIZE     : printf("Err : Expect Watchpoint Data Size                 \n"); break;
+    case ERR_EXPECT_WATCHPOINT_MODE     : printf("Err : Expect Watchpoint Access Mode               \n"); break;
     /* ######################################## Open file error ############################################# */
     case ERR_FILE_NOT_EXIST             : printf("Err : File doesn't exit                           \n"); break;
     /* ######################################### Handler error ############################################## */

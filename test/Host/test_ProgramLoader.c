@@ -166,6 +166,29 @@ void test_tlvMultipleStepTarget_should_receive_response_and_return_current_progr
   TEST_ASSERT_EQUAL(0, isYielding);
 }
 
+void test_tlvstepOver_should_receive_response_and_return_current_program_counter_address(void)
+{
+  uartInit_Ignore();
+	Tlv_Session *session = tlvCreateSession();
+  int result; uint32_t data = 0x20000010;
+
+  /* Send request */
+  result = stepOver(session);
+  TEST_ASSERT_EQUAL(0, result);
+  TEST_ASSERT_EQUAL(1, isYielding);
+
+  /* Received reply */
+  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
+  session->rxBuffer[0] = TLV_OK;
+  session->rxBuffer[1] = 5;
+  session->rxBuffer[6] = tlvPackIntoBuffer(&session->rxBuffer[2], (uint8_t *)&data, 4);
+
+  result = stepOver(session);
+  TEST_ASSERT_EQUAL_HEX32(0x20000010, result);
+  TEST_ASSERT_EQUAL(0, isYielding);
+}
+
+
 void test_tlvSoftReset_should_return_1_after_request_and_received_OK_reply(void) {
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();

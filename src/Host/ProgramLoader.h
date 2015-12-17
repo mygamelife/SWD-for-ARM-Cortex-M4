@@ -51,6 +51,7 @@ Process_Status run(Tlv_Session *session);
 
 /* Step target */
 uint32_t multipleStep(Tlv_Session *session, int nInstructions);
+uint32_t stepOver(Tlv_Session *session);
 
 /* Reset */
 Process_Status softReset(Tlv_Session *session);
@@ -75,11 +76,22 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks);
 Process_Status setBreakpoint(Tlv_Session *session, uint32_t address);
 
 /* Set Watchpoint */
-Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint16_t addressMask,uint32_t matchedData,uint8_t dataSize,uint8_t accessMode);
+Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint32_t addressMask,uint32_t matchedData,int dataSize,uint32_t accessMode);
+
+/* Set Remapping */
+Process_Status setInstructionRemapping(Tlv_Session *session,uint32_t instructionAddress,uint32_t machineCode);
+Process_Status setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,uint32_t literalData);
 
 /* Remove Breakpoint */
+Process_Status removeBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
+Process_Status removeAllBreakpoint(Tlv_Session *session);
+
+/* Remove Watchpoint*/
+Process_Status removeWatchpoint(Tlv_Session *session);
 
 /* Stop Flash Patch Remap */
+Process_Status stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
+Process_Status stopAllFlashPatchRemapping(Tlv_Session *session);
 
 /* Wait Debug Events */
 EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event);

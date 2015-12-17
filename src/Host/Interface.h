@@ -94,8 +94,16 @@ typedef enum {
   HALT,
   RUN,
   STEP,
+  STEPOVER,
   BREAKPOINT,
   WATCHPOINT,
+  INSTRUCTION_REMAP,
+  LITERAL_REMAP,
+  REMOVE_BREAKPOINT,
+  //REMOVE_ALLBREAKPOINT,
+  REMOVE_WATCHPOINT,
+  STOP_REMAP,
+  //STOP_ALLREMAP,
   ERASE,
   RESET_COMMAND,
   EXIT
@@ -106,6 +114,9 @@ User_Session *createNewUserSession(void);
 User_Session *waitUserCommand(void);
 void InterpreteCommand(User_Session *us, String *userInput);
 int getRegisterAddress(char *name);
+int getWatchpointMaskValue(char *mask);
+int getWatchpointSizevalue(char *size);
+int getWatchpointAccessMode(char *mode);
 int getFlashBank(char *name);
 void displayMemoryMap(uint8_t *data, uint32_t address, int length);
 void helpMenu(String *userInput);
@@ -119,9 +130,16 @@ void userReadMemory(User_Session *us, String *userInput);
 void userWriteRegister(User_Session *us, String *userInput);
 void userReadRegister(User_Session *us, String *userInput);
 void userStepTarget(User_Session *us, String *userInput);
+void userStepOver(User_Session *us);
 void userHaltTarget(User_Session *us);
 void userRunTarget(User_Session *us);
 void userSetBreakpoint(User_Session *us, String *userInput);
+void userSetWatchpoint(User_Session *us, String *userInput);
+void userSetInstructionRemapping(User_Session *us, String *userInput);
+void userSetLiteralRemapping(User_Session *us, String *userInput);
+void userRemoveBreakpoint(User_Session *us,String *userInput);
+void userRemoveWatchpoint(User_Session *us);
+void userStopFlashPatchRemapping(User_Session *us,String *userInput);
 void userErase(User_Session *us, String *userInput);
 void userSectionErase(User_Session *us, String *userInput);
 void userReset(User_Session *us, String *userInput);

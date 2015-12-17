@@ -401,7 +401,7 @@ int setInstructionRemapping(Tlv_Session *session,uint32_t instructionAddress,uin
  *
  *  Input :  session contain a element/handler used by tlv protocol 
  *           literalAddress is the address that will be remapped
- *           literalData is the machine code that will remapped from the literalAddress
+ *           literalData is the data that will remapped from the literalAddress
  *
  */
 int setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,uint32_t literalData)
