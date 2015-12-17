@@ -19,6 +19,13 @@ int main(void)
   readAhbIDR(&idr);
 
   Tlv_Session *session = tlvCreateSession();
+  
+  // swoInit(&session->hswo);
+  // getSwoBytes(session->hswo, session->swoBuffer, 5);
+  // itmInit();
+  // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  //memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x0000FACE);
+  //memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x000000AA);
 
   while(1)
   {
@@ -27,7 +34,6 @@ int main(void)
       taskManager(session);
     }
     Catch(err) {
-      resetSystemTime();
       tlvErrorReporter(session, err);
     }
   }

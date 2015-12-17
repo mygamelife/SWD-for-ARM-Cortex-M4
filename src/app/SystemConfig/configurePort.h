@@ -25,8 +25,8 @@
 #define RESET_PORT            GPIOF
 #define RESET_PIN             GPIO_PIN_6
 
-#define SWO_PORT              GPIOG
-#define SWO_PIN               GPIO_PIN_3
+// #define SWO_PORT              GPIOG
+// #define SWO_PIN               GPIO_PIN_3
 
 #define CLK_EN()              do{                       \
                                   __GPIOA_CLK_ENABLE();	\

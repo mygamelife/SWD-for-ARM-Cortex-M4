@@ -112,7 +112,7 @@ typedef enum {
 void displayOptionMenu(void);
 User_Session *createNewUserSession(void);
 User_Session *waitUserCommand(void);
-void InterpreteCommand(User_Session *us, String *userInput);
+User_Session *InterpreteCommand(String *userInput);
 int getRegisterAddress(char *name);
 int getWatchpointMaskValue(char *mask);
 int getWatchpointSizevalue(char *size);

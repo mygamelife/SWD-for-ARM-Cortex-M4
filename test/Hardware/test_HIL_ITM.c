@@ -21,40 +21,33 @@
 #include "LoadElf.h"
 #include "ProgramVerifier.h"
 #include "MemoryReadWrite.h"
+#include "CoreDebug.h"
+#include "CoreDebugEx.h"
 #include "Gpio.h"
+#include "Rcc.h"
 #include "Itm.h"
 #include "Tpiu.h"
 
 static int flag = 0;
 
 void setUp(void) {
-  if(flag == 0) {
-    flag = 1;
-    initMemoryReadWrite();
-    // itmInitx();
+  CEXCEPTION_T err;
+  
+  Try {
+    if(flag == 0) {
+      flag = 1;
+      initMemoryReadWrite();
+      itmInit();
+    }    
+  } Catch(err) {
+    displayErrorMessage(err);
   }
 }
 
 void tearDown(void) {}
 
 void test_ITM_configure_and_write_data_into_simulus_register_0(void) {
-  int a = 0;
-  // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
+  uint32_t data = 0;
   
-  // /* PORTE clock should enable */
-  // memoryReadWord((uint32_t)&rcc->RCC_AHB1ENR, &result);
-  // TEST_ASSERT_EQUAL_HEX32(0x10, result);
-  // /* Get GPIO Mode */
-  // memoryReadWord((uint32_t)&PORTE->MODER, &result);
-  // TEST_ASSERT_EQUAL_HEX32(0x20, result);
-  // /* Get GPIO Output Mode */
-  // memoryReadWord((uint32_t)&PORTE->OTYPER, &result);
-  // TEST_ASSERT_EQUAL_HEX32(0xFFFB, result);
-  // /* Get GPIO Speed */
-  // memoryReadWord((uint32_t)&PORTE->OSPEED, &result);
-  // TEST_ASSERT_EQUAL_HEX32(0x30, result);
-  
-  // /* Get GPIO PE2 Alternate Function Register */
-  // memoryReadWord((uint32_t)&PORTE->AFRL, &result);
-  // TEST_ASSERT_EQUAL_HEX32(0x0, result);
+  memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
 }

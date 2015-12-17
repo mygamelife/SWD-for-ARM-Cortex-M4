@@ -19,12 +19,11 @@ void test_openComPort_should_return_NULL(void)
 void test_uartInit_should_throw_error_if_no_COMPORT_is_found_else_hSerial_shouldnt_null(void)
 {
   CEXCEPTION_T err;
-  void *hSerial;
+  void *hSerial = NULL;
   
   Try {
     uartInit(&hSerial);
     TEST_ASSERT_NOT_NULL(hSerial);
-    
   } Catch(err) {
     displayErrorMessage(err);
     TEST_ASSERT_NULL(hSerial);

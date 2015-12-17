@@ -11,18 +11,14 @@
 #include "SystemTime.h"
 #include "Yield.h"
 
-#if defined(HOST) || defined(TEST)
-extern volatile int uartTxReady;
-extern volatile int uartRxReady;
-#endif
-
 typedef struct
 {
-  void *handler;
-  uint8_t txBuffer[255];                  /* Tlv transmit buffer used to transfer tlv packet to target                */
-  uint8_t rxBuffer[255];                  /* Tlv receive buffer used to receive tlv packet from target                */
-  Tlv_State receiveState;                 /* Send and Receive state */
-  uint32_t flags;                         /* Flags */
+  void *handler;            /* Handler to configure and initialize uart */
+  uint8_t txBuffer[255];    /* Tlv transmit buffer used to transfer tlv packet to target */
+  uint8_t rxBuffer[255];    /* Tlv receive buffer used to receive tlv packet from target */
+  uint32_t flags;           /* Tlv flags */
+  void *hswo;               /* SWO handler to configure and initialize uart to capture trace data */
+  uint8_t swoBuffer[255];   /* SWO Buffer to hold all the trace data */
   bool exit;
 } Tlv_Session;
 
@@ -39,7 +35,7 @@ typedef enum {
 #define TLV_SET_BREAKPOINT_FLAG                         ((uint32_t)0x00000010)
 #define TLV_SET_WATCHPOINT_FLAG                         ((uint32_t)0x00000020)
 #define TLV_BREAKPOINT_WAS_SET_FLAG                     ((uint32_t)0x00000040)
- 
+
 /* ##### Tlv Flags Status Macros ##### */
 #define GET_FLAG_STATUS(__SESSION__, __FLAG__)          (((__SESSION__)->flags & (__FLAG__)) == (__FLAG__))
 #define SET_FLAG_STATUS(__SESSION__, __FLAG__)          ((__SESSION__)->flags |= (__FLAG__))
@@ -59,7 +55,7 @@ Tlv *tlvReceive(Tlv_Session *session);
 
 /* Tlv service state machine */
 void tlvSendService(Tlv_Session *session);
-void tlvReceiveService(Tlv_Session *session);
+int tlvReceiveService(Tlv_Session *session);
 void tlvService(Tlv_Session *session);
 
 /* Tlv helper function */

@@ -173,9 +173,14 @@ void SysTick_Handler(void)
   * @Note   This function is redefined in "main.h" and related to DMA stream
   *         used for USART data transmission
   */
-void USARTx_IRQHandler(void)
+void UART_IRQHandler(void)
 {
   HAL_UART_IRQHandler(&uartHandle);
+}
+
+void SWO_IRQHandler(void)
+{
+  HAL_UART_IRQHandler(&swoHandle);
 }
 
 /**

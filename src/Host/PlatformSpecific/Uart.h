@@ -4,16 +4,19 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <windows.h>
+#include <string.h>
 #include "Tlv.h"
 #include "ErrorCode.h"
 #include "CException.h"
 
 typedef enum 
 {
-  UART_OK = 0,
-  UART_ERROR
+  UART_ERROR  = -1,
+  UART_OK     = 1,
+  UART_BUSY   = 2,
 } Uart_Status;
 
+#define UART_PORT                     "COM3"//"COM7"
 #define UART_BAUD_RATE                128000//9600
 #define closePort(__SESSION__)        CloseHandle(((HANDLE *)((__SESSION__)->handler)))
 
@@ -28,10 +31,11 @@ uint8_t sendBytes(void *handler, uint8_t *txBuffer, int length);
 uint8_t getBytes(void *handler, uint8_t *rxBuffer, int length);
 uint8_t getByte(void *handler, uint8_t *rxBuffer);
 
-int getAvailableComPort(void **handler);
-
 HANDLE findProbe(void);
 HANDLE openComPort(LPCSTR portname, DWORD baudrate);
 int isComPortAlive(HANDLE handler);
 
+int isRxBusy(void);
+int isTxBusy(void);
+void cancelRx(void);
 #endif // Uart_H

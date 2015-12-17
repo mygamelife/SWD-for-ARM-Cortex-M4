@@ -5,6 +5,6 @@
 #include "Swd.h"
 #include "ProgramWorker.h"
 #include "SystemConfigure.h"
-#include "Gpio/Gpio.h"
+#include "Trace/Itm.h"
 
 #endif // main_H

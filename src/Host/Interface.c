@@ -917,13 +917,14 @@ void helpCommand(Command_Code ccode) {
   *
   * return  : userSession contain all the information from the user input
   */
-void InterpreteCommand(User_Session *us, String *userInput) {
+User_Session *InterpreteCommand(String *userInput) {
   Identifier *command; Command_Code ccode;
-
+  User_Session *us = createNewUserSession();
+  
   command = (Identifier*)getToken(userInput);
   ccode = getCommandCode(command->name);
 
-  if(ccode == HELP)                           helpMenu(userInput);
+  if(ccode == HELP)                           {helpMenu(userInput); return NULL;}
   else if(ccode == LOAD)                      userLoadProgram(us, userInput);
   else if(ccode == WRITE_COMMAND)             userWriteMemory(us, userInput);
   else if(ccode == READ_MEMORY)               userReadMemory(us, userInput);
@@ -948,6 +949,8 @@ void InterpreteCommand(User_Session *us, String *userInput) {
 
   
   else Throw(ERR_INVALID_USER_COMMAND);
+  
+  return us;
 }
 
 /** waitUserCommand is a function to aquire whatever information
@@ -956,9 +959,7 @@ void InterpreteCommand(User_Session *us, String *userInput) {
 User_Session *waitUserCommand(void) {
   static int display = 0;
   Number *num; String *str;
-
-  User_Session *us = createNewUserSession();
-
+  
   if(display == 0) {
     display = 1;
     printf("> ");
@@ -972,7 +973,7 @@ User_Session *waitUserCommand(void) {
   }
 
   str = stringNew(InputBuffer);
-  InterpreteCommand(us, str);
+  User_Session *us = InterpreteCommand(str);
 
   stringDel(str);
   return us;

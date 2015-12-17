@@ -32,7 +32,7 @@
 #define BKPT_DEBUGEVENT           (1UL << SCB_DFSR_BKPT_Pos) 
 #define HALTED_DEBUGEVENT         (1UL << SCB_DFSR_HALTED_Pos)   
 
-#define DEMCR_TRCENA_MASK		      0x1000000
+#define DEMCR_TRCENA_MASK		      ((uint32_t)0x01000000)
 #define DEMCR_MON_REQ_MASK		    0x80000
 #define DEMCR_MON_STEP_MASK		    0x40000
 #define DEMCR_MON_PEND_MASK		    0x20000
