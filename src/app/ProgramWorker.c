@@ -602,6 +602,8 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   }
   /* Request flashProgrammer to erase target flash */
   requestStubErase(address, size);
+  /* Get system time to check if stub is timeout */
+  previousTime = getSystemTime();
   while(IsStubBusy() == 0) {
     if(isTimeout(FIVE_SECOND, previousTime)) {
       resetTask(tb);
@@ -641,6 +643,8 @@ int massEraseTargetFlash(Tlv_Session *session, uint32_t bank) {
   }
   /* Request flashProgrammer to erase target flash */
   requestStubMassErase(bank);
+  /* Get system time to check if stub is timeout */
+  previousTime = getSystemTime();
   while(IsStubBusy() == 0) {
     if(isTimeout(FIFTEEN_SECOND, previousTime)) {
       resetTask(tb);

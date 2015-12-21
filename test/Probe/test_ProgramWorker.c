@@ -548,7 +548,7 @@ void test_writeTargetFlash_should_write_into_target_ram_first_then_wait_for_stub
   /* Stub status is BUSY */
   getSystemTime_ExpectAndReturn(10);
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
-  isTimeout_ExpectAndReturn(TWO_SECOND, 10, 0);
+  isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
 
   writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
   TEST_ASSERT_EQUAL(1, isYielding);
@@ -588,14 +588,14 @@ void test_writeTargetFlash_should_throw_if_stub_is_timeout(void)
     /* Stub status is BUSY */
     getSystemTime_ExpectAndReturn(10);
     memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
-    isTimeout_ExpectAndReturn(TWO_SECOND, 10, 0);
+    isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
 
     writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
     TEST_ASSERT_EQUAL(1, isYielding);
 
     /* Stub status is OK */
     memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
-    isTimeout_ExpectAndReturn(TWO_SECOND, 10, 1);
+    isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 1);
 
     writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
     printf("Should Throw PROBE_STUB_NOT_RESPONDING\n");
@@ -618,7 +618,7 @@ void test_eraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   /* Stub status is OK */
   getSystemTime_ExpectAndReturn(10);
   memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
-  isTimeout_ExpectAndReturn(TWO_SECOND, 10, 0);
+  isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
 
   eraseTargetFlash(session, 0x08000000, 20000);
 
@@ -631,6 +631,10 @@ void test_eraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 20000, SWD_NO_ERROR);              //Set data size
   memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
 
+  getSystemTime_ExpectAndReturn(10);
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  
   eraseTargetFlash(session, 0x08000000, 20000);
 
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
@@ -649,6 +653,10 @@ void test_massEraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_1, SWD_NO_ERROR);            //Set flash banks
   memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
 
+  getSystemTime_ExpectAndReturn(10);
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  
   massEraseTargetFlash(session, FLASH_BANK_1);
 
   TEST_ASSERT_EQUAL(0, isYielding);
@@ -976,6 +984,10 @@ void test_taskManager_given_flash_erase_command_should_run_eraseFlashTarget(void
   memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, (int)20000, SWD_NO_ERROR);
   memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);
 
+  getSystemTime_ExpectAndReturn(10);
+  /* Stub status is OK */
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  
   /* Received packet */
   taskManager(session);
 
