@@ -414,7 +414,7 @@ void test_loadRam_should_load_program_update_pc_and_run_the_program(void)
 	Tlv_Session *session = tlvCreateSession();
   Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
 
-  for(; i < 28; i++) {
+  for(; i < 29; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
@@ -612,46 +612,6 @@ void test_hostInterpreter_by_requesting_tlv_read_register(void)
   TEST_ASSERT_EQUAL(FLAG_SET, GET_FLAG_STATUS(session, TLV_DATA_TRANSMIT_FLAG));
   TEST_ASSERT_EQUAL(FLAG_CLEAR, GET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG));
   TEST_ASSERT_EQUAL(0, isYielding);
-}
-
-void test_hostInterpreter_should_call_flash_mass_erase_if_flash_programmer_is_loaded(void) {
-  int i = 0;
-  uartInit_Ignore();
-	Tlv_Session *session = tlvCreateSession();
-
-  User_Session userSession;
-  userSession.tlvCommand = TLV_FLASH_MASS_ERASE;
-  userSession.address = BOTH_BANK;
-
-  waitUserCommand_ExpectAndReturn(&userSession);
-
-  printf("######################## Host interpreter #################### \n");
-
-  isProgramExist_IgnoreAndReturn(VERIFY_FAILED);
-  for(; i < 77; i++) {
-    SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-    session->rxBuffer[0] = TLV_OK;
-    session->rxBuffer[1] = 1;
-    session->rxBuffer[2] = 0;
-
-    getSystemTime_IgnoreAndReturn(10);
-    isTimeout_IgnoreAndReturn(0);
-    hostInterpreter(session);
-  }
-  TEST_ASSERT_EQUAL(1, isYielding);
-
-  SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
-  session->rxBuffer[0] = TLV_OK;
-  session->rxBuffer[1] = 1;
-  session->rxBuffer[2] = 0;
-
-  delUserSession_Expect(&userSession);
-  hostInterpreter(session);
-
-  TEST_ASSERT_EQUAL(0, isYielding);
-  TEST_ASSERT_EQUAL(TLV_FLASH_MASS_ERASE, session->txBuffer[0]);
-  TEST_ASSERT_EQUAL(2, session->txBuffer[1]);
-  TEST_ASSERT_EQUAL_HEX32(BOTH_BANK, session->txBuffer[2]);
 }
 
 void test_hostInterpreter_should_readMemory_and_stop_when_size_reached_0(void) {

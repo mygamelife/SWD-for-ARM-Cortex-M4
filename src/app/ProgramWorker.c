@@ -602,6 +602,13 @@ int eraseTargetFlash(Tlv_Session *session, uint32_t address, int size) {
   }
   /* Request flashProgrammer to erase target flash */
   requestStubErase(address, size);
+  while(IsStubBusy() == 0) {
+    if(isTimeout(FIVE_SECOND, previousTime)) {
+      resetTask(tb);
+      Throw(PROBE_STUB_NOT_RESPONDING);
+    }
+    yield(tb);
+  }
   /* Reply tlv acknowledge */
   tlvReply(session, TLV_OK, 0, NULL);
 
@@ -634,6 +641,13 @@ int massEraseTargetFlash(Tlv_Session *session, uint32_t bank) {
   }
   /* Request flashProgrammer to erase target flash */
   requestStubMassErase(bank);
+  while(IsStubBusy() == 0) {
+    if(isTimeout(FIFTEEN_SECOND, previousTime)) {
+      resetTask(tb);
+      Throw(PROBE_STUB_NOT_RESPONDING);
+    }
+    yield(tb);
+  }
   /* Reply tlv acknowledge */
   tlvReply(session, TLV_OK, 0, NULL);
 
@@ -726,7 +740,7 @@ int selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_STOP_REMAP                 : stopFlashPatchRemapping(session, get4Byte(&tlv->value[0]));                               break;
     case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
     case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
-    case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, get4Byte(&tlv->value[0]));                                  break;
+    case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, tlv->value[0]);												break;
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;

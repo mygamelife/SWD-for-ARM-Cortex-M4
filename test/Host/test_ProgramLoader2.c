@@ -76,7 +76,7 @@ void test_eraseSection_should_load_flash_programmer_if_it_is_not_loaded_before_s
 
   printf(" ####################### Erase Section #######################\n");
 
-  for(; i < 78; i++) {
+  for(; i < 80; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
@@ -138,7 +138,7 @@ void test_eraseAll_should_send_reactive_flashProgrammer_instead_of_reload_and_se
 	Tlv_Session *session = tlvCreateSession();
 
   printf(" ####################### Mass Erase #######################\n");
-  for(; i < 78; i++) {
+  for(; i < 80; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;
@@ -162,7 +162,7 @@ void test_loadFlash_should_request_flash_erase_section_and_program_Size(void)
   Program *p = getLoadableSection("test/ElfFiles/ledFlash.elf");
 
   printf(" ####################### Load Flash #######################\n");
-  for(; i < 106; i++) {
+  for(; i < 108; i++) {
     /* Received reply */
     SET_FLAG_STATUS(session, TLV_DATA_RECEIVE_FLAG);
     session->rxBuffer[0] = TLV_OK;

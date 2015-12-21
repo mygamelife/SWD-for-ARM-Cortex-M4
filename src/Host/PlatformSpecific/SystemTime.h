@@ -13,6 +13,8 @@
 #define THREE_SECOND        3000
 #define FOUR_SECOND         4000
 #define FIVE_SECOND         5000
+#define TEN_SECOND          10000
+#define FIFTEEN_SECOND      15000
 #define FORTY_SECOND        40000
 #define ONE_MINUTE          60000
 

@@ -32,7 +32,7 @@ void flashMassErase(uint32_t banks)  {
      execution. If this cannot be done safely, it is recommended to flush the caches by setting the
      DCRST and ICRST bits in the FLASH_CR register. */
   if(HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK)
-  { 
+  {
     /** While error occur during erase process error will be handle here **/
     FLASH_ERROR_CODE = HAL_FLASH_GetError();
     flashErrorHandler();
@@ -50,7 +50,6 @@ void flashMassErase(uint32_t banks)  {
   *
   * output  : NONE
   */
-
 void flashErase(uint32_t flashAddress, int size)  {
   uint32_t firstSector = 0, numOfSectors = 0;
   

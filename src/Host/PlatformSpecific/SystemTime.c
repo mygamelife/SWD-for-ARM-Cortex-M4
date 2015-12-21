@@ -16,8 +16,9 @@ uint16_t getSystemTime(void) {
   *           0 maximum timeout is not reach
   */
 int isTimeout(int timeout, uint32_t previousTime) {
-  if((getSystemTime() - previousTime) > timeout)
+  if((getSystemTime() - previousTime) > timeout) {
     return 1;
+  }
   
   return 0;
 }

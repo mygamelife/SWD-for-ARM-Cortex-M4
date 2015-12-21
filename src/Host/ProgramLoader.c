@@ -417,6 +417,8 @@ int loadRam(Tlv_Session *session, Program *p) {
 
   /* Start task */
   startTask(tb);
+  /* Halt target from being running anything */
+  await(halt(session), tb);
   /* Load specified program */
   await(loadProgram(session, p, TLV_WRITE_RAM), tb);
   printf("Done loading.....\n");
@@ -482,6 +484,8 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   /* Start task */
   startTask(tb);
   p = getLoadableSection(FP_PATH);
+  /* Halt target from being running anything */
+  await(halt(session), tb);
   /* Load Flash Programmer(FP) into target */
   await(loadRam(session, p), tb);
   /* Send section erase request to flash programmer */
@@ -510,6 +514,7 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   static Program *p;
   static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
+  // uint32_t timeTaken = 0;
   TaskBlock *tb = &taskBlock;
 
   if(session == NULL) Throw(TLV_NULL_SESSION);
@@ -517,6 +522,8 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   /* Start task */
   startTask(tb);
   p = getLoadableSection(FP_PATH);
+  /* Halt target from being running anything */
+  await(halt(session), tb);
   /* Load Flash Programmer(FP) into target */
   await(loadRam(session, p), tb);
   /* Send mass erase request to flash programmer */
@@ -525,9 +532,10 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   previousTime = getSystemTime();
   while((response = tlvReceive(session)) == NULL) {
     /* Check is maximum timeout is reached */
-    isProbeAlive(isTimeout(FORTY_SECOND, previousTime), tb);
+    isProbeAlive(isTimeout(FIFTEEN_SECOND, previousTime), tb);
     yield(tb);
   };
+  printf("Finish erased in %.3fs\n\n", (getSystemTime() - previousTime) * 0.001);
   delProgram(p);
   endTask(tb);
 
@@ -544,24 +552,27 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
   */
 int loadFlash(Tlv_Session *session, Program *p) {
   static TaskBlock taskBlock = {.state = 0};
+  static uint32_t previousTime = 0;
   TaskBlock *tb = &taskBlock;
-
+  
   if(session == NULL) Throw(TLV_NULL_SESSION);
   assert(p != NULL);
 
   /* Start task */
   startTask(tb);
+  previousTime = getSystemTime();
   /* Erase section */
   await(eraseSection(session, FLASH_BEGIN_ADDRESS, getTotalProgramSize(p)), tb);
-  printf("Done Erase.....\n");
+  // printf("Done Erase.....\n");
   /* Load actual program to flash */
   await(loadProgram(session, p, TLV_WRITE_FLASH), tb);
   /* Update program counter */
   await(writeRegister(session, PC, getEntryAddress(p)), tb);
-  printf("Update PC........\n");
+  // printf("Update PC........\n");
   /* Run the program */
   await(run(session), tb);
-  printf("Run Program......\n");
+  // printf("Run Program......\n");
+  printf("Finish programmed in %.3fs\n\n", (getSystemTime() - previousTime) * 0.001);
   /* End task */
   endTask(tb);
 

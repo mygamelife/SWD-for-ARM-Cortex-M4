@@ -547,7 +547,13 @@ static void FLASH_MassErase(uint8_t VoltageRange, uint32_t Banks)
 
   /* if the previous operation is completed, proceed to erase all sectors */
   FLASH->CR &= CR_PSIZE_MASK;
-  FLASH->CR |= tmp_psize;
+  if(VoltageRange == FLASH_VOLTAGE_RANGE_3) 
+  {
+    FLASH->CR |= FLASH_PSIZE_WORD;
+  }
+  else {
+	  FLASH->CR |= tmp_psize;
+  }
   if(Banks == FLASH_BANK_BOTH)
   {
     /* bank1 & bank2 will be erased*/

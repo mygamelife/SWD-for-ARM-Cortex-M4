@@ -4,6 +4,7 @@
 int main(void) {
   CEXCEPTION_T err;
   static Tlv_Session *session = NULL;
+  static Tlv *reply = NULL;
   
   displayOptionMenu();
   
@@ -19,9 +20,12 @@ int main(void) {
     Try {
       tlvService(session);
       hostInterpreter(session);
-      // 
-      // Receive packet and handle it here
-      //
+      reply = tlvReceive(session);
+      if(reply != NULL) {
+        reply = NULL;
+        printf("Full Erase Done....\n");
+        printf("> ");
+      }
     } Catch(err) {
       displayErrorMessage(err);
     }

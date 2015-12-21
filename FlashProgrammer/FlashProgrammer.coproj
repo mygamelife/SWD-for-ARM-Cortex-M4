@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <Project version="2G - 2.0.2" name="FlashProgrammer">
   <Target name="FlashProgrammer" isCurrent="1">
-    <Device manufacturerId="9" manufacturerName="ST" chipId="287" chipName="STM32F429ZI" boardId="" boardName="" coreId="4" coreName="Cortex M4"/>
+    <Device manufacturerId="9" manufacturerName="ST" chipId="287" chipName="STM32F429ZI" boardId="" boardName="" boardUrl="" coreId="4" coreName="Cortex M4"/>
     <BuildOption>
       <Compile>
         <Option name="OptimizationLevel" value="0"/>
@@ -86,10 +86,10 @@
     <File name="Hardware/stm32f4xx_hal_gpio_ex.h" path="app/Drivers/stm32f4xx_hal_gpio_ex.h" type="1"/>
     <File name="configuration/configurePort.h" path="../src/app/SystemConfig/configurePort.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash_ex.c" path="app/Drivers/stm32f4xx_hal_flash_ex.c" type="1"/>
-    <File name="configuration/SystemConfigure.h" path="../src/app/SystemConfig/SystemConfigure.h" type="1"/>
     <File name="startup/system_stm32f4xx.h" path="app/Drivers/system_stm32f4xx.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_rcc.h" path="app/Drivers/stm32f4xx_hal_rcc.h" type="1"/>
+    <File name="configuration/SystemConfigure.h" path="../src/app/SystemConfig/SystemConfigure.h" type="1"/>
     <File name="Core/core_cmSimd.h" path="app/Drivers/core_cmSimd.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_rcc.h" path="app/Drivers/stm32f4xx_hal_rcc.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal.c" path="app/Drivers/stm32f4xx_hal.c" type="1"/>
     <File name="configuration" path="" type="2"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.c" path="app/Drivers/stm32f4xx_hal_pwr_ex.c" type="1"/>
@@ -99,22 +99,22 @@
     <File name="Code/main.h" path="app/main.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr_ex.h" path="app/Drivers/stm32f4xx_hal_pwr_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_it.c" path="app/Drivers/stm32f4xx_it.c" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="app/Drivers/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.c" path="app/Drivers/stm32f4xx_hal_gpio.c" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_flash_ramfunc.h" path="app/Drivers/stm32f4xx_hal_flash_ramfunc.h" type="1"/>
     <File name="Core/core_cm4.h" path="app/Drivers/core_cm4.h" type="1"/>
     <File name="Hardware/stm32_hal_legacy.h" path="app/Drivers/Legacy/stm32_hal_legacy.h" type="1"/>
     <File name="Code/Flash.c" path="../src/app/Stub/Flash.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_flash.c" path="app/Drivers/stm32f4xx_hal_flash.c" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="app/Drivers/stm32f4xx_hal_rcc_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_pwr.h" path="app/Drivers/stm32f4xx_hal_pwr.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_rcc_ex.h" path="app/Drivers/stm32f4xx_hal_rcc_ex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_def.h" path="app/Drivers/stm32f4xx_hal_def.h" type="1"/>
-    <File name="Hardware/stm32f4xx_hal_cortex.h" path="app/Drivers/stm32f4xx_hal_cortex.h" type="1"/>
     <File name="Hardware/stm32f4xx_hal_gpio.h" path="app/Drivers/stm32f4xx_hal_gpio.h" type="1"/>
+    <File name="Hardware/stm32f4xx_hal_cortex.h" path="app/Drivers/stm32f4xx_hal_cortex.h" type="1"/>
     <File name="Code/SwdStub.c" path="../src/app/Stub/SwdStub.c" type="1"/>
     <File name="Hardware/stm32f4xx_hal_rcc.c" path="app/Drivers/stm32f4xx_hal_rcc.c" type="1"/>
     <File name="Code/memoryRW.h" path="../src/app/Stub/memoryRW.h" type="1"/>
-    <File name="Hardware/stm32f4xx_it.h" path="app/Drivers/stm32f4xx_it.h" type="1"/>
     <File name="Code/Flash.h" path="../src/app/Stub/Flash.h" type="1"/>
+    <File name="Hardware/stm32f4xx_it.h" path="app/Drivers/stm32f4xx_it.h" type="1"/>
     <File name="startup" path="" type="2"/>
     <File name="Core" path="" type="2"/>
     <File name="Code" path="" type="2"/>

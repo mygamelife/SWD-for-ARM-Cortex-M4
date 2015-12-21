@@ -21,7 +21,7 @@ int main(void)
   Tlv_Session *session = tlvCreateSession();
   
   // swoInit(&session->hswo);
-  // getSwoBytes(session->hswo, session->swoBuffer, 5);
+  // getSwoBytes(session->hswo, session->swoBuffer, 50);
   // itmInit();
   // memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0xDEADBEEF);
   //memoryWriteWord((uint32_t)&ITM->PORT[0].u32, 0x0000FACE);
