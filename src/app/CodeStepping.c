@@ -125,7 +125,11 @@ uint32_t stepOver()
       if(comparatorUsed == -1)
         return 0 ;
     
-      while(!(hasBreakpointDebugEventOccured()));
+      while(!(hasBreakpointDebugEventOccured()))
+      {
+    	  pc = readCoreRegister(CORE_REG_PC);
+    	  setCoreMode(CORE_DEBUG_MODE);
+      }
 
       disableFlashPatchInstructionComparator(comparatorUsed);
       clearBreakpointDebugEvent();

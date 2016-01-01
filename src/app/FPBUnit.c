@@ -208,8 +208,8 @@ int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode
   else
   {
     memoryReadHalfword(instructionAddress+2,&dataRead);
-    dataRead = dataRead << 16 ;
-    machineCode = swapHalfword(machineCode+dataRead);
+    machineCode = (machineCode << 16) + dataRead;
+    machineCode = swapHalfword(machineCode);
   }
   memoryWriteWord((REMAP_BASE + (4*comparatorToUse)),machineCode);
   manualSetInstructionRemapping(comparatorToUse,instructionAddress,REMAP_BASE);

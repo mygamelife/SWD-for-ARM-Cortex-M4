@@ -1,5 +1,8 @@
 #include "ProgramWorker.h"
 
+static CoreMode previousMode ;
+static int isHandled = 0;
+
 /* temp SRAM address 0x20005000 */
 static uint32_t tempAddress = 0x20005000;
 static Tlv *packet;
@@ -205,31 +208,35 @@ int haltTarget(Tlv_Session *session)
   */
 int runTarget(Tlv_Session *session)
 {
-  if(GET_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG) == FLAG_SET)
-  {
-    stepIntoOnce();
-    enableFPBUnit();
-    CLEAR_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG);
-  }
 
-  if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
+	  Tlv *tlv ;
+	  uint32_t pc =0 , empty = 0 ;
+	  setCoreMode(CORE_DEBUG_MODE);
 
-    setCoreMode(CORE_DEBUG_MODE);
-    if(getCoreMode() == CORE_DEBUG_MODE)
-      tlvReply(session, TLV_OK, 0, NULL);
-    else Throw(TLV_NOT_RUNNING);
-  }
-  else {
-    SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-    breakpointEventHandler(session);
-  }
+	  if(previousMode == CORE_DEBUG_HALT)
+	  {
+		  disableFPBUnit();
+		  stepOnly(1);
+		  enableFPBUnit();
+		  isHandled = 1 ;
+	  }
 
-  setCoreMode(CORE_DEBUG_MODE);
+	  if(getCoreMode() == CORE_DEBUG_MODE)
+	  {
+		  tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&empty);
+		  previousMode = CORE_DEBUG_MODE ;
+	  }
+	  else
+	  {
+		isHandled = 0;
+		previousMode = CORE_DEBUG_HALT;
+	    pc = readCoreRegister(CORE_REG_PC);
+	    tlv = tlvCreatePacket(TLV_OK, 4,(uint8_t *)& pc);
+	  }
+	  //else Throw(TLV_NOT_RUNNING);
 
-  if(getCoreMode() == CORE_DEBUG_MODE)
-    tlvReply(session, TLV_OK, 0, NULL);
+	  tlvSend(session, tlv);
 
-  else Throw(TLV_NOT_RUNNING);
 
   returnThis(1);
 }
@@ -244,6 +251,7 @@ uint32_t performSingleStepInto(Tlv_Session *session)
   uint32_t pc = 0 , initialPC = 0 ;
 
   initialPC = readCoreRegister(CORE_REG_PC);
+
 
   pc = stepIntoOnce();
 
@@ -561,6 +569,10 @@ int watchpointEventHandler(Tlv_Session *session)
     disableDWTComparator(COMPARATOR_1);
     clearDWTTrapDebugEvent() ;
   }
+  
+  /* Clear ongoingProcess and breakPoint flag to indicate the breakpoint event is over*/
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  CLEAR_FLAG_STATUS(session, TLV_SET_WATCHPOINT_FLAG);
 
   tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);
@@ -788,6 +800,7 @@ int selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HALT_TARGET                : haltTarget(session);                                                                      break;
     case TLV_RUN_TARGET                 : runTarget(session);                                                                       break;
     case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                               break;
+    case TLV_STEPOVER					: performStepOver(session);																	break;
     case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
     case TLV_REMOVE_BREAKPOINT          : removeHardwareBreakpoint(session, get4Byte(&tlv->value[0]));                              break;
     case TLV_REMOVE_ALL_BREAKPOINT      : removeAllHardwareBreakpoint(session);                                                     break;

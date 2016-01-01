@@ -103,6 +103,7 @@ Process_Status halt(Tlv_Session *session) {
   /* End tlv request task */
   endTask(tb);
 
+
   returnThis(PROCESS_DONE);
 }
 
@@ -118,7 +119,7 @@ Process_Status run(Tlv_Session *session) {
   static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
-
+  uint32_t data = 0 ;
   if(session == NULL) Throw(TLV_NULL_SESSION);
 
   /* Start tlv request task */
@@ -135,6 +136,12 @@ Process_Status run(Tlv_Session *session) {
   /* End tlv request task */
   endTask(tb);
 
+  data = get4Byte(&response->value[0]) ;
+  #ifdef HOST
+  if(data != 0)
+    printf("PC stops at %x\n", get4Byte(&response->value[0]));
+  #endif
+  
   returnThis(PROCESS_DONE);
 }
 
