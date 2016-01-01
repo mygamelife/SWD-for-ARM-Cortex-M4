@@ -402,6 +402,59 @@ void test_setWatchpoint_should_set_watchpoint_and_return_ACK()
   setWatchpoint(session,0x88884444,WATCHPOINT_MASK_BIT2_BIT0,0xAABB,WATCHPOINT_BYTE,WATCHPOINT_READ);
 }
 
+/*---------setInstructionRemapping----------------------*/
+void test_setInstructionRemapping_should_Throw_TLV_REMAP_MAXSET_if_all_comparators_are_in_use()
+{
+  CEXCEPTION_T err;
+
+  Try {
+    uartInit_Ignore();
+    Tlv_Session *session = tlvCreateSession();
+
+    autoSetInstructionRemapping_ExpectAndReturn(0x12345678,0xAABB,-1);
+    setInstructionRemapping(session,0x12345678,0xAABB);
+  } Catch(err) {
+    TEST_ASSERT_EQUAL(TLV_REMAP_MAXSET, err);
+  }
+}
+
+void test_setInstructionRemapping_set_remapping_and_return_ACK()
+{
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  autoSetInstructionRemapping_ExpectAndReturn(0x12345678,0xAABB,INSTRUCTION_COMP5);
+  setInstructionRemapping(session,0x12345678,0xAABB);
+}
+
+/*---------setLiteralRemapping----------------------*/
+void test_setLiteralRemapping_should_Throw_TLV_REMAP_MAXSET_if_all_comparators_are_in_use()
+{
+  
+  CEXCEPTION_T err;
+
+  Try {
+    uartInit_Ignore();
+    Tlv_Session *session = tlvCreateSession();
+
+    autoSetLiteralRemapping_ExpectAndReturn(0x12345678,0xAABB,-1);
+    setLiteralRemapping(session,0x12345678,0xAABB);
+  } Catch(err) {
+    TEST_ASSERT_EQUAL(TLV_REMAP_MAXSET, err);
+  }
+  
+}
+
+void test_setLiteralRemapping_set_remapping_and_return_ACK()
+{
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  autoSetLiteralRemapping_ExpectAndReturn(0x12345678,0xAABB,LITERAL_COMP0);
+  setLiteralRemapping(session,0x12345678,0xAABB);
+}
+
+
 /*---------removeHardwareBreakpoint----------------------*/
 void test_removeHardwareBreakpoint_should_remove_breakpoint_and_return_ACK()
 {
@@ -441,6 +494,18 @@ void test_removeAllHardwareBreakpoint_should_remove_all_breakpoint_and_return_AC
 
   removeAllHardwareBreakpoint(session);
 }
+
+/*---------removeWatchpoint----------------------*/
+void test_removeWatchpoint_should_remove_watchpoint_and_return_ACK()
+{
+  uartInit_Ignore();
+  Tlv_Session *session = tlvCreateSession();
+  
+  disableDWTComparator_ExpectAndReturn(COMPARATOR_1,0);
+  
+  removeWatchpoint(session);
+}
+
 
 /*---------stopFlashPatchRemapping----------------------*/
 void test_stopFlashPatchRemapping_should_stop_remapping_and_return_ACK()

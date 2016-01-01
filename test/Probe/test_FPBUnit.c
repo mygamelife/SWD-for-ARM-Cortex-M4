@@ -336,6 +336,51 @@ void test_autoSetInstructionRemapping_16bit_machineCode_case()
   TEST_ASSERT_EQUAL(COMP_REMAP,instructionComparatorReady[0]);
 }
 
+/*-------------------------autoSetLiteralRemapping-----------------------*/
+void test_autoSetLiteral_should_return_negative_1_if_all_comp_are_busy()
+{
+  //Read INSTRUCTION_COMP0
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, (uint32_t)&(LITERAL_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(1));
+  
+  //Read INSTRUCTION_COMP1
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, (uint32_t)&(LITERAL_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(1));
+  
+  TEST_ASSERT_EQUAL(-1,autoSetLiteralRemapping(0x08000000,0x12345678));
+}
+
+void test_autoSetLiteralRemapping_given_LITERAL_COMP1_free_should_program_literalData_to_REMAP_BASE()
+{
+  //Read LITERAL_COMP0
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, (uint32_t)&(LITERAL_COMP[0]));
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0x1));
+  
+  //Read LITERAL_COMP1
+  emulateSwdRegisterWrite(TAR_REG, SWD_AP, OK, (uint32_t)&(LITERAL_COMP[1]));
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, 0);
+	emulateSwdRegisterRead(DRW_REG, SWD_AP, OK, 1, interconvertMSBandLSB(0));
+  
+  //Program Literal Data
+  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,REMAP_BASE + 28);
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x12345678);
+ 
+  //Program FP_REMAP
+  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,(uint32_t)&(FPB->FP_REMAP));
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,REMAP_BASE & FP_REMAP_ADDRESS_MASK);
+  
+  //Program comparator
+  emulateSwdRegisterWrite(TAR_REG,SWD_AP,4,(uint32_t)&(LITERAL_COMP[1]));
+	emulateSwdRegisterWrite(DRW_REG,SWD_AP,4,0x08000001);
+  
+ 
+  TEST_ASSERT_EQUAL(LITERAL_COMP1,autoSetLiteralRemapping(0x08000000,0x12345678));
+  TEST_ASSERT_EQUAL(COMP_REMAP,literalComparatorReady[1]);
+}
+
 /*-------------------------disableFlashPatchInstructionComparator-----------------------*/
 void test_disableInstructionComparator_should_write_FP_COMP_DISABLE_to_the_selected_instruction_comparator()
 {

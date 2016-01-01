@@ -54,9 +54,6 @@ uint32_t swapHalfword(uint32_t data)
 }
 
 
-
-
-
 /**
  *  Use to set for instruction address breakpoint
  *
@@ -211,11 +208,34 @@ int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode
   else
   {
     memoryReadHalfword(instructionAddress+2,&dataRead);
-    dataRead = dataRead << 16 ;
-    machineCode = swapHalfword(machineCode+dataRead);
+    machineCode = (machineCode << 16) + dataRead;
+    machineCode = swapHalfword(machineCode);
   }
   memoryWriteWord((REMAP_BASE + (4*comparatorToUse)),machineCode);
   manualSetInstructionRemapping(comparatorToUse,instructionAddress,REMAP_BASE);
+  
+  return comparatorToUse;
+}
+
+/**
+ *  Use to set for literal data remapping
+ *
+ *  Input :  literalAddress is the address that will be remapped
+ *           literalData is the machine code that will remapped from the literalAddress
+ *
+ *  Output :  return LITERAL_COMP0 - LITERAL_COMP1 for valid comparator used
+ *            return -1 if invalid comparator is chosen
+ */
+int autoSetLiteralRemapping(uint32_t literalAddress,uint32_t literalData)
+{
+  int comparatorToUse = 0 ;
+  
+  comparatorToUse = selectNextFreeComparator(LITERAL_TYPE);
+  if(comparatorToUse == -1)
+    return -1 ;
+  
+  memoryWriteWord((REMAP_BASE + (4*(comparatorToUse + INSTRUCTION_COMP_NUM))),literalData);
+  manualSetLiteralRemapping(comparatorToUse,literalAddress,REMAP_BASE);
   
   return comparatorToUse;
 }

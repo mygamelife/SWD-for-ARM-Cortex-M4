@@ -1,5 +1,8 @@
 #include "ProgramWorker.h"
 
+static CoreMode previousMode ;
+static int isHandled = 0;
+
 /* temp SRAM address 0x20005000 */
 static uint32_t tempAddress = 0x20005000;
 static Tlv *packet;
@@ -215,31 +218,35 @@ int haltTarget(Tlv_Session *session)
   */
 int runTarget(Tlv_Session *session)
 {
-  if(GET_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG) == FLAG_SET)
-  {
-    stepIntoOnce();
-    enableFPBUnit();
-    CLEAR_FLAG_STATUS(session,TLV_BREAKPOINT_WAS_SET_FLAG);
-  }
 
-  if(GET_FLAG_STATUS(session, TLV_SET_BREAKPOINT_FLAG) != FLAG_SET) {
+	  Tlv *tlv ;
+	  uint32_t pc =0 , empty = 0 ;
+	  setCoreMode(CORE_DEBUG_MODE);
 
-    setCoreMode(CORE_DEBUG_MODE);
-    if(getCoreMode() == CORE_DEBUG_MODE)
-      tlvReply(session, TLV_OK, 0, NULL);
-    else Throw(TLV_NOT_RUNNING);
-  }
-  else {
-    SET_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
-    breakpointEventHandler(session);
-  }
+	  if(previousMode == CORE_DEBUG_HALT)
+	  {
+		  disableFPBUnit();
+		  stepOnly(1);
+		  enableFPBUnit();
+		  isHandled = 1 ;
+	  }
 
-  setCoreMode(CORE_DEBUG_MODE);
+	  if(getCoreMode() == CORE_DEBUG_MODE)
+	  {
+		  tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&empty);
+		  previousMode = CORE_DEBUG_MODE ;
+	  }
+	  else
+	  {
+		isHandled = 0;
+		previousMode = CORE_DEBUG_HALT;
+	    pc = readCoreRegister(CORE_REG_PC);
+	    tlv = tlvCreatePacket(TLV_OK, 4,(uint8_t *)& pc);
+	  }
+	  //else Throw(TLV_NOT_RUNNING);
 
-  if(getCoreMode() == CORE_DEBUG_MODE)
-    tlvReply(session, TLV_OK, 0, NULL);
+	  tlvSend(session, tlv);
 
-  else Throw(TLV_NOT_RUNNING);
 
   returnThis(1);
 }
@@ -254,6 +261,7 @@ uint32_t performSingleStepInto(Tlv_Session *session)
   uint32_t pc = 0 , initialPC = 0 ;
 
   initialPC = readCoreRegister(CORE_REG_PC);
+
 
   pc = stepIntoOnce();
 
@@ -373,9 +381,62 @@ int setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask a
 
   setDataWatchpoint_MatchingOneComparator(COMPARATOR_3,address,addressMask,matchedData,dataSize,accessMode);
 
+  SET_FLAG_STATUS(session, TLV_SET_WATCHPOINT_FLAG);
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 
+  returnThis(1);
+}
+
+/**
+ *  Set instruction address remapping
+ *
+ *  Input :  session contain a element/handler used by tlv protocol
+ *           instructionAddress is the address that will be remapped
+ *           machineCode is the machine code that will remapped from the instructionAddress
+ *
+ */
+int setInstructionRemapping(Tlv_Session *session,uint32_t instructionAddress,uint32_t machineCode)
+{
+  Tlv *tlv ;
+  
+  int comparatorUsed = 0;
+  
+  comparatorUsed = autoSetInstructionRemapping(instructionAddress,machineCode);
+  if( comparatorUsed == -1)
+    Throw(TLV_REMAP_MAXSET);
+  else
+  {
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+    tlvSend(session, tlv);
+  }
+  
+  returnThis(1);
+}
+
+/**
+ *  Set literal data remapping
+ *
+ *  Input :  session contain a element/handler used by tlv protocol 
+ *           literalAddress is the address that will be remapped
+ *           literalData is the data that will remapped from the literalAddress
+ *
+ */
+int setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,uint32_t literalData)
+{
+  Tlv *tlv ;
+  
+  int comparatorUsed = 0;
+  
+  comparatorUsed = autoSetLiteralRemapping(literalAddress,literalData);
+  if( comparatorUsed == -1)
+    Throw(TLV_REMAP_MAXSET);
+  else
+  {
+    tlv = tlvCreatePacket(TLV_OK, 0, 0);
+    tlvSend(session, tlv);
+  }
+  
   returnThis(1);
 }
 
@@ -411,6 +472,21 @@ int removeAllHardwareBreakpoint(Tlv_Session *session)
   tlv = tlvCreatePacket(TLV_OK, 0, 0);
   tlvSend(session, tlv);
 
+  returnThis(1);
+}
+
+/** Remove watchpoint
+ *
+ * Input     : session contain a element/handler used by tlv protocol
+ */
+int removeWatchpoint(Tlv_Session *session)
+{
+  Tlv *tlv ;
+  
+  disableDWTComparator(COMPARATOR_1);
+  tlv = tlvCreatePacket(TLV_OK, 0, 0);
+  tlvSend(session, tlv);
+  
   returnThis(1);
 }
 
@@ -503,6 +579,10 @@ int watchpointEventHandler(Tlv_Session *session)
     disableDWTComparator(COMPARATOR_1);
     clearDWTTrapDebugEvent() ;
   }
+  
+  /* Clear ongoingProcess and breakPoint flag to indicate the breakpoint event is over*/
+  CLEAR_FLAG_STATUS(session, TLV_ONGOING_PROCESS_FLAG);
+  CLEAR_FLAG_STATUS(session, TLV_SET_WATCHPOINT_FLAG);
 
   tlv = tlvCreatePacket(TLV_OK, 4, (uint8_t *)&pc);
   tlvSend(session, tlv);
@@ -748,15 +828,23 @@ int selectTask(Tlv_Session *session, Tlv *tlv)  {
     case TLV_HALT_TARGET                : haltTarget(session);                                                                      break;
     case TLV_RUN_TARGET                 : runTarget(session);                                                                       break;
     case TLV_STEP                       : performMultipleStepInto(session, get4Byte(&tlv->value[0]));                               break;
+    case TLV_STEPOVER					: performStepOver(session);																	break;
     case TLV_BREAKPOINT                 : setBreakpoint(session, get4Byte(&tlv->value[0]));                                         break;
     case TLV_REMOVE_BREAKPOINT          : removeHardwareBreakpoint(session, get4Byte(&tlv->value[0]));                              break;
     case TLV_REMOVE_ALL_BREAKPOINT      : removeAllHardwareBreakpoint(session);                                                     break;
+    case TLV_WATCHPOINT                 : setWatchpoint(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]), 
+                                                        get4Byte(&tlv->value[8]), get4Byte(&tlv->value[12]), 
+                                                        get4Byte(&tlv->value[16]));                                                 break;
+    case TLV_INSTRUCTION_REMAP          : setInstructionRemapping(session,get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));      break;
+    case TLV_LITERAL_REMAP              : setLiteralRemapping(session,get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));          break;
+    case TLV_REMOVE_WATCHPOINT          : removeWatchpoint(session);                                                                break;
     case TLV_STOP_REMAP                 : stopFlashPatchRemapping(session, get4Byte(&tlv->value[0]));                               break;
     case TLV_STOP_ALL_REMAP             : stopAllFlashPatchRemapping(session);                                                      break;
     case TLV_FLASH_ERASE                : eraseTargetFlash(session, get4Byte(&tlv->value[0]), get4Byte(&tlv->value[4]));            break;
     case TLV_FLASH_MASS_ERASE           : massEraseTargetFlash(session, tlv->value[0]);												break;
     case TLV_SOFT_RESET                 : performSoftResetOnTarget(session);                                                        break;
     case TLV_HARD_RESET                 : performHardResetOnTarget(session);                                                        break;
+    case TLV_VECT_RESET					: performVectorResetOnTarget(session);														break;
     case TLV_LOOP_BACK                  : loopBack(session, tlv);                                                                   break;
     case TLV_DEBUG_EVENTS               : debugEventHandler(session, tlv->value[0]);                                                break;
     case TLV_VERIFY_COM_PORT            : comPortVerification(session);                                                             break;

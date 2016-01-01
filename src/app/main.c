@@ -17,6 +17,10 @@ int main(void)
   swdInit();
   /* Power Up AHB Port */
   readAhbIDR(&idr);
+  /*Initialise FPB Unit*/
+  initialiseFPBUnit();
+  /*Set Target to Debug Mode*/
+  setCoreMode(CORE_DEBUG_MODE);
 
   Tlv_Session *session = tlvCreateSession();
   
@@ -30,11 +34,11 @@ int main(void)
   while(1)
   {
     Try {
-      tlvService(session);
-      taskManager(session);
-    }
+    tlvService(session);
+    taskManager(session);
+   }
     Catch(err) {
-      tlvErrorReporter(session, err);
+    tlvErrorReporter(session, err);
     }
   }
 }

@@ -79,9 +79,14 @@ int performStepOut(Tlv_Session *session);
 int setBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
 int setWatchpoint(Tlv_Session *session,uint32_t address,Watchpoint_AddressMask addressMask,
                    uint32_t matchedData,Watchpoint_DataSize dataSize,Watchpoint_AccessMode accessMode);
+
+int setInstructionRemapping(Tlv_Session *session,uint32_t instructionAddress,uint32_t machineCode);
+int setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,uint32_t literalData);
  
 int removeHardwareBreakpoint(Tlv_Session *session, uint32_t instructionAddress);
 int removeAllHardwareBreakpoint(Tlv_Session *session);
+
+int removeWatchpoint(Tlv_Session *session);
 
 int stopFlashPatchRemapping(Tlv_Session *session,uint32_t address);
 int stopAllFlashPatchRemapping(Tlv_Session *session);
