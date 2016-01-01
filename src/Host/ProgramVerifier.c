@@ -1,3 +1,20 @@
+/*  
+    Serial Wire Debug for ARM Cortex M4
+    Copyright (C) 2015 Chiu Vui Te, <mygamelife1@gmail.com>,
+    Cheah Sheng Li, <csl9408@gmail.com>
+    This file is part of GDB RSP and ARM Simulator.
+    This program is free software, you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY, without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License
+    along with This program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 #include "ProgramVerifier.h"
 
 int verifyLoadedProgram(uint8_t *loadedProgram, uint8_t *actualProgram, int size) {
