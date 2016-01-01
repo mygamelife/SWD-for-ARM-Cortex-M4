@@ -61,7 +61,6 @@ void test_userWriteRegister_should_throw_error_if_user_didnt_enter_register_addr
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userWriteRegister_should_throw_error_if_user_didnt_enter_anything(void)
@@ -78,16 +77,16 @@ void test_userWriteRegister_should_throw_error_if_user_didnt_enter_anything(void
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userReadRegister_should_throw_error_if_user_didnt_enter_register_address(void)
 {
   CEXCEPTION_T err;
-  String *str = stringNew("reg");
-  User_Session *us;
+  String *str = NULL;
+  User_Session *us = NULL;
 
   Try {
+    str = stringNew("reg ");
     us = InterpreteCommand(str);
   }
   Catch(err)  {
@@ -95,7 +94,6 @@ void test_userReadRegister_should_throw_error_if_user_didnt_enter_register_addre
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userReadRegister_should_acquire_info_enter_by_user(void)
@@ -125,7 +123,6 @@ void test_userReadRegister_given_invalid_register_address_should_throw_an_error(
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userStepTarget_should_throw_error_when_number_of_step_is_not_number(void)
@@ -142,7 +139,6 @@ void test_userStepTarget_should_throw_error_when_number_of_step_is_not_number(vo
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userStepTarget_should_get_step_insturction_and_number_of_step(void)
@@ -172,7 +168,6 @@ void test_userReadMemory_should_throw_error_when_address_is_not_in_number(void)
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userReadMemory_should_get_address_and_size(void)
@@ -202,7 +197,6 @@ void test_userLoadProgram_should_throw_an_error_if_path_name_is_invalid(void)
   }
 
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userRunTarget_should_get_run_command(void)
@@ -323,7 +317,6 @@ void test_userErase_should_throw_error(void)
   }
   
   stringDel(str);
-  delUserSession(us);
 }
 
 void test_userReset_should_get_reset_option(void)

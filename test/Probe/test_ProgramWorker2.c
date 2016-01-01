@@ -12,7 +12,7 @@
 #include "mock_DWTUnit.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_MemoryReadWrite.h"
-#include "mock_SwdStub.h"
+#include "mock_Stub.h"
 #include "mock_CodeStepping.h"
 #include "mock_SystemTime.h"
 

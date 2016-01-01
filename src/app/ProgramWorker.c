@@ -13,7 +13,7 @@ static Tlv *packet;
   *           0 stub is busy with the last operation
   */
 int IsStubBusy(void)  {
-  unsigned int stubStatus = memoryReadAndReturnWord((uint32_t)&STUB->status);
+  unsigned int stubStatus = memoryReadAndReturnWord((uint32_t)&Stub->status);
 
   if(stubStatus == STUB_OK) {
     return 1;
@@ -35,11 +35,11 @@ int IsStubBusy(void)  {
 void requestStubErase(uint32_t address, int size) {
 
   /* load flash start and end address to sram */
-  memoryWriteWord((uint32_t)&STUB->flashAddress, (uint32_t)address);
-  memoryWriteWord((uint32_t)&STUB->dataSize, (uint32_t)size);
+  memoryWriteWord((uint32_t)&Stub->flashAddress, (uint32_t)address);
+  memoryWriteWord((uint32_t)&Stub->dataSize, (uint32_t)size);
 
   /* load instruction to sram */
-  memoryWriteWord((uint32_t)&STUB->instruction, STUB_ERASE);
+  memoryWriteWord((uint32_t)&Stub->instruction, STUB_ERASE);
 }
 
 /** requestMassErase is a function to load the mass erase
@@ -55,10 +55,10 @@ void requestStubErase(uint32_t address, int size) {
 void requestStubMassErase(uint32_t bankSelect)  {
 
   /* load bank select to sram */
-  memoryWriteWord((uint32_t)&STUB->banks, (uint32_t)bankSelect);
+  memoryWriteWord((uint32_t)&Stub->banks, (uint32_t)bankSelect);
 
   /* load instruction to sram */
-  memoryWriteWord((uint32_t)&STUB->instruction, STUB_MASSERASE);
+  memoryWriteWord((uint32_t)&Stub->instruction, STUB_MASSERASE);
 }
 
 /** requestStubCopy is a function copy data from src (SRAM) to dest (Flash)
@@ -72,16 +72,26 @@ void requestStubMassErase(uint32_t bankSelect)  {
 void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size) {
 
   /* load SRAM start address into sram */
-  memoryWriteWord((uint32_t)&STUB->sramAddress, (uint32_t)dataAddress);
+  memoryWriteWord((uint32_t)&Stub->sramAddress, (uint32_t)dataAddress);
 
   /* load Flash start address into sram */
-  memoryWriteWord((uint32_t)&STUB->flashAddress, (uint32_t)destAddress);
+  memoryWriteWord((uint32_t)&Stub->flashAddress, (uint32_t)destAddress);
 
   /* load length into sram */
-  memoryWriteWord((uint32_t)&STUB->dataSize, (uint32_t)size);
+  memoryWriteWord((uint32_t)&Stub->dataSize, (uint32_t)size);
 
 	/* load copy instructoin into sram */
-  memoryWriteWord((uint32_t)&STUB->instruction, STUB_COPY);
+  memoryWriteWord((uint32_t)&Stub->instruction, STUB_COPY);
+}
+
+void requestStubPrescaleSystemClock(uint32_t prescale) {
+  /* Set stub instructoin */
+  memoryWriteWord((uint32_t)&Stub->instruction, STUB_PRESCALE_SYSCLK);
+}
+
+void requestStubGetSystemClock() {
+  /* Set stub instructoin */
+  memoryWriteWord((uint32_t)&Stub->instruction, STUB_GET_SYSCLK);
 }
 
 /** writeTargetRegister is a function to write value into target register using swd
@@ -894,4 +904,53 @@ void writeDataWithCorrectDataType(uint8_t **data, uint32_t *address, int *size) 
   *data += type;
   *address += type;
   *size -= type;
+}
+
+int prescaleTargetSystemClock(Tlv_Session *session, uint32_t prescale) {
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  startTask(tb);
+  /* Wait if stub is busy */
+  previousTime = getSystemTime();
+  while(IsStubBusy() == 0) {
+    if(isTimeout(FIVE_SECOND, previousTime)) {
+      resetTask(tb);
+      Throw(PROBE_STUB_NOT_RESPONDING);
+    }
+    yield(tb);
+  }
+  requestStubPrescaleSystemClock(prescale);
+  /* Reply tlv acknowledge */
+  tlvReply(session, TLV_OK, 0, NULL);
+
+  endTask(tb);
+  returnThis(1);
+}
+
+int getTargetSystemClock(Tlv_Session *session) {
+  uint32_t systemClock = 0;
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+  
+  startTask(tb);
+  /* Wait if stub is busy */
+  previousTime = getSystemTime();
+  while(IsStubBusy() == 0) {
+    if(isTimeout(FIVE_SECOND, previousTime)) {
+      resetTask(tb);
+      Throw(PROBE_STUB_NOT_RESPONDING);
+    }
+    yield(tb);
+  }
+  requestStubGetSystemClock();
+  /* Get system clock from Stub */
+  memoryReadWord((uint32_t)&Stub->sysClock, &systemClock);
+  /* Reply tlv acknowledge */
+  tlvReply(session, TLV_OK, 4, (uint8_t *)&systemClock);
+
+  endTask(tb);
+  returnThis(1);
 }

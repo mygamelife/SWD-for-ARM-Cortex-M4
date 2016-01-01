@@ -6,7 +6,7 @@
 #include "CoreDebug.h"
 #include "FPBUnit.h"
 #include "DWTUnit.h"
-#include "SwdStub.h"
+#include "Stub.h"
 #include "CodeStepping.h"
 #include "ErrorCode.h"
 #include "CException.h"
@@ -40,6 +40,8 @@ int IsStubBusy(void);
 void requestStubErase(uint32_t address, int size);
 void requestStubMassErase(uint32_t bankSelect);
 void requestStubCopy(uint32_t dataAddress, uint32_t destAddress, int size);
+void requestStubPrescaleSystemClock(uint32_t prescale);
+void requestStubGetSystemClock();
 
 /*############################################### FLASH ###############################################*/
 int writeTargetFlash(Tlv_Session *session, uint8_t *dataAddress, uint32_t destAddress, int size);
@@ -96,4 +98,9 @@ int loopBack(Tlv_Session *session, Tlv *packet);
 int comPortVerification(Tlv_Session *session);
 
 void selectAppropriateMethodToWriteRAM(uint8_t *data, uint32_t destAddress, int size);
+
+/* ################# Configure Target System Clock ################# */
+int prescaleTargetSystemClock(Tlv_Session *session, uint32_t prescale);
+int getTargetSystemClock(Tlv_Session *session);
+
 #endif // ProgramWorker_H

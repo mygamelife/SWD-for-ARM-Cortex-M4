@@ -13,7 +13,7 @@
 #include "mock_DWTUnit.h"
 #include "mock_stm32f4xx_hal_uart.h"
 #include "mock_MemoryReadWrite.h"
-#include "mock_SwdStub.h"
+#include "mock_Stub.h"
 #include "mock_CodeStepping.h"
 #include "mock_SystemTime.h"
 
@@ -23,34 +23,34 @@ void tearDown(void) {}
 
 void test_IsStubBusy_should_read_STUB_status_and_return_1(void)
 {
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
 
   TEST_ASSERT_EQUAL(1, IsStubBusy());
 }
 
 void test_requestStubErase_should_write_flashAddress_and_size_into_STUB_flahsAddress_and_dataSize(void)
 {
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);     //Set flash Address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 2048, SWD_NO_ERROR);               //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->flashAddress, 0x08000000, SWD_NO_ERROR);     //Set flash Address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->dataSize, 2048, SWD_NO_ERROR);               //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
 
   requestStubErase(0x08000000, 2048);
 }
 
 void test_requestStubMassErase_should_write_bankSelect_into_STUB_banks(void)
 {
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_2, SWD_NO_ERROR);            //Set flash banks
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->banks, FLASH_BANK_2, SWD_NO_ERROR);            //Set flash banks
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
 
   requestStubMassErase(FLASH_BANK_2);
 }
 
 void test_requestStubCopy_should_write_into_STUB_flashAddress_sramAddress_and_size_to_copy(void)
 {
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20000000, SWD_NO_ERROR);        //Set sram address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);       //Set flash address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 248, SWD_NO_ERROR);                  //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->sramAddress, 0x20000000, SWD_NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->flashAddress, 0x08000000, SWD_NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->dataSize, 248, SWD_NO_ERROR);                  //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
 
   requestStubCopy(0x20000000, 0x08000000, 248);
 }
@@ -547,20 +547,20 @@ void test_writeTargetFlash_should_write_into_target_ram_first_then_wait_for_stub
 
   /* Stub status is BUSY */
   getSystemTime_ExpectAndReturn(10);
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_BUSY);
   isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
 
   writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
   TEST_ASSERT_EQUAL(1, isYielding);
 
   /* Stub status is OK */
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
 
   /* Request stub copy */
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, SWD_NO_ERROR);        //Set sram address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08001000, SWD_NO_ERROR);       //Set flash address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 16, SWD_NO_ERROR);                    //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->sramAddress, 0x20005000, SWD_NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->flashAddress, 0x08001000, SWD_NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->dataSize, 16, SWD_NO_ERROR);                    //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
 
   writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
 
@@ -587,14 +587,14 @@ void test_writeTargetFlash_should_throw_if_stub_is_timeout(void)
 
     /* Stub status is BUSY */
     getSystemTime_ExpectAndReturn(10);
-    memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
+    memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_BUSY);
     isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
 
     writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
     TEST_ASSERT_EQUAL(1, isYielding);
 
     /* Stub status is OK */
-    memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
+    memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_BUSY);
     isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 1);
 
     writeTargetFlash(session, (uint8_t *)dataAddress, 0x08001000, 16);
@@ -617,7 +617,7 @@ void test_eraseTargetFlash_should_request_erase_if_stub_is_ready(void)
 
   /* Stub status is OK */
   getSystemTime_ExpectAndReturn(10);
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_BUSY);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_BUSY);
   isTimeout_ExpectAndReturn(FIVE_SECOND, 10, 0);
 
   eraseTargetFlash(session, 0x08000000, 20000);
@@ -625,15 +625,15 @@ void test_eraseTargetFlash_should_request_erase_if_stub_is_ready(void)
   TEST_ASSERT_EQUAL(1, isYielding);
 
   /* Stub status is OK */
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
 
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);     //Set flash Address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 20000, SWD_NO_ERROR);              //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->flashAddress, 0x08000000, SWD_NO_ERROR);     //Set flash Address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->dataSize, 20000, SWD_NO_ERROR);              //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_ERASE, SWD_NO_ERROR);      //Set Stub Instruction
 
   getSystemTime_ExpectAndReturn(10);
   /* Stub status is OK */
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
   
   eraseTargetFlash(session, 0x08000000, 20000);
 
@@ -648,14 +648,14 @@ void test_massEraseTargetFlash_should_request_erase_if_stub_is_ready(void)
 
   /* Stub status is OK */
   getSystemTime_ExpectAndReturn(10);
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
 
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->banks, FLASH_BANK_1, SWD_NO_ERROR);            //Set flash banks
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->banks, FLASH_BANK_1, SWD_NO_ERROR);            //Set flash banks
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_MASSERASE, SWD_NO_ERROR);    //Set Stub Instruction
 
   getSystemTime_ExpectAndReturn(10);
   /* Stub status is OK */
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
   
   massEraseTargetFlash(session, FLASH_BANK_1);
 
@@ -936,12 +936,12 @@ void test_taskManager_given_flash_command_should_run_writeTargetFlash(void)
 
   /* Stub status is OK */
   getSystemTime_ExpectAndReturn(10);
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
   /* Request stub copy */
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->sramAddress, 0x20005000, SWD_NO_ERROR);        //Set sram address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);       //Set flash address
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, 8, SWD_NO_ERROR);                    //Set data size
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->sramAddress, 0x20005000, SWD_NO_ERROR);        //Set sram address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->flashAddress, 0x08000000, SWD_NO_ERROR);       //Set flash address
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->dataSize, 8, SWD_NO_ERROR);                    //Set data size
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_COPY, SWD_NO_ERROR);         //Set Stub Instruction
 
   /* Received packet */
   taskManager(session);
@@ -977,16 +977,16 @@ void test_taskManager_given_flash_erase_command_should_run_eraseFlashTarget(void
 
   /* Stub status is OK */
   getSystemTime_ExpectAndReturn(10);
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
 
   /* Mocking Request Erase */
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->flashAddress, 0x08000000, SWD_NO_ERROR);
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->dataSize, (int)20000, SWD_NO_ERROR);
-  memoryWriteWord_ExpectAndReturn((uint32_t)&STUB->instruction, STUB_ERASE, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->flashAddress, 0x08000000, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->dataSize, (int)20000, SWD_NO_ERROR);
+  memoryWriteWord_ExpectAndReturn((uint32_t)&Stub->instruction, STUB_ERASE, SWD_NO_ERROR);
 
   getSystemTime_ExpectAndReturn(10);
   /* Stub status is OK */
-  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&STUB->status, STUB_OK);
+  memoryReadAndReturnWord_ExpectAndReturn((uint32_t)&Stub->status, STUB_OK);
   
   /* Received packet */
   taskManager(session);

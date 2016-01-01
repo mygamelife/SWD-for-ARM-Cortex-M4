@@ -5,7 +5,6 @@
 	#include "stm32f4xx_hal.h"
 #endif
 
-#include "swdStub.h"
 #include "memoryRW.h"
 #include "configurePort.h"
 #include "stm32f4xx_hal_flash.h"

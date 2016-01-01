@@ -13,6 +13,6 @@ int main(void)
 
   while(1)
   {
-	  swdStub(STUB->instruction);
+	  stub(Stub->instruction);
   }
 }

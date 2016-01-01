@@ -1,4 +1,4 @@
-#include "SwdStub.h"
+#include "Stub.h"
 
 /** stubInit is to initialize element in swd stub structure
   *
@@ -6,12 +6,15 @@
   * return  : NONE
   */
 void stubInit(void) {
-  STUB->instruction     = STUB_CLEAR;
-  STUB->status          = STUB_OK;
-  STUB->dataSize        = 0;
-  STUB->flashAddress    = 0;
-  STUB->sramAddress     = 0;
-  STUB->banks           = 0;
+  Stub->instruction       = STUB_CLEAR;
+  Stub->status            = STUB_OK;
+  Stub->dataSize          = 0;
+  Stub->flashAddress      = 0;
+  Stub->sramAddress       = 0;
+  Stub->banks             = 0;
+  Stub->sysClockPrescale  = 0;
+  Stub->sysClock          = 0;
+  Stub->id                = STUB_ID;
 }
 
 /** swdStub is small program routine take instruction from swd probe and response
@@ -19,7 +22,7 @@ void stubInit(void) {
   * input   : swdInstruction is an instruction send by probe
   * return  : NONE
   */
-void swdStub(int stubInstruction) {
+void stub(int stubInstruction) {
   switch(stubInstruction)  {
     case STUB_COPY :
       stubCopy();
@@ -32,6 +35,16 @@ void swdStub(int stubInstruction) {
     case STUB_MASSERASE :
       stubMassErase();
       break;
+      
+    case STUB_PRESCALE_SYSCLK :
+      stubPrescaleSystemClock();
+      break;
+      
+    case STUB_GET_SYSCLK :
+      stubGetSystemClock();
+      break;
+      
+    default : break;
   }
 }
 
@@ -43,15 +56,15 @@ void swdStub(int stubInstruction) {
 void stubCopy(void) {
   
   /* Change target status to busy to prevent other function to interrupt */
-  STUB->status = STUB_BUSY;
+  Stub->status = STUB_BUSY;
 
-  flashCopyFromSramToFlash(STUB->sramAddress, STUB->flashAddress, STUB->dataSize);
+  flashCopyFromSramToFlash(Stub->sramAddress, Stub->flashAddress, Stub->dataSize);
   
   /* Clear instruction prevent keep erase */
-  STUB->instruction = STUB_CLEAR;
+  Stub->instruction = STUB_CLEAR;
   
   /* Tell probe now target is ready for next instruction */
-  STUB->status = STUB_OK;
+  Stub->status = STUB_OK;
 }
 
 /**
@@ -64,15 +77,15 @@ void stubCopy(void) {
 void stubErase(void)  {
   
   /* Change target status to busy to prevent other function to interrupt */
-  STUB->status = STUB_BUSY;
+  Stub->status = STUB_BUSY;
   
-  flashErase(STUB->flashAddress, STUB->dataSize);
+  flashErase(Stub->flashAddress, Stub->dataSize);
   
   /* Clear instruction prevent keep erase */
-  STUB->instruction = STUB_CLEAR;
+  Stub->instruction = STUB_CLEAR;
   
   /* Tell probe now target is ready for next instruction */
-  STUB->status = STUB_OK;
+  Stub->status = STUB_OK;
 }
 
 /** stubMassErase is small program routine to erase specific 
@@ -84,15 +97,43 @@ void stubErase(void)  {
 void stubMassErase(void)  {
 
   /* Change target status to busy to prevent other function to interrupt */
-  STUB->status = STUB_BUSY;
+  Stub->status = STUB_BUSY;
   
-  flashMassErase(STUB->banks);
+  flashMassErase(Stub->banks);
     
   /* Clear instruction prevent keep erase */
-  STUB->instruction = STUB_CLEAR;
+  Stub->instruction = STUB_CLEAR;
 
   /* Tell probe now target is ready for next instruction */
-  STUB->status = STUB_OK;
+  Stub->status = STUB_OK;
+}
+
+void stubPrescaleSystemClock(void) {
+  /* Change target status to busy to prevent other function to interrupt */
+  Stub->status = STUB_BUSY;
+
+  /* Configure system clock */
+  configSystemClock(Stub->sysClockPrescale);
+  
+  /* Clear instruction prevent keep erase */
+  Stub->instruction = STUB_CLEAR;
+  
+  /* Tell probe now target is ready for next instruction */
+  Stub->status = STUB_OK;  
+}
+
+void stubGetSystemClock(void) {
+  /* Change target status to busy to prevent other function to interrupt */
+  Stub->status = STUB_BUSY;
+
+  /* Get system clock frequency */
+  Stub->sysClock = getSystemClock();
+  
+  /* Clear instruction prevent keep erase */
+  Stub->instruction = STUB_CLEAR;
+  
+  /* Tell probe now target is ready for next instruction */
+  Stub->status = STUB_OK;
 }
 
 /** svcServiceHandler is a svc handler written using C language
