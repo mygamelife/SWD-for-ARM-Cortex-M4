@@ -99,3 +99,10 @@ To understand detail about the particular instruction simply type in the followi
 ```
 help <instruction>
 ```
+The following example will show how to load elf file using CLI:
+To execute the load elf instruction we need file memory selection `ram/flash`. directory path and elf file name 
+Example your elf file is located in this directory `C:\Users\Demo\Projects\` and your elf file name is `Demo.elf`
+```
+load ram <> C:\Users\Demo\Projects\Demo.elf
+```
+Please be careful the `.elf` extension if it is missing the CLI will complains file path not found
