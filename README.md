@@ -82,3 +82,11 @@ To run all `probe` hardware-in-the-loop test:
 ```
 rake p=probe_hil.yml probe:hw:test:all
 ```
+
+CLI
+========
+To compile and release Command Line Interface for this project simply use the following command:
+```
+rake host:release
+```
+This command will automatic generate the Main.exe located in file build/release
