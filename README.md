@@ -90,3 +90,12 @@ To compile and release Command Line Interface for this project simply use the fo
 rake host:release
 ```
 This command will automatic generate the `Main.exe` located in file `build/release`
+
+The following CLI command will show the currently implemented instruction:
+```
+help
+```
+To understand detail about the particular instruction simply type in the following command to do that:
+```
+help <instruction>
+```
