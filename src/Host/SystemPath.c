@@ -4,6 +4,8 @@ char currentPath[FILENAME_MAX];
 char *buildRelease = "\\build\\release";
 
 int isCurrentDirectory(char *cwd) {
+  assert(cwd != NULL);
+  
   char *cwdPtr = strstr(cwd, buildRelease);
 
   if(cwdPtr != NULL) {
@@ -22,6 +24,7 @@ char *getCurrentDirectory(void) {
   }
   else {
     printf("Can't find current working directory\n");
+    return NULL;
   }
 }
 
@@ -35,7 +38,8 @@ char *getCurrentDirectory(void) {
   *             FP_OUTSIDE_CWD if outisde from the current directory
   */
 char *getFpPath(char *cwd) {
-
+  assert(cwd != NULL);
+  
   if(isCurrentDirectory(cwd))
   {
     return FP_INSIDE_CWD;

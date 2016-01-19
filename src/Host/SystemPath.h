@@ -3,6 +3,7 @@
 
 #include <stdio.h>  /* defines FILENAME_MAX */
 #include <string.h>
+#include <assert.h>
 #ifdef WINDOWS
     #include <direct.h>
     #define GetCurrentDir _getcwd
