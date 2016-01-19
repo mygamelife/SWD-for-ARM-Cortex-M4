@@ -103,6 +103,7 @@ Process_Status halt(Tlv_Session *session) {
   /* End tlv request task */
   endTask(tb);
 
+
   returnThis(PROCESS_DONE);
 }
 
@@ -118,7 +119,7 @@ Process_Status run(Tlv_Session *session) {
   static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
   TaskBlock *tb = &taskBlock;
-
+  uint32_t data = 0 ;
   if(session == NULL) Throw(TLV_NULL_SESSION);
 
   /* Start tlv request task */
@@ -135,6 +136,12 @@ Process_Status run(Tlv_Session *session) {
   /* End tlv request task */
   endTask(tb);
 
+  data = get4Byte(&response->value[0]) ;
+  #ifdef HOST
+  if(data != 0)
+    printf("PC stops at %x\n", get4Byte(&response->value[0]));
+  #endif
+  
   returnThis(PROCESS_DONE);
 }
 
@@ -171,6 +178,43 @@ uint32_t multipleStep(Tlv_Session *session, int nInstructions) {
   printf("value %x\n", get4Byte(&response->value[0]));
   #endif
 
+  returnThis(get4Byte(&response->value[0]));
+}
+
+/** stepOver is a function send tlv request to
+  * step over an instruction
+  *
+  * input   : session contain a element/handler used by tlv protocol
+  *
+  * return  : Current program counter address if successfully step
+  *           0 if waiting reply from probe
+  */
+uint32_t stepOver(Tlv_Session *session) 
+{
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start tlv request task */
+  startTask(tb);
+  /* Send tlv request */
+  tlvSendRequest(session, TLV_STEPOVER, 0, NULL);
+
+  /* Waiting reply from probe */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND,previousTime), tb);
+    yield(tb);
+  };
+
+  /* End tlv request task */
+  endTask(tb);
+  #ifdef HOST
+  printf("value %x\n", get4Byte(&response->value[0]));
+  #endif
   returnThis(get4Byte(&response->value[0]));
 }
 
@@ -610,6 +654,250 @@ Process_Status setBreakpoint(Tlv_Session *session, uint32_t address) {
   returnThis(PROCESS_DONE);
 }
 
+/** setWatchpoint is a function to set watchpoint
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           address is the address want to be stop at
+  *
+  * Return  : NONE
+  */
+Process_Status setWatchpoint(Tlv_Session *session, uint32_t address,uint32_t addressMask,uint32_t matchedData,int dataSize,uint32_t accessMode)
+{
+  static uint32_t previousTime = 0;
+  uint32_t data[] = {address, addressMask,matchedData,dataSize,accessMode};
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_WATCHPOINT, 20, (uint8_t *)data);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);
+}
+
+/** setInstructionRemapping is a function to remap instruction in Code space to RAM
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           instructionAddress is the address will be remapped
+  *           machineCode is the machine code that will remapped from the instructionAddress
+  *
+  * Return  : NONE
+  */
+Process_Status setInstructionRemapping(Tlv_Session *session,uint32_t instructionAddress,uint32_t machineCode)
+{
+  static uint32_t previousTime = 0;
+  uint32_t data[] = {instructionAddress, machineCode};
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_INSTRUCTION_REMAP, 8, (uint8_t *)data);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);
+}
+
+/** setLiteralRemapping is a function to remap literal data
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           literalAddress is the address will be remapped
+  *           literalData is the data that will remapped from the literalAddress
+  *
+  * Return  : NONE
+  */
+Process_Status setLiteralRemapping(Tlv_Session *session,uint32_t literalAddress,uint32_t literalData)
+{
+  static uint32_t previousTime = 0;
+  uint32_t data[] = {literalAddress, literalData};
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_LITERAL_REMAP, 8, (uint8_t *)data);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);
+}
+
+/** removeBreakpoint is a function to remove a single breakpoint
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           instructionAddress is the address set to breakpoint previously and going to be removed
+  *
+  * Return  : NONE
+  */
+Process_Status removeBreakpoint(Tlv_Session *session, uint32_t instructionAddress)
+{
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_REMOVE_BREAKPOINT, 4, (uint8_t *)&instructionAddress);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);
+}
+
+/** removeAllBreakpoint is a function to remove all breakpoint set
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *          
+  * Return  : NONE
+  */
+Process_Status removeAllBreakpoint(Tlv_Session *session)
+{
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_REMOVE_ALL_BREAKPOINT, 0, NULL);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);  
+}
+
+/** removeWatchpoint is a function to remove data watchpoint
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *          
+  * Return  : NONE
+  */
+Process_Status removeWatchpoint(Tlv_Session *session)
+{
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_REMOVE_WATCHPOINT, 0, NULL);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);     
+}
+
+/** stopFlashPatchRemapping is a function to stop single instruction/literal flash patch
+  * remapping
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *           address is the address going to be stop from remapping
+  *          
+  * Return  : NONE
+  */
+Process_Status stopFlashPatchRemapping(Tlv_Session *session,uint32_t address)
+{
+  static uint32_t previousTime = 0;
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_STOP_REMAP, 4, (uint8_t *)&address);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);
+}
+
+/** stopAllFlashPatchRemapping is a function to stop all instruction/literal flash patch
+  * remapping
+  *
+  * Input   : session contain a element/handler used by tlv protocol
+  *
+  * Return  : NONE
+  */
+Process_Status stopAllFlashPatchRemapping(Tlv_Session *session)
+{
+  static uint32_t previousTime = 0;  
+  static TaskBlock taskBlock = {.state = 0};
+  TaskBlock *tb = &taskBlock;
+
+  if(session == NULL) Throw(TLV_NULL_SESSION);
+
+  /* Start task */
+  startTask(tb);
+  tlvSendRequest(session, TLV_STOP_ALL_REMAP, 0, NULL);
+  /* Waiting reply */
+  previousTime = getSystemTime();
+  while((response = tlvReceive(session)) == NULL) {
+    /* Check is maximum timeout is reached */
+    isProbeAlive(isTimeout(FIVE_SECOND, previousTime), tb);
+    yield(tb);
+  };
+  /* End task */
+  endTask(tb);
+  returnThis(PROCESS_DONE);   
+}
+
 /** tlvWaitDebugEvents is a function to send expected event
   * to probe and wait for event to happen
   *
@@ -656,21 +944,32 @@ EventType tlvWaitDebugEvents(Tlv_Session *session, EventType event) {
 int selectCommand(Tlv_Session *session, User_Session *us) {
 
   switch(userSession->tlvCommand) {
-    case TLV_WRITE_RAM          : writeRam(session, (uint8_t *)us->data, us->address, us->size);    break;
-    case TLV_LOAD_RAM           : loadRam(session, us->program);                                    break;
-    case TLV_LOAD_FLASH         : loadFlash(session, us->program);                                  break;
-    case TLV_READ_MEMORY        : readMemory(session, us->address, us->size);                       break;
-    case TLV_WRITE_REGISTER     : writeRegister(session, us->address, us->data[0]);                 break;
-    case TLV_READ_REGISTER      : readRegister(session, us->address);                               break;
-    case TLV_HALT_TARGET        : halt(session);                                                    break;
-    case TLV_RUN_TARGET         : run(session);                                                     break;
-    case TLV_STEP               : multipleStep(session, us->data[0]);                               break;
-    case TLV_FLASH_ERASE        : eraseSection(session, us->address, us->size);                     break;
-    case TLV_FLASH_MASS_ERASE   : eraseAll(session, us->address);                                   break;
-    case TLV_BREAKPOINT         : setBreakpoint(session, us->address);                              break;
-    case TLV_SOFT_RESET         : softReset(session);                                               break;
-    case TLV_HARD_RESET         : hardReset(session);                                               break;
-    case TLV_EXIT               : systemExit(session);                                              break;
+    case TLV_WRITE_RAM              : writeRam(session, (uint8_t *)us->data, us->address, us->size);            break;
+    case TLV_LOAD_RAM               : loadRam(session, us->program);                                            break;
+    case TLV_LOAD_FLASH             : loadFlash(session, us->program);                                          break;
+    case TLV_READ_MEMORY            : readMemory(session, us->address, us->size);                               break;
+    case TLV_WRITE_REGISTER         : writeRegister(session, us->address, us->data[0]);                         break;
+    case TLV_READ_REGISTER          : readRegister(session, us->address);                                       break;
+    case TLV_HALT_TARGET            : halt(session);                                                            break;
+    case TLV_RUN_TARGET             : run(session);                                                             break;
+    case TLV_STEP                   : multipleStep(session, us->data[0]);                                       break;
+    case TLV_STEPOVER               : stepOver(session);                                                        break;
+    case TLV_FLASH_ERASE            : eraseSection(session, us->address, us->size);                             break;
+    case TLV_FLASH_MASS_ERASE       : eraseAll(session, us->address);                                           break;
+    case TLV_BREAKPOINT             : setBreakpoint(session, us->address);                                      break;
+    case TLV_WATCHPOINT             : setWatchpoint(session, us->address, us->data[0], us->data[1],
+                                      us->size, us->data[3]);                                                   break;
+    case TLV_INSTRUCTION_REMAP      : setInstructionRemapping(session, us->address, us->data[0]);               break;
+    case TLV_LITERAL_REMAP          : setLiteralRemapping(session, us->address, us->data[0]);                   break;
+    case TLV_SOFT_RESET             : softReset(session);                                                       break;
+    case TLV_HARD_RESET             : hardReset(session);                                                       break;
+    case TLV_VECT_RESET             : vectorReset(session);                                                     break;
+    case TLV_REMOVE_BREAKPOINT      : removeBreakpoint(session, us->address);                                   break;
+    case TLV_REMOVE_ALL_BREAKPOINT  : removeAllBreakpoint(session);                                             break;
+    case TLV_REMOVE_WATCHPOINT      : removeWatchpoint(session);                                                break;
+    case TLV_STOP_REMAP             : stopFlashPatchRemapping(session,us->address);                             break;
+    case TLV_STOP_ALL_REMAP         : stopAllFlashPatchRemapping(session);                                      break;
+    case TLV_EXIT                   : systemExit(session);                                                      break;
   }
 }
 

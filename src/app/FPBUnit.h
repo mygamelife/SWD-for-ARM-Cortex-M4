@@ -21,6 +21,7 @@ int manualSetLiteralRemapping(int literalCOMPno,uint32_t literalAddress, uint32_
 
 int autoSetInstructionBreakpoint(uint32_t instructionAddress);
 int autoSetInstructionRemapping(uint32_t instructionAddress,uint32_t machineCode);
+int autoSetLiteralRemapping(uint32_t literalAddress,uint32_t literalData);
 
 int disableFlashPatchInstructionComparator(int instructionCOMPno);
 int disableFlashPatchLiteralComparator(int literalCOMPno);
