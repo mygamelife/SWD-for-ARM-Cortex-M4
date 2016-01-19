@@ -527,7 +527,15 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
 
   /* Start task */
   startTask(tb);
-  p = getLoadableSection(getFpPath(getCurrentDirectory()));
+  
+  Try {
+    p = getLoadableSection(getFpPath(getCurrentDirectory()));
+  } Catch(err) {
+    resetTask(tb);
+    if(err == ERR_FILE_NOT_EXIST) {
+      Throw(ERR_FP_NOT_EXIST);
+    }
+  }
   /* Halt target from being running anything */
   await(halt(session), tb);
   /* Load Flash Programmer(FP) into target */
@@ -555,6 +563,7 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
   * Return  : NONE
   */
 Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
+  CEXCEPTION_T err;
   static Program *p;
   static uint32_t previousTime = 0;
   static TaskBlock taskBlock = {.state = 0};
@@ -565,7 +574,15 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
 
   /* Start task */
   startTask(tb);
-  p = getLoadableSection(getFpPath(getCurrentDirectory()));
+  
+  Try {
+    p = getLoadableSection(getFpPath(getCurrentDirectory()));
+  } Catch(err) {
+    resetTask(tb);
+    if(err == ERR_FILE_NOT_EXIST) {
+      Throw(ERR_FP_NOT_EXIST);
+    }
+  }
   /* Halt target from being running anything */
   await(halt(session), tb);
   /* Load Flash Programmer(FP) into target */
@@ -607,15 +624,12 @@ int loadFlash(Tlv_Session *session, Program *p) {
   previousTime = getSystemTime();
   /* Erase section */
   await(eraseSection(session, FLASH_BEGIN_ADDRESS, getTotalProgramSize(p)), tb);
-  // printf("Done Erase.....\n");
   /* Load actual program to flash */
   await(loadProgram(session, p, TLV_WRITE_FLASH), tb);
   /* Update program counter */
   await(writeRegister(session, PC, getEntryAddress(p)), tb);
-  // printf("Update PC........\n");
   /* Run the program */
   await(run(session), tb);
-  // printf("Run Program......\n");
   printf("Finish programmed in %.3fs\n\n", (getSystemTime() - previousTime) * 0.001);
   /* End task */
   endTask(tb);

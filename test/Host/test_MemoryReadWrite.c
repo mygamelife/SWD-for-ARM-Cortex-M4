@@ -4,6 +4,7 @@
 #include "SystemTime.h"
 #include "MemoryReadWrite.h"
 #include "CException.h"
+#include "ErrorCode.h"
 #include "mock_Uart.h"
 #include "mock_ProgramLoader.h"
 

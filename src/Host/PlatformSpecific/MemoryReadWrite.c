@@ -1,5 +1,5 @@
 #include "MemoryReadWrite.h"
-#include "string.h"
+
 /* Global Tlv Session */
 Tlv_Session *_session = NULL;
 
@@ -26,7 +26,10 @@ int memoryRead(uint32_t address, uint32_t *dataRead, int size) {
     while((data = readMemory(_session, address, size)) == NULL) {
       tlvService(_session);
     };
-  } Catch(err) { Throw(err); }
+  } Catch(err) {
+    displayErrorMessage(err);
+    Throw(err);
+  }
 
   if(size == WORD_SIZE)           {*dataRead = get4Byte(data);}
   else if(size == HALFWORD_SIZE)  {*dataRead = get2Byte(data);}
@@ -42,14 +45,17 @@ int memoryWrite(uint32_t address, uint32_t writeData, int size) {
     while(writeRam(_session, (uint8_t *)&writeData, address, size) != PROCESS_DONE) {
       tlvService(_session);
     };
-  } Catch(err) { Throw(err); }
+  } Catch(err) {
+    displayErrorMessage(err);
+    Throw(err);
+  }
 
   return 1;
 }
 
 int _flashWrite(uint32_t address, uint8_t *data, int size) {
   int status = 0;
-  
+
   Try {
     /* Erase flash */
     _flashErase(address, size);
@@ -57,7 +63,10 @@ int _flashWrite(uint32_t address, uint8_t *data, int size) {
     while(writeFlash(_session, data, address, size) != PROCESS_DONE) {
       tlvService(_session);
     };
-  } Catch(err) { Throw(err); }
+  } Catch(err) {
+    displayErrorMessage(err);
+    Throw(err);
+  }
 
   return 1;
 }
@@ -69,7 +78,10 @@ int _flashErase(uint32_t address, int size) {
     while(eraseSection(_session, address, size) != PROCESS_DONE) {
       tlvService(_session);
     };
-  } Catch(err) { Throw(err); }
+  } Catch(err) {
+    displayErrorMessage(err);
+    Throw(err);
+  }
 
   return 1;
 }

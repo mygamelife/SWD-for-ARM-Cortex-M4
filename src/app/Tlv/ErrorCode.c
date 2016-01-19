@@ -4,6 +4,7 @@ void displayErrorMessage(CEXCEPTION_T err) {
 
 	switch(err) {
     /* ############################################# Host error ######################################################### */
+    case TLV_NULL_SESSION               : printf("Err : TLV Session is null\n"                                              ); break;
     case TLV_TIMEOUT                    : printf("Err : Host time out\n"                                                    ); break;
     case TLV_INVALID_COMMAND            : printf("Err : Host received invalid command\n"                                    ); break;
     case TLV_CHECKSUM_ERROR             : printf("Err : Host received checksum error\n"                                     ); break;
@@ -53,6 +54,8 @@ void displayErrorMessage(CEXCEPTION_T err) {
                                           printf("There are several reasons can cause this issues, for example :\n"         );
                                           printf("- Serial cable is disconnected\n"                                         );
                                           printf("- Serial comm driver is corrupted or not installed\n"                     ); break;
+    /* ############################################## FP error ########################################################### */
+    case ERR_FP_NOT_EXIST               : printf("Err : FlashProgrammer.elf not found please check the current directory\n" ); break;
     /* ###################################### Undefine Error Code ######################################################## */
     default                             : printf("Err : Undefine error code %d\n", err);                                       break;
   }

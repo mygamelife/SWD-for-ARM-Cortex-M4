@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 #include "Yield.h"
+#include "string.h"
+#include "ErrorCode.h"
 #include "CException.h"
 #include "ProgramLoader.h"
 
