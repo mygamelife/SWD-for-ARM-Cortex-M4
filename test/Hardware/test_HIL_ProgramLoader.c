@@ -19,6 +19,7 @@
 #include "OperatorToken.h"
 #include "FileToken.h"
 #include "LoadElf.h"
+#include "SystemPath.h"
 #include "ProgramVerifier.h"
 
 static Tlv_Session *session = NULL;

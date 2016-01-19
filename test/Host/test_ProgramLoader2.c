@@ -12,6 +12,7 @@
 #include "CustomAssertion.h"
 #include "Yield.h"
 #include "LoadElf.h"
+#include "SystemPath.h"
 #include "mock_Uart.h"
 #include "mock_SystemTime.h"
 #include "mock_Interface.h"
@@ -72,7 +73,6 @@ void test_eraseSection_should_load_flash_programmer_if_it_is_not_loaded_before_s
   int i = 0;
   uartInit_Ignore();
 	Tlv_Session *session = tlvCreateSession();
-  Program *p = getLoadableSection("test/ElfFiles/ledRam.elf");
 
   printf(" ####################### Erase Section #######################\n");
 

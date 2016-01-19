@@ -12,6 +12,7 @@
 #include "CustomAssertion.h"
 #include "Yield.h"
 #include "LoadElf.h"
+#include "SystemPath.h"
 #include "mock_SystemTime.h"
 #include "mock_Uart.h"
 #include "mock_Interface.h"

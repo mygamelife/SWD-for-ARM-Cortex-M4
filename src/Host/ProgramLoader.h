@@ -11,18 +11,12 @@
 #include "Interface.h"
 #include "SystemTime.h"
 #include "ProgramVerifier.h"
+#include "SystemPath.h"
 
 typedef enum {
   PROCESS_BUSY = 0,
   PROCESS_DONE
 } Process_Status;
-
-#if defined(TEST)
-/* Flash Programmer File Path */
-#define FP_PATH    "test/ElfFiles/FlashProgrammer.elf"
-#else
-#define FP_PATH    "target/FlashProgrammer.elf"
-#endif
 
 /* ##### Host Interpreter Macros ##### */
 #define isProbeAlive(timeout, x)      do {  if(timeout)                     \

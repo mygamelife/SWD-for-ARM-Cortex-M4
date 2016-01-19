@@ -22,6 +22,7 @@
 #include "CoreDebug.h"
 #include "Yield.h"
 #include "LoadElf.h"
+#include "SystemPath.h"
 #include "ProgramVerifier.h"
 
 int initFlag = 0;

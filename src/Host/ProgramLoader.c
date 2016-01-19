@@ -527,7 +527,7 @@ Process_Status eraseSection(Tlv_Session *session, uint32_t address, int size) {
 
   /* Start task */
   startTask(tb);
-  p = getLoadableSection(FP_PATH);
+  p = getLoadableSection(getFpPath(getCurrentDirectory()));
   /* Halt target from being running anything */
   await(halt(session), tb);
   /* Load Flash Programmer(FP) into target */
@@ -565,7 +565,7 @@ Process_Status eraseAll(Tlv_Session *session, uint32_t banks) {
 
   /* Start task */
   startTask(tb);
-  p = getLoadableSection(FP_PATH);
+  p = getLoadableSection(getFpPath(getCurrentDirectory()));
   /* Halt target from being running anything */
   await(halt(session), tb);
   /* Load Flash Programmer(FP) into target */

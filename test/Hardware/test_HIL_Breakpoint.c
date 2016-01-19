@@ -24,6 +24,7 @@
 #include "FPBUnitEx.h"
 #include "Yield.h"
 #include "LoadElf.h"
+#include "SystemPath.h"
 #include "ProgramVerifier.h"
 
 #define CODE_SIZE (sizeof(machineCode) / sizeof(uint16_t))
