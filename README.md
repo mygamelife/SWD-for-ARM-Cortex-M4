@@ -65,13 +65,13 @@ rake hw:flash elf_to_hex="/e/ProgramFiles/GNU Tools ARM Embedded/4.9 2015q1/bin/
 
 Tests
 =====
-There is 2 different platform dependent test in this project which is specified in `host` and `probe`.
+There are 2 different platform `host` and `probe` dependent test in this project.
 
 To run all `host` test in command :
 ```
 rake host:test:all
 ```
-There is some different from running `probe` test because there are 2 different type of test one is running on ceedling using mock and the another hand is running on the actual hardware called hardware-in-the-loop test in `test/Hardware`. Therefore we need to load a specified `.yml` in order to run the `probe:test:all`.
+There are some difference from running `probe` test because there are 2 different type of test one is running on ceedling using mock and the another hand is running on the actual hardware called hardware-in-the-loop test in `test/Hardware`. Therefore we need to load a custom `.yml` in order to run the `probe:test:all`.
 
 To run all `probe` test running on ceedling:
 ```
